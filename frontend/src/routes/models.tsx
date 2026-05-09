@@ -40,17 +40,21 @@ const EXAMPLE_TEXTS = [
   "Somali pirates operating from Puntland hijacked a Turkish-owned cargo vessel with 23 Filipino and Indian crew members off the coast of Mogadishu on April 8th, demanding a $5 million ransom, while Al Shabaab militants simultaneously attacked the Kenyan Defense Forces base in Lamu County, killing 3 American military contractors and 8 Kenyan soldiers.",
 ]
 
+// 8-entity schema colors (optimized for grounding)
 const ENTITY_COLORS: Record<string, string> = {
-  PERPETRATOR: 'bg-red-500/20 text-red-700 dark:text-red-300 border-red-500',
+  // WHO (1 type - merged)
+  ACTOR: 'bg-red-500/20 text-red-700 dark:text-red-300 border-red-500',
+  // WHOM (1 type)
   VICTIM: 'bg-orange-500/20 text-orange-700 dark:text-orange-300 border-orange-500',
-  ACTOR: 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border-yellow-500',
-  GROUP: 'bg-pink-500/20 text-pink-700 dark:text-pink-300 border-pink-500',
-  EVENT_TYPE: 'bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-500',
-  WEAPON: 'bg-slate-500/20 text-slate-700 dark:text-slate-300 border-slate-500',
+  // WHAT (1 type)
+  ACTION: 'bg-violet-500/20 text-violet-700 dark:text-violet-300 border-violet-500',
+  // WHEN (1 type)
   DATE: 'bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500',
-  COUNTRY: 'bg-green-500/20 text-green-700 dark:text-green-300 border-green-500',
+  // WHERE (3 types)
+  REGION: 'bg-teal-500/20 text-teal-700 dark:text-teal-300 border-teal-500',
   CITY: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500',
-  LOCATION: 'bg-teal-500/20 text-teal-700 dark:text-teal-300 border-teal-500',
+  DISTRICT: 'bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border-cyan-500',
+  // HOW (1 type)
   CASUALTIES: 'bg-rose-500/20 text-rose-700 dark:text-rose-300 border-rose-500',
 }
 
@@ -154,9 +158,9 @@ export default function Models({ loaderData }: Route.ComponentProps) {
       setFormData({
         event_description: result.text,
         actor_normalized: structured.who?.[0] || '',
-        victim_normalized: structured.who?.[1] || '',
+        victim_normalized: structured.whom?.[0] || '',
         location_country: structured.where?.find(w =>
-          result.entities.some(e => e.label === 'COUNTRY' && e.text === w)
+          result.entities.some(e => e.label === 'REGION' && e.text === w)
         ) || structured.where?.[0] || '',
         location_city: structured.where?.find(w =>
           result.entities.some(e => e.label === 'CITY' && e.text === w)
@@ -568,32 +572,37 @@ export default function Models({ loaderData }: Route.ComponentProps) {
             </div>
 
             {/* 5W1H Structure - Grouped by specific entity types */}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
               {[
                 {
                   key: 'who',
                   label: 'WHO',
-                  types: ['PERPETRATOR', 'VICTIM', 'TARGET', 'ORGANIZATION', 'GOVERNMENT']
+                  types: ['ACTOR']
+                },
+                {
+                  key: 'whom',
+                  label: 'WHOM',
+                  types: ['VICTIM']
                 },
                 {
                   key: 'what',
                   label: 'WHAT',
-                  types: ['EVENT_TYPE', 'ACTION', 'WEAPON', 'VIOLENCE_TYPE']
+                  types: ['ACTION']
                 },
                 {
                   key: 'when',
                   label: 'WHEN',
-                  types: ['DATE', 'TIME', 'DURATION', 'FREQUENCY']
+                  types: ['DATE']
                 },
                 {
                   key: 'where',
                   label: 'WHERE',
-                  types: ['COUNTRY', 'REGION', 'CITY', 'DISTRICT', 'FACILITY', 'GEOGRAPHIC', 'COORDINATES']
+                  types: ['REGION', 'CITY', 'DISTRICT']
                 },
                 {
                   key: 'how',
                   label: 'HOW',
-                  types: ['CASUALTIES', 'INJURED', 'DISPLACEMENT', 'DAMAGE', 'MOTIVE', 'TRIGGER']
+                  types: ['CASUALTIES']
                 },
               ].map(({ key, label, types }) => {
                 // Group entities by their specific type within this category

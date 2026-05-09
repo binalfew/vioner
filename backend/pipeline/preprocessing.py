@@ -1,15 +1,18 @@
 """
 Data Preprocessing - Week 9-10
-Converts cleaned CSV annotations to BIO-tagged format for NER training
+Converts ACLED JSONL or CSV annotations to BIO-tagged JSONL format for NER training
 
 Author: Binalfew Kassa Mekonnen
 Date: December 2025
 
-Enhanced with:
-- Expanded 26-entity schema support
+Features:
+- 8-entity schema optimized for grounded extraction (5W1H framework)
+- Supports both JSONL and CSV input formats
+- Outputs JSONL format for memory-efficient training
 - Improved tokenization for African names (hyphens, apostrophes, diacritics)
-- Better overlap resolution preserving valid sub-entities
-- Multi-event text handling via event_segmentation module
+- Smart entity extraction with grounding verification
+
+Note: Event type classification (taxonomy) is handled separately as a post-NER task.
 """
 
 import pandas as pd
@@ -28,38 +31,48 @@ logger = logging.getLogger(__name__)
 
 
 # ============================================================================
-# ENTITY COLUMNS - Expanded 26-type schema
+# ENTITY COLUMNS - 8-type schema (optimized for grounded extraction)
 # ============================================================================
 
-# Core entity columns (backward compatible with original 8-type schema)
-CORE_ENTITY_COLUMNS = [
-    'PERPETRATOR', 'VICTIM', 'EVENT_TYPE', 'WEAPON',
-    'DATE', 'COUNTRY', 'CITY', 'CASUALTIES'
+# Entity columns for 8-type grounded schema
+ENTITY_COLUMNS = [
+    # WHO (1 type) - All actors merged
+    'ACTOR',
+    # WHOM (1 type) - Victims
+    'VICTIM',
+    # WHAT (1 type) - Actions
+    'ACTION',
+    # WHEN (1 type)
+    'DATE',
+    # WHERE (3 types)
+    'REGION', 'CITY', 'DISTRICT',
+    # HOW (1 type)
+    'CASUALTIES',
 ]
-
-# Extended entity columns for full 26-type schema
-EXTENDED_ENTITY_COLUMNS = [
-    # WHO (5 types)
-    'PERPETRATOR', 'VICTIM', 'TARGET', 'ORGANIZATION', 'GOVERNMENT',
-    # WHAT (4 types)
-    'EVENT_TYPE', 'ACTION', 'WEAPON', 'VIOLENCE_TYPE',
-    # WHEN (4 types)
-    'DATE', 'TIME', 'DURATION', 'FREQUENCY',
-    # WHERE (7 types)
-    'COUNTRY', 'REGION', 'CITY', 'DISTRICT', 'FACILITY', 'GEOGRAPHIC', 'COORDINATES',
-    # HOW (4 types)
-    'CASUALTIES', 'INJURED', 'DISPLACEMENT', 'DAMAGE',
-    # WHY (2 types)
-    'MOTIVE', 'TRIGGER',
-]
-
-# Default to extended columns, fallback to core if columns not present
-ENTITY_COLUMNS = EXTENDED_ENTITY_COLUMNS
 
 
 # ============================================================================
 # AFRICAN NAME PATTERNS
 # ============================================================================
+
+# African country names - should NEVER be labeled as ACTOR or VICTIM
+AFRICAN_COUNTRIES = {
+    'Nigeria', 'Somalia', 'Sudan', 'South Sudan', 'Ethiopia', 'Kenya',
+    'Uganda', 'Tanzania', 'Rwanda', 'Burundi', 'DRC', 'Congo',
+    'Democratic Republic of Congo', 'Central African Republic', 'CAR',
+    'Cameroon', 'Chad', 'Niger', 'Mali', 'Burkina Faso', 'Senegal',
+    'Guinea', 'Sierra Leone', 'Liberia', 'Ghana', 'Togo', 'Benin',
+    'Ivory Coast', "Cote d'Ivoire", 'Mauritania', 'Libya', 'Egypt',
+    'Tunisia', 'Algeria', 'Morocco', 'South Africa', 'Zimbabwe',
+    'Zambia', 'Malawi', 'Mozambique', 'Angola', 'Namibia', 'Botswana',
+    'Lesotho', 'Eswatini', 'Swaziland', 'Madagascar', 'Mauritius',
+    'Djibouti', 'Eritrea', 'Gabon', 'Equatorial Guinea',
+    'Republic of Congo', 'Congo-Brazzaville', 'Gambia', 'Guinea-Bissau',
+    'Cape Verde', 'Comoros', 'Seychelles', 'São Tomé and Príncipe',
+}
+
+# Lowercase version for case-insensitive matching
+AFRICAN_COUNTRIES_LOWER = {c.lower() for c in AFRICAN_COUNTRIES}
 
 # Common African name patterns that should be kept together
 AFRICAN_NAME_PATTERNS = [
@@ -93,29 +106,50 @@ AFRICAN_NAME_REGEX = re.compile(
 
 
 class AnnotationPreprocessor:
-    """Convert cleaned CSV annotations to BIO-tagged NER format."""
+    """Convert ACLED JSONL or CSV annotations to BIO-tagged JSONL format."""
 
-    def __init__(self, csv_file: str, output_dir: str = 'data/processed'):
+    def __init__(self, input_file: str, output_dir: str = 'data/processed'):
         """
         Initialize preprocessor.
 
         Args:
-            csv_file: Path to cleaned CSV file with verified entity spans
+            input_file: Path to JSONL or CSV file with annotations
             output_dir: Directory to save processed data
         """
-        self.csv_file = csv_file
+        self.input_file = input_file
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         self.label2id = LabelConfigs.get_label2id()
         self.id2label = LabelConfigs.get_id2label()
 
-    def load_csv(self) -> pd.DataFrame:
-        """Load CSV file with annotations."""
-        logger.info(f"Loading CSV from: {self.csv_file}")
-        df = pd.read_csv(self.csv_file)
-        logger.info(f"Loaded {len(df)} events")
-        return df
+        # Determine input format
+        self.is_jsonl = input_file.endswith('.jsonl')
+
+    def load_data(self) -> List[Dict]:
+        """Load data from JSONL or CSV file."""
+        if self.is_jsonl:
+            return self.load_jsonl()
+        else:
+            return self.load_csv()
+
+    def load_jsonl(self) -> List[Dict]:
+        """Load JSONL file with ACLED annotations."""
+        logger.info(f"Loading JSONL from: {self.input_file}")
+        events = []
+        with open(self.input_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                if line.strip():
+                    events.append(json.loads(line))
+        logger.info(f"Loaded {len(events)} events from JSONL")
+        return events
+
+    def load_csv(self) -> List[Dict]:
+        """Load CSV file with annotations and convert to list of dicts."""
+        logger.info(f"Loading CSV from: {self.input_file}")
+        df = pd.read_csv(self.input_file)
+        logger.info(f"Loaded {len(df)} events from CSV")
+        return df.to_dict('records')
 
     def extract_entities_from_row(self, row: pd.Series) -> List[Dict]:
         """
@@ -216,60 +250,352 @@ class AnnotationPreprocessor:
         entities.sort(key=lambda x: x['start'])
         return entities
 
+    def extract_entities_from_jsonl_event(self, event: Dict) -> List[Dict]:
+        """
+        Extract entities from an ACLED JSONL event.
+
+        The JSONL has an 'entities' array with entity information.
+        We extract only entities that are grounded in the text.
+        Also extracts DATE from natural language patterns.
+
+        Returns list of entities: [{'text': 'M23', 'type': 'PERPETRATOR', 'start': 21, 'end': 24}, ...]
+        """
+        entities = []
+        text = event.get('text', '')
+
+        if not text:
+            return entities
+
+        # Extract DATE from natural language patterns first
+        date_entities = self._extract_dates_from_text(text)
+        entities.extend(date_entities)
+
+        # Extract CASUALTIES from natural language patterns
+        casualty_entities = self._extract_casualties_from_text(text)
+        entities.extend(casualty_entities)
+
+        # Get pre-annotated entities from JSONL
+        jsonl_entities = event.get('entities', [])
+
+        for ent in jsonl_entities:
+            ent_type = ent.get('type', '')
+            ent_text = ent.get('text', '')
+
+            # Skip entity types not in our 12-type schema
+            if ent_type not in ENTITY_COLUMNS:
+                continue
+
+            # Skip empty or very short entities
+            if not ent_text or len(ent_text) < 2:
+                continue
+
+            # Try to find the entity text in the event text
+            grounded_text = self._find_grounded_text(ent_text, text)
+
+            if grounded_text:
+                # Find position in text
+                match = re.search(rf'\b{re.escape(grounded_text)}\b', text, re.IGNORECASE)
+                if match:
+                    actual_text = text[match.start():match.end()]
+
+                    # CRITICAL FIX: Country names should NEVER be ACTOR or VICTIM
+                    # They should be REGION or skipped entirely
+                    corrected_type = self._correct_country_label(actual_text, ent_type)
+
+                    # Skip if country name was incorrectly labeled as ACTOR/VICTIM
+                    if corrected_type is None:
+                        continue
+
+                    entities.append({
+                        'text': actual_text,
+                        'type': corrected_type,
+                        'start': match.start(),
+                        'end': match.end(),
+                    })
+
+        # Remove overlapping entities
+        entities = self._remove_overlapping_entities(entities)
+
+        # Sort by start position
+        entities.sort(key=lambda x: x['start'])
+        return entities
+
+    def _extract_dates_from_text(self, text: str) -> List[Dict]:
+        """
+        Extract DATE entities from natural language text.
+
+        Patterns matched:
+        - "20 December 2024" / "20 Dec 2024" (full and abbreviated months)
+        - "December 20, 2024"
+        - "December 2024"
+        - "early/mid/late December 2024"
+        - "On Monday" / "last Tuesday" (day of week)
+        """
+        entities = []
+
+        # Full month names
+        full_months = r'(?:January|February|March|April|May|June|July|August|September|October|November|December)'
+        # Abbreviated month names
+        abbrev_months = r'(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)'
+        # Combined
+        all_months = f'(?:{full_months}|{abbrev_months})'
+
+        # Date patterns (ordered from most specific to least specific)
+        date_patterns = [
+            # "20 December 2024" or "20 Dec 2024" or "20 December, 2024"
+            rf'\b(\d{{1,2}}\s+{all_months},?\s+\d{{4}})\b',
+            # "December 20, 2024" or "Dec 20 2024"
+            rf'\b({all_months}\s+\d{{1,2}},?\s+\d{{4}})\b',
+            # "early/mid/late December 2024"
+            rf'\b((?:early|mid|late)\s+{all_months}\s+\d{{4}})\b',
+            # Month Year (e.g., "December 2024", "Dec 2024")
+            rf'\b({all_months}\s+\d{{4}})\b',
+            # Day of week with context (e.g., "on Monday", "last Tuesday")
+            r'\b((?:on\s+|last\s+|this\s+)?(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)(?:\s+(?:morning|afternoon|evening|night))?)\b',
+        ]
+
+        found_spans = set()  # Track found spans to avoid duplicates
+
+        for pattern in date_patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE):
+                span = (match.start(), match.end())
+                # Avoid overlapping dates
+                if not any(s[0] <= span[0] < s[1] or s[0] < span[1] <= s[1] for s in found_spans):
+                    entities.append({
+                        'text': match.group(1),
+                        'type': 'DATE',
+                        'start': match.start(),
+                        'end': match.end(),
+                    })
+                    found_spans.add(span)
+
+        return entities
+
+    def _extract_casualties_from_text(self, text: str) -> List[Dict]:
+        """
+        Extract CASUALTIES entities from natural language text.
+
+        Patterns matched:
+        - "killed 15 people" / "15 killed"
+        - "at least 20 dead"
+        - "5 soldiers killed"
+        - "killing 10"
+        - "left 3 dead"
+        """
+        entities = []
+
+        # Casualty patterns (capture the number and context)
+        casualty_patterns = [
+            # "killed/kills X people/soldiers/etc"
+            r'\b(kill(?:ed|ing|s)?\s+(?:at\s+least\s+)?(\d+)(?:\s+\w+)?)\b',
+            # "X killed/dead"
+            r'\b((\d+)\s+(?:\w+\s+)?(?:killed|dead|died|slain))\b',
+            # "at least X dead/killed"
+            r'\b(at\s+least\s+(\d+)\s+(?:\w+\s+)?(?:dead|killed|died))\b',
+            # "left X dead"
+            r'\b(left\s+(\d+)\s+(?:\w+\s+)?dead)\b',
+            # "X fatalities/casualties/deaths"
+            r'\b((\d+)\s+(?:fatalit(?:y|ies)|casualt(?:y|ies)|deaths?))\b',
+            # "claiming X lives"
+            r'\b(claiming\s+(\d+)\s+lives?)\b',
+        ]
+
+        found_spans = set()
+
+        for pattern in casualty_patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE):
+                span = (match.start(), match.end())
+                # Avoid overlapping
+                if not any(s[0] <= span[0] < s[1] or s[0] < span[1] <= s[1] for s in found_spans):
+                    entities.append({
+                        'text': match.group(1),
+                        'type': 'CASUALTIES',
+                        'start': match.start(),
+                        'end': match.start() + len(match.group(1)),
+                    })
+                    found_spans.add(span)
+
+        return entities
+
+    def _correct_country_label(self, entity_text: str, original_type: str) -> Optional[str]:
+        """
+        Correct entity labels for country names.
+
+        Country names should NEVER be labeled as ACTOR or VICTIM.
+        - If labeled as ACTOR/VICTIM, return None (skip the entity)
+        - If labeled as REGION, keep it
+        - Otherwise, keep original label
+
+        Args:
+            entity_text: The actual entity text
+            original_type: The original entity type from ACLED
+
+        Returns:
+            Corrected entity type, or None to skip the entity
+        """
+        # Check if entity is a country name
+        entity_lower = entity_text.lower().strip()
+
+        # Check against country list
+        is_country = entity_lower in AFRICAN_COUNTRIES_LOWER
+
+        # Also check if it's a partial match (e.g., "Nigeria" in "central Nigeria")
+        if not is_country:
+            for country in AFRICAN_COUNTRIES_LOWER:
+                if entity_lower == country or entity_lower.endswith(country):
+                    is_country = True
+                    break
+
+        if is_country:
+            # Country names should NOT be ACTOR or VICTIM
+            if original_type in ('ACTOR', 'VICTIM'):
+                # Skip this entity entirely - it's incorrectly labeled
+                return None
+            # If it's already REGION, keep it
+            elif original_type == 'REGION':
+                return 'REGION'
+            # Otherwise, keep the original type
+            else:
+                return original_type
+
+        # Not a country - return original type
+        return original_type
+
+    def _find_grounded_text(self, normalized_text: str, event_text: str) -> Optional[str]:
+        """
+        Find the actual grounded text in the event text.
+
+        Handles cases like:
+        - "M23: March 23 Movement" -> "M23" (prefix before colon)
+        - "Military Forces of the Democratic Republic of Congo" -> "FARDC" or "military forces"
+        - "Rapid Support Forces" -> "RSF" (abbreviation)
+        - "Democratic Republic of Congo" -> "DRC" or "Congo"
+        - Direct match
+        """
+        event_text_lower = event_text.lower()
+
+        # Strategy 1: Direct match
+        if normalized_text.lower() in event_text_lower:
+            return normalized_text
+
+        # Strategy 2: Prefix before colon (e.g., "M23: March 23 Movement" -> "M23")
+        if ':' in normalized_text:
+            prefix = normalized_text.split(':')[0].strip()
+            if prefix.lower() in event_text_lower:
+                return prefix
+
+        # Strategy 3: First word (e.g., "Al Shabaab" from full name)
+        first_word = normalized_text.split()[0] if normalized_text.split() else ''
+        if len(first_word) >= 2 and first_word.lower() in event_text_lower:
+            return first_word
+
+        # Strategy 4: Try first N words (for multi-word matches)
+        words = normalized_text.split()
+        for n in range(min(3, len(words)), 0, -1):
+            partial = ' '.join(words[:n])
+            if len(partial) >= 3 and partial.lower() in event_text_lower:
+                return partial
+
+        # Strategy 5: Common abbreviations and alternative names
+        abbrev_map = {
+            # Armed forces
+            'Rapid Support Forces': ['RSF', 'Rapid Support', 'paramilitary'],
+            'Military Forces of': ['military forces', 'army', 'soldiers', 'troops', 'military'],
+            'Sudan Armed Forces': ['SAF', 'Sudan Armed', 'Sudanese military', 'Sudanese army'],
+            'Armed Forces of the Democratic Republic of Congo': ['FARDC', 'Congolese military', 'DRC military'],
+            'Sudanese Armed Forces': ['SAF', 'Sudanese military', 'army'],
+            'Police Forces of': ['police', 'security forces'],
+            'Military Forces of': ['military', 'army', 'soldiers', 'troops', 'forces'],
+            # Countries - expanded
+            'Democratic Republic of Congo': ['DRC', 'Congo', 'DR Congo', 'Congolese'],
+            'Central African Republic': ['CAR', 'Central Africa', 'Central African'],
+            'South Sudan': ['South Sudan', 'S. Sudan', 'South Sudanese'],
+            'South Africa': ['South Africa', 'SA'],
+            'Burkina Faso': ['Burkina Faso', 'Burkina', 'Burkinabe'],
+            'Cote d\'Ivoire': ['Cote d\'Ivoire', 'Ivory Coast'],
+            'Ethiopia': ['Ethiopia', 'Ethiopian'],
+            'Nigeria': ['Nigeria', 'Nigerian'],
+            'Somalia': ['Somalia', 'Somali'],
+            'Sudan': ['Sudan', 'Sudanese'],
+            'Kenya': ['Kenya', 'Kenyan'],
+            'Mali': ['Mali', 'Malian'],
+            'Cameroon': ['Cameroon', 'Cameroonian'],
+            'Uganda': ['Uganda', 'Ugandan'],
+            'Libya': ['Libya', 'Libyan'],
+            'Niger': ['Niger', 'Nigerien'],
+            'Chad': ['Chad', 'Chadian'],
+            'Mozambique': ['Mozambique', 'Mozambican'],
+            # Organizations
+            'Al-Shabaab': ['Al-Shabaab', 'al Shabaab', 'Shabaab', 'al-Shabab'],
+            'Boko Haram': ['Boko Haram', 'Boko', 'ISWAP'],
+            'Islamic State': ['ISIS', 'ISIL', 'Islamic State', 'IS fighters', 'jihadists'],
+            'Allied Democratic Forces': ['ADF', 'Allied Democratic'],
+            # Event types - expanded
+            'Armed clash': ['clash', 'clashed', 'clashes', 'fighting', 'battled', 'engagement', 'battle'],
+            'Battles': ['battle', 'battles', 'clash', 'clashes', 'fighting', 'confrontation', 'combat'],
+            'Violence against civilians': ['attacked', 'killed', 'assault', 'violence', 'murdered', 'targeted'],
+            'Protests': ['protest', 'protesters', 'demonstration', 'rally', 'demonstrators'],
+            'Riots': ['riot', 'riots', 'rioting', 'mob'],
+            'Explosions/Remote violence': ['explosion', 'bomb', 'shelling', 'airstrike', 'IED', 'blast', 'strike'],
+            'Strategic developments': ['ceasefire', 'agreement', 'negotiation', 'treaty', 'peace'],
+            'Looting/property destruction': ['looted', 'destroyed', 'burned', 'arson', 'vandalized'],
+            'Abduction/forced disappearance': ['kidnapped', 'abducted', 'seized', 'taken hostage'],
+            # Casualties - expanded
+            'Fatalities reported': ['killed', 'died', 'dead', 'fatalities', 'casualties', 'death', 'deaths'],
+            # Victims - expanded
+            'Civilians': ['civilians', 'villagers', 'residents', 'people', 'individuals', 'persons'],
+        }
+
+        normalized_lower = normalized_text.lower()
+        for pattern, alternatives in abbrev_map.items():
+            if pattern.lower() in normalized_lower:
+                for alt in alternatives:
+                    if alt.lower() in event_text_lower:
+                        return alt
+
+        # Strategy 6: Last word fallback for locations (e.g., "Borno State" -> "Borno")
+        if len(words) >= 2:
+            last_word = words[-1]
+            if len(last_word) >= 3 and last_word.lower() in event_text_lower:
+                return last_word
+
+        return None
+
     def _remove_overlapping_entities(self, entities: List[Dict]) -> List[Dict]:
         """
         Resolve overlapping entities while preserving valid sub-entities.
 
-        Improved algorithm:
-        1. Keep longer entities when they fully contain shorter ones of same type
-        2. For different types, use priority but allow non-overlapping sub-spans
-        3. Handle nested entities (e.g., "Nigerian Army" contains "Nigeria")
-
-        Priority (expanded for 26-type schema):
-        - WHO: PERPETRATOR(10) > GOVERNMENT(9) > ORGANIZATION(8) > TARGET(7) > VICTIM(6)
-        - WHAT: EVENT_TYPE(8) > ACTION(7) > WEAPON(6) > VIOLENCE_TYPE(5)
-        - WHEN: DATE(7) > TIME(6) > DURATION(5) > FREQUENCY(4)
-        - WHERE: FACILITY(9) > CITY(8) > DISTRICT(7) > REGION(6) > COUNTRY(5) > GEOGRAPHIC(4) > COORDINATES(3)
-        - HOW: CASUALTIES(8) > INJURED(7) > DISPLACEMENT(6) > DAMAGE(5)
-        - WHY: MOTIVE(6) > TRIGGER(5)
+        Priority (12-type schema):
+        - WHO: PERPETRATOR(10) > GOVERNMENT(9) > ORGANIZATION(8)
+        - WHOM: VICTIM(6)
+        - WHAT: EVENT_TYPE(8) > ACTION(7)
+        - WHEN: DATE(7)
+        - WHERE: CITY(8) > DISTRICT(7) > REGION(6) > COUNTRY(5)
+        - HOW: CASUALTIES(8)
         """
         if not entities:
             return entities
 
-        # Extended priority mapping for 26-type schema
+        # Priority mapping for 12-type schema
         type_priority = {
-            # WHO
+            # WHO (3 types)
             'PERPETRATOR': 10,
             'GOVERNMENT': 9,
             'ORGANIZATION': 8,
-            'TARGET': 7,
+            # WHOM (1 type)
             'VICTIM': 6,
-            # WHAT
+            # WHAT (2 types)
             'EVENT_TYPE': 8,
             'ACTION': 7,
-            'WEAPON': 6,
-            'VIOLENCE_TYPE': 5,
-            # WHEN
+            # WHEN (1 type)
             'DATE': 7,
-            'TIME': 6,
-            'DURATION': 5,
-            'FREQUENCY': 4,
-            # WHERE (facility > specific > general)
-            'FACILITY': 9,
+            # WHERE (4 types) - specific > general
             'CITY': 8,
             'DISTRICT': 7,
             'REGION': 6,
             'COUNTRY': 5,
-            'GEOGRAPHIC': 4,
-            'COORDINATES': 3,
-            # HOW
+            # HOW (1 type)
             'CASUALTIES': 8,
-            'INJURED': 7,
-            'DISPLACEMENT': 6,
-            'DAMAGE': 5,
-            # WHY
-            'MOTIVE': 6,
-            'TRIGGER': 5,
         }
 
         def get_priority(entity_type: str) -> int:
@@ -340,13 +666,13 @@ class AnnotationPreprocessor:
         Special handling for nested location entities.
 
         Examples:
-        - "Maiduguri, Borno State, Nigeria" - keep all three levels
-        - "northern Nigeria" - keep both GEOGRAPHIC and COUNTRY
+        - "Luofu (Batangi, Lubero, Nord-Kivu)" - keep all levels
+        - "Maiduguri, Borno State" - keep CITY and REGION
 
         This is called after initial overlap resolution to add back
         valid nested location hierarchies.
         """
-        location_types = {'COUNTRY', 'REGION', 'CITY', 'DISTRICT', 'FACILITY', 'GEOGRAPHIC'}
+        location_types = {'COUNTRY', 'REGION', 'CITY', 'DISTRICT'}
 
         # Find location entities
         location_entities = [e for e in entities if e['type'] in location_types]
@@ -356,10 +682,8 @@ class AnnotationPreprocessor:
             return entities
 
         # For each pair of location entities, check if they form a valid hierarchy
-        # (This is a simplified version - full implementation would use gazetteers)
         result_locations = []
         for loc in location_entities:
-            # Check if this location is contained within another but of different granularity
             is_valid = True
             for other_loc in location_entities:
                 if loc == other_loc:
@@ -368,10 +692,11 @@ class AnnotationPreprocessor:
                 # If same span but different type, keep the more specific one
                 if loc['start'] == other_loc['start'] and loc['end'] == other_loc['end']:
                     # Keep more specific (higher priority in location hierarchy)
-                    loc_specificity = ['COORDINATES', 'FACILITY', 'DISTRICT', 'CITY', 'REGION', 'COUNTRY', 'GEOGRAPHIC']
-                    if loc_specificity.index(loc['type']) > loc_specificity.index(other_loc['type']):
-                        is_valid = False
-                        break
+                    loc_specificity = ['DISTRICT', 'CITY', 'REGION', 'COUNTRY']
+                    if loc['type'] in loc_specificity and other_loc['type'] in loc_specificity:
+                        if loc_specificity.index(loc['type']) > loc_specificity.index(other_loc['type']):
+                            is_valid = False
+                            break
 
             if is_valid:
                 result_locations.append(loc)
@@ -485,26 +810,45 @@ class AnnotationPreprocessor:
 
         return list(zip(tokens, token_labels))
 
-    def process_single_event(self, row: pd.Series) -> Optional[Dict]:
+    def process_single_event(self, event: Dict) -> Optional[Dict]:
         """
-        Process a single event from CSV to NER format.
+        Process a single event from JSONL or CSV to NER format.
+
+        Args:
+            event: Dict with event data (from JSONL or CSV row)
 
         Returns:
             {
-                'id': 'EVENT_001',
-                'text': 'Armed militants...',
-                'tokens': ['Armed', 'militants', ...],
-                'labels': ['B-PERPETRATOR', 'I-PERPETRATOR', ...],
-                'entities': [{'text': 'Boko Haram', 'type': 'PERPETRATOR'}, ...]
+                'id': 'DRC34304',
+                'text': 'On 20 December 2024, M23...',
+                'tokens': ['On', '20', 'December', ...],
+                'labels': ['O', 'B-DATE', 'I-DATE', ...],
+                'entities': [{'text': 'M23', 'type': 'PERPETRATOR'}, ...]
             }
         """
-        event_id = row.get('Event_ID', '')
-        text = row.get('Event_Description', '')
+        # Handle both JSONL and CSV formats
+        if self.is_jsonl:
+            event_id = event.get('event_id', '')
+            text = event.get('text', '')
+        else:
+            event_id = event.get('Event_ID', '')
+            text = event.get('Event_Description', '')
 
-        if pd.isna(text) or not text.strip():
+        if not text or (isinstance(text, float) and pd.isna(text)):
             return None
 
-        entities = self.extract_entities_from_row(row)
+        text = str(text).strip()
+        if not text:
+            return None
+
+        # Extract entities based on input format
+        if self.is_jsonl:
+            entities = self.extract_entities_from_jsonl_event(event)
+        else:
+            # Convert dict to Series for CSV processing
+            row = pd.Series(event)
+            entities = self.extract_entities_from_row(row)
+
         bio_tagged = self.create_bio_tags(text, entities)
 
         if not bio_tagged:
@@ -530,20 +874,21 @@ class AnnotationPreprocessor:
         Returns:
             (train_data, val_data)
         """
-        df = self.load_csv()
+        events = self.load_data()
+        total_events = len(events)
 
-        logger.info("Processing events...")
+        logger.info(f"Processing {total_events} events...")
         processed_events = []
 
-        for row_num, (_, row) in enumerate(df.iterrows(), start=1):
-            event_data = self.process_single_event(row)
+        for idx, event in enumerate(events, start=1):
+            event_data = self.process_single_event(event)
             if event_data:
                 processed_events.append(event_data)
 
-            if row_num % 10000 == 0:
-                logger.info(f"Processed {row_num}/{len(df)} events")
+            if idx % 10000 == 0:
+                logger.info(f"Processed {idx}/{total_events} events")
 
-        logger.info(f"Successfully processed {len(processed_events)}/{len(df)} events")
+        logger.info(f"Successfully processed {len(processed_events)}/{total_events} events")
 
         # Shuffle and split
         import random
@@ -560,17 +905,19 @@ class AnnotationPreprocessor:
         return train_data, val_data
 
     def save_processed_data(self, train_data: List[Dict], val_data: List[Dict]):
-        """Save processed data to JSON files."""
-        train_file = self.output_dir / 'train.json'
-        val_file = self.output_dir / 'val.json'
+        """Save processed data to JSONL files."""
+        train_file = self.output_dir / 'train.jsonl'
+        val_file = self.output_dir / 'val.jsonl'
 
         logger.info(f"Saving train data to: {train_file}")
         with open(train_file, 'w', encoding='utf-8') as f:
-            json.dump(train_data, f, indent=2, ensure_ascii=False)
+            for event in train_data:
+                f.write(json.dumps(event, ensure_ascii=False) + '\n')
 
         logger.info(f"Saving validation data to: {val_file}")
         with open(val_file, 'w', encoding='utf-8') as f:
-            json.dump(val_data, f, indent=2, ensure_ascii=False)
+            for event in val_data:
+                f.write(json.dumps(event, ensure_ascii=False) + '\n')
 
         self.save_statistics(train_data, val_data)
 
@@ -620,23 +967,25 @@ class AnnotationPreprocessor:
         train_data, val_data = self.process_all(train_split=train_split)
         self.save_processed_data(train_data, val_data)
 
+        input_format = "JSONL" if self.is_jsonl else "CSV"
         print(f"\nPreprocessing complete!")
+        print(f"Input format: {input_format}")
         print(f"Output directory: {self.output_dir}")
         print(f"Files created:")
-        print(f"   - train.json ({len(train_data)} events)")
-        print(f"   - val.json ({len(val_data)} events)")
+        print(f"   - train.jsonl ({len(train_data)} events)")
+        print(f"   - val.jsonl ({len(val_data)} events)")
         print(f"   - statistics.json")
 
 
 if __name__ == '__main__':
     import argparse
 
-    parser = argparse.ArgumentParser(description='Preprocess cleaned CSV for NER training')
-    parser.add_argument('--csv', required=True, help='Path to cleaned CSV file')
+    parser = argparse.ArgumentParser(description='Preprocess ACLED JSONL or CSV for NER training')
+    parser.add_argument('--input', required=True, help='Path to input file (JSONL or CSV)')
     parser.add_argument('--output', default='data/processed', help='Output directory')
     parser.add_argument('--split', type=float, default=0.8, help='Train split ratio (default: 0.8)')
 
     args = parser.parse_args()
 
-    preprocessor = AnnotationPreprocessor(args.csv, args.output)
+    preprocessor = AnnotationPreprocessor(args.input, args.output)
     preprocessor.run_preprocessing(train_split=args.split)

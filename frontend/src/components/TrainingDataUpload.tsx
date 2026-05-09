@@ -47,16 +47,22 @@ type UploadState =
   | 'complete'
   | 'error'
 
-// Entity type to color mapping
+// Entity type to color mapping (8 types optimized for grounding)
 const ENTITY_COLORS: Record<string, string> = {
-  PERPETRATOR: 'bg-red-100 text-red-800 border-red-200',
+  // WHO (1 type - merged)
+  ACTOR: 'bg-red-100 text-red-800 border-red-200',
+  // WHOM (1 type)
   VICTIM: 'bg-orange-100 text-orange-800 border-orange-200',
-  COUNTRY: 'bg-blue-100 text-blue-800 border-blue-200',
+  // WHAT (1 type)
+  ACTION: 'bg-violet-100 text-violet-800 border-violet-200',
+  // WHEN (1 type)
+  DATE: 'bg-blue-100 text-blue-800 border-blue-200',
+  // WHERE (3 types)
+  REGION: 'bg-teal-100 text-teal-800 border-teal-200',
   CITY: 'bg-cyan-100 text-cyan-800 border-cyan-200',
-  DATE: 'bg-purple-100 text-purple-800 border-purple-200',
-  EVENT_TYPE: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  WEAPON: 'bg-gray-100 text-gray-800 border-gray-200',
-  CASUALTIES: 'bg-pink-100 text-pink-800 border-pink-200',
+  DISTRICT: 'bg-sky-100 text-sky-800 border-sky-200',
+  // HOW (1 type)
+  CASUALTIES: 'bg-rose-100 text-rose-800 border-rose-200',
 }
 
 export function TrainingDataUpload({

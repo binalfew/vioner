@@ -59,16 +59,22 @@ import {
   Pie,
 } from 'recharts'
 
-// Colors for entity types
+// Colors for 8 entity types (optimized for grounding)
 const ENTITY_COLORS: Record<string, string> = {
-  PERPETRATOR: '#ef4444',
+  // WHO (1 type - merged)
+  ACTOR: '#ef4444',
+  // WHOM (1 type)
   VICTIM: '#f97316',
-  COUNTRY: '#3b82f6',
+  // WHAT (1 type)
+  ACTION: '#8b5cf6',
+  // WHEN (1 type)
+  DATE: '#3b82f6',
+  // WHERE (3 types)
+  REGION: '#14b8a6',
   CITY: '#06b6d4',
-  DATE: '#8b5cf6',
-  EVENT_TYPE: '#eab308',
-  WEAPON: '#6b7280',
-  CASUALTIES: '#ec4899',
+  DISTRICT: '#0ea5e9',
+  // HOW (1 type)
+  CASUALTIES: '#f43f5e',
 }
 
 const getEntityColor = (entityType: string): string => {

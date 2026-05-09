@@ -155,45 +155,27 @@ class EntityValidator:
         if label.startswith('B-') or label.startswith('I-'):
             base_label = label[2:]
 
-        # Route to specific validator based on label
+        # Route to specific validator based on label (8-entity schema)
         validators = {
-            # WHO
-            'PERPETRATOR': self._validate_perpetrator,
+            # WHO (1 type - merged)
+            'ACTOR': self._validate_actor,
+
+            # WHOM (1 type)
             'VICTIM': self._validate_victim,
-            'TARGET': self._validate_target,
-            'ORGANIZATION': self._validate_organization,
-            'GOVERNMENT': self._validate_government,
 
-            # WHAT
-            'EVENT_TYPE': self._validate_event_type,
+            # WHAT (1 type)
             'ACTION': self._validate_action,
-            'WEAPON': self._validate_weapon,
-            'VIOLENCE_TYPE': self._validate_violence_type,
 
-            # WHEN
+            # WHEN (1 type)
             'DATE': self._validate_date,
-            'TIME': self._validate_time,
-            'DURATION': self._validate_duration,
-            'FREQUENCY': self._validate_frequency,
 
-            # WHERE
-            'COUNTRY': self._validate_country,
+            # WHERE (3 types)
             'REGION': self._validate_region,
             'CITY': self._validate_city,
             'DISTRICT': self._validate_district,
-            'FACILITY': self._validate_facility,
-            'GEOGRAPHIC': self._validate_geographic,
-            'COORDINATES': self._validate_coordinates,
 
-            # HOW
+            # HOW (1 type)
             'CASUALTIES': self._validate_casualties,
-            'INJURED': self._validate_injured,
-            'DISPLACEMENT': self._validate_displacement,
-            'DAMAGE': self._validate_damage,
-
-            # WHY
-            'MOTIVE': self._validate_motive,
-            'TRIGGER': self._validate_trigger,
         }
 
         validator = validators.get(base_label)
@@ -259,8 +241,81 @@ class EntityValidator:
         return validated
 
     # ========================================================================
-    # WHO VALIDATORS
+    # WHO VALIDATORS (8-entity schema: unified ACTOR type)
     # ========================================================================
+
+    def _validate_actor(self, text: str, context: Optional[str]) -> ValidationResult:
+        """Validate ACTOR entity (merged: perpetrators, organizations, government forces)."""
+        # Check if it's a known armed group
+        is_valid, confidence, canonical = self.kb.validate_perpetrator(text)
+        if canonical:
+            return ValidationResult(
+                is_valid=True,
+                confidence_adjustment=1.2,
+                reason=f"Known armed group: {canonical}",
+                canonical_form=canonical,
+                metadata={"source": "knowledge_base", "actor_type": "armed_group"}
+            )
+
+        # Check for government/military patterns
+        govt_patterns = [
+            r'\b(military\s+forces?|armed\s+forces?|army|soldiers?|troops?)\b',
+            r'\b(police|security\s+forces?|gendarmerie|paramilitary)\b',
+            r'\b(FARDC|ENDF|SNA|SAF|RSF|SANDF)\b',
+            r'\b(government|state\s+forces?)\b',
+        ]
+        for pattern in govt_patterns:
+            if re.search(pattern, text, re.IGNORECASE):
+                return ValidationResult(
+                    is_valid=True,
+                    confidence_adjustment=1.1,
+                    reason="Government/military actor",
+                    metadata={"actor_type": "government"}
+                )
+
+        # Check for organization patterns
+        org_patterns = [
+            r'\b(UN|AU|ECOWAS|IGAD|ICRC|MSF|UNHCR|UNICEF)\b',
+            r'\b(peacekeepers?|humanitarian\s+workers?)\b',
+            r'\b(NGO|organization|mission)\b',
+        ]
+        for pattern in org_patterns:
+            if re.search(pattern, text, re.IGNORECASE):
+                return ValidationResult(
+                    is_valid=True,
+                    confidence_adjustment=1.1,
+                    reason="Organization actor",
+                    metadata={"actor_type": "organization"}
+                )
+
+        # Check for armed group patterns
+        armed_patterns = [
+            r'\b(rebels?|insurgents?|militants?|fighters?|gunmen)\b',
+            r'\b(militia|gang|bandits?|attackers?)\b',
+            r'\b(Al-Shabaab|Boko\s*Haram|ISIS|ISIL|M23|ADF|LRA)\b',
+        ]
+        for pattern in armed_patterns:
+            if re.search(pattern, text, re.IGNORECASE):
+                return ValidationResult(
+                    is_valid=True,
+                    confidence_adjustment=1.1,
+                    reason="Armed group pattern",
+                    metadata={"actor_type": "armed_group"}
+                )
+
+        # Check if it looks like a proper noun (potential unknown actor)
+        if text and text[0].isupper() and len(text.split()) <= 5:
+            return ValidationResult(
+                is_valid=True,
+                confidence_adjustment=0.9,
+                reason="Possible actor (proper noun)"
+            )
+
+        return ValidationResult(
+            is_valid=True,
+            confidence_adjustment=0.8,
+            reason="Generic actor text"
+        )
 
     def _validate_perpetrator(self, text: str, context: Optional[str]) -> ValidationResult:
         """Validate PERPETRATOR entity."""
@@ -856,55 +911,6 @@ class EntityValidator:
         )
 
     # ========================================================================
-    # WHY VALIDATORS
-    # ========================================================================
-
-    def _validate_motive(self, text: str, context: Optional[str]) -> ValidationResult:
-        """Validate MOTIVE entity."""
-        motive_patterns = [
-            r'\b(revenge|retaliation|reprisal)\b',
-            r'\b(ethnic|religious|political|territorial)\b',
-            r'\b(land\s+dispute|resource\s+conflict|power\s+struggle)\b',
-            r'\b(insurgency|rebellion|jihad|extremism)\b',
-        ]
-
-        for pattern in motive_patterns:
-            if re.search(pattern, text, re.IGNORECASE):
-                return ValidationResult(
-                    is_valid=True,
-                    confidence_adjustment=1.1,
-                    reason="Matches motive pattern"
-                )
-
-        return ValidationResult(
-            is_valid=True,
-            confidence_adjustment=0.8,
-            reason="Generic motive"
-        )
-
-    def _validate_trigger(self, text: str, context: Optional[str]) -> ValidationResult:
-        """Validate TRIGGER entity."""
-        trigger_patterns = [
-            r'\b(in\s+response\s+to|following|after)\b',
-            r'\b(sparked\s+by|triggered\s+by|caused\s+by)\b',
-            r'\b(election|protest|demonstration|arrest)\b',
-        ]
-
-        for pattern in trigger_patterns:
-            if re.search(pattern, text, re.IGNORECASE):
-                return ValidationResult(
-                    is_valid=True,
-                    confidence_adjustment=1.1,
-                    reason="Matches trigger pattern"
-                )
-
-        return ValidationResult(
-            is_valid=True,
-            confidence_adjustment=0.8,
-            reason="Generic trigger"
-        )
-
-    # ========================================================================
     # CROSS-ENTITY CONSISTENCY VALIDATION
     # ========================================================================
 
@@ -985,14 +991,6 @@ class EntityValidator:
                 "May indicate incomplete extraction."
             )
 
-        # Check 6: WHY without WHO/WHAT
-        motives = by_type.get('MOTIVE', []) + by_type.get('TRIGGER', [])
-        if motives and not perpetrators and not actions:
-            issues.append(
-                "Motive/trigger identified without perpetrator or action. "
-                "This may indicate entity type confusion."
-            )
-
         is_consistent = len(issues) == 0
         return is_consistent, issues, warnings
 
@@ -1007,12 +1005,12 @@ class EntityValidator:
         """
         # Group by 5W1H category
         category_mapping = {
-            'WHO': ['PERPETRATOR', 'VICTIM', 'TARGET', 'ORGANIZATION', 'GOVERNMENT'],
+            'WHO': ['PERPETRATOR', 'TARGET', 'ORGANIZATION', 'GOVERNMENT'],
+            'WHOM': ['VICTIM'],
             'WHAT': ['EVENT_TYPE', 'ACTION', 'WEAPON', 'VIOLENCE_TYPE'],
             'WHEN': ['DATE', 'TIME', 'DURATION', 'FREQUENCY'],
             'WHERE': ['COUNTRY', 'REGION', 'CITY', 'DISTRICT', 'FACILITY', 'GEOGRAPHIC', 'COORDINATES'],
             'HOW': ['CASUALTIES', 'INJURED', 'DISPLACEMENT', 'DAMAGE'],
-            'WHY': ['MOTIVE', 'TRIGGER'],
         }
 
         found_categories = set()
@@ -1029,8 +1027,8 @@ class EntityValidator:
                     category_entities[category].append(e)
                     break
 
-        # Core categories (WHO, WHAT, WHEN, WHERE) are more important
-        core_categories = {'WHO', 'WHAT', 'WHEN', 'WHERE'}
+        # Core categories (WHO, WHOM, WHAT, WHEN, WHERE) are more important
+        core_categories = {'WHO', 'WHOM', 'WHAT', 'WHEN', 'WHERE'}
         core_found = found_categories.intersection(core_categories)
 
         # Calculate scores
@@ -1045,7 +1043,7 @@ class EntityValidator:
             'found_categories': list(found_categories),
             'missing_categories': missing,
             'category_entities': {k: len(v) for k, v in category_entities.items()},
-            'is_minimal_complete': 'WHO' in found_categories and 'WHERE' in found_categories,
+            'is_minimal_complete': ('WHO' in found_categories or 'WHOM' in found_categories) and 'WHERE' in found_categories,
         }
 
 

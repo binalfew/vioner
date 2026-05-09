@@ -48,17 +48,17 @@ class TestPreprocessing:
 
         mapping = LabelConfigs.get_5w1h_mapping()
 
-        # Should have all 6 categories
+        # Should have all 6 categories (WHO, WHOM, WHAT, WHEN, WHERE, HOW)
         assert 'WHO' in mapping
+        assert 'WHOM' in mapping
         assert 'WHAT' in mapping
         assert 'WHEN' in mapping
         assert 'WHERE' in mapping
         assert 'HOW' in mapping
-        assert 'WHY' in mapping
 
-        # WHO should include PERPETRATOR and VICTIM
+        # WHO should include PERPETRATOR (not VICTIM - that's in WHOM)
         assert 'PERPETRATOR' in mapping['WHO']
-        assert 'VICTIM' in mapping['WHO']
+        assert 'VICTIM' in mapping['WHOM']
 
         # WHERE should include COUNTRY and CITY
         assert 'COUNTRY' in mapping['WHERE']
@@ -70,13 +70,13 @@ class TestPreprocessing:
 
         # Test entity type to category
         assert LabelConfigs.get_category_for_label('PERPETRATOR') == 'WHO'
+        assert LabelConfigs.get_category_for_label('VICTIM') == 'WHOM'
         assert LabelConfigs.get_category_for_label('COUNTRY') == 'WHERE'
         assert LabelConfigs.get_category_for_label('DATE') == 'WHEN'
         assert LabelConfigs.get_category_for_label('CASUALTIES') == 'HOW'
-        assert LabelConfigs.get_category_for_label('MOTIVE') == 'WHY'
 
     def test_expanded_entity_schema(self):
-        """Test that entity schema has 26 types."""
+        """Test that entity schema has 24 types."""
         from pipeline.config import LabelConfigs
 
         label2id = LabelConfigs.get_label2id()
@@ -87,16 +87,22 @@ class TestPreprocessing:
             if label.startswith('B-'):
                 unique_entities.add(label[2:])
 
-        assert len(unique_entities) >= 26, f"Expected 26 entity types, got {len(unique_entities)}"
+        assert len(unique_entities) >= 24, f"Expected 24 entity types, got {len(unique_entities)}"
 
-        # Check specific types exist
+        # Check specific types exist (5W1H: WHO, WHOM, WHAT, WHEN, WHERE, HOW)
         expected_types = [
-            'PERPETRATOR', 'VICTIM', 'TARGET', 'ORGANIZATION', 'GOVERNMENT',
+            # WHO (4)
+            'PERPETRATOR', 'TARGET', 'ORGANIZATION', 'GOVERNMENT',
+            # WHOM (1)
+            'VICTIM',
+            # WHAT (4)
             'EVENT_TYPE', 'ACTION', 'WEAPON', 'VIOLENCE_TYPE',
+            # WHEN (4)
             'DATE', 'TIME', 'DURATION', 'FREQUENCY',
+            # WHERE (7)
             'COUNTRY', 'REGION', 'CITY', 'DISTRICT', 'FACILITY', 'GEOGRAPHIC', 'COORDINATES',
+            # HOW (4)
             'CASUALTIES', 'INJURED', 'DISPLACEMENT', 'DAMAGE',
-            'MOTIVE', 'TRIGGER'
         ]
 
         for et in expected_types:
@@ -561,16 +567,17 @@ class TestEvaluationService:
         """Test 5W1H category mapping in evaluation service."""
         from services.evaluation import CATEGORY_5W1H, ENTITY_TO_CATEGORY
 
-        # Check all categories exist
+        # Check all categories exist (WHO, WHOM, WHAT, WHEN, WHERE, HOW)
         assert 'WHO' in CATEGORY_5W1H
+        assert 'WHOM' in CATEGORY_5W1H
         assert 'WHAT' in CATEGORY_5W1H
         assert 'WHEN' in CATEGORY_5W1H
         assert 'WHERE' in CATEGORY_5W1H
         assert 'HOW' in CATEGORY_5W1H
-        assert 'WHY' in CATEGORY_5W1H
 
         # Check reverse mapping
         assert ENTITY_TO_CATEGORY['PERPETRATOR'] == 'WHO'
+        assert ENTITY_TO_CATEGORY['VICTIM'] == 'WHOM'
         assert ENTITY_TO_CATEGORY['COUNTRY'] == 'WHERE'
         assert ENTITY_TO_CATEGORY['DATE'] == 'WHEN'
         assert ENTITY_TO_CATEGORY['CASUALTIES'] == 'HOW'

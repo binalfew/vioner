@@ -23,39 +23,40 @@ class NERService:
     Service for loading and running the trained BERT NER model.
 
     The model extracts entities from violent event text and structures
-    them into 5W1H+WHY format (Who, What, When, Where, How, Why).
+    them into 5W1H format (Who, Whom, What, When, Where, How).
+    Based on VIONER_GUIDELINES.md.
     """
 
-    # 5W1H+WHY category mapping - MUST match pipeline/configs.py LabelConfigs
-    # Total: 26 entity types across 6 categories
+    # 5W1H category mapping - MUST match pipeline/config.py LabelConfigs
+    # Total: 8 entity types across 6 categories (optimized for grounding)
     CATEGORY_MAPPING = {
-        # WHO: Actors and participants (5 types)
-        'WHO': ['PERPETRATOR', 'VICTIM', 'TARGET', 'ORGANIZATION', 'GOVERNMENT'],
+        # WHO: All actors merged (1 type)
+        'WHO': ['ACTOR'],
 
-        # WHAT: Event type and actions (4 types)
-        'WHAT': ['EVENT_TYPE', 'ACTION', 'WEAPON', 'VIOLENCE_TYPE'],
+        # WHOM: Victims (1 type)
+        'WHOM': ['VICTIM'],
 
-        # WHEN: Temporal information (4 types)
-        'WHEN': ['DATE', 'TIME', 'DURATION', 'FREQUENCY'],
+        # WHAT: Actions only (1 type) - EVENT_TYPE handled by taxonomy classifier
+        'WHAT': ['ACTION'],
 
-        # WHERE: Location hierarchy (7 types)
-        'WHERE': ['COUNTRY', 'REGION', 'CITY', 'DISTRICT', 'FACILITY', 'GEOGRAPHIC', 'COORDINATES'],
+        # WHEN: Temporal information (1 type)
+        'WHEN': ['DATE'],
 
-        # HOW: Impact and method (4 types)
-        'HOW': ['CASUALTIES', 'INJURED', 'DISPLACEMENT', 'DAMAGE'],
+        # WHERE: Location hierarchy (3 types) - COUNTRY removed
+        'WHERE': ['REGION', 'CITY', 'DISTRICT'],
 
-        # WHY: Cause and context (2 types)
-        'WHY': ['MOTIVE', 'TRIGGER'],
+        # HOW: Impact (1 type)
+        'HOW': ['CASUALTIES'],
     }
 
     # Confidence thresholds per category (for filtering low-confidence predictions)
     CONFIDENCE_THRESHOLDS = {
         'WHO': 0.7,      # Actors need high confidence
+        'WHOM': 0.7,     # Victims need high confidence
         'WHAT': 0.6,     # Events can be more flexible
         'WHEN': 0.8,     # Dates should be precise
         'WHERE': 0.7,    # Locations need good confidence
         'HOW': 0.75,     # Impact metrics should be reliable
-        'WHY': 0.6,      # Cause/motive can be more flexible
     }
 
     def __init__(self, model_path: str, device: str = "cpu"):
@@ -267,21 +268,21 @@ class NERService:
 
     def _structure_5w1h(self, entities: List[Dict]) -> Dict[str, List[str]]:
         """
-        Map entities to 5W1H+WHY structure.
+        Map entities to 5W1H structure.
 
         Args:
             entities: List of extracted entities
 
         Returns:
-            Dictionary with who, what, when, where, how, why keys
+            Dictionary with who, whom, what, when, where, how keys
         """
         structured = {
             'who': [],
+            'whom': [],
             'what': [],
             'when': [],
             'where': [],
             'how': [],
-            'why': []
         }
 
         for entity in entities:
@@ -292,7 +293,7 @@ class NERService:
             if not text:
                 continue
 
-            # Find which 5W1H+WHY category this label belongs to
+            # Find which 5W1H category this label belongs to
             for category, labels in self.CATEGORY_MAPPING.items():
                 if label in labels:
                     key = category.lower()

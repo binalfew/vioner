@@ -6,7 +6,7 @@ Author: Binalfew Kassa Mekonnen
 Date: December 2025
 
 Enhanced with:
-- 5W1H category metrics (WHO, WHAT, WHEN, WHERE, HOW, WHY)
+- 5W1H category metrics (WHO, WHOM, WHAT, WHEN, WHERE, HOW)
 - Error analysis report generation
 - Domain-specific validation integration
 """
@@ -25,16 +25,16 @@ logger = logging.getLogger(__name__)
 
 
 # ============================================================================
-# 5W1H CATEGORY MAPPING
+# 5W1H CATEGORY MAPPING (8-entity schema optimized for grounding)
 # ============================================================================
 
 CATEGORY_5W1H = {
-    'WHO': ['PERPETRATOR', 'VICTIM', 'TARGET', 'ORGANIZATION', 'GOVERNMENT'],
-    'WHAT': ['EVENT_TYPE', 'ACTION', 'WEAPON', 'VIOLENCE_TYPE'],
-    'WHEN': ['DATE', 'TIME', 'DURATION', 'FREQUENCY'],
-    'WHERE': ['COUNTRY', 'REGION', 'CITY', 'DISTRICT', 'FACILITY', 'GEOGRAPHIC', 'COORDINATES'],
-    'HOW': ['CASUALTIES', 'INJURED', 'DISPLACEMENT', 'DAMAGE'],
-    'WHY': ['MOTIVE', 'TRIGGER'],
+    'WHO': ['ACTOR'],
+    'WHOM': ['VICTIM'],
+    'WHAT': ['ACTION'],
+    'WHEN': ['DATE'],
+    'WHERE': ['REGION', 'CITY', 'DISTRICT'],
+    'HOW': ['CASUALTIES'],
 }
 
 # Reverse mapping: entity type -> category
@@ -60,7 +60,7 @@ class EntityMetrics:
 @dataclass
 class CategoryMetrics:
     """Metrics for a 5W1H category."""
-    category: str  # WHO, WHAT, WHEN, WHERE, HOW, WHY
+    category: str  # WHO, WHOM, WHAT, WHEN, WHERE, HOW
     precision: float
     recall: float
     f1: float

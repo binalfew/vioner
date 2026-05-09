@@ -103,11 +103,12 @@ export interface Entity {
 }
 
 export interface StructuredEvent {
-  who: string[]
-  what: string[]
-  when: string[]
-  where: string[]
-  how: string[]
+  who: string[]    // Actors: ACTOR
+  whom: string[]   // Victims: VICTIM
+  what: string[]   // Actions: ACTION
+  when: string[]   // Temporal: DATE
+  where: string[]  // Location: REGION, CITY, DISTRICT
+  how: string[]    // Impact: CASUALTIES
 }
 
 export interface ExtractionResult {

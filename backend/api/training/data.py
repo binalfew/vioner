@@ -26,10 +26,11 @@ _processing_progress: Dict[str, dict] = {}
 # Required and optional columns for CSV
 REQUIRED_COLUMNS = ['Event_ID', 'Event_Description']
 
-# Entity columns (verified text spans)
+# Entity columns (verified text spans) - 8 types optimized for grounding
 OPTIONAL_COLUMNS = [
-    'PERPETRATOR', 'VICTIM', 'EVENT_TYPE', 'WEAPON',
-    'DATE', 'COUNTRY', 'CITY', 'CASUALTIES', 'Quality_Score'
+    'ACTOR', 'VICTIM', 'ACTION', 'DATE',
+    'REGION', 'CITY', 'DISTRICT', 'CASUALTIES',
+    'Quality_Score'
 ]
 
 

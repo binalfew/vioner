@@ -78,13 +78,13 @@ class Entity(BaseModel):
 
 
 class StructuredEvent(BaseModel):
-    """5W1H+WHY structured event representation."""
-    who: List[str] = Field(default_factory=list, description="Actors: PERPETRATOR, VICTIM, TARGET, ORGANIZATION, GOVERNMENT")
-    what: List[str] = Field(default_factory=list, description="Events: EVENT_TYPE, ACTION, WEAPON, VIOLENCE_TYPE")
-    when: List[str] = Field(default_factory=list, description="Temporal: DATE, TIME, DURATION, FREQUENCY")
-    where: List[str] = Field(default_factory=list, description="Location: COUNTRY, REGION, CITY, DISTRICT, FACILITY, GEOGRAPHIC, COORDINATES")
-    how: List[str] = Field(default_factory=list, description="Impact: CASUALTIES, INJURED, DISPLACEMENT, DAMAGE")
-    why: List[str] = Field(default_factory=list, description="Cause: MOTIVE, TRIGGER")
+    """5W1H structured event representation."""
+    who: List[str] = Field(default_factory=list, description="Actors: ACTOR")
+    whom: List[str] = Field(default_factory=list, description="Victims: VICTIM")
+    what: List[str] = Field(default_factory=list, description="Actions: ACTION")
+    when: List[str] = Field(default_factory=list, description="Temporal: DATE")
+    where: List[str] = Field(default_factory=list, description="Location: REGION, CITY, DISTRICT")
+    how: List[str] = Field(default_factory=list, description="Impact: CASUALTIES")
 
 
 class ExtractionResponse(BaseModel):

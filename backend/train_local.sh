@@ -14,16 +14,22 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 # Paths
 VENV_PATH="$SCRIPT_DIR/venv"
-TRAIN_FILE="$PROJECT_ROOT/data/processed/train.json"
-VAL_FILE="$PROJECT_ROOT/data/processed/val.json"
+TRAIN_FILE="$SCRIPT_DIR/data/processed/train.jsonl"
+VAL_FILE="$SCRIPT_DIR/data/processed/val.jsonl"
 OUTPUT_DIR="$SCRIPT_DIR/models"
 
 # Default training parameters
 MODEL="${MODEL:-bert-base-cased}"
-EPOCHS="${EPOCHS:-5}"
+EPOCHS="${EPOCHS:-10}"
 BATCH_SIZE="${BATCH_SIZE:-16}"
 LEARNING_RATE="${LEARNING_RATE:-2e-5}"
 RUN_EPOCHS="${RUN_EPOCHS:-}"
+
+# Early stopping and LR scheduler (NEW)
+PATIENCE="${PATIENCE:-3}"
+LR_SCHEDULER="${LR_SCHEDULER:-reduce_on_plateau}"
+LR_REDUCE_PATIENCE="${LR_REDUCE_PATIENCE:-2}"
+EARLY_STOPPING="${EARLY_STOPPING:-true}"
 
 echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}  VioNER Local Training${NC}"
@@ -69,6 +75,10 @@ echo "  Train Data:    $TRAIN_FILE"
 echo "  Val Data:      $VAL_FILE"
 echo "  Output Dir:    $OUTPUT_DIR"
 echo ""
+echo -e "${GREEN}Training Optimizations:${NC}"
+echo "  Early Stopping: $EARLY_STOPPING (patience=$PATIENCE)"
+echo "  LR Scheduler:   $LR_SCHEDULER (reduce patience=$LR_REDUCE_PATIENCE)"
+echo ""
 
 # Build command
 CMD="python3 $SCRIPT_DIR/pipeline/training.py \
@@ -78,7 +88,15 @@ CMD="python3 $SCRIPT_DIR/pipeline/training.py \
     --epochs $EPOCHS \
     --batch-size $BATCH_SIZE \
     --lr $LEARNING_RATE \
-    --output $OUTPUT_DIR"
+    --output $OUTPUT_DIR \
+    --patience $PATIENCE \
+    --lr-scheduler $LR_SCHEDULER \
+    --lr-reduce-patience $LR_REDUCE_PATIENCE"
+
+# Add early stopping flag
+if [ "$EARLY_STOPPING" = "false" ]; then
+    CMD="$CMD --no-early-stopping"
+fi
 
 if [ -n "$RUN_EPOCHS" ]; then
     CMD="$CMD --run-epochs $RUN_EPOCHS"

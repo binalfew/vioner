@@ -16,7 +16,7 @@ interface HistoryDetail {
   event_id: string | null
   created_at: string
   entities: Array<{ text: string; label: string; start: number; end: number; confidence: number }>
-  structured_event: { who: string[]; what: string[]; when: string[]; where: string[]; how: string[] }
+  structured_event: { who: string[]; whom: string[]; what: string[]; when: string[]; where: string[]; how: string[] }
   confidence_scores: Record<string, number>
 }
 
@@ -26,12 +26,20 @@ export async function clientLoader({ params }: Route.LoaderArgs) {
 }
 
 function getEntityColor(label: string): string {
-  if (label.includes('PERPETRATOR') || label.includes('ACTOR')) return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+  // WHO: Actors (1 type - merged)
+  if (label.includes('ACTOR')) return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+  // WHOM: Victims (1 type)
   if (label.includes('VICTIM')) return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
-  if (label.includes('LOCATION') || label.includes('COUNTRY') || label.includes('CITY')) return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-  if (label.includes('DATE') || label.includes('TIME')) return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-  if (label.includes('EVENT') || label.includes('ACTION')) return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
-  if (label.includes('CASUALT') || label.includes('DEATH') || label.includes('INJUR')) return 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200'
+  // WHAT: Actions (1 type)
+  if (label.includes('ACTION')) return 'bg-violet-100 text-violet-800 dark:bg-violet-900 dark:text-violet-200'
+  // WHEN: Temporal (1 type)
+  if (label.includes('DATE')) return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+  // WHERE: Location (3 types)
+  if (label.includes('REGION')) return 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200'
+  if (label.includes('CITY')) return 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-200'
+  if (label.includes('DISTRICT')) return 'bg-sky-100 text-sky-800 dark:bg-sky-900 dark:text-sky-200'
+  // HOW: Impact (1 type)
+  if (label.includes('CASUALTIES')) return 'bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200'
   return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200'
 }
 
@@ -104,6 +112,10 @@ export default function HistoryDetail({ loaderData }: Route.ComponentProps) {
             {detail.structured_event.who?.join(', ') || '-'}
           </div>
           <div className="bg-muted p-2 rounded">
+            <span className="font-medium">WHOM:</span>{' '}
+            {detail.structured_event.whom?.join(', ') || '-'}
+          </div>
+          <div className="bg-muted p-2 rounded">
             <span className="font-medium">WHAT:</span>{' '}
             {detail.structured_event.what?.join(', ') || '-'}
           </div>
@@ -115,7 +127,7 @@ export default function HistoryDetail({ loaderData }: Route.ComponentProps) {
             <span className="font-medium">WHERE:</span>{' '}
             {detail.structured_event.where?.join(', ') || '-'}
           </div>
-          <div className="bg-muted p-2 rounded col-span-2">
+          <div className="bg-muted p-2 rounded">
             <span className="font-medium">HOW:</span>{' '}
             {detail.structured_event.how?.join(', ') || '-'}
           </div>

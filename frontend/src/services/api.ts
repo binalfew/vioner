@@ -311,7 +311,7 @@ export const inferenceApi = {
       request_id: string
       text: string
       entities: Array<{ text: string; label: string; start: number; end: number; confidence: number }>
-      structured_event: { who: string[]; what: string[]; when: string[]; where: string[]; how: string[]; why: string[] }
+      structured_event: { who: string[]; whom: string[]; what: string[]; when: string[]; where: string[]; how: string[] }
       confidence_scores: Record<string, number>
       processing_time_ms: number
       model_version: string
@@ -658,7 +658,7 @@ export const historyApi = {
     event_id: string | null
     created_at: string
     entities: Array<{ text: string; label: string; start: number; end: number; confidence: number }>
-    structured_event: { who: string[]; what: string[]; when: string[]; where: string[]; how: string[]; why: string[] }
+    structured_event: { who: string[]; whom: string[]; what: string[]; when: string[]; where: string[]; how: string[] }
     confidence_scores: Record<string, number>
   }>(`/history/${id}`, { cache: 'no-store' }),
 

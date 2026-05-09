@@ -101,12 +101,15 @@ app = FastAPI(
     - **Analytics**: Statistics and trend analysis
     - **Knowledge Base**: Manage actors, locations, taxonomies
 
-    ## 5W1H Entity Types
-    - **WHO**: PERPETRATOR, VICTIM, ACTOR, GROUP, ORGANIZATION
-    - **WHAT**: EVENT_TYPE, ACTION, WEAPON, VIOLENCE_TYPE
-    - **WHEN**: DATE, TIME, DURATION, FREQUENCY
-    - **WHERE**: LOCATION, COUNTRY, CITY, REGION, ADDRESS
-    - **HOW**: METHOD, MANNER, INSTRUMENT, CASUALTIES
+    ## 5W1H Entity Types (8 types)
+    - **WHO**: ACTOR (perpetrators, organizations, government forces)
+    - **WHOM**: VICTIM
+    - **WHAT**: ACTION
+    - **WHEN**: DATE
+    - **WHERE**: REGION, CITY, DISTRICT
+    - **HOW**: CASUALTIES
+
+    Note: Event type classification (taxonomy) is handled as a post-NER task.
     """,
     version="1.0.0",
     lifespan=lifespan,

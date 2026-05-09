@@ -24,6 +24,7 @@ from transformers import (
     AutoModelForTokenClassification,
     get_linear_schedule_with_warmup,
 )
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from tqdm import tqdm
 import json
 import numpy as np
@@ -218,15 +219,23 @@ class ViolentEventNER:
         self.model.to(self.device)
         logger.info(f"Model loaded with {self.config.num_labels} labels")
 
+    def _load_data_file(self, file_path: str) -> list:
+        """Load data from JSONL or JSON file."""
+        with open(file_path, 'r', encoding='utf-8') as f:
+            if file_path.endswith('.jsonl'):
+                # JSONL format: one JSON object per line
+                return [json.loads(line) for line in f if line.strip()]
+            else:
+                # JSON format: single array
+                return json.load(f)
+
     def load_data(self, train_file: str, val_file: str):
-        """Load training and validation data."""
+        """Load training and validation data from JSONL or JSON files."""
         logger.info(f"Loading training data from: {train_file}")
-        with open(train_file, 'r') as f:
-            train_data = json.load(f)
+        train_data = self._load_data_file(train_file)
 
         logger.info(f"Loading validation data from: {val_file}")
-        with open(val_file, 'r') as f:
-            val_data = json.load(f)
+        val_data = self._load_data_file(val_file)
 
         # Create datasets
         self.train_dataset = NERDataset(
@@ -397,14 +406,46 @@ class ViolentEventNER:
             weight_decay=self.config.weight_decay,
         )
 
-        # Learning rate scheduler - calculate steps for this session
+        # Learning rate scheduler setup
+        lr_scheduler_type = getattr(self.config, 'lr_scheduler', 'linear')
         epochs_this_session = end_epoch - start_epoch
         num_training_steps = len(train_loader) * epochs_this_session
-        scheduler = get_linear_schedule_with_warmup(
-            optimizer,
-            num_warmup_steps=self.config.warmup_steps,
-            num_training_steps=num_training_steps,
-        )
+
+        if lr_scheduler_type == 'reduce_on_plateau':
+            # ReduceLROnPlateau - reduces LR when validation loss plateaus
+            lr_reduce_factor = getattr(self.config, 'lr_reduce_factor', 0.5)
+            lr_reduce_patience = getattr(self.config, 'lr_reduce_patience', 2)
+            scheduler = ReduceLROnPlateau(
+                optimizer,
+                mode='min',
+                factor=lr_reduce_factor,
+                patience=lr_reduce_patience,
+                min_lr=1e-7
+            )
+            warmup_scheduler = get_linear_schedule_with_warmup(
+                optimizer,
+                num_warmup_steps=self.config.warmup_steps,
+                num_training_steps=num_training_steps,
+            )
+            use_plateau_scheduler = True
+        elif lr_scheduler_type == 'linear':
+            scheduler = get_linear_schedule_with_warmup(
+                optimizer,
+                num_warmup_steps=self.config.warmup_steps,
+                num_training_steps=num_training_steps,
+            )
+            warmup_scheduler = None
+            use_plateau_scheduler = False
+        else:
+            scheduler = None
+            warmup_scheduler = None
+            use_plateau_scheduler = False
+
+        # Early stopping setup
+        use_early_stopping = getattr(self.config, 'use_early_stopping', True)
+        early_stopping_patience = getattr(self.config, 'early_stopping_patience', 5)
+        early_stopping_threshold = getattr(self.config, 'early_stopping_threshold', 0.001)
+        epochs_without_improvement = 0
 
         # Training history
         history = {
@@ -412,9 +453,11 @@ class ViolentEventNER:
             'val_loss': [],
             'val_accuracy': [],
             'epochs': [],
+            'learning_rates': [],
         }
 
         best_model_path = None
+        stopped_early = False
 
         if start_epoch == 0:
             self._log("\n" + "=" * 70)
@@ -432,6 +475,9 @@ class ViolentEventNER:
         self._log(f"Batch size: {self.config.batch_size}")
         self._log(f"This session: Epoch {start_epoch + 1} to {end_epoch} (of {self.config.num_epochs} total)")
         self._log(f"Learning rate: {self.config.learning_rate}")
+        self._log(f"LR Scheduler: {lr_scheduler_type}")
+        if use_early_stopping:
+            self._log(f"Early stopping: patience={early_stopping_patience}, threshold={early_stopping_threshold}")
         self._log("=" * 70)
 
         # Training loop
@@ -439,37 +485,69 @@ class ViolentEventNER:
             self._log(f"\nEpoch {epoch + 1}/{self.config.num_epochs}")
             self._log("-" * 70)
 
+            # Get current learning rate
+            current_lr = optimizer.param_groups[0]['lr']
+
             # Train (tqdm goes to terminal only, not log file)
-            train_loss = self._train_epoch(train_loader, optimizer, scheduler)
+            # Use warmup scheduler during training steps if using plateau scheduler
+            step_scheduler = warmup_scheduler if use_plateau_scheduler else scheduler
+            train_loss = self._train_epoch(train_loader, optimizer, step_scheduler)
 
             # Validate (tqdm goes to terminal only, not log file)
             val_loss, val_acc = self._validate_epoch(val_loader)
+
+            # Update ReduceLROnPlateau scheduler after validation
+            if use_plateau_scheduler and scheduler is not None:
+                old_lr = optimizer.param_groups[0]['lr']
+                scheduler.step(val_loss)
+                new_lr = optimizer.param_groups[0]['lr']
+                if new_lr < old_lr:
+                    self._log(f"📉 Learning rate reduced: {old_lr:.2e} → {new_lr:.2e}")
 
             # Record history
             history['train_loss'].append(train_loss)
             history['val_loss'].append(val_loss)
             history['val_accuracy'].append(val_acc)
             history['epochs'].append(epoch + 1)
+            history['learning_rates'].append(current_lr)
 
             # Log metrics (goes to both terminal and log file)
             self._log(f"Train Loss: {train_loss:.4f}")
             self._log(f"Val Loss: {val_loss:.4f}")
             self._log(f"Val Accuracy: {val_acc:.2%}")
+            self._log(f"Learning Rate: {current_lr:.2e}")
 
-            # Always save checkpoint after each epoch (for resume capability)
-            is_best = val_loss < best_val_loss
+            # Check for improvement
+            improvement = best_val_loss - val_loss
+            is_best = improvement > early_stopping_threshold
+
             if is_best:
                 best_val_loss = val_loss
+                epochs_without_improvement = 0
+            else:
+                epochs_without_improvement += 1
 
+            # Always save checkpoint after each epoch (for resume capability)
             best_model_path = self._save_checkpoint(epoch, val_loss, is_best)
 
             if is_best:
                 self._log(f"✅ Best model saved (val_loss: {val_loss:.4f})")
             else:
                 self._log(f"💾 Checkpoint saved (epoch {epoch + 1})")
+                if use_early_stopping:
+                    self._log(f"   No improvement for {epochs_without_improvement}/{early_stopping_patience} epochs")
+
+            # Early stopping check
+            if use_early_stopping and epochs_without_improvement >= early_stopping_patience:
+                self._log(f"\n⚠️  Early stopping triggered after {epochs_without_improvement} epochs without improvement")
+                stopped_early = True
+                break
 
         self._log("\n" + "=" * 70)
-        if end_epoch >= self.config.num_epochs:
+        if stopped_early:
+            self._log(f"TRAINING STOPPED EARLY (Epoch {epoch + 1}/{self.config.num_epochs})")
+            self._log(f"Best model was at epoch {getattr(self, '_best_epoch', 'unknown')}")
+        elif end_epoch >= self.config.num_epochs:
             self._log("TRAINING COMPLETE")
         else:
             self._log(f"SESSION COMPLETE (Epoch {end_epoch}/{self.config.num_epochs})")
@@ -872,6 +950,23 @@ if __name__ == '__main__':
     parser.add_argument('--log-file', type=str, default=None,
                         help='Path to write clean log output (without tqdm progress bars)')
 
+    # Early stopping options
+    parser.add_argument('--early-stopping', action='store_true', default=True,
+                        help='Enable early stopping (default: True)')
+    parser.add_argument('--no-early-stopping', dest='early_stopping', action='store_false',
+                        help='Disable early stopping')
+    parser.add_argument('--patience', type=int, default=5,
+                        help='Early stopping patience (epochs without improvement)')
+
+    # Learning rate scheduler options
+    parser.add_argument('--lr-scheduler', type=str, default='reduce_on_plateau',
+                        choices=['linear', 'reduce_on_plateau', 'none'],
+                        help='Learning rate scheduler type')
+    parser.add_argument('--lr-reduce-factor', type=float, default=0.5,
+                        help='Factor to reduce LR by when plateau detected')
+    parser.add_argument('--lr-reduce-patience', type=int, default=2,
+                        help='Epochs to wait before reducing LR')
+
     args = parser.parse_args()
 
     # Helper to log messages (before trainer is created)
@@ -908,6 +1003,13 @@ if __name__ == '__main__':
         learning_rate=args.lr,
         output_dir=args.output,
         no_timestamp=args.no_timestamp,
+        # Early stopping
+        use_early_stopping=args.early_stopping,
+        early_stopping_patience=args.patience,
+        # Learning rate scheduler
+        lr_scheduler=args.lr_scheduler,
+        lr_reduce_factor=args.lr_reduce_factor,
+        lr_reduce_patience=args.lr_reduce_patience,
     )
 
     # Initialize trainer with optional log file
