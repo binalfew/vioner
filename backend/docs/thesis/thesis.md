@@ -215,11 +215,14 @@ during the long months of training, debugging, and writing.
    6.9 End-to-End Demonstration ......................................... 86
    6.10 User Acceptance Testing ......................................... 87
    6.11 Error Analysis .................................................. 88
-7. Conclusions, Recommendations, and Future Work ......................... 90
-   7.1 Summary .......................................................... 90
-   7.2 Contributions .................................................... 91
-   7.3 Recommendations .................................................. 93
-   7.4 Future Work ...................................................... 94
+   6.12 Discussion ...................................................... 89
+   6.13 Threats to Validity ............................................. 90
+7. Conclusions, Recommendations, and Future Work ......................... 92
+   7.1 Summary .......................................................... 92
+   7.2 Answers to the Research Questions ................................ 94
+   7.3 Contributions .................................................... 95
+   7.4 Recommendations .................................................. 97
+   7.5 Future Work ...................................................... 98
 
 References ............................................................... 97
 
@@ -2793,7 +2796,115 @@ CRF on top of the BERT representations); injection of KB facts as
 input features during training to disambiguate REGION/CITY ambiguity
 at the model level; and addition of negative examples to reduce
 spurious WHEN extractions. These directions are taken up in
-Section 7.4.
+Section 7.5.
+
+## 6.12 Discussion
+
+The results in this chapter support three substantive claims.
+
+**The grounded schema decision was correct.** Restricting the
+schema to entity types with high natural grounding rates produced
+strong per-entity F1 across all eight retained types. The two
+entities dropped during pilot study (EVENT_TYPE and COUNTRY) are
+recovered downstream without harming the overall pipeline:
+EVENT_TYPE is reconstructed by the post-NER taxonomy classifier
+from action verbs and contextual cues, and COUNTRY is recovered by
+a single knowledge-base look-up from the most specific WHERE entity.
+Trying to train these entities as first-class NER labels, given
+their low grounding rate in raw text, would have penalised the
+overall model. The eight-entity schema decision answers research
+question 1 (Section 1.3) in the affirmative.
+
+**Focal loss with inverse-frequency weighting materially helps the
+minority entities.** The ablation in Table 6.5 shows that the
+combination improves VICTIM by eleven F1 points and ACTION by seven
+F1 points over plain cross entropy, while never hurting any other
+entity. This is a stronger result than either focal loss alone or
+class-weighted cross entropy alone, both of which improve fewer
+entities by smaller margins. The result answers research question
+2 by identifying a configuration whose per-entity performance is
+balanced rather than dominated by the largest classes.
+
+**Knowledge-base validation adds operational value at low cost.**
+At an enrichment rate of 64.3 percent for high-confidence ACTOR
+spans, and a flag rate of 2.4 percent for geographically implausible
+city / region pairs, the KB layer touches a substantial share of
+extractions without aggressively filtering them. The KB also
+canonicalises divergent surface forms ("Al Shabaab fighters", "the
+al-shabaab", "Al-Shabaab militants") to a single key, which
+materially improves the analytic value of downstream queries. This
+addresses research question 3.
+
+The architectural decision to expose the model and the knowledge
+base through a single web application addresses research question
+4: user acceptance testing confirmed that non-specialist users could
+operate the system end-to-end. The features they asked for
+(per-entity training metrics, PDF brief generation, drag-and-drop
+upload) are incremental rather than fundamental.
+
+The most important caveat is the role of synthetic augmentation in
+the training corpus. Approximately thirty percent of the training
+examples were generated from templates rather than drawn from real
+news. The augmentation pipeline was carefully tuned for
+grammaticality and geographic coherence, and the held-out validation
+set was drawn from the same combined corpus, so the reported metrics
+are a fair estimate of in-distribution performance. They may
+nevertheless overstate performance on out-of-distribution news with
+unusual phrasing. Section 7.5 prioritises annotated real-news
+expansion to close this gap.
+
+## 6.13 Threats to Validity
+
+Following standard practice for empirical software-engineering
+research, the threats to the validity of these results are
+classified along four axes.
+
+**Construct validity.** The chosen metric is span-level F1 with
+strict boundary matching, which penalises partial overlaps. Some
+downstream consumers may tolerate partial matches better than
+strict ones; their effective utility from the system could be
+higher than the strict F1 suggests. The construct (5W1H
+extraction) is also operationalised by an eight-entity schema that
+necessarily privileges some aspects of "event understanding" over
+others (for example, motivation and outcome are not modelled at the
+NER level).
+
+**Internal validity.** The validation set was held out before
+training began and was not used for hyperparameter tuning beyond
+selecting the best checkpoint, which mitigates the most obvious
+form of leakage. Augmented examples appear in both train and
+validation splits in proportion to their share of the combined
+corpus; while this preserves stratification, it may make the
+validation set more lenient than purely natural news would be. A
+secondary evaluation on a fully held-out natural-news subset is
+identified as future work.
+
+**External validity.** Generalisation beyond the ACLED-derived
+distribution is not directly evaluated. African news outlets vary
+substantially in stylistic conventions, and the model's performance
+on, for example, French-language African news translated into
+English, or social-media reporting from local citizen journalists,
+is not known. The eleven-percentage-point improvement on VICTIM
+attributable to focal loss with weighting was measured on the
+validation split and may shrink or grow on a fully out-of-distribution
+test set. The choice of `bert-base-cased` rather than a multilingual
+or African-pre-trained backbone also limits external validity to
+English-language reporting.
+
+**Conclusion validity.** The reported per-entity F1 numbers are
+single-run point estimates. Variation across random seeds was not
+formally measured. Anecdotal evidence from repeated runs during
+development suggests run-to-run variation of approximately
+±0.5 F1 on the macro average, but a formal multi-seed evaluation
+is part of future work. Latency numbers are medians and 95th
+percentiles over a fixed sample of representative articles on a
+single workstation; production latency under sustained concurrent
+load may differ.
+
+These threats do not undermine the principal claims of the chapter
+but should be borne in mind by readers considering operational
+adoption. The future-work programme in Section 7.5 prioritises
+exactly the evaluation expansions needed to address them.
 
 \pagebreak
 
@@ -2844,12 +2955,77 @@ data assembly, model training) are addressed in Chapters 2, 4, and
 7 and 8 (back-end and front-end) in Sections 5.6 and 5.7; objective
 9 (evaluation) in Chapter 6; objective 10 (limitations and future
 work) in Section 1.6 and the remainder of this chapter. The
-research questions in Section 1.3 are answered respectively by the
-eight-entity grounded schema (RQ1), the empirical results in
-Sections 6.4 to 6.6 (RQ2), the results in Section 6.7 (RQ3), and
-the system architecture in Sections 4.2 and 5.6 to 5.7 (RQ4).
+research questions in Section 1.3 are answered in detail in
+Section 7.2 below.
 
-## 7.2 Contributions
+## 7.2 Answers to the Research Questions
+
+The research questions stated in Section 1.3 are answered as follows.
+
+**RQ1: Which entity types in African violent-event news reports
+can be reliably grounded in source text, and what is an
+appropriate BIO schema for fine-tuning a BERT model on those
+entities?**
+
+Eight entity types — ACTOR, VICTIM, ACTION, DATE, REGION, CITY,
+DISTRICT, and CASUALTIES — were identified through pilot evaluation
+as reliably grounded in source text and were encoded under the BIO
+scheme as seventeen output labels. EVENT_TYPE and COUNTRY, which
+had been part of an earlier candidate schema, were dropped because
+their grounding rates were below an acceptable threshold; they are
+recovered at inference time by deterministic post-processing
+against the knowledge base. The retained schema yields macro F1
+0.887 and micro F1 0.909 on the held-out validation set
+(Section 6.4).
+
+**RQ2: How effectively can a fine-tuned BERT model recognise the
+chosen entities, and what loss function and sampling strategy
+produce the most balanced per-entity performance under severe
+class imbalance?**
+
+A fine-tuned `bert-base-cased` model achieves the per-entity F1
+distribution reported in Table 6.4, with the lowest-performing
+entity (VICTIM) at F1 0.817 and the highest-performing entity
+(DATE) at F1 0.956. The ablation in Table 6.5 shows that the
+combination of focal loss (γ = 2.0) with inverse-frequency class
+weighting delivers the most balanced per-entity performance,
+improving VICTIM by approximately eleven F1 points over plain
+cross entropy and ACTION by approximately seven F1 points, without
+hurting any high-support entity. Stratified diversity sampling
+augmented with template-based examples produced a 50,000-example
+training corpus in which rare entities are sufficiently represented
+to fine-tune effectively.
+
+**RQ3: To what extent does a curated knowledge base of African
+armed groups, conflict locations, and a hierarchical taxonomy
+improve the trustworthiness and downstream utility of extracted
+records?**
+
+The knowledge base canonicalises 64.3 percent of high-confidence
+ACTOR spans to a curated identifier with attached country, region,
+and type metadata. It flags 2.4 percent of multi-entity events as
+geographically implausible for analyst review. These two figures
+together demonstrate that the KB layer adds operational metadata
+to most extractions while flagging a small but useful share for
+human verification, without aggressively filtering valid
+extractions out. The four-level taxonomy (Annex B) supports
+multi-level queries from broad categories to specific event types
+in the analytics interface.
+
+**RQ4: What system architecture allows the model, the knowledge
+base, and the analytics layer to be operated together by users
+without machine learning expertise?**
+
+The four-layer architecture in Section 4.2 — model, service, data,
+presentation — exposes the model and knowledge base through
+documented HTTP APIs (Section 5.6) consumed by a React/TypeScript
+front-end (Section 5.7). User acceptance testing (Section 6.10)
+returned a mean rating of 4.4 out of 5 across six task dimensions
+from five participants representing analysts, researchers, and
+developers. The participants completed all six supplied tasks
+without ML-specific assistance.
+
+## 7.3 Contributions
 
 The contributions of this thesis are summarised below.
 
@@ -2881,7 +3057,7 @@ The contributions of this thesis are summarised below.
 - **A documented, reproducible methodology** spanning data
   preparation, training, inference, and operational packaging.
 
-## 7.3 Recommendations
+## 7.4 Recommendations
 
 The following recommendations are directed at organisations
 considering adoption of VioNER or similar systems in operational
@@ -2911,10 +3087,10 @@ early warning, humanitarian response, or research settings.
 5. **Plan for multilingual extension as a priority.** A substantial
    share of African conflict reporting is in French, Arabic,
    Portuguese, and various African languages. Multilingual
-   extension (Section 7.4) is the single most important capability
+   extension (Section 7.5) is the single most important capability
    gap from an operational standpoint.
 
-## 7.4 Future Work
+## 7.5 Future Work
 
 The future-work programme is organised by priority.
 
