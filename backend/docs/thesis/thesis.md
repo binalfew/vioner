@@ -96,9 +96,9 @@ African news reports of violent events through fine-tuned BERT-based
 named entity recognition coupled with a knowledge-base validation
 layer. A grounded annotation schema of eight entity types (ACTOR,
 VICTIM, ACTION, DATE, REGION, CITY, DISTRICT, CASUALTIES) is
-introduced in BIO format, alongside a four-level hierarchical
-taxonomy of approximately ninety-five African violent-event
-categories. The model was fine-tuned on a fifty-thousand-example
+introduced in Beginning-Inside-Outside (BIO) format, alongside a
+four-level hierarchical taxonomy of approximately ninety-five
+African violent-event categories. The model was fine-tuned on a fifty-thousand-example
 corpus derived from the Armed Conflict Location and Event Data
 project, combining stratified diversity sampling with template-based
 augmentation to address severe class imbalance, and using a
@@ -449,8 +449,9 @@ entity types and excludes those that cannot be reliably grounded in
 the source text.
 
 **Sub-problem 2: Severe class imbalance.** Within the annotated
-corpus, the distribution of BIO labels is heavily dominated by the O
-label, with entity tokens forming only a minority of the total.
+corpus, the distribution of Beginning-Inside-Outside (BIO) labels
+is heavily dominated by the O label, with entity tokens forming only
+a minority of the total.
 Within the entity tokens themselves, ACTOR, CITY, DATE, REGION, and
 DISTRICT labels dominate, while VICTIM, ACTION, and CASUALTIES are
 substantially rarer. Naive training tends to over-fit to the dominant
