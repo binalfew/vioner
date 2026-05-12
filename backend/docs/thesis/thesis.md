@@ -90,32 +90,42 @@ The volume of unstructured news reporting on violent events in Africa
 exceeds the capacity of human analysts to read, code, and act upon
 within operationally useful timeframes. The African Union Continental
 Early Warning System (AU-CEWS) aggregates thousands of articles daily,
-yet the transformation of these narratives into structured,
-analysable intelligence remains predominantly manual. This thesis
-presents VioNER, a system that extracts 5W1H attributes (Who, What,
-Where, When, Whom, How) from African news reports of violent events
-through fine-tuned BERT-based named entity recognition combined with a
-knowledge-base validation layer. A pipeline-grounded annotation
-schema of eight entity types is introduced (ACTOR, VICTIM, ACTION,
-DATE, REGION, CITY, DISTRICT, CASUALTIES), encoded in BIO format,
-together with a hierarchical taxonomy of African violent events
-spanning four levels and approximately ninety-five categories.
-The model is fine-tuned on 50,000 examples derived from the Armed
-Conflict Location and Event Data (ACLED) project, with stratified
-diversity sampling and template-based augmentation to mitigate severe
-class imbalance. A focal-loss objective with inverse-frequency class
-weighting is applied to counter the dominance of the O label. The
-trained model is exposed through a FastAPI service, a PostgreSQL event
-store, a curated knowledge base of armed groups and conflict
-locations, and a React/TypeScript web application supporting training,
-inference, event management, and analytics. Best validation loss
-reached 0.0136 on the held-out set. The system reduces analyst
-processing time substantially and produces structured records suitable
-for downstream early-warning analysis.
+yet their transformation into structured, analysable intelligence
+remains predominantly manual. This thesis presents VioNER, an
+end-to-end system that extracts 5W1H attributes (Who, What, Where,
+When, Whom, How) from African news reports of violent events through
+fine-tuned BERT-based named entity recognition coupled with a
+knowledge-base validation layer. A grounded annotation schema of
+eight entity types (ACTOR, VICTIM, ACTION, DATE, REGION, CITY,
+DISTRICT, CASUALTIES) is introduced in BIO format, alongside a
+four-level hierarchical taxonomy of approximately ninety-five
+African violent-event categories. The model was fine-tuned on a
+fifty-thousand-example corpus derived from the Armed Conflict
+Location and Event Data (ACLED) project, combining stratified
+diversity sampling with template-based augmentation to address severe
+class imbalance, in which the O (outside) label accounts for
+seventy-eight percent of tokens. A focal-loss objective (γ = 2.0)
+with inverse-frequency class weights was used to counter the dominant
+classes. The fine-tuned `bert-base-cased` model achieved a macro F1
+of 0.887 and a micro F1 of 0.909 on a ten-thousand-example held-out
+validation set, converging in two epochs with a best validation
+loss of 0.0136. An ablation isolated the contribution of focal loss
+with class weighting, which improved the rarest entity (VICTIM) by
+eleven F1 points over plain cross entropy. The trained model is
+exposed through a FastAPI service, a PostgreSQL event store, a
+curated knowledge base of one hundred and fifty African armed groups
+and two hundred conflict-affected cities, and a React/TypeScript web
+application supporting training, inference, event management, and
+analytics. End-to-end inference latency is one hundred and forty-two
+milliseconds for short articles and six hundred milliseconds for
+windowed long articles. User acceptance testing with five
+participants returned a mean rating of 4.4 out of 5 across six task
+dimensions. The artefact reduces analyst processing time
+substantially and produces structured records suitable for downstream
+early-warning analysis.
 
 **Keywords:** Named Entity Recognition, BERT, Event Extraction,
-Violent Events, African Conflicts, 5W1H, Knowledge Base, Early
-Warning Systems
+Violent Events, African Conflicts, 5W1H, Knowledge Base, Focal Loss
 
 \pagebreak
 
@@ -417,18 +427,33 @@ states the specific objectives that the work pursues.
 
 ## 1.2 Motivation
 
-The author's exposure to the operational context of African early
-warning at the Situation Monitoring Centre of AU-CEWS revealed two
-persistent gaps. The first is a throughput gap: the volume of news
-that human analysts can read in a working day is a small fraction of
-the daily inflow, and the cognitive load of reading and coding
-violent-event reports is high. The second is a consistency gap:
-analysts coding the same article may diverge in how they categorise
-actors, events, and locations, especially under time pressure or in
-fast-moving situations. These two gaps interact: a system that
-produces consistent structured records from a larger fraction of the
-inflow would free analyst attention for interpretation rather than
-extraction.
+Consider a typical morning in a continental monitoring centre. A
+single analyst is responsible for a region in which, over the
+preceding twenty-four hours, between two hundred and four hundred
+news items were aggregated by the centre's media-monitoring tool.
+Of these, perhaps fifteen to forty describe violent incidents that
+the analyst must read, structure into actor / action / location /
+time / casualty fields, classify, and route to the appropriate
+desk. By mid-morning the analyst has reached perhaps a quarter of
+the queue; by close of business, the residue rolls over into the
+next day. This pattern repeats across regions and analysts. The
+binding constraint on continental situation awareness is not the
+sophistication of analytical models but the throughput of human
+reading and coding.
+
+The author's exposure to this operational context at the AU-CEWS
+Situation Monitoring Centre revealed two persistent gaps. The first
+is a *throughput gap*: the volume of news that human analysts can
+read in a working day is a small fraction of the daily inflow, and
+the cognitive load of reading and coding violent-event reports is
+high. The second is a *consistency gap*: analysts coding the same
+article may diverge in how they categorise actors, events, and
+locations, especially under time pressure or in fast-moving
+situations. These two gaps interact. A system that produces
+consistent structured records from a larger fraction of the inflow
+would free analyst attention for interpretation rather than
+extraction, and would also raise the comparability of records
+across analysts, regions, and time periods.
 
 Three further observations motivate the technical choices made in
 this thesis. First, African conflict reporting features patterns and
@@ -524,6 +549,34 @@ questions.
 4. What system architecture allows the model, the knowledge base, and
    the analytics layer to be operated together by users without machine
    learning expertise?
+
+### Significance of the Study
+
+This study is significant on three grounds.
+
+**Operational significance.** The artefact reduces the analyst time
+required to convert raw news into structured event records. In the
+target context (AU-CEWS Situation Monitoring), analyst time is the
+binding constraint on situation awareness during fast-moving
+crises. Even a partial reduction in the cost of structured event
+extraction translates directly into faster, broader, and more
+consistent monitoring.
+
+**Methodological significance.** The combination of a grounded
+entity schema, focal-loss training under severe class imbalance,
+and a curated domain knowledge base is, to the best of the author's
+knowledge, the first such combination applied to African
+violent-event extraction at this scale. The methodology is
+documented in sufficient detail to be reproducible by other
+researchers.
+
+**Resource significance.** The four-level taxonomy of African
+violent events, the entity annotation schema, and the curated
+knowledge base of African armed groups and conflict-affected cities
+are themselves reusable artefacts. They can be adopted or adapted
+by researchers and practitioners working on adjacent tasks in
+conflict monitoring, humanitarian protection, and security
+analysis.
 
 ## 1.4 Objectives
 
