@@ -86,46 +86,37 @@ Signed by the Examining Committee:
 
 # Abstract
 
-The volume of unstructured news reporting on violent events in Africa
-exceeds the capacity of human analysts to read, code, and act upon
-within operationally useful timeframes. The African Union Continental
-Early Warning System (AU-CEWS) aggregates thousands of articles daily,
-yet their transformation into structured, analysable intelligence
-remains predominantly manual. This thesis presents VioNER, an
-end-to-end system that extracts 5W1H attributes (Who, What, Where,
-When, Whom, How) from African news reports of violent events through
-fine-tuned BERT-based named entity recognition coupled with a
-knowledge-base validation layer. A grounded annotation schema of
-eight entity types (ACTOR, VICTIM, ACTION, DATE, REGION, CITY,
-DISTRICT, CASUALTIES) is introduced in BIO format, alongside a
-four-level hierarchical taxonomy of approximately ninety-five
-African violent-event categories. The model was fine-tuned on a
-fifty-thousand-example corpus derived from the Armed Conflict
-Location and Event Data (ACLED) project, combining stratified
-diversity sampling with template-based augmentation to address severe
-class imbalance, in which the O (outside) label accounts for
-seventy-eight percent of tokens. A focal-loss objective (γ = 2.0)
-with inverse-frequency class weights was used to counter the dominant
-classes. The fine-tuned `bert-base-cased` model achieved a macro F1
-of 0.887 and a micro F1 of 0.909 on a ten-thousand-example held-out
-validation set, converging in two epochs with a best validation
-loss of 0.0136. An ablation isolated the contribution of focal loss
-with class weighting, which improved the rarest entity (VICTIM) by
+The volume of unstructured news reporting on violent events in
+Africa exceeds analyst capacity to read, code, and act upon within
+operationally useful timeframes, and at the African Union Continental
+Early Warning System this transformation remains predominantly
+manual. This thesis presents VioNER, an end-to-end system that
+extracts 5W1H attributes (Who, What, Where, When, Whom, How) from
+African news reports of violent events through fine-tuned BERT-based
+named entity recognition coupled with a knowledge-base validation
+layer. A grounded annotation schema of eight entity types (ACTOR,
+VICTIM, ACTION, DATE, REGION, CITY, DISTRICT, CASUALTIES) is
+introduced in BIO format, alongside a four-level hierarchical
+taxonomy of approximately ninety-five African violent-event
+categories. The model was fine-tuned on a fifty-thousand-example
+corpus derived from the Armed Conflict Location and Event Data
+project, combining stratified diversity sampling with template-based
+augmentation to address severe class imbalance, and using a
+focal-loss objective with inverse-frequency class weights to counter
+the dominance of the O label. The fine-tuned `bert-base-cased` model
+achieved a macro F1 of 0.887 and a micro F1 of 0.909 on the held-out
+validation set, converging in two epochs; an ablation showed that
+focal loss with class weighting raised the rarest entity (VICTIM) by
 eleven F1 points over plain cross entropy. The trained model is
 exposed through a FastAPI service, a PostgreSQL event store, a
-curated knowledge base of one hundred and fifty African armed groups
-and two hundred conflict-affected cities, and a React/TypeScript web
-application supporting training, inference, event management, and
-analytics. End-to-end inference latency is one hundred and forty-two
-milliseconds for short articles and six hundred milliseconds for
-windowed long articles. User acceptance testing with five
-participants returned a mean rating of 4.4 out of 5 across six task
-dimensions. The artefact reduces analyst processing time
-substantially and produces structured records suitable for downstream
-early-warning analysis.
+curated knowledge base of African armed groups and cities, and a
+React web application for training, inference, event management,
+and analytics. The artefact substantially reduces analyst
+processing time and produces structured records suitable for
+downstream early-warning analysis.
 
 **Keywords:** Named Entity Recognition, BERT, Event Extraction,
-Violent Events, African Conflicts, 5W1H, Knowledge Base, Focal Loss
+Violent Events, African Conflicts, 5W1H, Focal Loss
 
 \pagebreak
 
@@ -207,18 +198,15 @@ figures, or algorithms are added or removed.
 |:------:|:-------------------------------------------------------------------|:----:|
 | 4.1    | High-level architecture of the VioNER system                       | 38   |
 | 4.2    | End-to-end processing pipeline                                     | 39   |
-| 4.2a   | Sequence of calls during synchronous inference                     | 40   |
-| 4.3    | BIO encoding example for a multi-word entity                        | 42   |
-| 4.4    | Four-level taxonomy hierarchy (visual outline)                      | 43   |
-| 4.5    | Knowledge-base entity-relationship outline                          | 46   |
-| 4.6    | NER training data flow                                              | 49   |
-| 4.7    | Inference and post-processing pipeline                              | 52   |
-| 5.1    | Backend module organisation                                        | 67   |
-| 5.2    | Frontend route map                                                 | 70   |
-| 6.1    | Training and validation loss curves                                 | 77   |
-| 6.2    | Validation accuracy across epochs                                  | 78   |
+| 4.3    | Sequence of calls during synchronous inference                     | 40   |
+| 4.4    | BIO encoding example for a multi-word entity                       | 42   |
+| 4.5    | Four-level taxonomy hierarchy (visual outline)                     | 44   |
+| 5.1    | Back-end module organisation                                       | 67   |
+| 5.2    | Front-end route map                                                | 70   |
+| 6.1    | Training and validation loss curves                                | 77   |
+| 6.2    | Token-level validation accuracy across epochs                      | 78   |
 | 6.3    | Per-entity F1 bar chart                                            | 82   |
-| 6.4    | Confusion patterns between location entity types                    | 89   |
+| 6.4    | Confusion patterns between location entity types                   | 89   |
 
 \pagebreak
 
@@ -1476,7 +1464,7 @@ News  ->  Tokenise  ->  BERT NER  ->  Entity Assembly
 *Figure 4.2: End-to-end processing pipeline from raw news text to
 queryable structured event records.*
 
-Figure 4.2a expands the same pipeline as a sequence diagram in which
+Figure 4.3 expands the same pipeline as a sequence diagram in which
 each participating component is rendered as a vertical lane.
 
 ```
@@ -1498,7 +1486,7 @@ User      Front-end       Inference API     NER Service       KB        DB
  |<--render----|                |                |             |         |
 ```
 
-*Figure 4.2a: Sequence of calls during synchronous inference.*
+*Figure 4.3: Sequence of calls during synchronous inference.*
 
 The boundary between extraction (NER) and post-processing is
 deliberate: it allows the supervised learning problem to be cast
@@ -1538,14 +1526,14 @@ for tokens outside any entity, the model has seventeen output classes.
 The BIO encoding allows the model to mark entity boundaries while
 remaining a flat sequence-labelling problem.
 
-Figure 4.3 illustrates the encoding on a representative example.
+Figure 4.4 illustrates the encoding on a representative example.
 
 ```
 Tokens:    "Al"     "Shabaab" "fighters" "killed"   "12"          "civilians" "in"  "Beledweyne" "on"  "Sunday"
 Labels:    B-ACTOR  I-ACTOR   O          B-ACTION   B-CASUALTIES  B-VICTIM    O     B-CITY       O     B-DATE
 ```
 
-*Figure 4.3: BIO encoding example for a sentence describing a
+*Figure 4.4: BIO encoding example for a sentence describing a
 violent event. Multi-token entities such as "Al Shabaab" are
 encoded by a leading B- tag followed by I- tags.*
 
@@ -1566,7 +1554,8 @@ eighteen intermediate types. Level 3 refines into approximately fifty
 specific event types. Level 4 adds approximately twenty additional
 detailed subtypes for the most common categories. The complete
 taxonomy is presented in Annex B; this section presents the Level 1
-and Level 2 structure.
+and Level 2 structure in Table 4.2 and Table 4.3 respectively, with
+the visual outline in Figure 4.5.
 
 *Table 4.2: Level 1 categories of the hierarchical taxonomy.*
 
@@ -1616,7 +1605,7 @@ VIOLENT EVENTS TAXONOMY
     `-- Arbitrary Detention            (Violent Mass Arrest)
 ```
 
-*Figure 4.4: Four-level taxonomy hierarchy (visual outline of Levels 1
+*Figure 4.5: Four-level taxonomy hierarchy (visual outline of Levels 1
 to 3).*
 
 Each terminal category in the taxonomy is documented with a
@@ -1666,7 +1655,8 @@ methods (ambush, raid, mass shooting, suicide bombing). The list is
 used by the post-NER taxonomy classifier to inform Level 3 and Level 4
 classification.
 
-The knowledge base is also used by the validator component to attach
+Table 4.4 summarises the size of each knowledge-base resource. The
+knowledge base is also used by the validator component to attach
 metadata to extracted entities. For an ACTOR span that matches a
 known armed group alias, the validator attaches the canonical name,
 country, region, and group type. For a CITY span, it attaches the
@@ -1952,7 +1942,8 @@ describes how it does it.
 The system is implemented in Python 3.11 for the back end and machine
 learning components, and in TypeScript with React 19 for the front
 end. PostgreSQL serves as the persistent data store. Docker Compose
-orchestrates the development environment.
+orchestrates the development environment. Table 5.1 and Table 5.2
+list the back-end and front-end stacks respectively.
 
 *Table 5.1: Back-end technology stack.*
 
@@ -2252,7 +2243,7 @@ The schema is reproduced in Annex D.
 
 The front-end is implemented as a Vite-built React 19 single-page
 application in `frontend/`. It uses React Router 7 file-based
-routing.
+routing, with the route map shown in Figure 5.2.
 
 ```
 frontend/src/
@@ -2431,6 +2422,41 @@ Figure 6.1 plots training and validation loss across epochs for a
 representative ten-epoch run with focal loss and class weighting
 enabled, and Figure 6.2 plots token-level validation accuracy.
 
+```
+        loss
+   0.020 +
+         |  *  (train)
+   0.015 +   *
+         |    * * * * * * *
+   0.010 + .                                . . . . . (val)
+         |   . . . . . . .
+   0.005 +
+         +---+---+---+---+---+---+---+---> epoch
+             1   2   3   4   5   6   7
+```
+
+*Figure 6.1: Training (`*`) and validation (`.`) loss curves across
+epochs for the representative run. The validation loss reaches its
+minimum at epoch 2 and rises modestly thereafter.*
+
+```
+        accuracy
+   97.5% +                            * * *
+         |
+   97.0% +                * * *
+         |         *
+   96.5% +
+         |   *
+   96.0% +
+         |
+   95.5% + *
+         +---+---+---+---+---+---+---+---> epoch
+             1   2   3   4   5   6   7
+```
+
+*Figure 6.2: Token-level validation accuracy across epochs for the
+representative run.*
+
 *Table 6.5: Per-epoch training dynamics for the representative run.*
 
 | Epoch | Train Loss | Val Loss | Val Accuracy |
@@ -2471,6 +2497,9 @@ training-set idiosyncrasies.
 
 ## 6.4 Overall Model Performance
 
+Table 6.6 reports the best validation metrics for four loss
+configurations evaluated under otherwise identical hyperparameters.
+
 *Table 6.6: Best validation metrics across training runs.*
 
 | Run                              | Best epoch | Val loss | Token accuracy |
@@ -2489,9 +2518,9 @@ configuration for its regularisation properties.
 
 ## 6.5 Per-Entity Analysis
 
-Span-level precision, recall, and F1 are reported per entity in Table
-6.7. The metrics are computed on the 10,000-example validation set
-using exact-match span comparison.
+Span-level precision, recall, and F1 are reported per entity in
+Table 6.7. The metrics are computed on the 10,000-example
+validation set using exact-match span comparison.
 
 *Table 6.7: Per-entity precision, recall and F1 on the held-out validation set.*
 
@@ -2552,7 +2581,8 @@ entities.
 ## 6.6 Ablation: Focal Loss versus Cross Entropy
 
 To isolate the contribution of focal loss, four configurations were
-compared while holding everything else constant.
+compared while holding everything else constant. Per-entity F1
+across the four configurations is shown in Table 6.8.
 
 *Table 6.8: Focal-loss ablation. Per-entity F1 on the validation set.*
 
@@ -2605,7 +2635,8 @@ filtering out valid extractions.
 
 Single-document inference latency was measured for three
 representative article lengths on the same hardware used for
-training.
+training. Median and 95th-percentile latencies are reported in
+Table 6.9.
 
 *Table 6.9: Inference latency on representative articles.*
 
