@@ -130,26 +130,24 @@ reports inspired the work that follows.
 
 # Acknowledgements
 
-The author is deeply indebted to the advisor, Dr. Fekade Getrahun,
-for the guidance, critical reading, and steady encouragement provided
-throughout this research. His insistence on rigour and operational
-relevance shaped every chapter of this thesis.
+I am deeply indebted to my advisor, Dr. Fekade Getrahun, for his
+guidance, critical reading, and steady encouragement throughout this
+research. His insistence on rigour and operational relevance shaped
+every chapter of this thesis.
 
-Sincere thanks are due to the staff of the Addis Ababa University
-Department of Computer Science for their support during the
-programme, and to the African Union Continental Early Warning System
-(AU-CEWS) for articulating the operational requirements that
-motivated this work. The Armed Conflict Location and Event Data
-Project (ACLED) is gratefully acknowledged for maintaining the open
-dataset on which this study relies.
+I am grateful to the staff of the Addis Ababa University Department
+of Computer Science for their support during the programme, and to
+the African Union Continental Early Warning System (AU-CEWS) for
+articulating the operational requirements that motivated this work.
+I also thank the Armed Conflict Location and Event Data Project
+(ACLED) for maintaining the open dataset on which this study relies.
 
-The author also acknowledges the prior thesis work of Taye
-Abdulkadir, whose exploration of 5W extraction in the African context
-provided a foundation that this research extends.
+I acknowledge the prior thesis work of Taye Abdulkadir, whose
+exploration of 5W extraction in the African context provided a
+foundation that this research extends.
 
-Finally, deepest thanks are owed to the author's family and friends
-for their patience and support during the long months of training,
-debugging, and writing.
+Finally, I thank my family and friends for their patience and support
+during the long months of training, debugging, and writing.
 
 <!--
 Static Table of Contents. Build the docx WITHOUT the --toc flag so that
