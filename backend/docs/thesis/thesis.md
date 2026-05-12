@@ -240,6 +240,7 @@ Signed Declaration Sheet ................................................. 117
 
 | Table | Title                                                              | Page |
 |:-----:|:-------------------------------------------------------------------|:----:|
+| 3.1   | Comparative position of VioNER relative to prior systems           | 34   |
 | 4.1   | Eight-entity grounded schema for the VioNER NER component          | 41   |
 | 4.2   | Level 1 categories of the hierarchical taxonomy                    | 44   |
 | 4.3   | Level 2 intermediate violence types                                | 45   |
@@ -1361,29 +1362,63 @@ Chapter 7.
 
 ## 3.5 Summary of Gaps Addressed
 
+Table 3.1 compares the most directly related prior systems with
+VioNER along seven dimensions: NLP backbone, entity-schema size,
+target languages, regional focus, taxonomy depth, presence of a
+curated knowledge base, and operational packaging.
+
+*Table 3.1: Comparative position of VioNER relative to prior systems.*
+
+| System / dimension      | NLP backbone        | Schema | Languages | Regional focus | Taxonomy depth | KB integration | Operational packaging |
+|:------------------------|:--------------------|:------:|:----------|:---------------|:--------------:|:--------------:|:----------------------|
+| NEXUS [29]              | Pattern + linguistic | ~8    | Multilingual (EU) | Europe       | 2 levels       | PMVE ontology  | Internal prototype     |
+| Tanev et al. [1]        | Pattern + linguistic | ~6    | Multilingual    | Global         | 1 level        | None curated   | Internal system        |
+| YAGO [30]               | Heuristic / rules    | n/a   | English         | Global Wikipedia | n/a          | YAGO ontology  | Knowledge base only    |
+| Wang & Zhao [36]        | Pattern + semantic   | 5W1H  | Chinese         | Chinese news   | NOEM ontology  | NOEM            | Research prototype     |
+| Taye Abdulkadir [35]    | CoreNLP + Weka       | 5W     | English         | Africa         | None           | None            | Model only             |
+| Adelani et al. (MasakhaNER) [11] | mBERT/XLM-R | 4     | 10 African      | Africa         | n/a            | None            | Benchmark + corpus     |
+| **VioNER (this thesis)**| **bert-base-cased fine-tuned** | **8** | **English** | **Africa**     | **4 levels (~95 categories)** | **150 groups + 200 cities + weapons** | **Full web app + API + Docker** |
+
 The literature review and the related-work review converge on five
 gaps that this thesis addresses.
 
 1. **Grounded entity schema.** Prior African-context work has either
-   used very small schemas (e.g., person/organisation/location) or
-   broad schemas that include entity types that cannot be reliably
-   grounded in source text. This thesis introduces a deliberately
-   narrow eight-entity schema in which every entity type has been
-   verified to be grounded in source text in pilot evaluation.
+   used very small schemas (person / organisation / location, as in
+   MasakhaNER) or broader schemas that include entity types that
+   cannot be reliably grounded in source text (the original VioNER
+   proposal's 26-type schema). This thesis introduces a deliberately
+   intermediate eight-entity schema in which every entity type has
+   been verified to be grounded in source text in pilot evaluation
+   (Section 1.5).
 2. **Transformer-based NER for African violence.** Prior work in
-   this domain has not exploited fine-tuned transformer models at
-   the scale presented here.
+   this domain has used pattern-based extraction (NEXUS, Tanev et
+   al.) or pre-transformer machine learning (Taye Abdulkadir's
+   CoreNLP + Weka). VioNER is, to the best of the author's
+   knowledge, the first fine-tuned transformer NER model targeted
+   specifically at African violent-event 5W1H extraction at the
+   50,000-example scale.
 3. **African violent-event taxonomy at four levels.** No prior open
    taxonomy of African violent events at this level of granularity
-   has been published, to the best of the author's knowledge. The
-   four-level taxonomy is presented in full in Annex B.
+   has been published, to the best of the author's knowledge.
+   ACLED's taxonomy reaches two levels with approximately
+   twenty-five sub-event categories; UCDP and GDELT/CAMEO are
+   coarser-grained. The four-level VioNER taxonomy with
+   approximately ninety-five terminal categories is presented in
+   full in Annex B.
 4. **Knowledge-base validation layer.** The combination of a curated
-   knowledge base of African armed groups, cities, and weapons with a
-   learned extractor, used for both validation and enrichment of
-   extracted records, is a contribution.
+   knowledge base of African armed groups, cities, and weapons with
+   a learned extractor, used for both validation (flagging
+   geographically implausible extractions) and enrichment
+   (canonicalising armed-group names, attaching country and region
+   metadata to cities), is, to the best of the author's knowledge,
+   a contribution.
 5. **Operational packaging.** Prior academic work in this area has
-   stopped at the model boundary. This thesis delivers a full web
-   application with documented APIs and a reproducible deployment.
+   stopped at the model boundary. NEXUS, Tanev et al., and Taye
+   Abdulkadir all describe extraction systems without delivering a
+   reproducible, documented web application that non-specialist
+   users can operate end-to-end. This thesis delivers a full web
+   application with documented APIs and a reproducible Docker
+   Compose deployment.
 
 \pagebreak
 
