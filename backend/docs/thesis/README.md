@@ -5,28 +5,38 @@ project, prepared for submission to the Department of Computer
 Science, College of Natural Sciences, Addis Ababa University.
 
 - `thesis.md` — authoritative source (markdown).
-- `thesis.docx` — generated Word version (`pandoc thesis.md -o thesis.docx --toc --toc-depth=3`).
+- `thesis.docx` — generated Word version (`pandoc thesis.md -o thesis.docx`).
 
 ## Regenerating the Word version
 
 ```bash
 cd backend/docs/thesis
-pandoc thesis.md -o thesis.docx --toc --toc-depth=3
+pandoc thesis.md -o thesis.docx
 # Alternative with a reference template for AAU formatting:
 pandoc thesis.md \
   --reference-doc=aau-thesis-template.docx \
-  --toc --toc-depth=3 \
   -o thesis.docx
 ```
 
-**Important:** the `--toc --toc-depth=3` flags are required. The
-Table of Contents is **not** written manually in `thesis.md` (per the
-AAU guideline, "Table of contents must be generated automatically and
-not manually"); pandoc generates it from the chapter and section
-headings at build time. The List of Tables, List of Figures, and List
-of Algorithms are kept as manual tables in `thesis.md` because pandoc
-does not auto-generate them — update them whenever you add or remove
-a numbered figure, table, or algorithm.
+**Note on the Table of Contents:** the TOC is now a **static** table
+inside `thesis.md`. Pandoc is invoked WITHOUT `--toc` so it does not
+emit a Word TOC field; this prevents the "This document contains
+fields that may refer to other files. Do you want to update the
+fields?" prompt when Word opens the file.
+
+Trade-off vs. the AAU guideline:
+- AAU §4.1f says the TOC "must be generated automatically and not
+  manually". A static TOC violates this letter; if your committee is
+  strict, switch back: in `thesis.md`, replace the static TOC block
+  with an HTML comment placeholder, then build with
+  `pandoc thesis.md -o thesis.docx --toc --toc-depth=3`.
+- Page numbers in the static TOC are **estimates**. Update them
+  manually in Word against the actual rendered page numbers (apply
+  AAU page layout first, then revise the TOC entries).
+
+The List of Tables, List of Figures, and List of Algorithms are also
+manual tables in `thesis.md`; update them whenever a numbered figure,
+table, or algorithm is added or removed.
 
 ## Formatting requirements (from AAU CS guideline)
 
