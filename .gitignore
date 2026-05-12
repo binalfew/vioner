@@ -86,3 +86,6 @@ coverage/
 .coverage
 htmlcov/
 .pytest_cache/
+
+# Office lock files (Word/Excel/PowerPoint create these when a file is open)
+~$*
