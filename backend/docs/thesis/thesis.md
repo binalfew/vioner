@@ -158,84 +158,19 @@ foundation that this research extends.
 Finally, I thank my family and friends for their patience and support
 during the long months of training, debugging, and writing.
 
-\pagebreak
+<!--
+Pandoc auto-generates the Table of Contents from the `--toc` flag at
+build time. The TOC is intentionally NOT written manually here, in
+line with the AAU guideline ("Table of contents must be generated
+automatically and not manually"). To regenerate:
 
-# Table of Contents
+    pandoc thesis.md -o thesis.docx --toc --toc-depth=3
 
-1. Introduction ......................................................... 1
-   1.1 Background ........................................................ 1
-   1.2 Motivation ........................................................ 3
-   1.3 Statement of the Problem .......................................... 5
-   1.4 Objectives ........................................................ 7
-   1.5 Methods ........................................................... 8
-   1.6 Scope and Limitations ............................................. 10
-   1.7 Application of Results ............................................ 12
-   1.8 Organization of the Rest of the Thesis ............................ 14
-2. Literature Review ..................................................... 15
-   2.1 Information Extraction and Event Extraction ...................... 15
-   2.2 Named Entity Recognition ......................................... 17
-   2.3 Transformer Models and BERT ...................................... 19
-   2.4 Class Imbalance in Token Classification .......................... 22
-   2.5 Evaluation Metrics for Named Entity Recognition ................. 25
-   2.6 Conflict Event Databases and Coding Schemes ..................... 27
-   2.7 Knowledge Bases and Ontologies for Events ....................... 29
-3. Related Work .......................................................... 28
-   3.1 General Event Extraction from News ............................... 28
-   3.2 Violence-Specific Event Extraction Systems ....................... 30
-   3.3 Event Extraction in the African Context .......................... 32
-   3.4 Hierarchical Event Classification ................................ 33
-   3.5 Summary of Gaps Addressed ........................................ 34
-4. The Proposed Solution ................................................. 36
-   4.1 Design Principles ................................................ 36
-   4.2 System Architecture .............................................. 37
-   4.3 Entity Schema and BIO Encoding ................................... 40
-   4.4 Hierarchical Violent Event Taxonomy .............................. 43
-   4.5 Knowledge Base Design ............................................ 46
-   4.6 Training Pipeline ................................................ 48
-   4.7 Inference and Post-Processing .................................... 51
-   4.8 Web Application Architecture ..................................... 53
-5. Implementation ........................................................ 55
-   5.1 Technology Stack ................................................. 55
-   5.2 Data Acquisition and Preprocessing ............................... 57
-   5.3 Stratified Sampling and Augmentation ............................. 60
-   5.4 Model Training Implementation .................................... 62
-   5.5 Focal Loss and Class Weighting ................................... 65
-   5.6 Backend Services and API ......................................... 67
-   5.7 Frontend Application ............................................. 70
-   5.8 Containerised Deployment ......................................... 72
-6. Experimentation and Results ........................................... 74
-   6.1 Experimental Setup ............................................... 74
-   6.2 Dataset Statistics ............................................... 75
-   6.3 Training Dynamics ................................................ 77
-   6.4 Overall Model Performance ........................................ 79
-   6.5 Per-Entity Analysis .............................................. 81
-   6.6 Ablation: Focal Loss versus Cross Entropy ........................ 83
-   6.7 Knowledge-Base Validation Impact ................................. 84
-   6.8 Inference Latency and Throughput ................................. 85
-   6.9 End-to-End Demonstration ......................................... 86
-   6.10 User Acceptance Testing ......................................... 87
-   6.11 Error Analysis .................................................. 88
-   6.12 Discussion ...................................................... 89
-   6.13 Threats to Validity ............................................. 90
-7. Conclusions, Recommendations, and Future Work ......................... 92
-   7.1 Summary .......................................................... 92
-   7.2 Answers to the Research Questions ................................ 94
-   7.3 Contributions .................................................... 95
-   7.4 Recommendations .................................................. 97
-   7.5 Future Work ...................................................... 98
-
-References ............................................................... 97
-
-Annexes .................................................................. 101
-
-Annex A: Entity Annotation Guidelines (Summary) ......................... 101
-Annex B: Hierarchical Taxonomy of African Violent Events ................ 103
-Annex C: Knowledge Base Entries (Excerpt) ............................... 108
-Annex D: System Screenshots ............................................. 110
-Annex E: Sample Augmentation Templates .................................. 113
-Annex F: User Acceptance Testing Questionnaire .......................... 115
-
-Signed Declaration Sheet ................................................. 117
+The List of Tables, List of Figures, List of Algorithms, and Acronyms
+that follow are NOT auto-generated by pandoc and remain as manual
+lists below. They should be reviewed and updated whenever tables,
+figures, or algorithms are added or removed.
+-->
 
 \pagebreak
 

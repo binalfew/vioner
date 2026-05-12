@@ -19,6 +19,15 @@ pandoc thesis.md \
   -o thesis.docx
 ```
 
+**Important:** the `--toc --toc-depth=3` flags are required. The
+Table of Contents is **not** written manually in `thesis.md` (per the
+AAU guideline, "Table of contents must be generated automatically and
+not manually"); pandoc generates it from the chapter and section
+headings at build time. The List of Tables, List of Figures, and List
+of Algorithms are kept as manual tables in `thesis.md` because pandoc
+does not auto-generate them — update them whenever you add or remove
+a numbered figure, table, or algorithm.
+
 ## Formatting requirements (from AAU CS guideline)
 
 Apply these in Word after conversion:
