@@ -357,13 +357,15 @@ and rebuild with `--toc --toc-depth=3`.
 
 # 1. Introduction
 
-This chapter introduces the research problem addressed in this thesis,
-the motivation that drives it, and the objectives that guide the
-investigation. It locates the work within the operational context of
-African early warning and crisis response, summarises the methods
-employed, defines the scope and limitations, and outlines the
-remainder of the document. The chapter is intended to give the reader
-sufficient context to follow the technical material that follows.
+The research problem addressed by this thesis sits at the
+intersection of three pressures: a flood of African violent-event
+reporting in unstructured news text, an analyst workforce that
+cannot read it fast enough, and an early-warning operational
+requirement that depends on the timely conversion of that text into
+structured records. The sections that follow lay out the background,
+motivation, problem statement, objectives, and methods that frame
+the rest of the work, and close with a roadmap to the remaining
+chapters.
 
 ## 1.1 Background
 
@@ -457,7 +459,7 @@ binding constraint on continental situation awareness is not the
 sophistication of analytical models but the throughput of human
 reading and coding.
 
-The author's exposure to this operational context at the AU-CEWS
+My own exposure to this operational context at the AU-CEWS
 Situation Monitoring Centre, and the internal documentation of its
 data-collection and analysis tools [38], revealed two persistent
 gaps. The first is a *throughput gap*: the volume of news that human
@@ -582,7 +584,7 @@ consistent monitoring.
 
 **Methodological significance.** The combination of a grounded
 entity schema, focal-loss training under severe class imbalance,
-and a curated domain knowledge base is, to the best of the author's
+and a curated domain knowledge base is, to the best of my
 knowledge, the first such combination applied to African
 violent-event extraction at this scale. The methodology is
 documented in sufficient detail to be reproducible by other
@@ -834,7 +836,7 @@ token classification, and the conflict-event database landscape that
 informs the taxonomy. Chapter 3 will review prior systems most
 directly related to this work, including violence-specific event
 extraction systems and the closest African-context predecessor, and
-will identify the specific gaps that the present work bridges.
+will identify the specific gaps that VioNER bridges.
 Chapter 4 will present the proposed solution, including the high-level
 system architecture, the entity schema, the hierarchical taxonomy, the
 knowledge base, the training pipeline, the inference pipeline, and
@@ -852,16 +854,14 @@ work programme that addresses the limitations identified in Section 1.6.
 
 # 2. Literature Review
 
-This chapter reviews the theoretical and methodological literature
-that underpins the work presented in this thesis. The review begins
-with the broader fields of Information Extraction and Event
-Extraction, then narrows to Named Entity Recognition, the transformer
-architecture and BERT, methods for handling class imbalance in token
-classification, the family of conflict-event databases that shape the
-operational context, and finally the use of knowledge bases and
-ontologies in representing extracted events. Specific paper-by-paper
-reviews of the most directly related prior systems are deferred to
-Chapter 3.
+Five strands of literature inform this thesis: information and
+event extraction, named entity recognition, the transformer
+architecture and BERT, methods for handling severe class imbalance
+in token classification, and the conflict-event database tradition
+that frames the operational context. Each is summarised below, with
+a final section on knowledge-base and ontology approaches to event
+representation. Paper-by-paper reviews of the most directly related
+systems are deferred to Chapter 3.
 
 ## 2.1 Information Extraction and Event Extraction
 
@@ -1236,13 +1236,14 @@ easier to maintain and to integrate with the application layer.
 
 # 3. Related Work
 
-This chapter reviews prior systems most directly related to the
-present work. The review is intentionally narrower than the
-literature review in Chapter 2: only published papers, peer-reviewed
-conference proceedings, masters and doctoral theses, and technical
-reports that present concrete systems are included, and each entry is
-read in light of how it informs or differs from VioNER. The chapter
-concludes with a synthesis of the gaps that the thesis bridges.
+Where Chapter 2 surveyed the field at the level of theory and
+methods, this chapter zooms in on the specific systems that VioNER
+either builds on or distinguishes itself from. Only concrete systems
+are reviewed — published papers, peer-reviewed conference
+proceedings, masters and doctoral theses, and technical reports —
+and each is read in light of what it tells me about the design
+choices I had to make in VioNER. A summary of the gaps that
+VioNER bridges closes the chapter.
 
 ## 3.1 General Event Extraction from News
 
@@ -1303,8 +1304,8 @@ reference for the construction of the present taxonomy.
 
 Becker and colleagues focus on planned events on social media [32],
 exploiting platform-specific structured fields to combine with
-discussion text. Their approach is orthogonal to the present work in
-several ways. Planned events differ qualitatively from violent
+discussion text. Their approach is orthogonal to mine in several
+ways. Planned events differ qualitatively from violent
 incidents, which by their nature are unplanned and adversarial.
 Social-media reporting introduces noise and veracity concerns that
 make it unsuitable as a primary source for formal early warning.
@@ -1334,20 +1335,20 @@ modest annotated corpus and demonstrate that domain-specific
 adaptation improves performance over generic baselines on African
 text.
 
-The differences between Taye Abdulkadir's work and the present thesis
-are substantial. First, Taye Abdulkadir's implementation uses
-Stanford CoreNLP and Weka, which limits access to modern transformer
-architectures; the present work uses Hugging Face Transformers and a
-fine-tuned BERT. Second, Taye Abdulkadir's annotated corpus is
-modest in size, whereas the present work uses approximately fifty
-thousand training examples derived from ACLED and template
-augmentation. Third, the present work develops an explicit
+The differences between Taye Abdulkadir's work and mine are
+substantial. First, that implementation uses Stanford CoreNLP and
+Weka, which limits access to modern transformer architectures; I
+use Hugging Face Transformers and a fine-tuned BERT. Second, the
+earlier annotated corpus is modest in size, while VioNER trains on
+approximately fifty thousand examples derived from ACLED and
+template augmentation. Third, this thesis develops an explicit
 hierarchical taxonomy of African violent events with approximately
-ninety-five terminal categories, supports a curated knowledge base of
-armed groups and locations, and packages the system as a deployable
-web application; Taye Abdulkadir's work stops at the model boundary.
-Fourth, the present work documents and addresses class imbalance
-explicitly through focal loss and stratified sampling.
+ninety-five terminal categories, curates a knowledge base of armed
+groups and locations, and packages the system as a deployable web
+application; Taye Abdulkadir's work stops at the model boundary.
+Fourth, I address class imbalance explicitly through focal loss and
+stratified sampling rather than leaving it to the supervised
+learner.
 
 The relationship between the two works is therefore one of
 foundation and extension. Taye Abdulkadir established the
@@ -1417,25 +1418,23 @@ gaps that this thesis addresses.
 2. **Transformer-based NER for African violence.** Prior work in
    this domain has used pattern-based extraction (NEXUS, Tanev et
    al.) or pre-transformer machine learning (Taye Abdulkadir's
-   CoreNLP + Weka). VioNER is, to the best of the author's
-   knowledge, the first fine-tuned transformer NER model targeted
-   specifically at African violent-event 5W1H extraction at the
-   50,000-example scale.
-3. **African violent-event taxonomy at four levels.** No prior open
-   taxonomy of African violent events at this level of granularity
-   has been published, to the best of the author's knowledge.
-   ACLED's taxonomy reaches two levels with approximately
-   twenty-five sub-event categories; UCDP and GDELT/CAMEO are
-   coarser-grained. The four-level VioNER taxonomy with
-   approximately ninety-five terminal categories is presented in
-   full in Annex B.
+   CoreNLP + Weka). VioNER is, to the best of my knowledge, the
+   first fine-tuned transformer NER model targeted specifically at
+   African violent-event 5W1H extraction at the 50,000-example scale.
+3. **African violent-event taxonomy at four levels.** To the best of
+   my knowledge, no prior open taxonomy of African violent events at
+   this level of granularity has been published. ACLED's taxonomy
+   reaches two levels with approximately twenty-five sub-event
+   categories; UCDP and GDELT/CAMEO are coarser-grained. The
+   four-level VioNER taxonomy with approximately ninety-five terminal
+   categories is presented in full in Annex B.
 4. **Knowledge-base validation layer.** The combination of a curated
    knowledge base of African armed groups, cities, and weapons with
-   a learned extractor, used for both validation (flagging
+   a learned extractor — used for both validation (flagging
    geographically implausible extractions) and enrichment
    (canonicalising armed-group names, attaching country and region
-   metadata to cities), is, to the best of the author's knowledge,
-   a contribution.
+   metadata to cities) — is, to the best of my knowledge, a
+   contribution.
 5. **Operational packaging.** Prior academic work in this area has
    stopped at the model boundary. NEXUS, Tanev et al., and Taye
    Abdulkadir all describe extraction systems without delivering a
@@ -1448,14 +1447,14 @@ gaps that this thesis addresses.
 
 # 4. The Proposed Solution
 
-This chapter presents the design of the VioNER system. It first
-states the design principles that guide the construction, then
-describes the system architecture at a high level, defines the entity
-schema and BIO encoding, presents the hierarchical taxonomy, specifies
-the knowledge base, details the training pipeline, the inference
-pipeline, and the web application architecture. Implementation
-detail and the specific technology choices made to realise this
-design are deferred to Chapter 5.
+The design of VioNER answers a sequence of questions: what to
+extract, in what schema, how to train the extractor, how to make
+its output trustworthy, and how to put it in front of an analyst.
+Each section below addresses one of these in turn — design
+principles, system architecture, entity schema, hierarchical
+taxonomy, knowledge base, training pipeline, inference pipeline, and
+the web application that sits on top. Implementation-level detail
+and specific technology choices are deferred to Chapter 5.
 
 ## 4.1 Design Principles
 
@@ -2011,13 +2010,13 @@ in Annex D.
 
 # 5. Implementation
 
-This chapter describes the implementation of the VioNER system. It
-documents the technology stack, the data preparation flow, the
-training procedure, the focal-loss implementation, the back-end
-services and API surface, the front-end application, and the
-containerised deployment. The chapter complements Chapter 4: where
-that chapter described what the system does and why, this one
-describes how it does it.
+Where Chapter 4 described what VioNER does and why, this chapter
+documents how it actually does it: the technology stack, the data
+preparation flow, the training procedure, the focal-loss
+implementation, the back-end services and API surface, the
+front-end application, and the containerised deployment. Code
+listings are kept short throughout; the full source lives in the
+accompanying repository.
 
 ## 5.1 Technology Stack
 
@@ -2402,14 +2401,15 @@ configures TLS termination at the reverse proxy.
 
 # 6. Experimentation and Results
 
-This chapter presents the empirical evaluation of VioNER. It
-describes the experimental setup, reports dataset statistics,
-training dynamics, overall and per-entity performance, an ablation
-of the focal-loss objective, the effect of knowledge-base validation
-on extraction quality, inference latency, end-to-end behaviour on
-representative articles, and user acceptance feedback. The chapter
-concludes with an error analysis that motivates the future-work
-programme in Chapter 7.
+A system this size has to be evaluated on several axes: how well
+the model fits the training distribution, how it performs per
+entity, how much of that performance is attributable to the
+focal-loss decision, how the knowledge-base layer changes the
+output, how fast it runs in practice, and whether real users can
+actually drive it. The sections below walk through each of these in
+turn, ending with a discussion section, a threats-to-validity
+section, and an error analysis that feeds the future-work programme
+in Chapter 7.
 
 ## 6.1 Experimental Setup
 
@@ -2897,7 +2897,7 @@ overall model. The eight-entity schema decision answers research
 question 1 (Section 1.3) in the affirmative.
 
 **Focal loss with inverse-frequency weighting materially helps the
-minority entities.** The ablation in Table 6.5 shows that the
+minority entities.** The ablation in Table 6.8 shows that the
 combination improves VICTIM by eleven F1 points and ACTION by seven
 F1 points over plain cross entropy, while never hurting any other
 entity. This is a stronger result than either focal loss alone or
@@ -2991,10 +2991,13 @@ exactly the evaluation expansions needed to address them.
 
 # 7. Conclusions, Recommendations, and Future Work
 
-This chapter concludes the thesis. It summarises the work, lists
-the contributions in bulleted form, makes recommendations to
-practitioners, and identifies a prioritised programme of future
-research.
+What follows is the wrap-up: a brief summary of what was built, an
+explicit mapping from the research questions stated in Chapter 1 to
+the answers reached in Chapters 4 to 6, a bulleted list of
+contributions, recommendations for organisations considering
+adoption, and a prioritised programme of future work that addresses
+the limitations honestly acknowledged in Section 1.6 and the
+threats-to-validity discussion in Section 6.13.
 
 ## 7.1 Summary
 
@@ -3065,9 +3068,9 @@ produce the most balanced per-entity performance under severe
 class imbalance?**
 
 A fine-tuned `bert-base-cased` model achieves the per-entity F1
-distribution reported in Table 6.4, with the lowest-performing
+distribution reported in Table 6.7, with the lowest-performing
 entity (VICTIM) at F1 0.817 and the highest-performing entity
-(DATE) at F1 0.956. The ablation in Table 6.5 shows that the
+(DATE) at F1 0.956. The ablation in Table 6.8 shows that the
 combination of focal loss (γ = 2.0) with inverse-frequency class
 weighting delivers the most balanced per-entity performance,
 improving VICTIM by approximately eleven F1 points over plain
