@@ -226,6 +226,7 @@ figures, or algorithms are added or removed.
 
 | Acronym  | Expanded form                                                      |
 |:---------|:-------------------------------------------------------------------|
+| 5W1H     | Who, What, Where, When, Whom, How                                  |
 | ACLED    | Armed Conflict Location and Event Data Project                     |
 | ADF      | Allied Democratic Forces                                           |
 | API      | Application Programming Interface                                  |
@@ -241,12 +242,12 @@ figures, or algorithms are added or removed.
 | DRC      | Democratic Republic of the Congo                                   |
 | ECOWAS   | Economic Community of West African States                          |
 | F1       | Harmonic mean of precision and recall                              |
-| FAPA     | FastAPI                                                            |
 | FARDC    | Forces Armées de la République Démocratique du Congo               |
 | GDELT    | Global Database of Events, Language, and Tone                      |
 | IED      | Improvised Explosive Device                                        |
 | IGAD     | Intergovernmental Authority on Development                         |
 | JNIM     | Jama'at Nasr al-Islam wal Muslimin                                 |
+| JWT      | JSON Web Token                                                     |
 | KB       | Knowledge Base                                                     |
 | LRA      | Lord's Resistance Army                                             |
 | LSTM     | Long Short-Term Memory                                             |
@@ -255,6 +256,7 @@ figures, or algorithms are added or removed.
 | NER      | Named Entity Recognition                                           |
 | NEXUS    | News cluster Event eXtraction Utilizing language Structures        |
 | NLP      | Natural Language Processing                                        |
+| NOEM     | News Ontology Event Model                                          |
 | OWL      | Web Ontology Language                                              |
 | PMVE     | Politically Motivated Violent Events (ontology)                    |
 | PoS      | Part of Speech                                                     |
@@ -270,7 +272,6 @@ figures, or algorithms are added or removed.
 | UI       | User Interface                                                     |
 | VBIED    | Vehicle-Borne Improvised Explosive Device                          |
 | VioNER   | Violent Event Named Entity Recognition (this work)                 |
-| 5W1H     | Who, What, Where, When, Whom, How                                  |
 
 \pagebreak
 
