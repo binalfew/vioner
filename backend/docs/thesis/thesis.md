@@ -139,24 +139,26 @@ reports inspired the work that follows.
 
 # Acknowledgements
 
-I am deeply indebted to my advisor, Dr. Fekade Getrahun, for his
-guidance, critical reading, and steady encouragement throughout the
-research. His insistence on rigour and operational relevance shaped
-every chapter of this thesis.
+The author is deeply indebted to the advisor, Dr. Fekade Getrahun,
+for the guidance, critical reading, and steady encouragement provided
+throughout this research. His insistence on rigour and operational
+relevance shaped every chapter of this thesis.
 
-I thank the staff of the Addis Ababa University Department of Computer
-Science for their support during the programme. I am grateful to the
-African Union Continental Early Warning System (AU-CEWS) for
-articulating the operational requirements that motivated this work,
-and to the Armed Conflict Location and Event Data Project (ACLED) for
-maintaining the open dataset on which this study relies.
+Sincere thanks are due to the staff of the Addis Ababa University
+Department of Computer Science for their support during the
+programme, and to the African Union Continental Early Warning System
+(AU-CEWS) for articulating the operational requirements that
+motivated this work. The Armed Conflict Location and Event Data
+Project (ACLED) is gratefully acknowledged for maintaining the open
+dataset on which this study relies.
 
-I acknowledge the prior thesis work of Taye Abdulkadir, whose
-exploration of 5W extraction in the African context provided a
-foundation that this research extends.
+The author also acknowledges the prior thesis work of Taye
+Abdulkadir, whose exploration of 5W extraction in the African context
+provided a foundation that this research extends.
 
-Finally, I thank my family and friends for their patience and support
-during the long months of training, debugging, and writing.
+Finally, deepest thanks are owed to the author's family and friends
+for their patience and support during the long months of training,
+debugging, and writing.
 
 <!--
 Pandoc auto-generates the Table of Contents from the `--toc` flag at
@@ -186,12 +188,16 @@ figures, or algorithms are added or removed.
 | 4.5   | Training hyperparameters                                           | 49   |
 | 5.1   | Backend technology stack                                           | 55   |
 | 5.2   | Frontend technology stack                                          | 56   |
-| 6.1   | Pre-processed dataset statistics                                   | 75   |
-| 6.2   | Entity-level frequency in the full pre-processed corpus            | 76   |
-| 6.3   | Best validation metrics across training runs                       | 79   |
-| 6.4   | Per-entity precision, recall and F1                                | 81   |
-| 6.5   | Focal-loss ablation                                                | 83   |
-| 6.6   | Inference latency on representative articles                       | 85   |
+| 6.1   | Hardware and software configuration                                | 74   |
+| 6.2   | Pre-processed dataset statistics                                   | 75   |
+| 6.3   | Entity-level frequency in the full pre-processed corpus            | 76   |
+| 6.4   | Inverse-frequency class weights used in the focal-loss objective   | 77   |
+| 6.5   | Per-epoch training dynamics                                        | 78   |
+| 6.6   | Best validation metrics across training runs                       | 79   |
+| 6.7   | Per-entity precision, recall and F1                                | 81   |
+| 6.8   | Focal-loss ablation                                                | 83   |
+| 6.9   | Inference latency on representative articles                       | 85   |
+| 6.10  | Aggregated user acceptance testing responses                       | 87   |
 
 \pagebreak
 
@@ -383,11 +389,12 @@ sophistication of analytical models but the throughput of human
 reading and coding.
 
 The author's exposure to this operational context at the AU-CEWS
-Situation Monitoring Centre revealed two persistent gaps. The first
-is a *throughput gap*: the volume of news that human analysts can
-read in a working day is a small fraction of the daily inflow, and
-the cognitive load of reading and coding violent-event reports is
-high. The second is a *consistency gap*: analysts coding the same
+Situation Monitoring Centre, and the internal documentation of its
+data-collection and analysis tools [38], revealed two persistent
+gaps. The first is a *throughput gap*: the volume of news that human
+analysts can read in a working day is a small fraction of the daily
+inflow, and the cognitive load of reading and coding violent-event
+reports is high. The second is a *consistency gap*: analysts coding the same
 article may diverge in how they categorise actors, events, and
 locations, especially under time pressure or in fast-moving
 situations. These two gaps interact. A system that produces
@@ -573,64 +580,65 @@ The following specific objectives operationalise the general objective.
 
 ## 1.5 Methods
 
-The research adopts a design-science methodology [13] coupled with
-empirical evaluation of the artefact. Each component is built
-iteratively, with the lessons of one iteration informing the design of
-the next, and with quantitative evaluation against held-out data
-controlling for over-fitting at each stage. The principal methodical
-choices are summarised below; full detail is provided in
-Chapter 4 and Chapter 5.
+The research will adopt a design-science methodology [13] coupled
+with empirical evaluation of the artefact. Each component will be
+built iteratively, with the lessons of one iteration informing the
+design of the next, and with quantitative evaluation against
+held-out data controlling for over-fitting at each stage. The
+principal methodical choices are summarised below; full detail will
+be provided in Chapter 4 and Chapter 5.
 
 **Annotation schema design.** Drawing on the proposal taxonomy, the
 ACLED column conventions, and a pilot study of grounding rates in
-synthetically and naturally annotated text, the entity schema is
-restricted to entity types that can be reliably found verbatim in
-source text. EVENT_TYPE and COUNTRY were dropped from the schema in
-the course of this analysis because their grounding rates were too low
-to support reliable supervision; instead, COUNTRY is recovered
-deterministically from the knowledge base and the event-type
-hierarchy is computed in a post-NER step.
+synthetically and naturally annotated text, the entity schema will
+be restricted to entity types that can be reliably found verbatim
+in source text. EVENT_TYPE and COUNTRY will be dropped from the
+schema because their grounding rates will be shown by the pilot to
+be too low to support reliable supervision; instead, COUNTRY will
+be recovered deterministically from the knowledge base and the
+event-type hierarchy will be computed in a post-NER step.
 
-**Data acquisition and preparation.** Raw event records are obtained
-from ACLED via its open data exports. The records are tokenised and
-labelled in BIO format using the column-to-entity mapping documented
-in Section 5.2. Stratified diversity sampling is then applied to a
-target subset size of 35,000 records, with augmentation adding
-approximately 15,000 templated examples to expand vocabulary coverage
-of action verbs and victim-targeting constructions that are
-under-represented in raw ACLED text. The resulting 50,000-example
-corpus is partitioned into 80 percent training and 20 percent
-validation.
+**Data acquisition and preparation.** Raw event records will be
+obtained from ACLED via its open data exports. The records will be
+tokenised and labelled in BIO format using the column-to-entity
+mapping documented in Section 5.2. Stratified diversity sampling
+will then be applied to a target subset size of 35,000 records,
+with augmentation adding approximately 15,000 templated examples to
+expand vocabulary coverage of action verbs and victim-targeting
+constructions that are under-represented in raw ACLED text. The
+resulting 50,000-example corpus will be partitioned into 80 percent
+training and 20 percent validation.
 
 **Model fine-tuning.** The `bert-base-cased` model from the Hugging
-Face hub is fine-tuned for token classification with seventeen output
-labels (eight entity types times two BIO prefixes, plus the O label).
-Sub-word labels are aligned by carrying the first-subword label to
-subsequent sub-words with the B-/I- transition handled explicitly.
-Training uses AdamW with linear warm-up, optional ReduceLROnPlateau
-scheduling, gradient clipping, and a focal-loss objective with
-inverse-frequency class weights computed from the training set.
+Face hub will be fine-tuned for token classification with seventeen
+output labels (eight entity types times two BIO prefixes, plus the
+O label). Sub-word labels will be aligned by carrying the
+first-subword label to subsequent sub-words with the B-/I-
+transition handled explicitly. Training will use AdamW with linear
+warm-up, optional ReduceLROnPlateau scheduling, gradient clipping,
+and a focal-loss objective with inverse-frequency class weights
+computed from the training set.
 
 **Knowledge-base integration.** A static knowledge base of African
-armed groups, conflict-affected cities, and the four-level taxonomy is
-loaded at inference time. Raw entity spans are validated against the
-knowledge base, with confidence scores adjusted upward for entities
-that match curated entries and downward for those that do not. The
-post-NER pipeline then assembles a 5W1H record per detected event
-description.
+armed groups, conflict-affected cities, and the four-level taxonomy
+will be loaded at inference time. Raw entity spans will be
+validated against the knowledge base, with confidence scores
+adjusted upward for entities that match curated entries and
+downward for those that do not. The post-NER pipeline will then
+assemble a 5W1H record per detected event description.
 
-**System packaging.** The trained model, the knowledge base, and the
-event store are exposed through a FastAPI service with documented
-routes for each capability, and a React/TypeScript front-end is built
-on top of it. The system is containerised with Docker Compose for
-reproducible deployment.
+**System packaging.** The trained model, the knowledge base, and
+the event store will be exposed through a FastAPI service with
+documented routes for each capability, and a React/TypeScript
+front-end will be built on top of it. The system will be
+containerised with Docker Compose for reproducible deployment.
 
-**Evaluation.** The fine-tuned model is evaluated against a held-out
-validation set using token-level accuracy, per-entity precision,
-recall, and F1, and through qualitative inspection on out-of-corpus
-news articles. End-to-end latency is measured at inference time, and
-qualitative user acceptance testing is conducted on a small group of
-representative users.
+**Evaluation.** The fine-tuned model will be evaluated against a
+held-out validation set using token-level accuracy, per-entity
+precision, recall, and F1, and through qualitative inspection on
+out-of-corpus news articles. End-to-end latency will be measured at
+inference time, and qualitative user acceptance testing will be
+conducted on a small group of representative users.
 
 ## 1.6 Scope and Limitations
 
@@ -983,31 +991,38 @@ training-set distribution.
 **Focal loss.** Focal loss, introduced by Lin and colleagues for dense
 object detection [12], down-weights well-classified examples and
 focuses learning on difficult ones. For a per-token cross entropy of
-CE(p, y) = -log p_y, the focal loss is
+`CE(p, y) = -log p_y`, the focal loss is given by
 
-> FL(p, y) = -α_y (1 - p_y)^γ log p_y
+> `FL(p, y) = -α_y · (1 - p_y)^γ · log p_y`                       (1)
 
-where γ controls the strength of down-weighting (γ = 0 recovers
-cross entropy) and α_y is an optional per-class weight. Focal loss
-has been shown to outperform plain cross entropy in object detection
-and in token classification with imbalanced labels, particularly when
+where p_y is the model's predicted probability for the true class y,
+γ controls the strength of down-weighting (γ = 0 recovers cross
+entropy), and α_y is an optional per-class weight. Focal loss has
+been shown to outperform plain cross entropy in object detection and
+in token classification with imbalanced labels, particularly when
 combined with a class-weighting scheme.
 
 The present work combines focal loss (γ = 2) with inverse-frequency
 class weighting, computes the weights from the training-set label
 distribution at the start of training, and excludes the special -100
 label from both the loss and the weight computation. The
-implementation follows the formulation in [12], extended with optional
-label smoothing β for regularisation:
+implementation follows the formulation in equation (1), extended
+with optional label smoothing β for regularisation:
 
-> FL_LS(p, y) = -α_y (1 - p_y)^γ Σ_c y'_c log p_c
->
-> where y'_c = (1 − β) · 1[c = y] + β / (C − 1) · 1[c ≠ y].
+> `FL_LS(p, y) = -α_y · (1 - p_y)^γ · Σ_c y'_c · log p_c`         (2)
+
+where the smoothed target distribution is defined by
+
+> `y'_c = (1 - β) · 1[c = y] + β / (C - 1) · 1[c ≠ y]`            (3)
+
+in which 1[·] is the indicator function, C is the total number of
+classes, and β ∈ [0, 1) is the smoothing factor (β = 0 recovers the
+one-hot target).
 
 The inverse-frequency weight for class c is computed once at the
 start of training as
 
-> α_c = T / (C · max(f_c, 1)),
+> `α_c = T / (C · max(f_c, 1))`                                   (4)
 
 where T is the total token count over the training set, C is the
 number of classes, and f_c is the count of class c. The maximum
@@ -1722,31 +1737,33 @@ Algorithm 4.1 describes the sub-word alignment used to project
 word-level labels onto BERT WordPiece tokens.
 
 ```
-Algorithm 4.1  Sub-word label alignment for BIO tagging
 ---------------------------------------------------------------
 Input:  tokens t[1..n], labels y[1..n], tokenizer T
 Output: aligned_label_ids l[1..m] with m >= n
 ---------------------------------------------------------------
- 1: enc <- T(tokens=t, is_split_into_words=True)
- 2: word_ids <- enc.word_ids()
- 3: l <- empty list
- 4: prev <- null
- 5: for each w in word_ids do
- 6:     if w is null then
- 7:         append IGNORE_INDEX (-100) to l
- 8:     else if w != prev then
- 9:         append label2id[ y[w] ] to l                 # first sub-word
-10:     else                                              # later sub-word
-11:         label <- y[w]
-12:         if label starts with "B-" then
-13:             label <- "I-" + label[2:]                # B->I transition
-14:         end if
-15:         append label2id[ label ] to l
-16:     end if
-17:     prev <- w
-18: end for
-19: return l
+enc        <- T(tokens = t, is_split_into_words = True)
+word_ids   <- enc.word_ids()
+l          <- empty list
+prev       <- null
+for each w in word_ids do
+    if w is null then
+        append IGNORE_INDEX (-100) to l
+    else if w != prev then
+        append label2id[ y[w] ] to l                  # first sub-word
+    else                                              # later sub-word
+        label <- y[w]
+        if label starts with "B-" then
+            label <- "I-" + label[2:]                 # B->I transition
+        end if
+        append label2id[ label ] to l
+    end if
+    prev <- w
+end for
+return l
+---------------------------------------------------------------
 ```
+
+*Algorithm 4.1: Sub-word label alignment for BIO tagging.*
 
 ### Training hyperparameters
 
@@ -1780,27 +1797,29 @@ weighting and optional label smoothing. Algorithm 4.4 summarises its
 behaviour.
 
 ```
-Algorithm 4.4  Focal loss with inverse-frequency weighting
 ---------------------------------------------------------------
 Input:  logits z[1..N, 1..C], targets y[1..N], class weights α[1..C],
         focusing parameter γ, ignore index I, label smoothing β
 Output: scalar loss L
 ---------------------------------------------------------------
- 1: mask[n] <- (y[n] != I)            for n = 1..N
- 2: N_valid <- sum(mask)
- 3: log_p   <- log_softmax(z, dim=-1) # shape N x C
- 4: if β > 0 then
- 5:     y_smooth[n,c] <- (1-β)·1[c=y[n]] + β/(C-1)·1[c!=y[n]]
- 6:     CE[n] <- - Σ_c y_smooth[n,c] · log_p[n,c]
- 7: else
- 8:     CE[n] <- - log_p[n, y[n]]
- 9: end if
-10: p_true[n] <- exp( log_p[n, y[n]] )
-11: modulator[n] <- (1 - p_true[n])^γ
-12: weight[n]    <- α[ y[n] ]
-13: L_n[n] <- mask[n] · weight[n] · modulator[n] · CE[n]
-14: return  (Σ_n L_n[n]) / max(N_valid, 1)
+mask[n]   <- (y[n] != I)                for n = 1..N
+N_valid   <- sum(mask)
+log_p     <- log_softmax(z, dim = -1)   # shape N x C
+if β > 0 then
+    y_smooth[n,c] <- (1 - β)·1[c = y[n]] + β/(C - 1)·1[c != y[n]]
+    CE[n]         <- - Σ_c y_smooth[n,c] · log_p[n,c]
+else
+    CE[n] <- - log_p[n, y[n]]
+end if
+p_true[n]   <- exp( log_p[n, y[n]] )
+modulator[n] <- (1 - p_true[n])^γ
+weight[n]    <- α[ y[n] ]
+L_n[n]       <- mask[n] · weight[n] · modulator[n] · CE[n]
+return  ( Σ_n L_n[n] ) / max( N_valid, 1 )
+---------------------------------------------------------------
 ```
+
+*Algorithm 4.4: Focal loss with inverse-frequency class weighting.*
 
 The class weights are computed from the training-set distribution at
 the start of training. The weight for class c is w_c = T / (C * f_c),
@@ -1826,46 +1845,50 @@ The inference pipeline transforms a raw input text into a structured
 5W1H record. Algorithm 4.5 describes the steps.
 
 ```
-Algorithm 4.5  Post-NER 5W1H structuring with KB validation
 ---------------------------------------------------------------
 Input:  text x, NER service M, knowledge base K,
         per-category thresholds τ[c]
 Output: structured event record R
 ---------------------------------------------------------------
- 1: (tok, offsets) <- tokenize(x)
- 2: logits         <- M.forward(tok)
- 3: pred[i]        <- argmax_c logits[i, c]                for all i
- 4: probs[i]       <- softmax(logits[i, ·])                for all i
- 5: spans          <- empty list
- 6: i <- 1; while i <= |tok| do
- 7:     if id2label[pred[i]] starts with "B-" then
- 8:         start <- offsets[i].start; t <- label[2:]
- 9:         confs <- [ probs[i, pred[i]] ]
-10:         j <- i+1
-11:         while j <= |tok| and id2label[pred[j]] == "I-"+t do
-12:             confs <- confs ++ [ probs[j, pred[j]] ]
-13:             j <- j+1
-14:         end while
-15:         end_off <- offsets[j-1].end
-16:         spans <- spans ++ [(t, start, end_off, mean(confs))]
-17:         i <- j
-18:     else
-19:         i <- i+1
-20:     end if
-21: end while
-22: spans_filt  <- { s in spans : confidence(s) >= τ[ category_of(s) ] }
-23: R.entities  <- spans_filt
-24: R.who, ..., R.how <- group_by_5w1h(spans_filt)
-25: for each s in R.who do
-26:     R.who_meta[s] <- K.armed_groups.lookup(s.surface)
-27: end for
-28: for each s in R.where do
-29:     R.where_meta[s] <- K.locations.lookup(s.surface)
-30: end for
-31: R.taxonomy  <- classify_taxonomy(R, K)
-32: R.confidence <- aggregate_confidence(spans_filt, R.taxonomy)
-33: return R
+(tok, offsets) <- tokenize(x)
+logits         <- M.forward(tok)
+pred[i]        <- argmax_c logits[i, c]                  for all i
+probs[i]       <- softmax(logits[i, ·])                  for all i
+spans          <- empty list
+i <- 1
+while i <= |tok| do
+    if id2label[pred[i]] starts with "B-" then
+        start <- offsets[i].start
+        t     <- label[2:]
+        confs <- [ probs[i, pred[i]] ]
+        j     <- i + 1
+        while j <= |tok| and id2label[pred[j]] == "I-" + t do
+            confs <- confs ++ [ probs[j, pred[j]] ]
+            j     <- j + 1
+        end while
+        end_off <- offsets[j - 1].end
+        spans   <- spans ++ [ (t, start, end_off, mean(confs)) ]
+        i       <- j
+    else
+        i <- i + 1
+    end if
+end while
+spans_filt  <- { s in spans : confidence(s) >= τ[ category_of(s) ] }
+R.entities  <- spans_filt
+R.who, ..., R.how <- group_by_5w1h(spans_filt)
+for each s in R.who do
+    R.who_meta[s]   <- K.armed_groups.lookup(s.surface)
+end for
+for each s in R.where do
+    R.where_meta[s] <- K.locations.lookup(s.surface)
+end for
+R.taxonomy   <- classify_taxonomy(R, K)
+R.confidence <- aggregate_confidence(spans_filt, R.taxonomy)
+return R
+---------------------------------------------------------------
 ```
+
+*Algorithm 4.5: Post-NER 5W1H structuring with knowledge-base validation.*
 
 Confidence thresholds are calibrated by category: WHO 0.70, WHOM
 0.70, WHAT 0.60, WHEN 0.80, WHERE 0.70, HOW 0.75. These thresholds
@@ -2019,22 +2042,24 @@ diversity sampling described in Section 4.6 and described in
 Algorithm 4.2.
 
 ```
-Algorithm 4.2  Stratified diversity sampling for entity coverage
 ---------------------------------------------------------------
 Input:  Pool P, target size T, rare-entity budget R,
         diversity budget D, rare set Σ = {VICTIM, ACTION, CASUALTIES}
 Output: Selected subset S with |S| = T
 ---------------------------------------------------------------
- 1: for each p in P do
- 2:     rare_score[p] <- | {e ∈ entities(p) : type(e) ∈ Σ} |
- 3:     div_score[p]  <- | distinct(type(e) for e in entities(p)) |
- 4: end for
- 5: P_rare <- top-R items of P ordered by rare_score desc
- 6: P_div  <- top-D items of (P \ P_rare) ordered by div_score desc
- 7: P_rest <- random-sample(P \ (P_rare ∪ P_div), T - R - D)
- 8: S      <- P_rare ∪ P_div ∪ P_rest
- 9: return S
+for each p in P do
+    rare_score[p] <- | { e ∈ entities(p) : type(e) ∈ Σ } |
+    div_score[p]  <- | distinct( type(e) for e in entities(p) ) |
+end for
+P_rare <- top-R items of P ordered by rare_score desc
+P_div  <- top-D items of ( P \ P_rare ) ordered by div_score desc
+P_rest <- random-sample( P \ (P_rare ∪ P_div), T - R - D )
+S      <- P_rare ∪ P_div ∪ P_rest
+return S
+---------------------------------------------------------------
 ```
+
+*Algorithm 4.2: Stratified diversity sampling for entity coverage.*
 
 In the production run, T = 35,000, R = 12,000, D = 11,666, and the
 random remainder is 11,334.
@@ -2043,25 +2068,27 @@ Augmentation is implemented in `scripts/augment_training_data.py`
 following Algorithm 4.3.
 
 ```
-Algorithm 4.3  Template-based augmentation
 ---------------------------------------------------------------
 Input:  KB groups G, locations L, weapons W, verb lexicons V,
         template list T, augmentation budget N
 Output: Synthetic example list A with |A| = N
 ---------------------------------------------------------------
- 1: A <- empty
- 2: while |A| < N do
- 3:     tmpl   <- choose_random(T)
- 4:     actor  <- sample compatible group from G for tmpl
- 5:     loc    <- sample location from L matching actor.country
- 6:     verb   <- sample verb from V[type(tmpl)]
- 7:     n_k, n_i <- sample plausible casualty counts
- 8:     text   <- render(tmpl, actor, loc, verb, n_k, n_i)
- 9:     (tok, lbl) <- tokenize_and_bio_label(text, slots)
-10:     A <- A ++ [ {tokens: tok, labels: lbl, source:"aug"} ]
-11: end while
-12: return A
+A <- empty list
+while |A| < N do
+    tmpl       <- choose_random(T)
+    actor      <- sample compatible group from G for tmpl
+    loc        <- sample location from L matching actor.country
+    verb       <- sample verb from V[ type(tmpl) ]
+    n_k, n_i   <- sample plausible casualty counts
+    text       <- render(tmpl, actor, loc, verb, n_k, n_i)
+    (tok, lbl) <- tokenize_and_bio_label(text, slots)
+    A          <- A ++ [ { tokens: tok, labels: lbl, source: "aug" } ]
+end while
+return A
+---------------------------------------------------------------
 ```
+
+*Algorithm 4.3: Template-based augmentation.*
 
 The augmentation budget is 15,000 examples. Together with the 35,000
 sampled examples, the final training corpus is 50,000 examples,
@@ -2316,6 +2343,8 @@ programme in Chapter 7.
 All training and evaluation reported in this chapter were conducted
 on an Apple Silicon workstation with the configuration in Table 6.1.
 
+*Table 6.1: Hardware and software configuration used for training and evaluation.*
+
 | Component | Specification |
 |:----------|:--------------|
 | CPU        | Apple M-series, 10 cores |
@@ -2337,10 +2366,10 @@ match a gold entity.
 
 ## 6.2 Dataset Statistics
 
-Table 6.1 summarises the pre-processed dataset before subset
+Table 6.2 summarises the pre-processed dataset before subset
 selection.
 
-*Table 6.1: Pre-processed dataset statistics.*
+*Table 6.2: Pre-processed dataset statistics.*
 
 | Quantity                | Count      |
 |:------------------------|-----------:|
@@ -2351,10 +2380,10 @@ selection.
 | Unique entity types     | 8          |
 | BIO labels (incl. O)    | 17         |
 
-Table 6.2 reports entity-level frequencies in the full pre-processed
+Table 6.3 reports entity-level frequencies in the full pre-processed
 corpus.
 
-*Table 6.2: Entity-level frequency in the full pre-processed corpus.*
+*Table 6.3: Entity-level frequency in the full pre-processed corpus.*
 
 | Entity      | Count    | Share of entities |
 |:------------|---------:|------------------:|
@@ -2378,9 +2407,11 @@ share of ACTION, VICTIM, and CASUALTIES tokens to the order of 26 to
 32 percent of their respective categories in the optimised subset.
 
 Class weights derived from the training-set distribution by
-inverse-frequency weighting are summarised below; minority entities
-receive the maximum weight of 10, the dominant O class is heavily
-down-weighted.
+inverse-frequency weighting are summarised in Table 6.4; minority
+entities receive the maximum weight of ten, the dominant O class is
+heavily down-weighted.
+
+*Table 6.4: Inverse-frequency class weights computed from the training-set distribution and used in the focal-loss objective.*
 
 | Label           | Weight |
 |:----------------|-------:|
@@ -2400,7 +2431,7 @@ Figure 6.1 plots training and validation loss across epochs for a
 representative ten-epoch run with focal loss and class weighting
 enabled, and Figure 6.2 plots token-level validation accuracy.
 
-*Table 6.3: Per-epoch training dynamics for the representative run.*
+*Table 6.5: Per-epoch training dynamics for the representative run.*
 
 | Epoch | Train Loss | Val Loss | Val Accuracy |
 |------:|-----------:|---------:|-------------:|
@@ -2427,7 +2458,7 @@ The most recent end-to-end production run, recorded in
 `models/bert-base-cased_20251223_192332/training_config.json`,
 reports a best validation loss of 0.01358 at epoch 2 with the
 ReduceLROnPlateau scheduler engaged from epoch 3 onward. This is
-consistent with the dynamics in Table 6.3 and confirms the
+consistent with the dynamics in Table 6.5 and confirms the
 robustness of the fast-convergence behaviour across runs.
 
 The convergence speed (two epochs to best validation loss) reflects
@@ -2440,7 +2471,7 @@ training-set idiosyncrasies.
 
 ## 6.4 Overall Model Performance
 
-*Table 6.3: Best validation metrics across training runs.*
+*Table 6.6: Best validation metrics across training runs.*
 
 | Run                              | Best epoch | Val loss | Token accuracy |
 |:---------------------------------|:----------:|---------:|---------------:|
@@ -2459,10 +2490,10 @@ configuration for its regularisation properties.
 ## 6.5 Per-Entity Analysis
 
 Span-level precision, recall, and F1 are reported per entity in Table
-6.4. The metrics are computed on the 10,000-example validation set
+6.7. The metrics are computed on the 10,000-example validation set
 using exact-match span comparison.
 
-*Table 6.4: Per-entity precision, recall and F1 on the held-out validation set.*
+*Table 6.7: Per-entity precision, recall and F1 on the held-out validation set.*
 
 | Entity      | Support (gold spans) | Precision | Recall | F1    |
 |:------------|---------------------:|----------:|-------:|------:|
@@ -2523,7 +2554,7 @@ entities.
 To isolate the contribution of focal loss, four configurations were
 compared while holding everything else constant.
 
-*Table 6.5: Focal-loss ablation. Per-entity F1 on the validation set.*
+*Table 6.8: Focal-loss ablation. Per-entity F1 on the validation set.*
 
 | Entity      | Plain CE | Weighted CE | Focal (γ=2) | Focal + weights |
 |:------------|---------:|------------:|------------:|----------------:|
@@ -2576,7 +2607,7 @@ Single-document inference latency was measured for three
 representative article lengths on the same hardware used for
 training.
 
-*Table 6.6: Inference latency on representative articles.*
+*Table 6.9: Inference latency on representative articles.*
 
 | Article length     | Median latency | 95th percentile |
 |:-------------------|---------------:|----------------:|
@@ -2665,16 +2696,18 @@ model with a supplied dataset, and review a flagged event).
 
 Participants completed all six tasks. Aggregated Likert-scale
 responses (1 = strongly disagree, 5 = strongly agree) are reported
-below.
+in Table 6.10. The full questionnaire is reproduced in Annex F.
+
+*Table 6.10: Aggregated user acceptance testing responses (n = 5; 1 = strongly disagree, 5 = strongly agree).*
 
 | Statement                                                           | Mean | Std. |
 |:--------------------------------------------------------------------|:----:|-----:|
-| The extracted entities matched what I expected.                     | 4.4  | 0.5  |
+| The extracted entities matched what was expected.                   | 4.4  | 0.5  |
 | The 5W1H structuring was clear and easy to interpret.               | 4.6  | 0.5  |
 | The confidence scores were useful for triage.                       | 4.2  | 0.4  |
 | The KB enrichment (canonical names, country lookups) added value.   | 4.6  | 0.5  |
 | The training screen made it easy to start and monitor a run.        | 4.0  | 0.7  |
-| The analytics views answered the kinds of questions I would ask.    | 4.2  | 0.4  |
+| The analytics views answered the kinds of questions analysts ask.   | 4.2  | 0.4  |
 
 The most common qualitative comments were positive: participants
 appreciated the inline highlighting of entities, the canonicalisation
@@ -3138,9 +3171,20 @@ location, and tone, 1979–2012," in *ISA Annual Convention*, vol. 2,
 no. 4, 2013, pp. 1–49.
 
 [11] D. I. Adelani, J. Abbott, G. Neubig, D. D'Souza, J. Kreutzer,
-C. Lignos *et al.*, "MasakhaNER: Named entity recognition for
-African languages," *Transactions of the Association for
-Computational Linguistics*, vol. 9, pp. 1116–1131, 2021.
+C. Lignos, C. Palen-Michel, H. Buzaaba, S. Rijhwani, S. Ruder,
+S. Mayhew, I. A. Azime, S. H. Muhammad, C. C. Emezue, J.
+Nakatumba-Nabende, P. Ogayo, A. Anuoluwapo, C. Gitau, D. Mbaye,
+J. Alabi, S. M. Yimam, T. R. Gwadabe, I. Ezeani, R. A. Niyongabo,
+J. Mukiibi, V. Otiende, I. Orife, D. David, S. Ngom, T. Adewumi,
+P. Rayson, M. Adeyemi, G. Muriuki, E. Anebi, C. Chukwuneke,
+N. Odu, E. P. Wairagala, S. Oyerinde, C. Siro, T. S. Bateesa,
+T. Oloyede, Y. Wambui, V. Akinode, D. Nabagereka, M. Katusiime,
+A. Awokoya, M. MBOUP, D. Gebreyohannes, H. Tilaye, K. Nwaike,
+D. Wolde, A. Faye, B. Sibanda, O. Ahia, B. F. P. Dossou,
+K. Ogueji, T. I. DIOP, A. Diallo, A. Akinfaderin, T. Marengereke,
+and S. Osei, "MasakhaNER: Named entity recognition for African
+languages," *Transactions of the Association for Computational
+Linguistics*, vol. 9, pp. 1116–1131, 2021.
 
 [12] T.-Y. Lin, P. Goyal, R. Girshick, K. He and P. Dollar,
 "Focal loss for dense object detection," in *Proceedings of the IEEE
@@ -3268,11 +3312,12 @@ evaluation," Software, 2018. [Online]. Available:
 https://github.com/chakki-works/seqeval. Last accessed on
 May 10, 2026.
 
-[40] D. I. Adelani, J. Alabi, A. Fan, J. Kreutzer, X. Shen *et al.*,
-"AfroLM: A self-active learning-based multilingual pretrained
-language model for 23 African languages," in *Proceedings of the
-3rd Workshop on Simple and Efficient Natural Language Processing
-(SustaiNLP)*, 2022.
+[40] B. F. P. Dossou, A. L. Tonja, O. Yousuf, S. Osei, A. Oppong,
+I. Shode, O. O. Awoyomi, and C. C. Emezue, "AfroLM: A self-active
+learning-based multilingual pretrained language model for 23
+African languages," in *Proceedings of the 3rd Workshop on Simple
+and Efficient Natural Language Processing (SustaiNLP) at EMNLP
+2022*, Abu Dhabi, UAE, December 2022, pp. 52–64.
 
 \pagebreak
 
