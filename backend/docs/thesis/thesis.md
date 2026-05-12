@@ -263,6 +263,7 @@ Signed Declaration Sheet ................................................. 117
 |:------:|:-------------------------------------------------------------------|:----:|
 | 4.1    | High-level architecture of the VioNER system                       | 38   |
 | 4.2    | End-to-end processing pipeline                                     | 39   |
+| 4.2a   | Sequence of calls during synchronous inference                     | 40   |
 | 4.3    | BIO encoding example for a multi-word entity                        | 42   |
 | 4.4    | Four-level taxonomy hierarchy (visual outline)                      | 43   |
 | 4.5    | Knowledge-base entity-relationship outline                          | 46   |
@@ -1522,6 +1523,30 @@ News  ->  Tokenise  ->  BERT NER  ->  Entity Assembly
 *Figure 4.2: End-to-end processing pipeline from raw news text to
 queryable structured event records.*
 
+Figure 4.2a expands the same pipeline as a sequence diagram in which
+each participating component is rendered as a vertical lane.
+
+```
+User      Front-end       Inference API     NER Service       KB        DB
+ |             |                |                |             |         |
+ |--paste-->   |                |                |             |         |
+ |             |--POST /infer-->|                |             |         |
+ |             |                |--extract(t)--->|             |         |
+ |             |                |                |--BERT fwd-->|         |
+ |             |                |                |<--logits----|         |
+ |             |                |                |--assemble spans       |
+ |             |                |                |--lookup--->  |        |
+ |             |                |                |<--canonical--|        |
+ |             |                |                |--classify (rules)-->  |
+ |             |                |                |<--taxonomy----|       |
+ |             |                |<--event record-|             |         |
+ |             |                |--save event--------------------------> |
+ |             |<--event id-----|                |             |         |
+ |<--render----|                |                |             |         |
+```
+
+*Figure 4.2a: Sequence of calls during synchronous inference.*
+
 The boundary between extraction (NER) and post-processing is
 deliberate: it allows the supervised learning problem to be cast
 narrowly, with the schema in 4.3, while still producing a richer
@@ -1758,20 +1783,32 @@ across entity types.
 Algorithm 4.1 describes the sub-word alignment used to project
 word-level labels onto BERT WordPiece tokens.
 
-> **Algorithm 4.1:** Sub-word label alignment for BIO tagging
->
-> Input: tokens, labels, tokenizer
->
-> 1. Run the tokenizer with `is_split_into_words=True`.
-> 2. Retrieve `word_ids` from the encoding.
-> 3. Initialise `prev_word_idx` to None.
-> 4. For each `word_idx` in `word_ids`:
->    - If `word_idx` is None: emit -100 (ignore in loss).
->    - Else if `word_idx != prev_word_idx`: emit `label2id[labels[word_idx]]`.
->    - Else: take the label of the underlying word; if it starts with B-,
->      rewrite the prefix to I-; emit `label2id` of the rewritten label.
->    - Set `prev_word_idx = word_idx`.
-> 5. Return the list of label ids.
+```
+Algorithm 4.1  Sub-word label alignment for BIO tagging
+---------------------------------------------------------------
+Input:  tokens t[1..n], labels y[1..n], tokenizer T
+Output: aligned_label_ids l[1..m] with m >= n
+---------------------------------------------------------------
+ 1: enc <- T(tokens=t, is_split_into_words=True)
+ 2: word_ids <- enc.word_ids()
+ 3: l <- empty list
+ 4: prev <- null
+ 5: for each w in word_ids do
+ 6:     if w is null then
+ 7:         append IGNORE_INDEX (-100) to l
+ 8:     else if w != prev then
+ 9:         append label2id[ y[w] ] to l                 # first sub-word
+10:     else                                              # later sub-word
+11:         label <- y[w]
+12:         if label starts with "B-" then
+13:             label <- "I-" + label[2:]                # B->I transition
+14:         end if
+15:         append label2id[ label ] to l
+16:     end if
+17:     prev <- w
+18: end for
+19: return l
+```
 
 ### Training hyperparameters
 
@@ -1804,19 +1841,28 @@ The custom loss combines focal loss with inverse-frequency class
 weighting and optional label smoothing. Algorithm 4.4 summarises its
 behaviour.
 
-> **Algorithm 4.4:** Focal loss with inverse-frequency weighting
->
-> Input: logits z (N x C), targets y (N), class weights α (C), gamma,
-> ignore index I, label smoothing β
->
-> 1. Mask positions where y == I and exclude them from the loss.
-> 2. Compute log-softmax of z to obtain log p.
-> 3. If β > 0, smooth one-hot targets so that the true class gets
->    1 - β and the remaining mass β / (C-1) is distributed uniformly.
-> 4. Compute per-position cross entropy: CE_n = -Σ_c y_n,c * log p_n,c.
-> 5. Compute focal modulating factor: m_n = (1 - p_n,y_n)^γ.
-> 6. Multiply by per-class weight α_y_n.
-> 7. Return the mean of α_y_n * m_n * CE_n over the un-masked positions.
+```
+Algorithm 4.4  Focal loss with inverse-frequency weighting
+---------------------------------------------------------------
+Input:  logits z[1..N, 1..C], targets y[1..N], class weights α[1..C],
+        focusing parameter γ, ignore index I, label smoothing β
+Output: scalar loss L
+---------------------------------------------------------------
+ 1: mask[n] <- (y[n] != I)            for n = 1..N
+ 2: N_valid <- sum(mask)
+ 3: log_p   <- log_softmax(z, dim=-1) # shape N x C
+ 4: if β > 0 then
+ 5:     y_smooth[n,c] <- (1-β)·1[c=y[n]] + β/(C-1)·1[c!=y[n]]
+ 6:     CE[n] <- - Σ_c y_smooth[n,c] · log_p[n,c]
+ 7: else
+ 8:     CE[n] <- - log_p[n, y[n]]
+ 9: end if
+10: p_true[n] <- exp( log_p[n, y[n]] )
+11: modulator[n] <- (1 - p_true[n])^γ
+12: weight[n]    <- α[ y[n] ]
+13: L_n[n] <- mask[n] · weight[n] · modulator[n] · CE[n]
+14: return  (Σ_n L_n[n]) / max(N_valid, 1)
+```
 
 The class weights are computed from the training-set distribution at
 the start of training. The weight for class c is w_c = T / (C * f_c),
@@ -1841,28 +1887,47 @@ the `--extend-epochs` flag.
 The inference pipeline transforms a raw input text into a structured
 5W1H record. Algorithm 4.5 describes the steps.
 
-> **Algorithm 4.5:** Post-NER 5W1H structuring with knowledge-base
-> validation
->
-> Input: text, NER service, knowledge base
->
-> 1. Tokenise text and run BERT NER to obtain per-token label ids and
->    softmax probabilities.
-> 2. Walk the predictions to assemble entity spans following BIO
->    transitions; for each span, record start, end, label, surface
->    form, and the mean confidence of the constituent sub-tokens.
-> 3. Filter spans by category-specific confidence thresholds (see
->    below).
-> 4. Map each filtered span to its 5W1H category via the
->    {ACTOR -> WHO, VICTIM -> WHOM, ACTION -> WHAT, DATE -> WHEN,
->    REGION/CITY/DISTRICT -> WHERE, CASUALTIES -> HOW} table.
-> 5. For each ACTOR span, look up the canonical name and metadata in
->    the armed-groups KB; for each WHERE span, look up the country
->    and parent region in the locations KB; for each weapon mention
->    surfaced in HOW, look up the weapon category.
-> 6. Apply the taxonomy classifier (Section 4.4) over the enriched
->    record to assign Level 1 to Level 4 taxonomy labels.
-> 7. Combine all of the above into a single structured event record.
+```
+Algorithm 4.5  Post-NER 5W1H structuring with KB validation
+---------------------------------------------------------------
+Input:  text x, NER service M, knowledge base K,
+        per-category thresholds τ[c]
+Output: structured event record R
+---------------------------------------------------------------
+ 1: (tok, offsets) <- tokenize(x)
+ 2: logits         <- M.forward(tok)
+ 3: pred[i]        <- argmax_c logits[i, c]                for all i
+ 4: probs[i]       <- softmax(logits[i, ·])                for all i
+ 5: spans          <- empty list
+ 6: i <- 1; while i <= |tok| do
+ 7:     if id2label[pred[i]] starts with "B-" then
+ 8:         start <- offsets[i].start; t <- label[2:]
+ 9:         confs <- [ probs[i, pred[i]] ]
+10:         j <- i+1
+11:         while j <= |tok| and id2label[pred[j]] == "I-"+t do
+12:             confs <- confs ++ [ probs[j, pred[j]] ]
+13:             j <- j+1
+14:         end while
+15:         end_off <- offsets[j-1].end
+16:         spans <- spans ++ [(t, start, end_off, mean(confs))]
+17:         i <- j
+18:     else
+19:         i <- i+1
+20:     end if
+21: end while
+22: spans_filt  <- { s in spans : confidence(s) >= τ[ category_of(s) ] }
+23: R.entities  <- spans_filt
+24: R.who, ..., R.how <- group_by_5w1h(spans_filt)
+25: for each s in R.who do
+26:     R.who_meta[s] <- K.armed_groups.lookup(s.surface)
+27: end for
+28: for each s in R.where do
+29:     R.where_meta[s] <- K.locations.lookup(s.surface)
+30: end for
+31: R.taxonomy  <- classify_taxonomy(R, K)
+32: R.confidence <- aggregate_confidence(spans_filt, R.taxonomy)
+33: return R
+```
 
 Confidence thresholds are calibrated by category: WHO 0.70, WHOM
 0.70, WHAT 0.60, WHEN 0.80, WHERE 0.70, HOW 0.75. These thresholds
@@ -2015,19 +2080,23 @@ The `create_training_subset.py` script implements the stratified
 diversity sampling described in Section 4.6 and described in
 Algorithm 4.2.
 
-> **Algorithm 4.2:** Stratified diversity sampling for entity coverage
->
-> Input: Pool P, target size T, rare-entity budget R, diversity budget D
->
-> 1. Identify the rare entity set: {VICTIM, ACTION, CASUALTIES}.
-> 2. For each example p in P, compute its rare-entity score (number of
->    distinct rare-entity types present).
-> 3. Select the top R examples by rare-entity score.
-> 4. From the remaining pool, score each example by its number of
->    distinct entity types and select the top D examples.
-> 5. From the residual pool, randomly sample the remaining T - R - D
->    examples.
-> 6. Return the union.
+```
+Algorithm 4.2  Stratified diversity sampling for entity coverage
+---------------------------------------------------------------
+Input:  Pool P, target size T, rare-entity budget R,
+        diversity budget D, rare set Σ = {VICTIM, ACTION, CASUALTIES}
+Output: Selected subset S with |S| = T
+---------------------------------------------------------------
+ 1: for each p in P do
+ 2:     rare_score[p] <- | {e ∈ entities(p) : type(e) ∈ Σ} |
+ 3:     div_score[p]  <- | distinct(type(e) for e in entities(p)) |
+ 4: end for
+ 5: P_rare <- top-R items of P ordered by rare_score desc
+ 6: P_div  <- top-D items of (P \ P_rare) ordered by div_score desc
+ 7: P_rest <- random-sample(P \ (P_rare ∪ P_div), T - R - D)
+ 8: S      <- P_rare ∪ P_div ∪ P_rest
+ 9: return S
+```
 
 In the production run, T = 35,000, R = 12,000, D = 11,666, and the
 random remainder is 11,334.
@@ -2035,20 +2104,26 @@ random remainder is 11,334.
 Augmentation is implemented in `scripts/augment_training_data.py`
 following Algorithm 4.3.
 
-> **Algorithm 4.3:** Template-based augmentation
->
-> Input: KB armed groups, locations, weapons; verb lexicons; template list
->
-> 1. For each template, repeatedly:
->    - Sample an actor from the KB compatible with the template.
->    - Sample a location from the KB compatible with the actor's country
->      of operation, where possible.
->    - Sample an action verb from the verb lexicon appropriate to the
->      template type (location-taking, victim-taking, or clash).
->    - Sample casualties counts within plausible ranges.
->    - Populate the template and produce a tokenised, BIO-labelled
->      example with `source = "augmentation"`.
-> 2. Stop when the augmentation budget is exhausted.
+```
+Algorithm 4.3  Template-based augmentation
+---------------------------------------------------------------
+Input:  KB groups G, locations L, weapons W, verb lexicons V,
+        template list T, augmentation budget N
+Output: Synthetic example list A with |A| = N
+---------------------------------------------------------------
+ 1: A <- empty
+ 2: while |A| < N do
+ 3:     tmpl   <- choose_random(T)
+ 4:     actor  <- sample compatible group from G for tmpl
+ 5:     loc    <- sample location from L matching actor.country
+ 6:     verb   <- sample verb from V[type(tmpl)]
+ 7:     n_k, n_i <- sample plausible casualty counts
+ 8:     text   <- render(tmpl, actor, loc, verb, n_k, n_i)
+ 9:     (tok, lbl) <- tokenize_and_bio_label(text, slots)
+10:     A <- A ++ [ {tokens: tok, labels: lbl, source:"aug"} ]
+11: end while
+12: return A
+```
 
 The augmentation budget is 15,000 examples. Together with the 35,000
 sampled examples, the final training corpus is 50,000 examples,
@@ -3423,28 +3498,108 @@ guideline.
   taxonomy with category definitions, decision rules, and worked
   examples.
 
-### Database schema summary
+### Database schema (PostgreSQL)
 
 ```
-users                ( id, email, full_name, role, password_hash, created_at )
-training_runs        ( id, user_id, model, dataset, hyperparameters,
-                       started_at, finished_at, status, best_epoch,
-                       best_val_loss )
-events               ( id, user_id, source_text, extracted_at, model_id,
-                       taxonomy_level_1, taxonomy_level_2,
-                       taxonomy_level_3, taxonomy_level_4,
-                       confidence, status )
-event_entities       ( id, event_id, entity_type, surface_form,
-                       canonical_form, start, end, confidence,
-                       kb_match_id )
-kb_armed_groups      ( id, canonical_name, aliases, country, region,
-                       group_type, active )
-kb_locations         ( id, name, type, country, parent_region )
-kb_taxonomy          ( id, level, parent_id, name, definition,
-                       criteria, keywords )
-inference_history    ( id, user_id, input_text, output_event_id,
-                       latency_ms, created_at )
+users
+  id                 UUID PRIMARY KEY
+  email              TEXT UNIQUE NOT NULL
+  full_name          TEXT NOT NULL
+  role               TEXT NOT NULL CHECK (role IN ('admin','analyst','viewer'))
+  password_hash      TEXT NOT NULL
+  is_active          BOOLEAN DEFAULT TRUE
+  created_at         TIMESTAMPTZ DEFAULT NOW()
+  last_login_at      TIMESTAMPTZ
+
+training_runs
+  id                 UUID PRIMARY KEY
+  user_id            UUID NOT NULL REFERENCES users(id)
+  model              TEXT NOT NULL                 -- e.g. 'bert-base-cased'
+  dataset_path       TEXT NOT NULL
+  hyperparameters    JSONB NOT NULL                -- ModelConfig dump
+  started_at         TIMESTAMPTZ DEFAULT NOW()
+  finished_at        TIMESTAMPTZ
+  status             TEXT CHECK (status IN ('queued','running','completed','failed','cancelled'))
+  best_epoch         INTEGER
+  best_val_loss      DOUBLE PRECISION
+  checkpoint_path    TEXT
+  log_path           TEXT
+
+events
+  id                 UUID PRIMARY KEY
+  user_id            UUID REFERENCES users(id)
+  source_text        TEXT NOT NULL
+  source_url         TEXT
+  extracted_at       TIMESTAMPTZ DEFAULT NOW()
+  model_id           UUID REFERENCES training_runs(id)
+  taxonomy_level_1   TEXT
+  taxonomy_level_2   TEXT
+  taxonomy_level_3   TEXT
+  taxonomy_level_4   TEXT
+  primary_country    TEXT
+  primary_region     TEXT
+  primary_city       TEXT
+  event_date         DATE
+  total_killed       INTEGER
+  total_injured      INTEGER
+  confidence         DOUBLE PRECISION
+  status             TEXT CHECK (status IN ('extracted','reviewed','confirmed','flagged','rejected'))
+
+event_entities
+  id                 UUID PRIMARY KEY
+  event_id           UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE
+  entity_type        TEXT NOT NULL                 -- ACTOR, VICTIM, ...
+  surface_form       TEXT NOT NULL                 -- as found in text
+  canonical_form     TEXT                          -- after KB lookup
+  start_offset       INTEGER NOT NULL
+  end_offset         INTEGER NOT NULL
+  confidence         DOUBLE PRECISION NOT NULL
+  kb_match_id        UUID                          -- nullable FK to KB row
+
+kb_armed_groups
+  id                 UUID PRIMARY KEY
+  canonical_name     TEXT UNIQUE NOT NULL
+  aliases            TEXT[] DEFAULT '{}'
+  country            TEXT NOT NULL
+  region             TEXT NOT NULL
+  group_type         TEXT CHECK (group_type IN
+                        ('militia','terrorist','rebel','government','mercenary'))
+  active             BOOLEAN DEFAULT TRUE
+  notes              TEXT
+
+kb_locations
+  id                 UUID PRIMARY KEY
+  name               TEXT NOT NULL
+  loc_type           TEXT CHECK (loc_type IN ('city','region','district','country'))
+  country            TEXT NOT NULL
+  parent_region      TEXT
+  latitude           DOUBLE PRECISION
+  longitude          DOUBLE PRECISION
+
+kb_taxonomy
+  id                 UUID PRIMARY KEY
+  level              INTEGER NOT NULL CHECK (level BETWEEN 1 AND 4)
+  parent_id          UUID REFERENCES kb_taxonomy(id)
+  name               TEXT NOT NULL
+  definition         TEXT
+  criteria           TEXT
+  keywords           TEXT[]
+
+inference_history
+  id                 UUID PRIMARY KEY
+  user_id            UUID REFERENCES users(id)
+  input_text         TEXT NOT NULL
+  output_event_id    UUID REFERENCES events(id)
+  latency_ms         INTEGER NOT NULL
+  model_id           UUID REFERENCES training_runs(id)
+  created_at         TIMESTAMPTZ DEFAULT NOW()
 ```
+
+Indexes are created on `events(event_date)`,
+`events(primary_country, primary_region)`,
+`event_entities(event_id, entity_type)`,
+`event_entities(canonical_form)` for actor-centric queries, and
+`training_runs(user_id, started_at desc)` for the dashboard.
 
 \pagebreak
 
