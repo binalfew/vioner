@@ -176,8 +176,9 @@ during the long months of training, debugging, and writing.
    2.2 Named Entity Recognition ......................................... 17
    2.3 Transformer Models and BERT ...................................... 19
    2.4 Class Imbalance in Token Classification .......................... 22
-   2.5 Conflict Event Databases and Coding Schemes ..................... 24
-   2.6 Knowledge Bases and Ontologies for Events ....................... 26
+   2.5 Evaluation Metrics for Named Entity Recognition ................. 25
+   2.6 Conflict Event Databases and Coding Schemes ..................... 27
+   2.7 Knowledge Bases and Ontologies for Events ....................... 29
 3. Related Work .......................................................... 28
    3.1 General Event Extraction from News ............................... 28
    3.2 Violence-Specific Event Extraction Systems ....................... 30
@@ -936,6 +937,21 @@ performance. This property is particularly important when the
 domain corpus is heavily skewed in its label distribution, as is the
 case in this work.
 
+The need for African-specific resources has been recognised in
+recent work. Adelani and colleagues introduced MasakhaNER [11], a
+named-entity recognition benchmark for ten African languages
+including Amharic, Hausa, Igbo, Kinyarwanda, Luganda, Luo, Wolof,
+and Yoruba, with annotations for PERSON, ORGANISATION, LOCATION, and
+DATE. MasakhaNER demonstrated that generic multilingual models such
+as mBERT and XLM-RoBERTa underperform on African text compared to
+models pre-trained or further fine-tuned on African corpora.
+Subsequent work on AfroLM and AfroXLMR has extended this line by
+producing African-pre-trained encoders. The VioNER schema targets
+English-language reporting and therefore uses `bert-base-cased`, but
+the design is compatible with these African encoders as a future
+backbone, and the entity inventory (ACTOR/VICTIM/ACTION/etc.) is
+strictly richer than the four-type MasakhaNER schema.
+
 ## 2.3 Transformer Models and BERT
 
 The transformer architecture, introduced by Vaswani and colleagues
@@ -1042,9 +1058,77 @@ class weighting, computes the weights from the training-set label
 distribution at the start of training, and excludes the special -100
 label from both the loss and the weight computation. The
 implementation follows the formulation in [12], extended with optional
-label smoothing for regularisation.
+label smoothing β for regularisation:
 
-## 2.5 Conflict Event Databases and Coding Schemes
+> FL_LS(p, y) = -α_y (1 - p_y)^γ Σ_c y'_c log p_c
+>
+> where y'_c = (1 − β) · 1[c = y] + β / (C − 1) · 1[c ≠ y].
+
+The inverse-frequency weight for class c is computed once at the
+start of training as
+
+> α_c = T / (C · max(f_c, 1)),
+
+where T is the total token count over the training set, C is the
+number of classes, and f_c is the count of class c. The maximum
+weight is clipped to ten to prevent gradient instability. This
+clipping also has the practical effect of treating the three rarest
+entities (VICTIM, ACTION, CASUALTIES) identically at the loss level
+even though their raw frequencies differ slightly.
+
+In token classification the ignore index (-100) used for special
+tokens, sub-word continuations after the first sub-word of a word,
+and padding, must be respected by the loss. The custom focal loss
+in this work masks ignored positions before computing log-softmax,
+which both excludes them from the loss and keeps the per-position
+probability normalisation correct.
+
+## 2.5 Evaluation Metrics for Named Entity Recognition
+
+Two granularities of evaluation are conventionally reported for
+sequence-labelling NER: token-level and span-level (sometimes called
+entity-level).
+
+**Token-level metrics** compare gold and predicted BIO labels at
+each token position. Accuracy is the share of positions where the
+labels agree, with special tokens excluded. Per-class precision and
+recall can also be computed at this granularity. Token-level
+accuracy is, however, a misleading headline metric for imbalanced
+tagging: with O constituting roughly seventy-eight percent of
+tokens in this work's corpus, a degenerate model that predicts O
+everywhere would already achieve seventy-eight percent accuracy.
+
+**Span-level metrics** compare assembled entity spans rather than
+individual tokens. A predicted span (type t, start s, end e) is
+counted as a true positive if and only if a gold span exists with
+the same type and the same start and end positions. Partial
+overlaps count as a false positive (the prediction) and a false
+negative (the gold span). Per-entity precision is true positives
+divided by predicted spans; per-entity recall is true positives
+divided by gold spans; F1 is the harmonic mean. Macro F1 averages
+per-entity F1 with equal weight; micro F1 pools counts across
+entities before computing the single F1, weighting more populous
+entities more heavily.
+
+The standard reference implementation of span-level NER evaluation
+is `seqeval` [39], which exposes both "default" (BIO with strict
+boundary matching) and "strict" variants. The present work reports
+span-level precision, recall, and F1 with strict boundary matching
+to avoid inflated scores from partial credit, since downstream
+consumers of the extracted records (the knowledge-base validator,
+the event store, the analytics layer) treat boundary mismatches as
+distinct extractions rather than partial matches.
+
+A subtle point arises with BIO encoding under sub-word tokenisation.
+The convention used here, with the first sub-word inheriting the
+B- or I- label of the underlying word and subsequent sub-words
+receiving an I- label converted from any leading B-, ensures that
+the recovered spans align with whole-word boundaries at inference
+time. Where this convention is not followed, span-level evaluation
+may be systematically optimistic or pessimistic depending on how
+sub-word predictions are merged.
+
+## 2.6 Conflict Event Databases and Coding Schemes
 
 The taxonomic structure of violent events is informed by a long line
 of conflict-event databases. Three are particularly influential.
@@ -1087,7 +1171,7 @@ that reflect African conflict dynamics, including pastoralist-farmer
 clashes, communal cattle raiding, and election violence. The
 taxonomy is presented in full in Annex B.
 
-## 2.6 Knowledge Bases and Ontologies for Events
+## 2.7 Knowledge Bases and Ontologies for Events
 
 Knowledge bases (KBs) and ontologies complement extraction by
 providing reference data and semantic structure against which
@@ -2957,6 +3041,17 @@ and Knowledge Discovery*, vol. 22, no. 1–2, pp. 31–72, 2011.
 
 [38] CEWS, *Data Collection and Analysis Tools for Continental Early
 Warning System*, Unpublished Internal Document, Addis Ababa, 2013.
+
+[39] H. Nakayama, "seqeval: A Python framework for sequence labeling
+evaluation," Software, 2018. [Online]. Available:
+https://github.com/chakki-works/seqeval. Last accessed on
+May 10, 2026.
+
+[40] D. I. Adelani, J. Alabi, A. Fan, J. Kreutzer, X. Shen *et al.*,
+"AfroLM: A self-active learning-based multilingual pretrained
+language model for 23 African languages," in *Proceedings of the
+3rd Workshop on Simple and Efficient Natural Language Processing
+(SustaiNLP)*, 2022.
 
 \pagebreak
 
