@@ -1310,7 +1310,7 @@ VioNER along seven dimensions: NLP backbone, entity-schema size,
 target languages, regional focus, taxonomy depth, presence of a
 curated knowledge base, and operational packaging.
 
-*Table 3.1: Comparative position of VioNER relative to prior systems.*
+*Table 3.1: Comparative position of VioNER relative to prior systems*
 
 | System / dimension      | NLP backbone        | Schema | Languages | Regional focus | Taxonomy depth | KB integration | Operational packaging |
 |:------------------------|:--------------------|:------:|:----------|:---------------|:--------------:|:--------------:|:----------------------|
@@ -1444,7 +1444,7 @@ provides the web UI.
 +--------+         +------------+         +------------+
 ```
 
-*Figure 4.1: High-level architecture of the VioNER system.*
+*Figure 4.1: High-level architecture of the VioNER system*
 
 Figure 4.2 sketches the end-to-end processing pipeline that an
 incoming article traverses.
@@ -1463,7 +1463,7 @@ News  ->  Tokenise  ->  BERT NER  ->  Entity Assembly
 ```
 
 *Figure 4.2: End-to-end processing pipeline from raw news text to
-queryable structured event records.*
+queryable structured event records*
 
 Figure 4.3 expands the same pipeline as a sequence diagram in which
 each participating component is rendered as a vertical lane.
@@ -1487,7 +1487,7 @@ User      Front-end       Inference API     NER Service       KB        DB
  |<--render----|                |                |             |         |
 ```
 
-*Figure 4.3: Sequence of calls during synchronous inference.*
+*Figure 4.3: Sequence of calls during synchronous inference*
 
 The boundary between extraction (NER) and post-processing is
 deliberate: it allows the supervised learning problem to be cast
@@ -1502,7 +1502,7 @@ confirmed as reliably grounded in source text. The resulting eight
 entity types, organised under the 5W1H categories, are listed in
 Table 4.1.
 
-*Table 4.1: Eight-entity grounded schema for the VioNER NER component.*
+*Table 4.1: Eight-entity grounded schema for the VioNER NER component*
 
 | 5W1H category | Entity type | Description and examples |
 |:--------------|:------------|:-------------------------|
@@ -1536,7 +1536,7 @@ Labels:    B-ACTOR  I-ACTOR   O          B-ACTION   B-CASUALTIES  B-VICTIM    O 
 
 *Figure 4.4: BIO encoding example for a sentence describing a
 violent event. Multi-token entities such as "Al Shabaab" are
-encoded by a leading B- tag followed by I- tags.*
+encoded by a leading B- tag followed by I- tags*
 
 Sub-word tokenisation introduces a complication: a single
 gold-labelled word may be split into several sub-word tokens, and the
@@ -1558,7 +1558,7 @@ taxonomy is presented in Annex B; this section presents the Level 1
 and Level 2 structure in Table 4.2 and Table 4.3 respectively, with
 the visual outline in Figure 4.5.
 
-*Table 4.2: Level 1 categories of the hierarchical taxonomy.*
+*Table 4.2: Level 1 categories of the hierarchical taxonomy*
 
 | Level 1                          | Definition                                                            |
 |:---------------------------------|:----------------------------------------------------------------------|
@@ -1567,7 +1567,7 @@ the visual outline in Figure 4.5.
 | Communal Violence                | Violence between identity-based groups (ethnic, religious, clan) over resources, territory, or social dominance.                                  |
 | State Violence Against Civilians | Violence perpetrated by state security forces against non-combatant civilians outside of armed conflict contexts.                                |
 
-*Table 4.3: Level 2 intermediate violence types.*
+*Table 4.3: Level 2 intermediate violence types*
 
 | Level 1                          | Level 2                                                                                                       |
 |:---------------------------------|:--------------------------------------------------------------------------------------------------------------|
@@ -1607,7 +1607,7 @@ VIOLENT EVENTS TAXONOMY
 ```
 
 *Figure 4.5: Four-level taxonomy hierarchy (visual outline of Levels 1
-to 3).*
+to 3)*
 
 Each terminal category in the taxonomy is documented with a
 definition, classification criteria, distinguishing features, typical
@@ -1667,7 +1667,7 @@ disagrees with the location extracted in the same sentence) lower the
 event's overall confidence score and are surfaced in the analytics
 view for manual review.
 
-*Table 4.4: Knowledge base content summary.*
+*Table 4.4: Knowledge base content summary*
 
 | Resource                | Approximate size |
 |:------------------------|:-----------------|
@@ -1754,13 +1754,13 @@ return l
 ---------------------------------------------------------------
 ```
 
-*Algorithm 4.1: Sub-word label alignment for BIO tagging.*
+*Algorithm 4.1: Sub-word label alignment for BIO tagging*
 
 ### Training hyperparameters
 
 The principal hyperparameters are listed in Table 4.5.
 
-*Table 4.5: Training hyperparameters.*
+*Table 4.5: Training hyperparameters*
 
 | Hyperparameter            | Value             |
 |:--------------------------|:------------------|
@@ -1810,7 +1810,7 @@ return  ( Σ_n L_n[n] ) / max( N_valid, 1 )
 ---------------------------------------------------------------
 ```
 
-*Algorithm 4.4: Focal loss with inverse-frequency class weighting.*
+*Algorithm 4.4: Focal loss with inverse-frequency class weighting*
 
 The class weights are computed from the training-set distribution at
 the start of training. The weight for class c is w_c = T / (C * f_c),
@@ -1879,7 +1879,7 @@ return R
 ---------------------------------------------------------------
 ```
 
-*Algorithm 4.5: Post-NER 5W1H structuring with knowledge-base validation.*
+*Algorithm 4.5: Post-NER 5W1H structuring with knowledge-base validation*
 
 Confidence thresholds are calibrated by category: WHO 0.70, WHOM
 0.70, WHAT 0.60, WHEN 0.80, WHERE 0.70, HOW 0.75. These thresholds
@@ -1946,7 +1946,7 @@ end. PostgreSQL serves as the persistent data store. Docker Compose
 orchestrates the development environment. Table 5.1 and Table 5.2
 list the back-end and front-end stacks respectively.
 
-*Table 5.1: Back-end technology stack.*
+*Table 5.1: Back-end technology stack*
 
 | Component                  | Choice                                                 |
 |:---------------------------|:-------------------------------------------------------|
@@ -1966,7 +1966,7 @@ list the back-end and front-end stacks respectively.
 | Logging                    | Python `logging` with structured output                |
 | Containerisation           | Docker, Docker Compose                                 |
 
-*Table 5.2: Front-end technology stack.*
+*Table 5.2: Front-end technology stack*
 
 | Component                  | Choice                                                 |
 |:---------------------------|:-------------------------------------------------------|
@@ -2051,7 +2051,7 @@ return S
 ---------------------------------------------------------------
 ```
 
-*Algorithm 4.2: Stratified diversity sampling for entity coverage.*
+*Algorithm 4.2: Stratified diversity sampling for entity coverage*
 
 In the production run, T = 35,000, R = 12,000, D = 11,666, and the
 random remainder is 11,334.
@@ -2080,7 +2080,7 @@ return A
 ---------------------------------------------------------------
 ```
 
-*Algorithm 4.3: Template-based augmentation.*
+*Algorithm 4.3: Template-based augmentation*
 
 The augmentation budget is 15,000 examples. Together with the 35,000
 sampled examples, the final training corpus is 50,000 examples,
@@ -2209,7 +2209,7 @@ backend/
     init/                       DDL bootstrap
 ```
 
-*Figure 5.1: Back-end module organisation.*
+*Figure 5.1: Back-end module organisation*
 
 The application lifespan handler initialises the database connection,
 loads the NER model from the configured checkpoint path, and starts
@@ -2268,7 +2268,7 @@ frontend/src/
   lib/                           helpers (formatting, dates, colour scales)
 ```
 
-*Figure 5.2: Front-end route map.*
+*Figure 5.2: Front-end route map*
 
 The Inference screen lets a user paste a paragraph of text or upload
 a document, calls `/api/inference`, and renders the returned
@@ -2335,7 +2335,7 @@ programme in Chapter 7.
 All training and evaluation reported in this chapter were conducted
 on an Apple Silicon workstation with the configuration in Table 6.1.
 
-*Table 6.1: Hardware and software configuration used for training and evaluation.*
+*Table 6.1: Hardware and software configuration used for training and evaluation*
 
 | Component | Specification |
 |:----------|:--------------|
@@ -2361,7 +2361,7 @@ match a gold entity.
 Table 6.2 summarises the pre-processed dataset before subset
 selection.
 
-*Table 6.2: Pre-processed dataset statistics.*
+*Table 6.2: Pre-processed dataset statistics*
 
 | Quantity                | Count      |
 |:------------------------|-----------:|
@@ -2375,7 +2375,7 @@ selection.
 Table 6.3 reports entity-level frequencies in the full pre-processed
 corpus.
 
-*Table 6.3: Entity-level frequency in the full pre-processed corpus.*
+*Table 6.3: Entity-level frequency in the full pre-processed corpus*
 
 | Entity      | Count    | Share of entities |
 |:------------|---------:|------------------:|
@@ -2403,7 +2403,7 @@ inverse-frequency weighting are summarised in Table 6.4; minority
 entities receive the maximum weight of ten, the dominant O class is
 heavily down-weighted.
 
-*Table 6.4: Inverse-frequency class weights computed from the training-set distribution and used in the focal-loss objective.*
+*Table 6.4: Inverse-frequency class weights computed from the training-set distribution and used in the focal-loss objective*
 
 | Label           | Weight |
 |:----------------|-------:|
@@ -2438,7 +2438,7 @@ enabled, and Figure 6.2 plots token-level validation accuracy.
 
 *Figure 6.1: Training (`*`) and validation (`.`) loss curves across
 epochs for the representative run. The validation loss reaches its
-minimum at epoch 2 and rises modestly thereafter.*
+minimum at epoch 2 and rises modestly thereafter*
 
 ```
         accuracy
@@ -2456,9 +2456,9 @@ minimum at epoch 2 and rises modestly thereafter.*
 ```
 
 *Figure 6.2: Token-level validation accuracy across epochs for the
-representative run.*
+representative run*
 
-*Table 6.5: Per-epoch training dynamics for the representative run.*
+*Table 6.5: Per-epoch training dynamics for the representative run*
 
 | Epoch | Train Loss | Val Loss | Val Accuracy |
 |------:|-----------:|---------:|-------------:|
@@ -2501,7 +2501,7 @@ training-set idiosyncrasies.
 Table 6.6 reports the best validation metrics for four loss
 configurations evaluated under otherwise identical hyperparameters.
 
-*Table 6.6: Best validation metrics across training runs.*
+*Table 6.6: Best validation metrics across training runs*
 
 | Run                              | Best epoch | Val loss | Token accuracy |
 |:---------------------------------|:----------:|---------:|---------------:|
@@ -2523,7 +2523,7 @@ Span-level precision, recall, and F1 are reported per entity in
 Table 6.7. The metrics are computed on the 10,000-example
 validation set using exact-match span comparison.
 
-*Table 6.7: Per-entity precision, recall and F1 on the held-out validation set.*
+*Table 6.7: Per-entity precision, recall and F1 on the held-out validation set*
 
 | Entity      | Support (gold spans) | Precision | Recall | F1    |
 |:------------|---------------------:|----------:|-------:|------:|
@@ -2551,7 +2551,7 @@ DISTRICT   |============================== 0.826
 VICTIM     |============================= 0.817
 ```
 
-*Figure 6.3: Per-entity F1 bar chart.*
+*Figure 6.3: Per-entity F1 bar chart*
 
 Several patterns emerge.
 
@@ -2585,7 +2585,7 @@ To isolate the contribution of focal loss, four configurations were
 compared while holding everything else constant. Per-entity F1
 across the four configurations is shown in Table 6.8.
 
-*Table 6.8: Focal-loss ablation. Per-entity F1 on the validation set.*
+*Table 6.8: Per-entity F1 on the validation set for the focal-loss ablation*
 
 | Entity      | Plain CE | Weighted CE | Focal (γ=2) | Focal + weights |
 |:------------|---------:|------------:|------------:|----------------:|
@@ -2639,7 +2639,7 @@ representative article lengths on the same hardware used for
 training. Median and 95th-percentile latencies are reported in
 Table 6.9.
 
-*Table 6.9: Inference latency on representative articles.*
+*Table 6.9: Inference latency on representative articles*
 
 | Article length     | Median latency | 95th percentile |
 |:-------------------|---------------:|----------------:|
@@ -2730,7 +2730,7 @@ Participants completed all six tasks. Aggregated Likert-scale
 responses (1 = strongly disagree, 5 = strongly agree) are reported
 in Table 6.10. The full questionnaire is reproduced in Annex F.
 
-*Table 6.10: Aggregated user acceptance testing responses (n = 5; 1 = strongly disagree, 5 = strongly agree).*
+*Table 6.10: Aggregated user acceptance testing responses (n = 5; 1 = strongly disagree, 5 = strongly agree)*
 
 | Statement                                                           | Mean | Std. |
 |:--------------------------------------------------------------------|:----:|-----:|
@@ -2788,7 +2788,7 @@ DISTRICT      0.07    0.09     ----
 ```
 
 *Figure 6.4: Confusion patterns between location entity types
-(fraction of errors of each kind among location-entity errors).*
+(fraction of errors of each kind among location-entity errors)*
 
 The error analysis motivates three concrete future-work directions:
 explicit boundary refinement (for example, training a span-level
