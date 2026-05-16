@@ -510,8 +510,8 @@ operational adoption.
 
 ## 1.3 Statement of the Problem
 
-The central problem addressed in this thesis is the absence, in the
-African early-warning ecosystem, of a robust, accurate, and openly
+The central problem addressed in this thesis is the absence, in
+the African early-warning ecosystem, of an accurate and openly
 documented pipeline for converting English-language news reports of
 violent events into structured 5W1H records suitable for downstream
 analysis. The problem can be decomposed into three sub-problems.
@@ -611,7 +611,7 @@ and exposes the full capability through a documented web platform.
 
 The following specific objectives operationalise the general objective.
 
-1. Review state-of-the-art literature on information extraction, event
+1. Review the literature on information extraction, event
    extraction, named entity recognition, transformer-based language
    models, and conflict event coding, and position the work with
    respect to it.
@@ -3024,9 +3024,10 @@ threats-to-validity discussion in Section 6.13.
 
 ## 7.1 Summary
 
-This thesis set out to address the absence, in the African early
-warning ecosystem, of a robust and openly documented pipeline for
-converting English-language news reports of violent events into
+This thesis set out to address the absence, in the African
+early-warning ecosystem, of an accurate and openly documented
+pipeline for converting English-language news reports of violent
+events into
 structured 5W1H records. The general objective stated in
 Section 1.4 was the design, implementation, and evaluation of VioNER,
 an integrated system that uses fine-tuned BERT-based named entity
