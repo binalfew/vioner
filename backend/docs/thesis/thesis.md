@@ -381,37 +381,35 @@ Converting these narratives into structured, queryable representations
 is a prerequisite for systematic monitoring, statistical aggregation,
 and evidence-based decision making.
 
-Natural Language Processing (NLP) has historically offered a partial
-answer to this problem through techniques such as part-of-speech
-tagging, named entity recognition, syntactic parsing, and coreference
-resolution [2]. Building on these foundations, the sub-field of
-Information Extraction (IE) seeks to identify named entities,
-relations between entities, and events within text and to populate
-structured records that downstream systems can consume. Event
-Extraction, in turn, treats an event as a complex construct with
-attributes such as actors, actions, locations, temporal markers, and
-circumstances, and aims to recover these attributes from prose [3],
-[4].
+Natural Language Processing (NLP) is the half-century-old discipline
+that attempts to make computers do useful things with human
+language, and the toolbox it has developed — part-of-speech tagging,
+syntactic parsing, named entity recognition, coreference resolution
+[2] — is exactly what an early-warning analyst is doing implicitly
+when reading a news article. Information Extraction (IE) is the
+specific sub-discipline that tries to mechanise the analyst's work:
+take prose in, produce structured records out. Event Extraction,
+in turn, narrows IE to events — verbs, nominalised actions, and
+their participants — and asks the model to recover who did what to
+whom, where, when, and how, from text alone [3], [4].
 
-Within Event Extraction, the 5W1H paradigm provides a compact
-template: Who performed the act, What action was taken, Whom or what
-was affected, Where it occurred, When it occurred, and How it
-unfolded. The 5W1H template is well aligned with how journalists are
-trained to report and with how analysts are trained to consume
-reports. It is therefore a natural target representation for an
-extraction system intended to support intelligence and humanitarian
-work.
+The 5W1H frame I adopt is not new. Journalism schools have taught
+it for over a century, and analysts in early-warning centres read
+for those slots whether or not they explicitly call them that. The
+attractive property for an automated system is that 5W1H decouples
+*what to extract* from *which event types exist*: even before any
+taxonomic question is settled, an extractor can populate a 5W1H
+record that downstream analytics can later classify.
 
-The state of the art in NLP shifted decisively with the introduction
-of the Transformer architecture [5] and pre-trained language models
-based on it, of which Bidirectional Encoder Representations from
-Transformers (BERT) is the most widely deployed [6]. BERT and its
-successors are pre-trained on large corpora using masked language
-modelling, then fine-tuned on smaller labelled datasets for downstream
-tasks such as Named Entity Recognition (NER). The combination of
-strong pre-training with task-specific fine-tuning has substantially
-narrowed the gap between research prototypes and operational systems
-for token-level prediction tasks [7].
+The technical opportunity is recent. Vaswani and colleagues'
+transformer architecture [5] and the line of pre-trained language
+models built on it — most prominently BERT [6] — narrowed the gap
+between research prototypes and operational NLP systems for
+token-level tasks by an order of magnitude in five years [7]. The
+combination of large-scale self-supervised pre-training with
+small-scale task-specific fine-tuning is what makes a 50,000-example
+domain corpus a workable input for a competitive NER model, where
+ten years earlier it would not have been.
 
 Within the specific domain of conflict and violence monitoring,
 several long-running data collection efforts have constructed
@@ -865,32 +863,36 @@ systems are deferred to Chapter 3.
 
 ## 2.1 Information Extraction and Event Extraction
 
-Information Extraction (IE) is the family of techniques that derive
-structured data from unstructured natural-language text [4]. Within
-IE, the canonical sub-tasks include Named Entity Recognition, relation
-extraction, coreference resolution, and event extraction. These
-sub-tasks are typically organised in a pipeline in which the output of
-one stage is consumed by the next, although end-to-end and joint
-learning approaches have also been developed.
+The umbrella term Information Extraction (IE) [4] covers any
+technique that pulls structured records out of free text. The field
+is conventionally broken into four sub-tasks — named entity
+recognition, relation extraction, coreference resolution, and event
+extraction — and although the textbook arrangement is a pipeline,
+in practice a great deal of recent work bundles two or more of these
+into joint or end-to-end models. The architectural decision I make
+in §4.2 is to stay close to the textbook pipeline, on grounds of
+debuggability and clarity rather than peak accuracy.
 
-Event Extraction (EE) treats an event as a structured combination of
-attributes representing an empirical occurrence, typically a verb or
-nominal predicate together with its participants (agent, patient,
-instrument), location, and time [3]. Two long-standing schemas have
-shaped how the field thinks about event structure. The Automatic
-Content Extraction (ACE) program defined a typology of event types
-with corresponding arguments and influenced a generation of supervised
-event extraction systems [14]. The Text Analysis Conference Knowledge
-Base Population (TAC-KBP) track has continued this line of work with
-larger and more diverse benchmarks.
+Event Extraction is the sub-task I care about most directly. The
+operational definition I use is the one in Ahn [3]: an event is a
+verb or nominal predicate together with the participants (agent,
+patient, instrument), the location, and the time that the predicate
+involves. The Automatic Content Extraction program [14] formalised
+this view in the early 2000s by publishing a typology of event
+types and their arguments, and that typology shaped the next
+decade of supervised event extraction. The Text Analysis Conference
+Knowledge Base Population track later picked up the baton with
+larger and more diverse evaluations.
 
-Within EE, the 5W1H paradigm offers a journalistic alternative to ACE
-that is particularly well suited to news text [15]. Rather than
-committing to a fixed inventory of event types, 5W1H asks, for each
-reported event, the questions Who, What, Whom, Where, When, and How.
-This thesis adopts the 5W1H formulation and ties it to a domain
-ontology of violent events; the ontology lives outside the NER model
-proper and is applied as a post-processing step.
+The journalistic 5W1H frame [15] is a less rigid alternative. It
+sidesteps the question of which event types to enumerate by asking
+the same six questions — Who, What, Whom, Where, When, How — of
+every reported event. For news text this is a near-perfect fit:
+journalists are trained to answer those questions in roughly the
+first paragraph, and analysts read for exactly those slots. I adopt
+5W1H, leave event-type classification to a post-NER step against
+the taxonomy in §4.4, and so avoid baking a fixed event-type
+inventory into the supervised learning problem itself.
 
 Hogenboom and colleagues survey event extraction methods for decision
 support in two complementary papers [16], [4]. They identify three
@@ -907,98 +909,104 @@ knowledge-base validation are rule-driven.
 
 ## 2.2 Named Entity Recognition
 
-Named Entity Recognition (NER) is the task of identifying spans of
-text that refer to entities of interest and assigning each span to one
-of a small set of types. Classical NER systems before the deep
-learning era combined hand-crafted features with sequence models such
-as Hidden Markov Models, Maximum Entropy Markov Models, and
-Conditional Random Fields (CRFs) [17]. CRFs were widely adopted
-because they model dependencies between successive labels, which is
-essential for the BIO tagging scheme adopted by most modern NER
-systems.
+For the purposes of this thesis, NER means deciding for every token
+in a sentence whether it belongs to an entity I care about and, if
+so, which entity type. Before deep learning, the dominant approach
+combined hand-engineered features (capitalisation patterns,
+gazetteers, surrounding part-of-speech tags) with a sequence model
+that knew how to make a structured prediction over the whole
+sentence — Hidden Markov Models, Maximum Entropy Markov Models, and
+later Conditional Random Fields (CRFs) [17]. CRFs became the
+workhorse because they model how successive labels constrain each
+other, which matters when entities span multiple tokens and a B-
+must be followed by I-, not by another B-.
 
-The BIO scheme assigns each token one of three roles: B- for the
-beginning of an entity, I- for an internal token of an entity, and O
-for a token outside any entity. For a schema with k entity types,
-this expands to 2k + 1 labels in total. The BIO encoding is
-exhaustively understood in the literature, including its variants
-(BIOES, BILOU) that add explicit single-token and end-of-entity
-labels to further constrain decoder behaviour. This thesis adopts
-the simple BIO formulation, which gives seventeen labels for the
-eight-entity schema (two BIO prefixes per entity type plus the O
-label).
+I encode entities in BIO, the simplest of the standard schemes: a
+B- prefix on the first token of an entity, an I- prefix on each
+continuation token, and an O label everywhere else. For a schema
+with k entity types, BIO produces 2k + 1 labels — in my case,
+seventeen. Variants like BIOES or BILOU add explicit single-token
+and final-token labels to give the decoder more structure to lean
+on. I chose plain BIO for two reasons: the entity types in §4.3
+are short enough that the extra labels would mostly be redundant,
+and seqeval-style evaluation tooling supports plain BIO without
+configuration.
 
-Neural NER systems began to outperform feature-engineered models with
-the introduction of word embeddings and bi-directional Long
-Short-Term Memory (BiLSTM) networks [18]. The combination of BiLSTM
-with character-level convolutional networks and a CRF decoder, as in
-the architecture of Lample and colleagues [19], became the standard
-recipe for several years. These models proved that distributed
-representations could substitute for many of the hand-engineered
-features that had been central to earlier systems.
+The first wave of neural NER systems leant on word embeddings fed
+through bi-directional Long Short-Term Memory (BiLSTM) networks
+[18], typically combined with a character-level convolutional or
+recurrent layer to handle out-of-vocabulary tokens, and a CRF head
+on top to keep the BIO transitions sane. Lample and colleagues'
+architecture [19] became the recipe most replicated for several
+years, and it showed that learned representations could replace
+much of what the feature-engineering era had hand-crafted.
 
-The introduction of contextual word representations such as ELMo [20]
-and especially BERT [6] subsequently produced a step change in NER
-accuracy. Modern NER systems typically fine-tune a pre-trained
-transformer encoder with a linear classifier on top, optionally with
-a CRF head. Devlin and colleagues reported state-of-the-art results
-on the CoNLL-2003 NER benchmark with this architecture, and the
-results have been replicated and extended in subsequent work on
-multilingual and domain-specific NER.
+The next jump came from contextual representations — ELMo [20] and
+particularly BERT [6]. Once a transformer encoder had absorbed
+general-purpose language structure during pre-training, swapping
+out the classifier head and fine-tuning the encoder produced
+results that surpassed every BiLSTM-CRF system on the CoNLL-2003
+benchmark, and the recipe has stayed roughly the same since:
+contextual encoder, linear classifier, optional CRF head,
+cross-entropy or focal loss. VioNER follows this recipe.
 
-For violent-event extraction in the African context, the most
-relevant property of pre-trained transformer encoders is their
-inductive bias toward generalisation: a model that has been pre-trained
-on a large general-domain corpus can be fine-tuned with a relatively
-small domain-specific corpus and still produce strong domain-specific
-performance. This property is particularly important when the
-domain corpus is heavily skewed in its label distribution, as is the
-case in this work.
+The property that matters most for a low-resource setting like the
+African violent-event domain is that a transformer encoder absorbs
+enough general English during pre-training that a comparatively
+small specialised corpus can fine-tune it to good per-entity
+performance. The 50,000-example corpus I describe in Chapter 5
+would be far too small for a from-scratch BiLSTM-CRF; it is
+sufficient for a fine-tuned BERT precisely because of this
+transfer.
 
-The need for African-specific resources has been recognised in
-recent work. Adelani and colleagues introduced MasakhaNER [11], a
-named-entity recognition benchmark for ten African languages
-including Amharic, Hausa, Igbo, Kinyarwanda, Luganda, Luo, Wolof,
-and Yoruba, with annotations for PERSON, ORGANISATION, LOCATION, and
-DATE. MasakhaNER demonstrated that generic multilingual models such
-as mBERT and XLM-RoBERTa underperform on African text compared to
-models pre-trained or further fine-tuned on African corpora.
-Subsequent work on AfroLM and AfroXLMR has extended this line by
-producing African-pre-trained encoders. The VioNER schema targets
-English-language reporting and therefore uses `bert-base-cased`, but
-the design is compatible with these African encoders as a future
-backbone, and the entity inventory (ACTOR/VICTIM/ACTION/etc.) is
-strictly richer than the four-type MasakhaNER schema.
+Recent work has pushed for African-language NER resources directly.
+Adelani and colleagues' MasakhaNER [11] established a benchmark for
+ten African languages with annotations for PERSON, ORGANISATION,
+LOCATION, and DATE; their headline finding is that generic
+multilingual encoders such as mBERT and XLM-RoBERTa underperform on
+African text relative to encoders that have seen African corpora
+during pre-training. AfroLM [40] and AfroXLMR continued this line.
+My target is English-language reporting of African events rather
+than African-language reporting, so I use `bert-base-cased`, but
+the entity schema is strictly richer than MasakhaNER's four types,
+and an African-pre-trained backbone is a natural future swap
+(§7.5).
 
 ## 2.3 Transformer Models and BERT
 
-The transformer architecture, introduced by Vaswani and colleagues
-[5], replaces recurrent and convolutional sequence operations with
-self-attention. In self-attention, each position in a sequence
-attends to every other position, with attention weights computed from
-learned query, key, and value projections. The architecture allows
-strong parallel computation, captures long-range dependencies without
-the vanishing-gradient problems of recurrent models, and scales well
-with both data and parameters.
+The transformer [5] removed the recurrent step that had constrained
+sequence models for years and put self-attention in its place: each
+position in the input gets to look directly at every other position,
+through learned query / key / value projections, and the cost of
+that look-up is paid in parallel rather than in sequence. For my
+purposes the practical consequences matter more than the
+mathematical novelty: training can be parallelised on a GPU,
+long-range dependencies — exactly the kind that link an actor at
+the start of a sentence to a casualty count at the end — survive
+the encoding intact, and the architecture scales gracefully with
+parameter count and data.
 
-BERT [6] applies the encoder half of the transformer to
-representation learning. The model is pre-trained on a large corpus
-using two objectives: masked language modelling, in which 15 percent
-of the input tokens are masked and the model is trained to predict
-them, and next-sentence prediction, in which the model receives a
-pair of sentences and is trained to predict whether the second
-follows the first. The pre-trained encoder can then be fine-tuned on
-downstream tasks with relatively few task-specific parameters.
+BERT [6] is the encoder half of the original transformer turned
+into a representation learner. Its pre-training task is
+deliberately self-supervised: a randomly masked 15 percent of the
+input tokens get hidden, the model is asked to predict them from
+the surrounding context, and an auxiliary next-sentence-prediction
+head is trained alongside on pairs of sentences. After that
+pre-training run, the encoder carries enough generic English
+structure that I can attach a small task-specific head and
+fine-tune the whole thing on a few tens of thousands of NER
+examples with sensible results.
 
-For token-level prediction tasks such as NER, BERT exposes the
-sequence of contextual representations as output. A linear
-classification head over these representations produces per-token
-logits over the label vocabulary, and the model is fine-tuned with a
-standard cross-entropy or alternative loss against gold labels. The
-`bert-base-cased` variant used in this thesis has 12 transformer
-layers, 768 hidden dimensions, and approximately 110 million
-parameters. Cased tokenisation is preferred for NER because
-capitalisation is a strong feature for entity detection in English.
+For token classification specifically, the recipe is simple. BERT
+gives me one contextual vector per WordPiece token; I run a linear
+layer over each vector to produce logits across the seventeen-label
+vocabulary; I backpropagate a focal-loss objective with class
+weights (§2.4) through everything. The `bert-base-cased` checkpoint
+I use has twelve transformer layers, 768-dimensional hidden states,
+and roughly 110 million parameters. I use the cased variant
+deliberately: in English conflict reporting, capitalisation is
+extraordinarily informative for ACTOR and location entities, and
+the uncased variant throws that information away.
 
 Two further properties of BERT influence the design of the present
 system. First, BERT uses WordPiece sub-word tokenisation; a single
@@ -1027,50 +1035,55 @@ of the ablation discussion in Chapter 6.
 
 ## 2.4 Class Imbalance in Token Classification
 
-Token classification in NER is intrinsically class-imbalanced. In a
-typical news sentence, most tokens carry the O label, and within the
-entity tokens themselves some types are far more common than others.
-For the corpus assembled in this thesis, O tokens constitute
-approximately 78 percent of the total, with entity tokens forming the
-remaining 22 percent. Within the entity tokens, the distribution is
-itself skewed: ACTOR, CITY, DATE, REGION, and DISTRICT together
-account for the bulk of entity occurrences, while VICTIM, ACTION, and
-CASUALTIES are substantially rarer (see Chapter 6 for full
-statistics).
+NER under BIO is, almost by construction, a deeply imbalanced
+classification problem. Most tokens in any natural-language
+sentence are not part of any entity, so they all carry the O label;
+across the corpus I assemble in Chapter 5, O accounts for roughly
+seventy-eight percent of all tokens. The remaining twenty-two
+percent is itself uneven: ACTOR, CITY, DATE, REGION, and DISTRICT
+are common enough to learn well, while VICTIM, ACTION, and
+CASUALTIES are the entities I most need to recover and the entities
+on which a naive learner does worst.
 
-Three well-established families of techniques address class imbalance.
+The literature gives three handles on this problem, and I take a
+position on each.
 
-**Re-sampling.** The training set is rebalanced by oversampling
-minority-class examples or undersampling majority-class examples
-[24]. In token classification, this is awkward because rebalancing
-operates at the example level rather than the token level: a single
-sentence contains tokens from many classes, and oversampling sentences
-that include a rare entity also oversamples the O tokens within those
-sentences. Stratified diversity sampling, as adopted in this thesis,
-applies the principle at example granularity while preserving overall
-distributional diversity.
+**Re-sampling** the training set [24] is the textbook first response.
+Oversample the sentences that contain a rare entity, undersample
+the ones full of O. The wrinkle in token classification is that the
+oversampling decision lives at the example level — a single
+sentence — but the imbalance lives at the token level. Oversampling
+a sentence to recover one VICTIM token also pulls along thirty O
+tokens. My stratified diversity sampling (§5.3) is a compromise: it
+oversamples sentences that contain rare entity *types*, while
+selecting for entity-type diversity rather than entity-token count,
+so it grows the rare classes without pumping up O proportionally.
 
-**Class-weighted cross entropy.** The cross-entropy loss is reweighted
-per class so that minority classes carry larger gradient contributions
-[25]. Inverse-frequency weighting computes the weight for class c as
-1/f_c, optionally normalised; effective-number weighting [26] uses a
-smoothed variant that accounts for sample overlap. This thesis
-applies inverse-frequency class weights computed from the actual
-training-set distribution.
+**Class-weighted cross entropy** [25] adjusts the loss rather than
+the sampler. Each class is given a weight, large for rare classes
+and small for the dominant ones, that multiplies its contribution
+to the gradient. Inverse-frequency weighting sets the weight to
+1/f_c (optionally normalised); effective-number weighting [26]
+smooths this with a corpus-sample-overlap correction. I use
+inverse-frequency weights, computed once from the training-set
+distribution at the start of training, with a maximum-weight cap to
+prevent the rarest classes from dominating gradient updates.
 
-**Focal loss.** Focal loss, introduced by Lin and colleagues for dense
-object detection [12], down-weights well-classified examples and
-focuses learning on difficult ones. For a per-token cross entropy of
-`CE(p, y) = -log p_y`, the focal loss is given by
+**Focal loss** [12] takes a different angle. Originally proposed
+for dense object detection, where the foreground/background ratio
+is even worse than for NER, it down-weights examples the model is
+already confident about and concentrates the loss on the examples
+it is still uncertain on. The formulation, given a per-token cross
+entropy `CE(p, y) = -log p_y`, is
 
 > `FL(p, y) = -α_y · (1 - p_y)^γ · log p_y`                       (1)
 
-where p_y is the model's predicted probability for the true class y,
-γ controls the strength of down-weighting (γ = 0 recovers cross
-entropy), and α_y is an optional per-class weight. Focal loss has
-been shown to outperform plain cross entropy in object detection and
-in token classification with imbalanced labels, particularly when
-combined with a class-weighting scheme.
+where p_y is the model's predicted probability of the true class y,
+γ ≥ 0 controls how aggressively easy examples are discounted (with
+γ = 0 recovering ordinary cross entropy), and α_y is an optional
+per-class weight that lets focal loss compose with class weighting.
+A growing body of token-classification work has reported gains from
+this combination over either ingredient alone.
 
 The present work combines focal loss (γ = 2) with inverse-frequency
 class weighting, computes the weights from the training-set label
@@ -1137,8 +1150,8 @@ entities more heavily.
 
 The standard reference implementation of span-level NER evaluation
 is `seqeval` [39], which exposes both "default" (BIO with strict
-boundary matching) and "strict" variants. The present work reports
-span-level precision, recall, and F1 with strict boundary matching
+boundary matching) and "strict" variants. I report span-level
+precision, recall, and F1 with strict boundary matching
 to avoid inflated scores from partial credit, since downstream
 consumers of the extracted records (the knowledge-base validator,
 the event store, the analytics layer) treat boundary mismatches as
@@ -1247,82 +1260,92 @@ VioNER bridges closes the chapter.
 
 ## 3.1 General Event Extraction from News
 
-Tanev, Atkinson, and Piskorski present a real-time news event
-extraction architecture aimed at global crisis monitoring [1]. Their
-system processes large volumes of multilingual news and combines
-pattern-based event recognition with geographical clustering to
-identify locations and to track evolving situations. Its strengths
-include scalability and breadth of coverage; its limitations, from
-the perspective of this thesis, are that event recognition is
-pattern-based rather than learned and that the system does not
-generate a structured 5W1H representation per event suitable for
-downstream querying.
+Tanev, Atkinson, and Piskorski [1] built an early version of what
+operational crisis-monitoring infrastructure actually looks like at
+scale: a multilingual pipeline that pulls news from many feeds,
+recognises events through hand-written patterns, and clusters them
+geographically so that an emerging story can be tracked across
+sources. What I take from their work is the engineering attitude —
+they treat scale as the central problem rather than treating it as
+an afterthought. What I don't take is the pattern-based event
+recognition. Their system does not produce structured 5W1H records
+that a downstream analyst could query, and patterns alone do not
+scale across the actor-name and place-name diversity of African
+conflict reporting.
 
-Hogenboom and colleagues survey event-extraction methods from text
-with a particular focus on decision-support applications [16], [4].
-They identify three methodological families (data-driven,
-knowledge-driven, hybrid) and conclude that hybrid pipelines that
-combine statistical learning with linguistic and domain rules are the
-most operationally viable. The methodological positioning of VioNER,
-in which a learned NER component is paired with a rule-driven
-post-processing layer informed by a curated knowledge base, follows
-their recommendation.
+Hogenboom and colleagues survey the broader event-extraction
+landscape twice, with a slightly different cut each time [16], [4].
+Their conclusion in both surveys is the same: data-driven methods
+generalise but lose precision on rare event types, knowledge-driven
+methods are precise but fragile, and the hybrid pipelines that mix
+the two outperform either pure approach in operational settings.
+VioNER takes this seriously. The NER component is data-driven; the
+post-processing layer (5W1H grouping, KB lookup, taxonomy
+assignment) is rule-driven; the two communicate through confidence
+scores and KB metadata rather than trying to do the whole job in
+either paradigm.
 
-Suchanek, Kasneci, and Weikum construct YAGO, a large-scale ontology
-of facts extracted automatically from Wikipedia and WordNet [30].
-YAGO demonstrates the value of automatic extraction from a structured
-source: by exploiting infobox and category data, the authors derive
-millions of structured assertions with high accuracy. The relevance
-to this thesis is twofold. First, YAGO illustrates the operational
-distinction between extracting from semi-structured sources, where
-extraction can rely on the structure, and extracting from free text,
-where the model must learn structure from regularities in surface
-form. Second, YAGO embeds extracted facts in an ontology, which
-parallels the role of the taxonomy and knowledge base in VioNER.
+YAGO [30] is a different beast — Suchanek, Kasneci, and Weikum
+extract millions of facts from Wikipedia infoboxes and WordNet
+hierarchies into a single OWL ontology. YAGO is not directly
+comparable to VioNER (its source is semi-structured rather than
+free text) but two of its design choices are instructive. First,
+where the source has structure, you should use it; an infobox is a
+gift compared to a paragraph. Second, embedding extracted facts in
+an ontology — not just storing them as rows — gives the result
+analytical leverage that flat records do not. The four-level
+taxonomy in §4.4 is my answer to that second observation, applied
+to a free-text extraction setting where I do not get YAGO's
+infobox luxury.
 
-Hienert and Luciano extend a similar approach to the extraction of
-historical events from multilingual Wikipedia [31], demonstrating the
-applicability of standardised event models such as LODE to large
-corpora. Their methodology is constrained by the semi-structured
-nature of the source and is not directly applicable to ACLED notes or
-to full news articles. It is, however, a useful counterpoint:
-extraction from semi-structured sources is qualitatively different
-from extraction from free text.
+Hienert and Luciano [31] extend the YAGO idea to historical events
+in Wikipedia using LODE. Their pipeline assumes the same
+semi-structured input. I cite it here mainly as a counterpoint:
+extracting from a Wikipedia article that already names "Battle of
+Adwa, 1896" in its title is a fundamentally easier problem than
+extracting events from ACLED notes or full-length news articles
+where the event has to be inferred from prose.
 
 ## 3.2 Violence-Specific Event Extraction Systems
 
-Piskorski, Tanev, and Wennerberg developed the NEXUS system, which
-extracts security-related events using the PMVE ontology [29]. NEXUS
-applies keyword filtering and linguistic patterns to identify
-violence-relevant articles, then maps extracted entities and events
-onto PMVE classes. The system's strengths include a principled
-ontology and demonstrated coverage of European security incidents;
-its limitations, from the perspective of African deployment, include
-its tuning to European actor and place vocabularies and its reliance
-on hand-crafted patterns. PMVE itself, however, is a valuable
-reference for the construction of the present taxonomy.
+The NEXUS system [29] is the closest stylistic precedent in
+violence-specific extraction. Piskorski, Tanev, and Wennerberg
+filter incoming news with keywords, run linguistic patterns to find
+violence-relevant sentences, then snap extracted entities onto the
+classes of their Politically Motivated Violent Events ontology. I
+draw two lessons from NEXUS. The principled ontology — PMVE —
+shows how much analytical reach a tight conceptual model gives
+downstream consumers, and my four-level taxonomy is partly a
+response to that. At the same time, NEXUS demonstrates how
+expensive pattern-based recognition becomes once the actor and
+place vocabularies shift: it was tuned to European security
+incidents, and porting it to the African continent — with several
+hundred armed groups and tens of thousands of locality names —
+would require essentially rebuilding the pattern base. I chose
+fine-tuned BERT precisely because it amortises that vocabulary work
+into the pre-training stage.
 
-Becker and colleagues focus on planned events on social media [32],
-exploiting platform-specific structured fields to combine with
-discussion text. Their approach is orthogonal to mine in several
-ways. Planned events differ qualitatively from violent
-incidents, which by their nature are unplanned and adversarial.
-Social-media reporting introduces noise and veracity concerns that
-make it unsuitable as a primary source for formal early warning.
-That said, Becker and colleagues' integration of structured platform
-data with unstructured text is a precedent for the role of the
-knowledge base in VioNER.
+Two social-media-oriented papers sit at the edge of relevance to my
+work. Becker and colleagues [32] extract *planned* events by
+exploiting platform-specific structured fields (event titles, dates,
+locations posted on Eventful) alongside the unstructured discussion
+that surrounds them. Magnuson and colleagues [33] build a related
+Twitter recommendation system over Eventbrite. Both targets differ
+from violent events on every axis — events are unplanned and
+adversarial, the source is not authoritative, and there is no
+structured platform-side metadata to lean on — so I do not adopt
+their pipelines. The architectural lesson I do take is the
+explicit pairing of structured platform data with unstructured text;
+the knowledge base in §4.5 plays the role that Eventful or Eventbrite
+plays in Becker's setting.
 
-Magnuson and colleagues build a Twitter-based event recommendation
-system on top of Eventbrite [33]. Their work confirms both the
-promise and the risks of social-media event extraction. Aratefeh and
-Khreich survey techniques for event detection in Twitter [34],
-categorising approaches into supervised, unsupervised, and hybrid
-methods and discussing the role of topic modelling, classification,
-and clustering. While VioNER targets traditional news rather than
-social media, the noise-handling and short-text techniques surveyed in
-this body of work are useful contingency tools for future extensions
-to short-form reporting.
+Aratefeh and Khreich [34] survey event detection on Twitter
+specifically and catalogue the supervised, unsupervised, and hybrid
+techniques that have been tried for the short-text, high-noise
+regime. VioNER processes news rather than tweets, so the survey
+does not drive my architecture, but the noise-handling and short-text
+techniques it catalogues are the natural starting point if I extend
+VioNER to citizen-journalist sources in future work.
 
 ## 3.3 Event Extraction in the African Context
 
