@@ -1652,23 +1652,28 @@ so that they are excluded from the loss.
 
 ## 4.4 Hierarchical Violent Event Taxonomy
 
-The taxonomy of violent events is constructed at four levels. Level
-1 distinguishes four broad violence categories. Level 2 introduces
-eighteen intermediate types. Level 3 refines into approximately fifty
-specific event types. Level 4 adds approximately twenty additional
-detailed subtypes for the most common categories. The complete
-taxonomy is presented in Annex B; this section presents the Level 1
-and Level 2 structure in Table 4.2 and Table 4.3 respectively, with
-the visual outline in Figure 4.5.
+The taxonomy I developed for this thesis is a four-level hierarchy.
+Level 1 names four broad categories of violence; Level 2 introduces
+eighteen intermediate types nested under them; Level 3 refines those
+into roughly fifty specific event types; and Level 4 adds another
+twenty or so detailed subtypes where the operational distinctions
+warrant it. The synthesis draws on ACLED's primary event types [8],
+UCDP's distinction between state-based, non-state, and one-sided
+violence [9], and the violence-relevant classes of PMVE [29], with
+African-specific extensions for pastoralist / farmer clashes and
+communal cattle raiding that none of those frameworks cover at this
+depth. The complete tree is in Annex B; the present section
+summarises Levels 1 and 2 in Tables 4.2 and 4.3 and gives the
+visual outline in Figure 4.5.
 
 *Table 4.2: Level 1 categories of the hierarchical taxonomy*
 
-| Level 1                          | Definition                                                            |
-|:---------------------------------|:----------------------------------------------------------------------|
-| Political Violence               | Violence motivated by political objectives, including contesting state authority, achieving political change, or advancing ideological agendas. |
-| Criminal Violence                | Violence motivated by economic gain or territorial control by criminal organisations.                                                              |
-| Communal Violence                | Violence between identity-based groups (ethnic, religious, clan) over resources, territory, or social dominance.                                  |
-| State Violence Against Civilians | Violence perpetrated by state security forces against non-combatant civilians outside of armed conflict contexts.                                |
+| Level 1                          | Working definition adopted in this thesis                               |
+|:---------------------------------|:-------------------------------------------------------------------------|
+| Political Violence               | Acts intended to contest state authority, push political change, or advance an ideological programme; perpetrators range from rebel and insurgent groups to terrorist organisations and political factions. |
+| Criminal Violence                | Acts whose primary motivation is economic gain or the territorial control of a criminal enterprise; perpetrators are gangs, bandits, organised-crime networks, or individual criminals. |
+| Communal Violence                | Acts between identity-defined groups — ethnic, religious, clan, or pastoralist / farmer communities — over land, water, livestock, or social standing, where the state is not the primary target. |
+| State Violence Against Civilians | Lethal or severely coercive acts by police, military, or paramilitary forces directed at non-combatants outside an active armed-conflict context, encompassing extrajudicial killing, protest crackdowns, and forced displacement. |
 
 *Table 4.3: Level 2 intermediate violence types*
 
@@ -3552,8 +3557,15 @@ deterministically from CITY and REGION via the knowledge base.
 
 ## Annex B: Hierarchical Taxonomy of African Violent Events
 
-The full four-level taxonomy is reproduced below. Level 4 subtypes
-are listed only where they apply.
+This annex reproduces, in full, the taxonomy I developed during the
+literature-review phase of this thesis. The taxonomy is the result
+of my own synthesis of ACLED [8], UCDP [9], and the PMVE
+ontology [29], extended with African-specific categories (notably
+pastoralist-farmer clashes and communal cattle raiding) that the
+three external frameworks do not cover at this depth. It was
+maintained as a separate working document during development and is
+preserved here verbatim as the canonical reference for §4.4. Level 4
+subtypes are listed only where they apply.
 
 ### Level 1: POLITICAL VIOLENCE
 
