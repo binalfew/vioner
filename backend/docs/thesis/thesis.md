@@ -1845,15 +1845,22 @@ each containing `tokens`, `labels`, `text`, and `entities` fields.
 ### Stratified diversity sampling
 
 The raw corpus is large (approximately 212,000 events) but
-diversity-poor: many events share repeating phrasing. The
-`create_training_subset.py` script (Algorithm 4.2) selects a
-35,000-example subset that maximises diversity while ensuring that
-rare entity types receive proportionate representation. The algorithm
-operates in three phases: first, it selects examples that contain at
-least one rare entity (VICTIM, ACTION, CASUALTIES) until the rare-class
-budget is met; second, it selects examples with high entity diversity
-(number of distinct entity types); third, it fills the remaining
-budget by random sampling from the residual pool.
+diversity-poor. A surprising number of ACLED notes follow a single
+formula — "Armed group X attacked location Y, killing N persons" —
+which means an unsampled corpus is effectively several thousand
+variations of the same sentence. Training on it doesn't fail; it
+just plateaus early. The `create_training_subset.py` script
+(Algorithm 4.2) selects a 35,000-example subset that maximises
+diversity while ensuring rare entity types are over-represented
+relative to their raw frequency. Three phases. First, the sampler
+greedily picks examples containing at least one of the rare
+entities (VICTIM, ACTION, CASUALTIES) until the rare-class budget
+is met. Second, it picks examples with the highest count of
+distinct entity types. Third, it fills the remaining budget by
+random sampling from what is left. I tried sampling on entity-type
+n-gram diversity instead of distinct-type count and the result was
+marginally better on rare entities but several F1 points worse on
+DATE, so I reverted.
 
 ### Augmentation
 
@@ -3034,22 +3041,27 @@ training metrics) are incremental engineering, not redesigns; nothing
 in the feedback suggested the structure of the system was wrong.
 
 It is worth recording what I tried first and abandoned, because the
-final design only makes sense against the things it is not. My
-first training corpus was the full 212,000-event ACLED extract, on
-the assumption that more data is always better; the model that
-came out of that run actually scored lower on rare-entity F1 than
-later runs on smaller corpora, because the duplication of common
-phrasing in ACLED notes was drowning out the rare entities. That
-is what motivated the stratified diversity sampler in §5.3. I also
-spent a week trying to learn EVENT_TYPE as a first-class NER label
-on the original 26-type schema before the grounding pilot
-convinced me to drop it; the model's per-entity F1 on EVENT_TYPE
-plateaued around 0.4 no matter what I tried, which is what you
-should expect when the label can't be reliably found in the source
-text. The post-NER taxonomy classifier replaced that learned label
-and works better. The hybrid statistics-plus-rules approach in
-§4.7, which initially felt like a compromise, turned out to be a
-genuine improvement.
+final design only makes sense against the things it is not. In
+October 2025 my first training corpus was the full 212,000-event
+ACLED extract, on the assumption that more data is always better;
+the model that came out of that run actually scored lower on
+rare-entity F1 than later runs on smaller corpora, because the
+duplication of common phrasing in ACLED notes was drowning out the
+rare entities. That is what motivated the stratified diversity
+sampler in §5.3. In November 2025 I also spent the better part of
+a week trying to learn EVENT_TYPE as a first-class NER label on the
+original 26-type schema. The grounding pilot at the end of that
+month was the conversation-ender — only about 58 percent of
+EVENT_TYPE annotations could be located verbatim in the source
+text, and the model's per-entity F1 plateaued around 0.4 no matter
+what I tried. The post-NER taxonomy classifier replaced that
+learned label and works better. The hybrid statistics-plus-rules
+approach in §4.7, which initially felt like a compromise, turned
+out to be a genuine improvement. By December the schema had
+settled at the eight entity types reported in §4.3, and most of
+the subsequent work was on training-pipeline ergonomics — early
+stopping, ReduceLROnPlateau, the focal-loss variant — rather than
+on the schema itself.
 
 The caveat I keep coming back to is the synthetic augmentation. About
 thirty percent of the training corpus is templated rather than drawn
