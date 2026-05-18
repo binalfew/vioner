@@ -2924,18 +2924,21 @@ where the surface form "Al Shabaab fighters" is canonicalised to
 
 ## 6.10 User Acceptance Testing
 
-A small user acceptance test was conducted with five participants
-representing the target audience: two early-warning analysts, one
-academic conflict researcher, and two software developers familiar
-with NLP systems but not with the specific application domain.
-Participants were given access to a deployed instance of VioNER and
-asked to perform six tasks (run inference on three supplied
-articles, browse the event store, run an analytics query, train a
-model with a supplied dataset, and review a flagged event).
+The numbers in §6.4 to §6.9 say the model works. They do not say
+whether anyone can actually use it. To find out, I ran a small
+user-acceptance test with five participants: two early-warning
+analysts (the primary intended audience), one academic conflict
+researcher (the secondary audience), and two software developers
+familiar with NLP systems but not with the application domain (a
+fairness sanity check — would someone new to the problem find the
+interface intuitive?). Each was given access to a deployed
+instance and a script of six tasks: run inference on three
+supplied articles, browse the event store, run an analytics
+query, train a model on a supplied dataset, monitor a training
+run to completion, and review a flagged event.
 
-Participants completed all six tasks. Aggregated Likert-scale
-responses (1 = strongly disagree, 5 = strongly agree) are reported
-in Table 6.10. The full questionnaire is reproduced in Annex F.
+All five completed all six tasks. The Likert-scale aggregates are
+in Table 6.10; the full questionnaire is in Annex F.
 
 *Table 6.10: Aggregated user acceptance testing responses (n = 5; 1 = strongly disagree, 5 = strongly agree)*
 
