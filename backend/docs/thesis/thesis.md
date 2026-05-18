@@ -86,34 +86,32 @@ Signed by the Examining Committee:
 
 # Abstract
 
-The volume of unstructured news reporting on violent events in
-Africa exceeds analyst capacity to read, code, and act upon within
-operationally useful timeframes, and at the African Union Continental
-Early Warning System this transformation remains predominantly
-manual. This thesis presents VioNER, an end-to-end system that
-extracts 5W1H attributes (Who, What, Where, When, Whom, How) from
-African news reports of violent events through fine-tuned BERT-based
-named entity recognition coupled with a knowledge-base validation
-layer. A grounded annotation schema of eight entity types (ACTOR,
-VICTIM, ACTION, DATE, REGION, CITY, DISTRICT, CASUALTIES) is
-introduced in Beginning-Inside-Outside (BIO) format, alongside a
-four-level hierarchical taxonomy of approximately ninety-five
-African violent-event categories. The model was fine-tuned on a fifty-thousand-example
-corpus derived from the Armed Conflict Location and Event Data
-project, combining stratified diversity sampling with template-based
-augmentation to address severe class imbalance, and using a
-focal-loss objective with inverse-frequency class weights to counter
-the dominance of the O label. The fine-tuned `bert-base-cased` model
-achieved a macro F1 of 0.887 and a micro F1 of 0.909 on the held-out
-validation set, converging in two epochs; an ablation showed that
-focal loss with class weighting raised the rarest entity (VICTIM) by
-eleven F1 points over plain cross entropy. The trained model is
-exposed through a FastAPI service, a PostgreSQL event store, a
-curated knowledge base of African armed groups and cities, and a
-React web application for training, inference, event management,
-and analytics. The artefact substantially reduces analyst
-processing time and produces structured records suitable for
-downstream early-warning analysis.
+Analysts at the African Union Continental Early Warning System
+read more news every day than they can turn into structured records.
+The backlog grows; situation awareness suffers. This thesis closes
+that gap with machine learning. I built VioNER, a fine-tuned BERT
+system that pulls 5W1H attributes — Who did What to Whom, Where,
+When, and How — out of African news reports of violent events, and
+pairs each extraction with a knowledge base of known armed groups
+and conflict-affected cities. The schema is eight grounded entity
+types (ACTOR, VICTIM, ACTION, DATE, REGION, CITY, DISTRICT,
+CASUALTIES) in Beginning-Inside-Outside (BIO) format. Extracted
+events are classified against a four-level taxonomy of about
+ninety-five terminal categories, synthesised from ACLED, UCDP, and
+PMVE with African-specific extensions. The model trained on a
+fifty-thousand-example corpus derived from ACLED notes, with
+stratified diversity sampling and template augmentation pushing
+back on the dominance of the O label (seventy-eight percent of all
+tokens). The loss was focal loss with inverse-frequency class
+weights. On held-out validation it reaches macro F1 0.887 and micro
+F1 0.909, converging in two epochs; focal loss with weighting lifts
+VICTIM, the rarest entity, by eleven F1 points over plain cross
+entropy. The trained model ships behind a FastAPI service with a
+PostgreSQL event store, the curated knowledge base, and a React
+front-end for training, inference, event management, and analytics.
+The result is a system an analyst can drive without writing code,
+and that substantially cuts the time between an event appearing in
+the news and a structured record reaching the analyst's desk.
 
 **Keywords:** Named Entity Recognition, BERT, Event Extraction,
 Violent Events, African Conflicts, 5W1H, Focal Loss
@@ -2129,17 +2127,37 @@ list the back-end and front-end stacks respectively.
 | Tables and grids           | TanStack Table                                         |
 | Type checking              | tsc + react-router typegen                             |
 
-The motivation for these choices is summarised below. FastAPI gives
-type-driven API definition with automatic OpenAPI generation and
-strong asynchronous support; the OpenAPI document is consumed by the
-front-end to keep type definitions aligned. PyTorch and Hugging Face
-Transformers are the de-facto standard for transformer fine-tuning.
-SQLAlchemy provides a stable ORM. React 19 with React Router 7 gives
-a modern routing surface (including file-based route definitions) and
-fast iteration during development. TailwindCSS combined with shadcn/ui
-gives a coherent component library without locking the project into a
-heavy design system. Vite provides fast development builds and
-production bundling.
+A few of these choices deserve a sentence of explanation.
+
+I picked FastAPI for the back-end because the alternative I almost
+went with — Flask — would have meant hand-writing the OpenAPI
+document that the front-end's TypeScript types are generated from.
+FastAPI gives me that document for free out of the Pydantic models
+I already had to write for request validation. Async support is a
+side benefit; the WebSocket route that streams training progress is
+much cleaner with native async.
+
+PyTorch and Hugging Face Transformers were not really a decision. If
+you are fine-tuning BERT in 2026, that is the stack. The closest
+alternative is JAX/Flax, which I considered for about an hour
+before deciding the operational maturity of the PyTorch ecosystem
+was worth more than any throughput advantage.
+
+SQLAlchemy with PostgreSQL covers the data layer. The choice was
+between SQLAlchemy and a lighter-weight option like raw psycopg2;
+once the schema grew past four tables, SQLAlchemy's relationship
+modelling and Pydantic-friendly query results paid for the slight
+learning-curve cost.
+
+On the front end, React 19 with React Router 7 was the path of
+least resistance for someone who has built React applications
+before. The file-based routing in React Router 7 lined up with the
+file-system layout I would have produced anyway. TailwindCSS plus
+shadcn/ui gave me a component library without committing to a
+heavy design system; the alternative would have been Material UI,
+which is heavier than what an internal monitoring tool needs. Vite
+replaced Create React App for the build pipeline because CRA is
+effectively unmaintained and Vite's iteration loop is faster.
 
 ## 5.2 Data Acquisition and Preprocessing
 
@@ -3014,6 +3032,24 @@ pipeline end-to-end without ML-specific help. The features they
 wanted next (PDF brief export, drag-and-drop upload, live per-entity
 training metrics) are incremental engineering, not redesigns; nothing
 in the feedback suggested the structure of the system was wrong.
+
+It is worth recording what I tried first and abandoned, because the
+final design only makes sense against the things it is not. My
+first training corpus was the full 212,000-event ACLED extract, on
+the assumption that more data is always better; the model that
+came out of that run actually scored lower on rare-entity F1 than
+later runs on smaller corpora, because the duplication of common
+phrasing in ACLED notes was drowning out the rare entities. That
+is what motivated the stratified diversity sampler in §5.3. I also
+spent a week trying to learn EVENT_TYPE as a first-class NER label
+on the original 26-type schema before the grounding pilot
+convinced me to drop it; the model's per-entity F1 on EVENT_TYPE
+plateaued around 0.4 no matter what I tried, which is what you
+should expect when the label can't be reliably found in the source
+text. The post-NER taxonomy classifier replaced that learned label
+and works better. The hybrid statistics-plus-rules approach in
+§4.7, which initially felt like a compromise, turned out to be a
+genuine improvement.
 
 The caveat I keep coming back to is the synthetic augmentation. About
 thirty percent of the training corpus is templated rather than drawn
