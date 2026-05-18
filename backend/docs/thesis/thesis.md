@@ -2789,31 +2789,41 @@ VICTIM     |============================= 0.817
 
 *Figure 6.3: Per-entity F1 bar chart*
 
-Several patterns emerge.
+A few patterns stand out when I look at this table.
 
-- **DATE achieves the highest F1.** Date expressions in conflict
-  reporting follow predictable patterns ("on Monday", "January 15",
-  "yesterday") that are well covered by the training corpus and well
-  bounded by prepositions and capitalisation.
-- **ACTOR, CITY, and DATE form a cluster of strong performance.**
-  These entities have both abundant training data and distinctive
-  surface markers.
-- **REGION and DISTRICT are slightly weaker.** Their main source of
-  error is mutual confusion: a region named after its capital city
-  is sometimes tagged CITY rather than REGION, and a city that
-  doubles as a district is sometimes tagged DISTRICT. The confusion
-  pattern is analysed further in Section 6.11.
-- **VICTIM is the lowest-performing entity.** Despite the augmentation
-  effort and the inverse-frequency weighting, the rarest entity in
-  the corpus also has the noisiest boundary signal: victim
-  descriptions vary widely in length and phrasing ("civilians", "ten
-  villagers, including women and children"), and the model
-  occasionally truncates or over-extends spans.
+DATE wins by a clear margin. Date expressions in conflict reporting
+follow a small number of patterns ("on Monday", "January 15",
+"yesterday", "earlier this week"), they are usually bounded by
+prepositions and capitalisation, and the training corpus has more
+than enough of them. There is not much room for improvement here
+without venturing into temporal-expression normalisation, which is
+outside scope.
 
-The macro F1 of 0.887 indicates that all entity types are recognised
-to a useful degree even after accounting for class imbalance. The
-micro F1 of 0.909 reflects the dominance of the high-support, high-F1
-entities.
+ACTOR, CITY, and DATE together form a strong cluster — three
+entities where the training distribution is rich and the surface
+forms are distinctive. The next tier (REGION at 0.891, CASUALTIES
+at 0.885, ACTION at 0.866) is solid but visibly lower; the dip
+correlates more with the entity's compositional irregularity
+(REGION names that double as cities; CASUALTIES that mix numerals
+and words; ACTION verbs in passive voice) than with sheer training
+volume.
+
+DISTRICT and VICTIM trail at 0.826 and 0.817. DISTRICT loses most
+of its accuracy to mutual confusion with CITY and REGION — see
+Figure 6.4 in §6.11. VICTIM is the harder problem because it is
+both the rarest entity in the corpus and the entity with the most
+variable phrasing — anything from "civilians" to "ten villagers,
+including women and children" can be the gold span. Augmentation
+and inverse-frequency weighting move the floor up by 11 F1 points
+relative to plain cross entropy (§6.6) but they do not eliminate
+the structural noise.
+
+The macro F1 of 0.887 means every entity type, including the
+rarest, is recognised well enough to be useful operationally. The
+micro F1 of 0.909 is higher because it is dominated by the
+high-support, high-F1 entities; it is the right number when
+estimating overall extraction throughput, while the macro number
+is the right one for assessing balance.
 
 ## 6.6 Ablation: Focal Loss versus Cross Entropy
 
