@@ -3181,56 +3181,64 @@ breaks.
 
 ## 6.13 Threats to Validity
 
-Following standard practice for empirical software-engineering
-research, the threats to the validity of these results are
-classified along four axes.
+Empirical software-engineering work conventionally classifies its
+threats along four axes — construct, internal, external, and
+conclusion. I'll work through them in that order, with the honest
+caveats up front rather than buried.
 
-**Construct validity.** The chosen metric is span-level F1 with
-strict boundary matching, which penalises partial overlaps. Some
-downstream consumers may tolerate partial matches better than
-strict ones; their effective utility from the system could be
-higher than the strict F1 suggests. The construct (5W1H
-extraction) is also operationalised by an eight-entity schema that
-necessarily privileges some aspects of "event understanding" over
-others (for example, motivation and outcome are not modelled at the
-NER level).
+The construct I am measuring is span-level F1 under strict
+boundary matching. Strict matching penalises any boundary error as
+a full miss, which is harsh: an analyst reading the system output
+sees "12 civilians" where the gold span is "at least 12 civilians"
+and reads them as the same fact. Downstream consumers that
+tolerate partial matches will perceive higher effective accuracy
+than my F1 reports. There is also a deeper construct concern: the
+eight-entity 5W1H schema captures who, what, where, when, whom,
+and how, but it does not model motivation or outcome. The model
+extracts the structured facts; reasoning about why an event
+happened, or what its consequences were, is outside what NER can
+deliver.
 
-**Internal validity.** The validation set was held out before
-training began and was not used for hyperparameter tuning beyond
-selecting the best checkpoint, which mitigates the most obvious
-form of leakage. Augmented examples appear in both train and
-validation splits in proportion to their share of the combined
-corpus; while this preserves stratification, it may make the
-validation set more lenient than purely natural news would be. A
-secondary evaluation on a fully held-out natural-news subset is
-identified as future work.
+On internal validity, the main mitigation in place is that the
+validation set was carved off before any training started and is
+never used for hyperparameter tuning — only for selecting the best
+checkpoint at the end of each run. That removes the most obvious
+form of leakage. The honest weakness is that augmented examples
+appear in both training and validation splits in proportion to
+their share of the combined corpus. That preserves stratification
+and gives a fair in-distribution estimate, but the validation set
+is therefore more lenient than purely natural news would be. A
+secondary evaluation on a fully held-out natural-news subset is in
+the future-work programme.
 
-**External validity.** Generalisation beyond the ACLED-derived
-distribution is not directly evaluated. African news outlets vary
-substantially in stylistic conventions, and the model's performance
-on, for example, French-language African news translated into
-English, or social-media reporting from local citizen journalists,
-is not known. The eleven-percentage-point improvement on VICTIM
-attributable to focal loss with weighting was measured on the
-validation split and may shrink or grow on a fully out-of-distribution
-test set. The choice of `bert-base-cased` rather than a multilingual
-or African-pre-trained backbone also limits external validity to
-English-language reporting.
+External validity is where the limitations bite hardest. I have
+not directly evaluated generalisation beyond ACLED-derived
+phrasing. African news outlets vary substantially in stylistic
+conventions, and I do not know what happens to F1 when the input
+is, say, a French-language article machine-translated to English,
+or a Lagos-newspaper feature with a more literary register, or a
+citizen-journalist tweet about a clash. The eleven-F1-point
+VICTIM improvement from focal loss with weighting was measured on
+*my* validation split; it could shrink or grow on truly
+out-of-distribution data. The choice of `bert-base-cased` rather
+than a multilingual or African-pre-trained backbone is the other
+half of this limitation — the system is bound to English-language
+reporting until that swap happens (§7.5).
 
-**Conclusion validity.** The reported per-entity F1 numbers are
-single-run point estimates. Variation across random seeds was not
-formally measured. Anecdotal evidence from repeated runs during
-development suggests run-to-run variation of approximately
-±0.5 F1 on the macro average, but a formal multi-seed evaluation
-is part of future work. Latency numbers are medians and 95th
-percentiles over a fixed sample of representative articles on a
-single workstation; production latency under sustained concurrent
-load may differ.
+On conclusion validity, the per-entity F1 numbers I report are
+single-run point estimates. I did not formally measure variation
+across random seeds, though I ran the full pipeline enough times
+during development to know the macro F1 wobbles by roughly ±0.5
+between runs. A formal multi-seed evaluation is in future work.
+Latency numbers are medians and 95th percentiles over a fixed
+sample of representative articles on a single workstation;
+production latency under sustained concurrent load — multiple
+users hitting the service simultaneously — would need a separate
+load test.
 
-These threats do not undermine the principal claims of the chapter
-but should be borne in mind by readers considering operational
-adoption. The future-work programme in Section 7.5 prioritises
-exactly the evaluation expansions needed to address them.
+None of these threats undermines the headline claims of the
+chapter. They are the conditions under which the numbers should be
+read, and the gaps that §7.5 prioritises closing.
 
 \pagebreak
 
