@@ -3439,9 +3439,12 @@ The contributions of this thesis are summarised below.
 
 ## 7.4 Recommendations
 
-The following recommendations are directed at organisations
-considering adoption of VioNER or similar systems in operational
-early warning, humanitarian response, or research settings.
+These are addressed to organisations weighing adoption of VioNER —
+or any comparable extraction system — in operational early
+warning, humanitarian response, or research. They are written less
+as marketing claims than as the cautions I would offer in a
+conversation with someone about to deploy this work in their own
+context.
 
 1. **Treat extraction output as a triage layer, not a final
    product.** The system produces high-quality first-pass
