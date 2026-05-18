@@ -850,42 +850,41 @@ adapt the taxonomy without having to start from scratch.
 
 ## 1.8 Organization of the Rest of the Thesis
 
-The next two chapters cover the literature. Chapter 2 will work
-through the relevant theory — information and event extraction,
-named entity recognition, transformers and BERT, class-imbalance
-methods, the conflict-event database tradition, and event-oriented
-knowledge representation — at a level sufficient to support the
-decisions made in Chapter 4. Chapter 3 will then narrow to the
-specific prior systems VioNER builds on or distinguishes itself
-from, ending with the gap analysis that motivates the rest of the
-work.
+Two chapters cover the literature. In Chapter 2 I work through the
+relevant theory — information and event extraction, named entity
+recognition, transformers and BERT, class-imbalance methods, the
+conflict-event database tradition, and event-oriented knowledge
+representation — at a level sufficient to support the decisions
+that come in Chapter 4. Chapter 3 then narrows to the specific
+prior systems VioNER builds on or distinguishes itself from, ending
+with the gap analysis that motivates the rest of the work.
 
-The middle of the thesis is the system itself. Chapter 4 will lay
-out the design: the architecture, the entity schema, the
+After that, two chapters cover the system itself. Chapter 4 lays
+out the design — the architecture, the entity schema, the
 hierarchical taxonomy, the knowledge base, the training pipeline,
-the inference pipeline, and the web application that ties them
-together. Chapter 5 will document how each of those parts is
-actually built — the technology stack, the data preparation, the
-training implementation, the focal-loss code, the back-end
-services, the front-end, the containerised deployment. The
-separation between Chapter 4 (what and why) and Chapter 5 (how)
-is deliberate; readers interested in the design without the
-implementation detail can stop after Chapter 4.
+the inference pipeline, and the web application that ties them all
+together. Chapter 5 documents how each of those parts is actually
+built: technology stack, data preparation, training
+implementation, focal-loss code, back-end services, front-end,
+containerised deployment. Splitting *what and why* (Chapter 4)
+from *how* (Chapter 5) was a deliberate editorial decision —
+readers interested in the design without the implementation detail
+can stop after Chapter 4 and not feel they have missed anything.
 
-Chapter 6 will then report the evaluation: dataset statistics,
+Evaluation comes next. Chapter 6 reports dataset statistics,
 training dynamics, overall and per-entity performance, the
 focal-loss ablation, the impact of the knowledge-base layer,
 latency measurements, end-to-end demonstration on real articles,
-user-acceptance feedback, and an honest error analysis. The
-chapter closes with a discussion, a threats-to-validity section,
-and a brief account of the experiments I tried first and
-abandoned.
+user-acceptance feedback, and an honest error analysis. It closes
+with a discussion section, a threats-to-validity section, and a
+brief account of the experiments I tried first and abandoned.
 
-Chapter 7 will wrap up — a summary anchored back to the analyst
-queue of §1.2, explicit answers to the four research questions of
-§1.3, a list of contributions, recommendations for organisations
-considering adoption, and a prioritised future-work programme that
-addresses the limitations of §1.6 and the threats of §6.13.
+Finally, Chapter 7 wraps up. There is a summary anchored back to
+the analyst queue of §1.2, explicit answers to the four research
+questions of §1.3, a contributions list, recommendations for
+organisations considering adoption, and a prioritised future-work
+programme that addresses the limitations of §1.6 and the threats
+of §6.13.
 
 \pagebreak
 
@@ -902,26 +901,26 @@ systems are deferred to Chapter 3.
 
 ## 2.1 Information Extraction and Event Extraction
 
-The umbrella term Information Extraction (IE) [4] covers any
-technique that pulls structured records out of free text. The field
-is conventionally broken into four sub-tasks — named entity
-recognition, relation extraction, coreference resolution, and event
-extraction — and although the textbook arrangement is a pipeline,
-in practice a great deal of recent work bundles two or more of these
-into joint or end-to-end models. The architectural decision I make
-in §4.2 is to stay close to the textbook pipeline, on grounds of
-debuggability and clarity rather than peak accuracy.
+Information Extraction (IE) [4] is a big tent. The umbrella covers
+any technique that pulls structured records out of unstructured
+text — named entity recognition, relation extraction, coreference
+resolution, event extraction. Textbook diagrams arrange these as a
+pipeline; in current research the lines blur, with joint and
+end-to-end models bundling two or more sub-tasks into a single
+neural network. I take the textbook side. Pipeline. Debuggability
+beats marginal accuracy at the scale this thesis operates at.
+§4.2 makes that choice concrete.
 
-Event Extraction is the sub-task I care about most directly. The
-operational definition I use is the one in Ahn [3]: an event is a
-verb or nominal predicate together with the participants (agent,
-patient, instrument), the location, and the time that the predicate
-involves. The Automatic Content Extraction program [14] formalised
-this view in the early 2000s by publishing a typology of event
-types and their arguments, and that typology shaped the next
-decade of supervised event extraction. The Text Analysis Conference
+Event Extraction is the sub-task I care about most. Ahn's
+definition [3] is the operational one I use: an event is a verb or
+nominal predicate together with the participants (agent, patient,
+instrument), the location, and the time the predicate involves.
+The Automatic Content Extraction program [14] formalised that view
+in the early 2000s by publishing a typology of event types and
+their arguments. Two decades of supervised event-extraction
+research grew out of that typology. The Text Analysis Conference
 Knowledge Base Population track later picked up the baton with
-larger and more diverse evaluations.
+larger, more diverse benchmarks.
 
 The journalistic 5W1H frame [15] is a less rigid alternative. It
 sidesteps the question of which event types to enumerate by asking
@@ -2976,11 +2975,12 @@ numbers, but the KB layer is doing real work.
 
 ## 6.8 Inference Latency and Throughput
 
-A model that takes a minute per article is not usable for an
-analyst on a deadline, so I measured single-document latency
-across three representative article lengths on the same Apple
-Silicon laptop I trained on. Median and 95th-percentile latencies
-sit in Table 6.9.
+Speed matters. An analyst on a deadline cannot wait a minute per
+article. To check that VioNER is fast enough, I measured
+single-document latency at three representative article lengths on
+the same Apple Silicon laptop I trained on. Median and
+95th-percentile latencies sit in Table 6.9. The numbers are
+encouraging.
 
 *Table 6.9: Inference latency on representative articles*
 
