@@ -2880,10 +2880,11 @@ filtering out valid extractions.
 
 ## 6.8 Inference Latency and Throughput
 
-Single-document inference latency was measured for three
-representative article lengths on the same hardware used for
-training. Median and 95th-percentile latencies are reported in
-Table 6.9.
+A model that takes a minute per article is not usable for an
+analyst on a deadline, so I measured single-document latency
+across three representative article lengths on the same Apple
+Silicon laptop I trained on. Median and 95th-percentile latencies
+sit in Table 6.9.
 
 *Table 6.9: Inference latency on representative articles*
 
@@ -2893,10 +2894,17 @@ Table 6.9.
 | Medium (≤500 tokens)| 246 ms        |  298 ms         |
 | Long (≤1500 tokens, windowed) | 612 ms |  834 ms      |
 
-These latencies include tokenisation, BERT inference on MPS, entity
-assembly, confidence filtering, KB enrichment, and JSON
-serialisation. Throughput in batch mode (sixteen documents per batch)
-reaches approximately 65 short documents per second.
+The figures are end-to-end — they include tokenisation, BERT
+forward pass on MPS, entity assembly, confidence filtering, KB
+enrichment, and JSON serialisation. A short article comes back in
+roughly the time it takes to switch browser tabs. Long articles
+need windowing to stay under BERT's 512-token limit, which is
+where the bulk of the long-article latency comes from; the actual
+GPU work is roughly linear in token count. In batch mode (sixteen
+documents per batch), throughput approaches 65 short documents per
+second, which would clear a regional-desk overnight queue of a few
+hundred items in a few minutes if that batch path is wired into a
+scheduled job.
 
 ## 6.9 End-to-End Demonstration
 
