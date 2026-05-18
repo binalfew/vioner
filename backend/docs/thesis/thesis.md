@@ -2096,10 +2096,13 @@ simple version catches the obvious cases at very low cost.
 
 ## 4.8 Web Application Architecture
 
-The web application is organised as a single-page React/TypeScript
-front-end backed by a FastAPI service. The front-end communicates
-with the back-end exclusively through JSON over HTTPS, with a single
-WebSocket channel reserved for streaming training progress.
+The web application is a fairly conventional single-page-app
+arrangement: a React/TypeScript front-end on top of a FastAPI
+service, communicating exclusively in JSON over HTTPS. The one
+non-standard piece is a single WebSocket channel reserved for
+streaming training progress; everything else fits the
+request/response pattern naturally and there is no reason to pull
+in a heavier real-time machinery for it.
 
 The back-end exposes the following route groups, all under `/api`:
 
@@ -2734,8 +2737,12 @@ training-set idiosyncrasies.
 
 ## 6.4 Overall Model Performance
 
-Table 6.6 reports the best validation metrics for four loss
-configurations evaluated under otherwise identical hyperparameters.
+Before reporting the headline F1 numbers I want to lay out the
+loss-function comparison, because it is the cleanest way to see
+that the choices I made were the right ones. Table 6.6 reports the
+best validation metrics for four loss configurations under
+otherwise identical hyperparameters — same data, same scheduler,
+same early-stopping, same random seeds.
 
 *Table 6.6: Best validation metrics across training runs*
 
