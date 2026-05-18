@@ -3449,7 +3449,14 @@ early warning, humanitarian response, or research settings.
 
 ## 7.5 Future Work
 
-The future-work programme is organised by priority.
+There are more next steps than I can do in any reasonable time
+frame, so I have ordered them by what I think buys the most for
+the next six to twelve months of work. The high-priority items are
+the ones that close the most operationally significant gaps; the
+medium-priority items improve quality and usability without
+changing what the system fundamentally does; the lower-priority
+items are interesting research directions that do not need to be
+solved for the system to be useful.
 
 ### High priority
 
@@ -3503,10 +3510,12 @@ The future-work programme is organised by priority.
   replication, role-based access control, audit logging, and other
   enterprise concerns for sustained operational deployment.
 
-The breadth of the future-work programme reflects the
-foundational nature of the work presented here: VioNER establishes
-a working baseline on which a substantial research and engineering
-programme can be built.
+Reading the list back, what jumps out to me is how much of it is
+incremental engineering rather than fundamental research. That is
+the right shape, I think. The hard methodological choices — the
+schema, the loss function, the post-NER architecture — were made in
+this thesis, and what remains is mostly the kind of work that
+gets done once you have a working baseline to push on.
 
 \pagebreak
 
