@@ -2709,31 +2709,39 @@ representative run*
 | 6     | 0.0032     | 0.0084   | 97.44 %      |
 | 7     | 0.0028     | 0.0088   | 97.55 %      |
 
-Two observations stand out. First, the validation loss reaches its
-minimum at epoch 2, after which it begins to creep upward. Training
-loss continues to fall, indicating onset of overfitting. The early
-stopping mechanism with patience 5 and threshold 0.001 detects this
-within five further epochs and terminates training. Second,
-token-level validation accuracy continues to improve even as
-validation loss worsens. This is a known artefact of focal loss and
-class-weighted training: the model becomes more confident on
-already-correct predictions (raising accuracy) while losing
-calibration on minority-class boundaries (raising loss).
+Two things stand out reading this table. The validation loss bottoms
+out at epoch 2 and then begins to creep up while the training loss
+keeps falling — textbook overfitting, and the early-stopping logic
+(patience 5, threshold 0.001) catches it within five further epochs
+and shuts the run down. The slightly trickier observation is that
+token-level validation *accuracy* keeps improving even after
+validation *loss* worsens. That looks like a contradiction the
+first time you see it; it isn't. Focal loss with class weighting
+encourages the model to grow more confident on examples it already
+gets right, which pushes accuracy up; it also makes the model less
+calibrated on the minority-class boundaries it still gets wrong,
+which is the cost the loss is recording. Reading those two curves
+against each other gave me the patience setting in the first
+place — without the loss curve, accuracy alone would have led to a
+longer training run for a worse model.
 
 The most recent end-to-end production run, recorded in
 `models/bert-base-cased_20251223_192332/training_config.json`,
-reports a best validation loss of 0.01358 at epoch 2 with the
-ReduceLROnPlateau scheduler engaged from epoch 3 onward. This is
-consistent with the dynamics in Table 6.5 and confirms the
-robustness of the fast-convergence behaviour across runs.
+hits a best validation loss of 0.01358 at epoch 2 with
+ReduceLROnPlateau engaged from epoch 3 onward. The dynamics match
+Table 6.5, which is the kind of robustness across runs you want
+before you trust the numbers.
 
-The convergence speed (two epochs to best validation loss) reflects
-two design choices acting together. First, the BERT pre-training
-provides strong initialisation, so very little adaptation is needed
-to specialise to the African violent-event NER task. Second, the
-50,000-example training set is large enough to saturate the
-fine-tuning signal within a few passes; further epochs over-fit on
-training-set idiosyncrasies.
+Why convergence is this fast at two epochs is worth saying out
+loud. BERT's pre-training is doing most of the work: the encoder
+arrives at fine-tuning with a strong representation of English
+already learned, and the supervised step has to do relatively
+little adaptation to specialise it to African violent-event NER. A
+fifty-thousand-example corpus is also large enough that the
+fine-tuning signal saturates fast. After epoch 2, the model is
+just memorising idiosyncratic phrases from the training set —
+which is exactly what the early-stopping mechanism is there to
+catch.
 
 ## 6.4 Overall Model Performance
 
