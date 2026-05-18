@@ -2597,8 +2597,8 @@ they read on inspection.
 
 ## 6.2 Dataset Statistics
 
-Table 6.2 summarises the pre-processed dataset before subset
-selection.
+The pre-processed dataset, before any sampling decisions, is shown
+in Table 6.2.
 
 *Table 6.2: Pre-processed dataset statistics*
 
@@ -2611,8 +2611,10 @@ selection.
 | Unique entity types     | 8          |
 | BIO labels (incl. O)    | 17         |
 
-Table 6.3 reports entity-level frequencies in the full pre-processed
-corpus.
+The interesting story is in the entity-level distribution, not in
+the headline counts. Table 6.3 shows what each entity type is worth
+as a share of the entity-token total — and it is exactly the
+imbalance §2.4 warned about.
 
 *Table 6.3: Entity-level frequency in the full pre-processed corpus*
 
@@ -2627,15 +2629,23 @@ corpus.
 | VICTIM      | 27,641   |  2.7 %            |
 | CASUALTIES  | 24,634   |  2.4 %            |
 
-The O-token share over the full corpus is approximately 78 percent of
-all tokens, confirming the imbalance noted in Section 2.4.
+ACTOR, CITY, and DATE between them carry the majority of entity
+tokens; VICTIM and CASUALTIES barely break two and a half percent
+each. Step back one level and the imbalance gets worse: the O label
+(everything that isn't an entity) accounts for roughly seventy-eight
+percent of all tokens. A naive cross-entropy fine-tune on this
+distribution will report deceptively high overall accuracy while
+quietly under-recovering exactly the rare entities an analyst cares
+about most. This is the table that motivates §6.6's ablation.
 
-After stratified diversity sampling and augmentation (Section 5.3),
-the production training corpus comprises 50,000 examples partitioned
-40,000 (train) and 10,000 (validation). Augmented examples constitute
-approximately 30 percent of this corpus and substantially raise the
-share of ACTION, VICTIM, and CASUALTIES tokens to the order of 26 to
-32 percent of their respective categories in the optimised subset.
+After running the corpus through the diversity sampler and the
+template augmenter (§5.3), the production training corpus is 50,000
+examples split 80 / 20 into 40,000 training and 10,000 validation.
+Augmented examples make up about thirty percent of this corpus and
+push the share of ACTION, VICTIM, and CASUALTIES tokens up to
+roughly twenty-six to thirty-two percent of their respective
+categories in the optimised subset — enough exposure to learn from,
+without drowning the natural distribution.
 
 Class weights derived from the training-set distribution by
 inverse-frequency weighting are summarised in Table 6.4; minority
