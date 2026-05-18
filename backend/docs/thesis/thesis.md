@@ -2853,30 +2853,40 @@ hurt by the focal-loss objective.
 
 ## 6.7 Knowledge-Base Validation Impact
 
-The knowledge-base validation layer (Section 4.5) attaches metadata
-to extracted spans and adjusts confidence scores. Its contribution
-to downstream usefulness is assessed in two ways.
+Measuring the value of the KB layer is harder than measuring the
+model. The KB does not directly affect the F1 numbers — it operates
+downstream of the extractor — and the right unit of evaluation is
+not "accuracy" but "did the layer earn its keep on the operational
+side". I picked two concrete metrics for that, one for the
+enrichment path and one for the validation path.
 
-First, the percentage of high-confidence (`p >= 0.85`) ACTOR spans
-whose canonical name is found in the KB is **64.3 percent** of
-validation-set ACTOR predictions. This number is interpreted as the
-share of extractions that downstream pipelines can be enriched with
-group metadata without further look-up. The remaining 35.7 percent
-are typically generic descriptors ("gunmen", "armed men") that
-cannot be canonicalised without further context.
+The first measures enrichment. Of the high-confidence ACTOR spans
+(`p >= 0.85`) produced by the model on the validation set,
+**64.3 percent** match a canonical entry in the armed-groups KB and
+arrive at the analyst's desk with country, region, and group-type
+metadata already attached. The remaining 35.7 percent are
+overwhelmingly generic descriptors — "gunmen", "armed men", "armed
+militants", "the attackers" — that no KB can canonicalise without
+more context. So roughly two thirds of the named-perpetrator
+mentions get enrichment for free, which is the number that matters
+when an analyst queries "show me all events attributed to X" and
+expects the surface-form variations of X to collapse to a single key.
 
-Second, the rate of geographically implausible CITY/REGION pairs (a
-CITY whose country, per the KB, differs from the country implied by
-the REGION) is **2.4 percent** of multi-entity events with both a
-CITY and a REGION extracted. Such events are flagged in the UI for
-manual review, and on inspection most arise from genuine ambiguity in
-the source text (for example, a story discussing a cross-border
-incident that mentions a city on one side and a region on the other)
-rather than extraction errors.
+The second measures validation. The KB flags an event as
+geographically suspicious when its extracted CITY's country (per the
+KB) does not match the country implied by its REGION. On the
+validation set, this triggers on **2.4 percent** of multi-entity
+events that have both a CITY and a REGION. When I inspected the
+flagged cases, most turned out to be either genuine cross-border
+incidents the article was reporting on (one side names a city in
+country A, the other names a region in country B) or extraction
+errors at the edges where REGION and CITY are mutually confused —
+the same confusion pattern §6.11 talks about. Either way, the flag
+correctly surfaces the events where an analyst should re-read
+before trusting.
 
-Together, these numbers indicate that the knowledge base adds
-operational value on top of the raw NER output without significantly
-filtering out valid extractions.
+Two thirds enrichment, one in forty events flagged. Not headline
+numbers, but the KB layer is doing real work.
 
 ## 6.8 Inference Latency and Throughput
 
