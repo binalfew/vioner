@@ -593,31 +593,29 @@ questions.
 
 ### Significance of the Study
 
-This study is significant on three grounds.
+The most direct significance is operational. Analyst time at AU-CEWS
+is, as §1.2 argued, the binding constraint on continental situation
+awareness during fast-moving crises; even a partial reduction in the
+cost of producing a structured event record translates almost one to
+one into faster, broader, and more consistent monitoring. That is
+the case for building VioNER at all.
 
-**Operational significance.** The artefact reduces the analyst time
-required to convert raw news into structured event records. In the
-target context (AU-CEWS Situation Monitoring), analyst time is the
-binding constraint on situation awareness during fast-moving
-crises. Even a partial reduction in the cost of structured event
-extraction translates directly into faster, broader, and more
-consistent monitoring.
+The methodological contribution is the combination, rather than any
+single ingredient. Grounded supervision, focal loss with class
+weighting, and a curated domain knowledge base used both for
+validation and enrichment have each been studied in isolation; to
+the best of my knowledge they have not been combined and reported
+together on African violent-event extraction at this scale. The
+methodology is documented in detail through Chapters 4 and 5 so
+that it can be reproduced or adapted.
 
-**Methodological significance.** The combination of a grounded
-entity schema, focal-loss training under severe class imbalance,
-and a curated domain knowledge base is, to the best of my
-knowledge, the first such combination applied to African
-violent-event extraction at this scale. The methodology is
-documented in sufficient detail to be reproducible by other
-researchers.
-
-**Resource significance.** The four-level taxonomy of African
-violent events, the entity annotation schema, and the curated
-knowledge base of African armed groups and conflict-affected cities
-are themselves reusable artefacts. They can be adopted or adapted
-by researchers and practitioners working on adjacent tasks in
-conflict monitoring, humanitarian protection, and security
-analysis.
+Finally, the artefacts themselves have a life beyond this thesis.
+The four-level taxonomy, the eight-entity annotation schema, and the
+curated knowledge base of African armed groups and conflict-affected
+cities are reusable; another researcher working on humanitarian
+protection, conflict early warning, or peace and security analysis
+should be able to pick any of them up without rebuilding from
+scratch.
 
 ## 1.4 Objectives
 
