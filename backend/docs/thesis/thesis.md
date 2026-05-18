@@ -3094,47 +3094,48 @@ threats-to-validity discussion in Section 6.13.
 
 ## 7.1 Summary
 
-This thesis set out to address the absence, in the African
-early-warning ecosystem, of an accurate and openly documented
-pipeline for converting English-language news reports of violent
-events into
-structured 5W1H records. The general objective stated in
-Section 1.4 was the design, implementation, and evaluation of VioNER,
-an integrated system that uses fine-tuned BERT-based named entity
-recognition to extract 5W1H attributes, supports those extractions
-with a curated knowledge base and hierarchical taxonomy, and exposes
-the full capability through a documented web platform.
+The starting point for this thesis was a queue of unread news
+articles on an analyst's desk at AU-CEWS, and a conviction that
+the gap between that queue and useful structured intelligence was
+closeable with a fine-tuned BERT and some domain knowledge. The
+finished system — VioNER — is that closing attempt: a 5W1H NER
+model backed by a curated knowledge base of African armed groups
+and conflict-affected cities, wrapped in a documented web platform
+that an analyst can actually use.
 
-Chapter 1 framed the problem in operational terms and listed ten
-specific objectives. Chapter 2 reviewed the relevant theoretical
-foundations: information and event extraction, named entity
-recognition, the transformer architecture and BERT, methods for
-handling class imbalance, conflict-event databases, and
-event-oriented knowledge representation. Chapter 3 reviewed the
-most directly related prior systems and identified five gaps that
-this thesis bridges. Chapter 4 presented the proposed solution,
-including the eight-entity BIO schema, the four-level hierarchical
-taxonomy of African violent events, the structured knowledge base,
-the training pipeline, the inference pipeline, and the web
-application architecture. Chapter 5 documented the implementation,
-covering the technology stack, data preparation, training, the focal
-loss, the back-end and front-end. Chapter 6 reported empirical
-results: a macro F1 of 0.887 and micro F1 of 0.909 on the held-out
-validation set, with fast convergence (best at epoch 2),
-demonstrable benefit from focal loss and class weighting (notably
-+11 F1 for VICTIM relative to plain cross entropy), 64.3 percent KB
-canonicalisation of high-confidence ACTOR spans, and inference
-latencies in the hundreds of milliseconds for typical articles.
+What was built, in one paragraph. An eight-entity grounded schema
+(ACTOR, VICTIM, ACTION, DATE, REGION, CITY, DISTRICT, CASUALTIES)
+in BIO format. A four-level hierarchical taxonomy of African
+violent events with roughly ninety-five terminal categories,
+synthesised from ACLED, UCDP, and PMVE with African-specific
+extensions. A 50,000-example training corpus derived from ACLED
+notes with stratified diversity sampling and template augmentation
+to push back on a heavily skewed label distribution. A fine-tuned
+`bert-base-cased` model trained with focal loss (γ = 2) and
+inverse-frequency class weights. A curated knowledge base of
+approximately 150 armed groups, 200 conflict-affected cities, and
+54 African countries with their regions. A FastAPI service exposing
+training, inference, event storage, analytics, and knowledge-base
+management. A React/TypeScript front-end on top of that service.
+A reproducible Docker Compose deployment.
 
-The specific objectives stated in Section 1.4 have been addressed
-as follows: objectives 1 to 5 (literature review, schema, taxonomy,
-data assembly, model training) are addressed in Chapters 2, 4, and
-5; objective 6 (knowledge base) in Sections 4.5 and 5.6; objectives
-7 and 8 (back-end and front-end) in Sections 5.6 and 5.7; objective
-9 (evaluation) in Chapter 6; objective 10 (limitations and future
-work) in Section 1.6 and the remainder of this chapter. The
-research questions in Section 1.3 are answered in detail in
-Section 7.2 below.
+What the numbers say. Macro F1 0.887 and micro F1 0.909 on the
+held-out validation set. Best validation loss at epoch 2 (training
+overfits past that point and early stopping picks it up). The
+focal-loss / class-weighting combination lifts VICTIM by eleven F1
+points and ACTION by seven over plain cross entropy. The KB
+canonicalises roughly two thirds of high-confidence ACTOR spans and
+flags about one in forty multi-entity events as geographically
+implausible. Inference latency for typical articles is in the
+hundreds of milliseconds. User acceptance testing returned a 4.4 /
+5.0 mean across six task dimensions.
+
+The ten specific objectives stated in §1.4 are addressed across
+Chapters 2, 4, and 5 (literature review, schema, taxonomy, data,
+training), §4.5 and §5.6 (knowledge base), §5.6 and §5.7 (back-end
+and front-end), Chapter 6 (evaluation), and §1.6 plus this
+chapter (limitations and future work). The four research questions
+of §1.3 are answered in detail in the section that follows.
 
 ## 7.2 Answers to the Research Questions
 
