@@ -669,65 +669,66 @@ The following specific objectives operationalise the general objective.
 
 ## 1.5 Methods
 
-The research will adopt a design-science methodology [13] coupled
-with empirical evaluation of the artefact. Each component will be
-built iteratively, with the lessons of one iteration informing the
-design of the next, and with quantitative evaluation against
-held-out data controlling for over-fitting at each stage. The
-principal methodical choices are summarised below; full detail will
-be provided in Chapter 4 and Chapter 5.
+The methodological frame is design science [13]: build the
+artefact iteratively, evaluate it empirically at each stage, let
+the lessons of one iteration shape the next, and control for
+over-fitting throughout with held-out data. Below is the plan in
+prose. Chapters 4 and 5 will give the technical detail.
 
-**Annotation schema design.** Drawing on the proposal taxonomy, the
-ACLED column conventions, and a pilot study of grounding rates in
-synthetically and naturally annotated text, the entity schema will
-be restricted to entity types that can be reliably found verbatim
-in source text. EVENT_TYPE and COUNTRY will be dropped from the
-schema because their grounding rates will be shown by the pilot to
-be too low to support reliable supervision; instead, COUNTRY will
-be recovered deterministically from the knowledge base and the
-event-type hierarchy will be computed in a post-NER step.
+The work will begin with the annotation schema. The starting point
+will be the twenty-six-type schema in the proposal, refined through
+a pilot study in which a sample of articles will be annotated by
+hand to measure the proportion of each entity type that can be
+located verbatim in source text. Entity types whose grounding rate
+falls below an acceptable threshold will be dropped from the NER
+schema and recovered downstream by post-processing — concretely,
+EVENT_TYPE will be reconstructed by the taxonomy classifier from
+the action verb plus context, and COUNTRY by a knowledge-base
+look-up from the most specific WHERE entity. The result will be a
+narrower schema in which every entity type can be reliably
+supervised.
 
-**Data acquisition and preparation.** Raw event records will be
-obtained from ACLED via its open data exports. The records will be
-tokenised and labelled in BIO format using the column-to-entity
-mapping documented in Section 5.2. Stratified diversity sampling
-will then be applied to a target subset size of 35,000 records,
-with augmentation adding approximately 15,000 templated examples to
-expand vocabulary coverage of action verbs and victim-targeting
-constructions that are under-represented in raw ACLED text. The
-resulting 50,000-example corpus will be partitioned into 80 percent
-training and 20 percent validation.
+The training corpus will come from the ACLED open data export.
+Records will be tokenised, BIO-labelled by projecting the
+structured ACLED columns onto the free-text notes, and reduced
+from the full 212,000-event pool to a smaller, more diverse
+subset by stratified sampling that over-represents the rare entity
+types. Template-based augmentation will add roughly fifteen
+thousand synthetic examples to cover vocabulary that ACLED notes
+do not (active-voice action verbs, descriptive victim phrasings).
+The combined corpus will be split eighty / twenty into training
+and validation, with stratification on entity-type presence.
 
-**Model fine-tuning.** The `bert-base-cased` model from the Hugging
-Face hub will be fine-tuned for token classification with seventeen
-output labels (eight entity types times two BIO prefixes, plus the
-O label). Sub-word labels will be aligned by carrying the
-first-subword label to subsequent sub-words with the B-/I-
-transition handled explicitly. Training will use AdamW with linear
-warm-up, optional ReduceLROnPlateau scheduling, gradient clipping,
-and a focal-loss objective with inverse-frequency class weights
-computed from the training set.
+The model itself will be a fine-tuned `bert-base-cased` with a
+seventeen-label token-classification head, trained under AdamW
+with linear warm-up, ReduceLROnPlateau scheduling, gradient
+clipping, and focal loss with inverse-frequency class weights.
+Sub-word labels will be aligned by carrying the first sub-word's
+label to subsequent sub-words and explicitly handling the B- to I-
+transition.
 
-**Knowledge-base integration.** A static knowledge base of African
-armed groups, conflict-affected cities, and the four-level taxonomy
-will be loaded at inference time. Raw entity spans will be
-validated against the knowledge base, with confidence scores
-adjusted upward for entities that match curated entries and
-downward for those that do not. The post-NER pipeline will then
-assemble a 5W1H record per detected event description.
+A curated knowledge base of African armed groups, conflict-affected
+cities, and weapon categories will be loaded at inference time and
+used for two purposes. First, validation: it will confirm or flag
+extracted entities against curated reference data. Second,
+enrichment: it will attach canonical names, country of operation,
+and group type to matched entities. Mismatches between an actor's
+known country of operation and the location extracted from the
+same sentence will lower the event's overall confidence score and
+surface it for analyst review.
 
-**System packaging.** The trained model, the knowledge base, and
-the event store will be exposed through a FastAPI service with
-documented routes for each capability, and a React/TypeScript
-front-end will be built on top of it. The system will be
-containerised with Docker Compose for reproducible deployment.
+The full system will be packaged behind a FastAPI service, a
+PostgreSQL event store, and a React/TypeScript front-end that
+covers training, inference, event management, and analytics. The
+whole stack will run under Docker Compose.
 
-**Evaluation.** The fine-tuned model will be evaluated against a
-held-out validation set using token-level accuracy, per-entity
-precision, recall, and F1, and through qualitative inspection on
-out-of-corpus news articles. End-to-end latency will be measured at
-inference time, and qualitative user acceptance testing will be
-conducted on a small group of representative users.
+Finally, the system will be evaluated against a held-out validation
+set with token-level accuracy and span-level precision, recall, and
+F1 per entity; against a small set of representative real-world
+news articles by qualitative inspection; and by user acceptance
+testing with a small group of representative users. End-to-end
+inference latency will be measured on the same hardware used for
+training.
 
 ## 1.6 Scope and Limitations
 
