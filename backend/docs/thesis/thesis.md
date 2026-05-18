@@ -2050,19 +2050,29 @@ return R
 
 *Algorithm 4.5: Post-NER 5W1H structuring with knowledge-base validation*
 
-Confidence thresholds are calibrated by category: WHO 0.70, WHOM
-0.70, WHAT 0.60, WHEN 0.80, WHERE 0.70, HOW 0.75. These thresholds
-were determined by inspection of validation-set behaviour: WHEN
-demands high precision because dates are easy to verify and false
-positives are highly visible; WHAT is allowed to be more permissive
-because actions are typically supported by surrounding context.
+Confidence thresholds are calibrated per category: WHO and WHOM at
+0.70, WHAT at 0.60, WHEN at 0.80, WHERE at 0.70, HOW at 0.75. The
+numbers came out of two evenings of inspecting validation-set
+errors. WHEN got the highest threshold because dates are easy for
+the analyst to verify against the article timestamp, so a false
+positive is highly visible and worth filtering aggressively. WHAT
+got the lowest because action verbs are usually well-supported by
+the surrounding context — even a low-confidence "attacked" is
+useful when the surrounding sentence makes the violence
+unambiguous.
 
-Multi-event texts are handled by a segmentation step that splits long
-documents into event-bearing sentences before running NER. The
-segmentation module (`pipeline/segmentation.py`) uses sentence
-boundary detection and a small set of indicator phrases (for example,
-"in a separate incident", "earlier that week") to identify event
-boundaries.
+Multi-event articles are a separate problem. A long news article
+often describes two or three incidents in sequence, and running
+NER over the whole article in one pass produces a confused 5W1H
+record that mixes actors from incident one with locations from
+incident two. The segmentation module in `pipeline/segmentation.py`
+splits long documents into event-bearing sentence groups before NER
+runs, using sentence boundary detection and a small set of
+indicator phrases ("in a separate incident", "earlier that week",
+"meanwhile") that mark transitions between events. The module is
+simple and the indicator-phrase list is short; it could be replaced
+by a learned event-boundary classifier in future work, but the
+simple version catches the obvious cases at very low cost.
 
 ## 4.8 Web Application Architecture
 
