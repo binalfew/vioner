@@ -2301,7 +2301,10 @@ return S
 *Algorithm 4.2: Stratified diversity sampling for entity coverage*
 
 In the production run, T = 35,000, R = 12,000, D = 11,666, and the
-random remainder is 11,334.
+random remainder is 11,334. I arrived at those budgets empirically.
+Earlier runs used a fifty-fifty rare-versus-diverse split and
+under-recovered the dominant entities; the current split was the
+first one where the macro and micro F1 numbers moved together.
 
 Augmentation is implemented in `scripts/augment_training_data.py`
 following Algorithm 4.3.
@@ -2329,15 +2332,21 @@ return A
 
 *Algorithm 4.3: Template-based augmentation*
 
-The augmentation budget is 15,000 examples. Together with the 35,000
-sampled examples, the final training corpus is 50,000 examples,
-partitioned 40,000 / 10,000 into train and validation.
+The augmentation budget is 15,000 examples. Combined with the
+35,000 sampled examples, the final training corpus is 50,000. I
+partition it 40,000 / 10,000 into train and validation. That
+split is conservative — eighty / twenty is on the validation-heavy
+side of normal practice for token classification, but with rare
+entities at single-digit percentages I wanted enough validation
+support for VICTIM and CASUALTIES to give stable F1 numbers
+per epoch.
 
-Sample verb lexicons (location-taking verbs include "attacked",
-"raided", "stormed", "bombed", "shelled"; victim-taking verbs include
-"killed", "wounded", "abducted", "displaced"; clash verbs include
-"clashed with", "exchanged fire with", "battled") together with the
-template catalogue are reproduced in Annex E.
+Sample verb lexicons cover three template patterns. Location-taking
+verbs include "attacked", "raided", "stormed", "bombed", "shelled".
+Victim-taking verbs include "killed", "wounded", "abducted",
+"displaced". Clash verbs are multi-word phrases like "clashed
+with", "exchanged fire with", "battled". The full template
+catalogue is in Annex E.
 
 ## 5.4 Model Training Implementation
 
@@ -2747,21 +2756,22 @@ representative run*
 | 6     | 0.0032     | 0.0084   | 97.44 %      |
 | 7     | 0.0028     | 0.0088   | 97.55 %      |
 
-Two things stand out reading this table. The validation loss bottoms
-out at epoch 2 and then begins to creep up while the training loss
-keeps falling — textbook overfitting, and the early-stopping logic
-(patience 5, threshold 0.001) catches it within five further epochs
-and shuts the run down. The slightly trickier observation is that
-token-level validation *accuracy* keeps improving even after
-validation *loss* worsens. That looks like a contradiction the
-first time you see it; it isn't. Focal loss with class weighting
-encourages the model to grow more confident on examples it already
-gets right, which pushes accuracy up; it also makes the model less
-calibrated on the minority-class boundaries it still gets wrong,
-which is the cost the loss is recording. Reading those two curves
-against each other gave me the patience setting in the first
-place — without the loss curve, accuracy alone would have led to a
-longer training run for a worse model.
+Two things stand out reading this table. The validation loss
+bottoms out at epoch 2 and then begins to creep up while the
+training loss keeps falling. Textbook overfitting. The
+early-stopping logic (patience 5, threshold 0.001) catches it
+within five further epochs and shuts the run down.
+
+The trickier observation is that token-level validation *accuracy*
+keeps improving even after validation *loss* worsens. That looks
+like a contradiction the first time you see it. It isn't. Focal
+loss with class weighting encourages the model to grow more
+confident on examples it already gets right, which pushes accuracy
+up. It also makes the model less calibrated on the minority-class
+boundaries it still gets wrong, which is the cost the loss is
+recording. Reading those two curves against each other gave me the
+patience setting. Without the loss curve, accuracy alone would
+have led to a longer training run for a worse model.
 
 The most recent end-to-end production run, recorded in
 `models/bert-base-cased_20251223_192332/training_config.json`,
