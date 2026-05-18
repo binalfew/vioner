@@ -1573,12 +1573,17 @@ reconstructed later.
 
 ## 4.2 System Architecture
 
-Figure 4.1 outlines the high-level architecture of VioNER. The system
-is organised in four layers: a model layer that hosts the trained
-BERT model, a service layer that exposes the model and supporting data
-stores through HTTP APIs, a data layer that persists events,
-training runs, and user accounts, and a presentation layer that
-provides the web UI.
+VioNER follows a fairly standard four-layer architecture, sketched
+in Figure 4.1. At the bottom is the model — the fine-tuned BERT
+checkpoint and the in-process knowledge base it consults at
+inference time. Above that, a FastAPI service exposes the model
+and the supporting data stores through documented HTTP routes; the
+service is the only thing the rest of the world talks to. Below
+the service sits the persistence layer, a PostgreSQL instance that
+holds extracted events, training runs, user accounts, and audit
+trails. On top, the React/TypeScript front-end gives an analyst
+something to click on. Each layer has one job. None of the layers
+knows more about its neighbours than the contract demands.
 
 ```
 +--------------------------------------------------------------+
@@ -1797,33 +1802,41 @@ rule-based step in future work.
 
 ## 4.5 Knowledge Base Design
 
-The knowledge base is a structured, in-process resource loaded at
-service startup. It consists of three dictionaries.
+The knowledge base lives in memory next to the model and is built
+out of three dictionaries: armed groups, locations, and weapons. I
+considered loading it from Postgres at startup but the lookup volume
+during inference is high and an in-memory dict has obvious latency
+advantages; the trade-off is that adding or editing a KB entry
+requires a service restart, which the analyst-facing flows in §5.6
+handle gracefully.
 
-**Armed Groups.** Approximately 150 entries cover major armed groups
-active in Africa, each represented by a canonical name, a list of
-aliases, a country of operation, a region, and a group type (militia,
-terrorist, rebel, or government). Entries are organised by region
-(East, West, North, Southern, Central Africa) for readability.
-Example entries include Al-Shabaab (Somalia), Boko Haram (Nigeria),
-M23 (DRC), Rapid Support Forces (Sudan), JNIM (Mali), and Wagner
-Group (multiple). The full list is in Annex C.
+The armed-groups dictionary has roughly 150 entries. Each entry
+carries a canonical name, the list of aliases under which the group
+is reported in news, the country of operation, the broader region
+(East / West / North / Southern / Central Africa), and a group type
+in {militia, terrorist, rebel, government}. The list deliberately
+favours groups currently or recently active over historical ones —
+Al-Shabaab, Boko Haram, M23, RSF, JNIM, ISGS, Wagner Group, ENDF,
+TPLF — and is structured for easy extension as new actors emerge.
+Annex C has the full inventory.
 
-**Cities and Regions.** Approximately 200 conflict-affected cities
-are recorded with their country and parent administrative region.
-The dictionary also covers all 54 African countries with their
-capitals and major regions. Examples include Maiduguri (Nigeria,
-Borno), Goma (DRC, North Kivu), Mogadishu (Somalia, Banaadir), El
-Fasher (Sudan, North Darfur), and Bamako (Mali, Bamako Capital
-District). The dictionary is used both to resolve city-country
-ambiguity at inference time and to flag geographically implausible
-extractions.
+The locations dictionary records about 200 conflict-affected cities
+along with all 54 African countries and their primary regions. Each
+city entry maps to a country and a parent administrative unit, so
+"Maiduguri" resolves to Nigeria / Borno, "Goma" to DRC / North Kivu,
+"Mogadishu" to Somalia / Banaadir, and so on. Two operational uses
+follow. At inference time, an extracted CITY gets its country and
+region attached automatically. When an extracted ACTOR's known
+country of operation does not match the country derived from the
+location in the same sentence — say, "M23 attacking Maiduguri" —
+the event gets flagged for analyst review.
 
-**Weapons and Tactics.** A categorised list of weapons (firearms,
-explosives, edged weapons, fire/arson, heavy weapons) and tactical
-methods (ambush, raid, mass shooting, suicide bombing). The list is
-used by the post-NER taxonomy classifier to inform Level 3 and Level 4
-classification.
+The weapons dictionary is the smallest. It groups weapon mentions
+into categories (firearms, explosives, edged weapons, fire / arson,
+heavy weapons) and tactical methods (ambush, raid, mass shooting,
+suicide bombing). It exists mainly to feed the post-NER taxonomy
+classifier in §4.4, which uses weapon and method signals to refine
+the Level 3 and Level 4 classification.
 
 Table 4.4 summarises the size of each knowledge-base resource. The
 knowledge base is also used by the validator component to attach
