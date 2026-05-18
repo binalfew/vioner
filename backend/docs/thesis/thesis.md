@@ -2316,45 +2316,50 @@ template catalogue are reproduced in Annex E.
 
 ## 5.4 Model Training Implementation
 
-The trainer is implemented as `pipeline/training.py`, organised
-around a `ViolentEventNER` class that wraps the Hugging Face model,
-the tokenizer, the dataset, and the training loop.
+The trainer lives in `pipeline/training.py`, organised around a
+single `ViolentEventNER` class that owns the Hugging Face model,
+the tokenizer, the dataset wrappers, and the training loop. I
+considered splitting these into separate modules — model, dataset,
+trainer — but in practice the loop reads everything from the
+config and the indirection of crossing module boundaries on every
+step was not worth it for the scale this thesis operates at.
 
-The constructor receives a `ModelConfig` dataclass that captures all
-hyperparameters (Table 4.5). Device selection prefers Apple Silicon
-GPU (MPS) when available, falls back to CUDA where present, and
-ultimately to CPU. The `load_model` method instantiates
-`AutoTokenizer.from_pretrained` and
-`AutoModelForTokenClassification.from_pretrained` for `bert-base-cased`,
-configures the model with the 17-label classification head, and moves
-it to the selected device.
+The constructor takes a `ModelConfig` dataclass holding every
+hyperparameter listed in Table 4.5. Device selection runs in
+order: prefer Apple Silicon GPU (MPS) if available, fall back to
+CUDA, then CPU. The order reflects the hardware I actually used —
+the workstation I trained on is an Apple M-series laptop with 64 GB
+unified memory — and the fallback exists because the training
+script also needs to run on a CUDA box for occasional sanity
+checks. `load_model` instantiates `AutoTokenizer.from_pretrained`
+and `AutoModelForTokenClassification.from_pretrained` for
+`bert-base-cased`, sets up the 17-label classification head, and
+moves the model to the selected device.
 
-The `NERDataset` class implements `torch.utils.data.Dataset`. Its
-`__getitem__` runs the tokenizer with `is_split_into_words=True`,
-retrieves `word_ids`, and applies the alignment in Algorithm 4.1.
-Special tokens are assigned label -100, which PyTorch ignores in the
-default cross-entropy loss and which the custom focal loss also
-respects.
+Data flows through an `NERDataset` class extending
+`torch.utils.data.Dataset`. `__getitem__` runs the tokenizer with
+`is_split_into_words=True`, pulls out the `word_ids`, and applies
+the sub-word alignment from Algorithm 4.1. Special tokens get label
+-100, which PyTorch's default cross entropy ignores; the custom
+focal loss respects the same convention.
 
-The training loop iterates `num_epochs` epochs, with a per-epoch
-forward/backward pass for training and a no-grad validation pass.
-Gradient clipping bounds the L2 norm of the gradient at 1.0. The
-linear warm-up schedule is applied during the first `warmup_steps`
-optimisation steps, after which the ReduceLROnPlateau scheduler takes
-over and reduces the learning rate by a factor of 0.5 when the
-validation loss fails to improve for two consecutive epochs.
+The training loop is conventional: forward-backward on the
+training set, no-grad validation at the end of each epoch,
+gradient clipping at L2 norm 1.0, linear warm-up for the first
+`warmup_steps` optimisation steps, ReduceLROnPlateau scheduling
+after warm-up (factor 0.5, patience 2 epochs). Early stopping is
+just a running count of epochs since the last improvement in
+validation loss; when the count hits the patience threshold the
+loop exits and the best checkpoint is restored from `best/`.
 
-Early stopping is implemented by tracking the best validation loss
-seen so far and a counter of epochs without improvement. When the
-counter reaches the patience threshold, training stops. The best
-model is restored from the `best/` checkpoint after termination.
-
-Resumption is supported by `resume_training`, which reads the saved
-`training_config.json`, locates the most recent epoch folder, and
-re-enters the training loop at the appropriate epoch. Extension of a
-completed run is supported by the `--extend-epochs` flag, which
-increments the total epoch count and restarts the loop at the next
-epoch.
+There is one feature worth highlighting because it saved me time
+repeatedly during development: the resume path. `resume_training`
+reads the `training_config.json` from any prior run, locates the
+last epoch folder, and re-enters the loop at the appropriate epoch.
+Combined with the `--extend-epochs` flag (which increments the
+total epoch count of a completed run), it means I never had to
+restart training from scratch after a power cycle or after deciding
+mid-training that I wanted to push the run further.
 
 ## 5.5 Focal Loss and Class Weighting
 
@@ -2570,14 +2575,22 @@ on an Apple Silicon workstation with the configuration in Table 6.1.
 | PyTorch    | 2.6 |
 | Transformers | 4.46 |
 
-Validation metrics are computed on the held-out 10,000-example
-validation split that was set aside at the start of training and not
-seen during any training run. Token-level accuracy excludes positions
-labelled with the special ignore index (-100). Per-entity precision,
-recall, and F1 are computed over assembled entity spans (rather than
-individual tokens) so that boundary errors are penalised. A predicted
-entity is considered correct if its label, start, and end exactly
-match a gold entity.
+A note on what I evaluate against. The validation set is the same
+10,000-example split I set aside at the very start of training and
+never touched again — not for hyperparameter tuning, not for
+checkpoint selection, not for sampler tuning. Touching the
+validation set with any of those would invalidate every number
+that follows. Token-level accuracy ignores positions labelled with
+the -100 special index (special tokens, sub-word continuations).
+Per-entity precision, recall, and F1 are computed at span level,
+not at token level, because boundary errors are real errors a
+downstream consumer notices. A predicted span counts as correct
+only if its type, start, and end exactly match a gold span;
+partial overlaps count as a false positive plus a false negative.
+The strictness of this scoring is the right choice for the
+operational consumers I have in mind, but as discussed in §6.11 it
+does make some of the headline numbers look slightly worse than
+they read on inspection.
 
 ## 6.2 Dataset Statistics
 
