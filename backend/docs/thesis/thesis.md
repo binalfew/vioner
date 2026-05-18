@@ -2214,13 +2214,16 @@ effectively unmaintained and Vite's iteration loop is faster.
 
 ## 5.2 Data Acquisition and Preprocessing
 
-The primary data source is the ACLED open dataset, accessed through
-the ACLED API. The retrieved records cover the 54 African countries
-and span multiple years. The raw extract is approximately 212,590
-event records.
+ACLED publishes its data through an open API. I pulled the full
+African extract — every event coded across the 54 countries since
+their coverage started — and ended up with 212,590 records.
+Anything beyond Africa was filtered out at ingest. The data lives
+on disk as JSONL; that format predates my project and matches what
+ACLED's own export tooling produces.
 
-The preprocessing module `pipeline/preprocessing.py` converts the raw
-extract into BIO-tagged training data. The principal steps are:
+The `pipeline/preprocessing.py` module turns that raw extract into
+BIO-tagged training data. The procedure is straightforward enough
+to lay out as four numbered steps.
 
 1. **Loading.** Each event is loaded from JSONL, with required fields
    verified and missing values defaulted.
