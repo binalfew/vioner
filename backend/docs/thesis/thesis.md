@@ -2877,9 +2877,15 @@ reaches approximately 65 short documents per second.
 
 ## 6.9 End-to-End Demonstration
 
-To illustrate the end-to-end behaviour, the system was applied to a
-sample of recent open-source news articles describing African
-violent events. Three illustrative cases are reproduced below.
+Numbers and confusion matrices only go so far. To show what VioNER
+actually does when you give it real prose, I ran it on a handful
+of recent open-source articles about African violent events and
+captured the extracted records. Three of them are reproduced below,
+chosen because they each exercise a different part of the pipeline:
+a coordinated terror attack with KB canonicalisation, a
+state-violence case that lands on a multi-label taxonomy
+assignment, and a communal-violence case with no clear single
+perpetrator-target distinction.
 
 **Case 1.** *Input:* "Al Shabaab fighters launched a coordinated
 attack on the Lido Beach restaurant in Mogadishu on Saturday
