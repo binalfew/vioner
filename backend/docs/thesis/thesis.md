@@ -1653,11 +1653,15 @@ output by combining the NER result with deterministic knowledge.
 
 ## 4.3 Entity Schema and BIO Encoding
 
-The entity schema is the central design decision. As discussed under
-P1, the schema is restricted to entity types that pilot evaluation
-confirmed as reliably grounded in source text. The resulting eight
-entity types, organised under the 5W1H categories, are listed in
-Table 4.1.
+The schema is the single most consequential design choice in the
+thesis. Get it wrong and the supervised learning problem is set up
+against you; get it right and the model has a fighting chance. The
+P1 grounding rule (§4.1) does most of the work: an entity type is
+in the schema if and only if a human annotator can find it
+verbatim in the source text on a reliable majority of occurrences.
+Anything that fails that test gets pushed downstream to
+post-processing. Eight types survived the pilot, organised under
+the 5W1H categories in Table 4.1.
 
 *Table 4.1: Eight-entity grounded schema for the VioNER NER component*
 
@@ -1695,14 +1699,17 @@ Labels:    B-ACTOR  I-ACTOR   O          B-ACTION   B-CASUALTIES  B-VICTIM    O 
 violent event. Multi-token entities such as "Al Shabaab" are
 encoded by a leading B- tag followed by I- tags*
 
-Sub-word tokenisation introduces a complication: a single
-gold-labelled word may be split into several sub-word tokens, and the
-labels must be projected onto the sub-words during training. The
-convention adopted here, summarised as Algorithm 4.1 in Section 4.6,
-assigns the original label to the first sub-word and converts any
-leading B- prefix to I- for subsequent sub-words, while assigning the
-ignore index (-100) to special tokens such as [CLS], [SEP], and [PAD]
-so that they are excluded from the loss.
+There is one wrinkle the encoding has to handle. BERT uses WordPiece
+sub-word tokenisation, so a single annotated word can be split into
+two or three pieces — "Beledweyne" might become "Beled", "##wey",
+"##ne", each with its own row in the input. The labels have to be
+projected onto the sub-words consistently or training will see
+inconsistent signals across runs. The convention I use, formalised
+as Algorithm 4.1 in §4.6, carries the original word's label to the
+first sub-word, rewrites any leading B- to I- on subsequent
+sub-words (because only the first sub-word can be the *start* of
+the entity), and assigns -100 to special tokens like [CLS], [SEP],
+and [PAD] so they're ignored by the loss.
 
 ## 4.4 Hierarchical Violent Event Taxonomy
 
