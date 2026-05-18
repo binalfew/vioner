@@ -1425,23 +1425,29 @@ pattern of feeding extraction output into a structured ontology with
 hierarchical classes is a direct antecedent of the post-NER taxonomy
 pipeline in VioNER.
 
-ACLED's own taxonomy, while operationally tuned, is also a precedent
-for hierarchical violence categorisation [8]. ACLED uses two levels
-(event type and sub-event type) and approximately twenty-five
-sub-event categories. The present work extends this in two
-directions: in depth, by adding two additional levels of granularity
-(an intermediate Level 2 and a detailed Level 4); and in breadth, by
-adding African-specific categories such as pastoralist-farmer clashes
-and communal cattle raiding that are folded into other categories in
-ACLED.
+ACLED's own taxonomy is the other obvious precedent for
+hierarchical violence categorisation [8]. ACLED uses two levels —
+event type and sub-event type — with about twenty-five sub-event
+categories in total. I extend that in two directions: depth, by
+adding an intermediate Level 2 above and a detailed Level 4 below;
+and breadth, by introducing African-specific categories
+(pastoralist-farmer clashes, communal cattle raiding, post-election
+revenge violence) that ACLED folds into broader buckets. The extra
+depth costs me classification accuracy at the deepest level — it
+is harder to distinguish a Level 4 "Roadside Ambush" from a
+"Complex Ambush" than to pick a Level 1 — but the trade-off makes
+sense for an operational tool where the analyst can stop at
+whatever level of granularity they trust.
 
 A learned hierarchical classifier could in principle replace the
-rule-based taxonomy assignment used here. Methods for hierarchical
-classification range from top-down cascades, in which a separate
-classifier is trained at each level, to global classifiers that
-predict the entire path simultaneously [37]. Designing and training a
-learned hierarchical classifier is identified as future work in
-Chapter 7.
+rule-based taxonomy assignment I use today. The classical methods
+[37] split into top-down cascades — one classifier per level,
+conditioned on the parent label — and global classifiers that
+predict the whole path at once. The cascade is easier to debug and
+train incrementally; the global model can recover from a wrong
+upper-level prediction. Either is a meaningful upgrade over the
+rule-based fallback I currently use, and §7.5 prioritises the
+cascade variant.
 
 ## 3.5 Summary of Gaps Addressed
 
@@ -2852,9 +2858,15 @@ is the right one for assessing balance.
 
 ## 6.6 Ablation: Focal Loss versus Cross Entropy
 
-To isolate the contribution of focal loss, four configurations were
-compared while holding everything else constant. Per-entity F1
-across the four configurations is shown in Table 6.8.
+This is the ablation I cared about the most going in. The choice
+between plain cross entropy, weighted cross entropy, focal loss,
+and the focal-loss + weights combination changes the gradient
+signal in different ways, and I wanted to know whether the two
+imbalance-handling ingredients were genuinely complementary or
+whether one of them carried the other. To find out, I trained
+four models with identical data, scheduler, early-stopping, and
+random seeds — only the loss function changed. Per-entity F1
+across the four configurations is in Table 6.8.
 
 *Table 6.8: Per-entity F1 on the validation set for the focal-loss ablation*
 
@@ -2870,11 +2882,22 @@ across the four configurations is shown in Table 6.8.
 | CASUALTIES  | 0.853    | 0.871       | 0.872       | 0.885           |
 | **Macro avg** | **0.855** | **0.873** | **0.878** | **0.887**     |
 
-The minority-class entities (ACTION, VICTIM, CASUALTIES) benefit most
-from the combination. VICTIM in particular improves by approximately
-eleven F1 points relative to plain cross entropy. High-support
-entities show smaller but consistent improvements; no entity type is
-hurt by the focal-loss objective.
+The pattern is unambiguous and is the answer to the question I set
+out to ask. The minority entities — ACTION, VICTIM, CASUALTIES —
+are exactly the ones that benefit most from the combination, with
+VICTIM moving by eleven F1 points relative to plain cross entropy.
+Each ingredient on its own helps: weighted cross entropy lifts
+VICTIM by seven F1 points, focal loss alone by nine. The two
+together lift it by eleven. That is not a redundant
+combination — it is a complementary one — and that complementarity
+is what justifies the slightly more complex loss function in
+production. The high-support entities show smaller, consistent
+improvements across the same axis, and crucially no entity is
+hurt by the focal-loss objective relative to plain cross entropy.
+That last property mattered to me operationally: an imbalance-aware
+loss that protects the rare classes at the cost of the common ones
+would have been a regression for analyst workflows that depend on
+DATE and ACTOR accuracy.
 
 ## 6.7 Knowledge-Base Validation Impact
 
