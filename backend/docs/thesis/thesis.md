@@ -537,39 +537,43 @@ documented pipeline for converting English-language news reports of
 violent events into structured 5W1H records suitable for downstream
 analysis. The problem can be decomposed into three sub-problems.
 
-**Sub-problem 1: Domain-specific entity recognition.** Generic NER
-models trained on news corpora do not consistently recognise
-African-specific armed groups, regional administrative units,
-conflict-affected localities, and the casualty descriptions used in
-African conflict reporting. Off-the-shelf models also do not
-distinguish the actor, victim, action, and casualty roles that an
-operational analyst cares about. A model fine-tuned on annotated
-African conflict text is therefore required, supported by a
-grounded annotation schema that captures the operationally relevant
-entity types and excludes those that cannot be reliably grounded in
-the source text.
+The first sub-problem is *domain-specific entity recognition*.
+Generic NER models trained on European or North American news
+corpora do not consistently recognise the actors, places, and
+casualty descriptions that characterise African conflict reporting.
+Boko Haram, JNIM, the Allied Democratic Forces, Fano, Anti-Balaka,
+the Rapid Support Forces — these are not entities a generic model
+has seen during pre-training, and the closest matches it can find
+in its vocabulary are usually wrong. Off-the-shelf models also do
+not distinguish the actor, victim, action, and casualty roles that
+an operational analyst actually uses. The implication: a model
+fine-tuned on annotated African conflict text, supported by a
+grounded annotation schema that captures the operationally
+relevant entity types and excludes those that cannot be reliably
+grounded.
 
-**Sub-problem 2: Severe class imbalance.** Within the annotated
-corpus, the distribution of Beginning-Inside-Outside (BIO) labels
-is heavily dominated by the O label, with entity tokens forming only
-a minority of the total.
-Within the entity tokens themselves, ACTOR, CITY, DATE, REGION, and
-DISTRICT labels dominate, while VICTIM, ACTION, and CASUALTIES are
-substantially rarer. Naive training tends to over-fit to the dominant
-classes and under-recover the rare but operationally important ones.
-A loss function and sampling strategy that compensate for this
-imbalance are required.
+The second is *severe class imbalance*. In the annotated corpus,
+roughly seventy-eight percent of all tokens carry the outside (O)
+label. Of the remaining twenty-two percent that are actual
+entities, ACTOR, CITY, DATE, REGION, and DISTRICT account for the
+bulk; VICTIM, ACTION, and CASUALTIES — the entities an analyst
+cares about most operationally — make up only single digits each.
+A naive cross-entropy fine-tune on this distribution will report
+deceptively high overall accuracy while quietly under-recovering
+exactly the rare classes that matter. The implication: a loss
+function and sampling strategy that compensate explicitly for the
+imbalance.
 
-**Sub-problem 3: Operational packaging.** A trained model alone is
-not an operational capability. To be useful, the model must be
+The third is *operational packaging*. A trained model on its own is
+not an operational capability. To be useful, the model has to be
 exposed through a documented API, paired with a curated knowledge
-base, embedded in a workflow that supports article ingestion, event
-storage, and analytics, and operable by users who are not machine
-learning specialists. Most prior academic work on event extraction
-in the African context has stopped at the model boundary, leaving
-the operational packaging undone. This thesis addresses operational
-packaging as a first-class research output rather than as
-implementation detail.
+base, embedded in a workflow that supports article ingestion,
+event storage, and analytics, and operable by users who are not
+machine learning specialists. Most prior academic work on event
+extraction in the African context stops at the model boundary —
+the model is published, the operational layer is not. This thesis
+treats operational packaging as a first-class research output, not
+as an implementation footnote.
 
 ### Research Questions
 
@@ -1206,37 +1210,41 @@ sub-word predictions are merged.
 The taxonomic structure of violent events is informed by a long line
 of conflict-event databases. Three are particularly influential.
 
-**ACLED.** The Armed Conflict Location and Event Data Project [8]
-maintains a georeferenced database of political violence and protest
-events covering Africa, the Middle East, Latin America, South and
-South-East Asia, and other regions. Each ACLED record includes
-fields for event type, sub-event type, actors, location, fatalities,
-and a free-text note describing the event. ACLED's event type taxonomy
-distinguishes battles, explosions and remote violence, violence
-against civilians, protests, riots, and strategic developments, with
-sub-event types under each. ACLED is the principal data source for
-this thesis: the training corpus is constructed by labelling ACLED
-event notes against the column metadata, and the taxonomy presented
-in Annex B is influenced by ACLED's structure.
+ACLED [8] is the principal one for this thesis. The Armed Conflict
+Location and Event Data Project maintains a georeferenced database
+of political violence and protest events covering Africa, the
+Middle East, Latin America, South and South-East Asia, and other
+regions. Each ACLED record includes fields for event type,
+sub-event type, actors, location, fatalities, and a free-text note
+describing the event. ACLED's own event-type taxonomy uses six
+primary categories (battles, explosions and remote violence,
+violence against civilians, protests, riots, strategic
+developments) with sub-event types under each. My training corpus
+is built directly from ACLED's open data — the structured columns
+provide the labels for the BIO tagging in the notes — and the
+four-level taxonomy in Annex B is in part an extension of ACLED's
+structure.
 
-**UCDP.** The Uppsala Conflict Data Program [9] focuses on organised
-violence, distinguishing state-based conflict, non-state conflict,
-and one-sided violence, with fatality thresholds that exclude
-lower-intensity events. UCDP's careful definitional work, including
-the operational definition of organised actors and the distinction
-between battle-related and civilian deaths, informs the boundary
-between political violence and other categories in the taxonomy.
+UCDP [9] is the second influential database. The Uppsala Conflict
+Data Program focuses on *organised* violence, distinguishing
+state-based conflict, non-state conflict, and one-sided violence,
+with fatality thresholds that exclude lower-intensity events.
+UCDP's definitional work — what counts as an "organised" actor,
+how battle-related deaths differ from civilian deaths — informs the
+boundary between political violence and the other categories in my
+taxonomy, even though I am not using UCDP data directly.
 
-**GDELT.** The Global Database of Events, Language, and Tone [10] is
-an automatically generated event database using the CAMEO event
-coding framework [27]. CAMEO is a broad taxonomy covering both
-cooperative and conflictual events, organised in a four-digit
-hierarchical code. GDELT's scale is impressive, but its automated
-extraction is comparatively coarse and produces a high volume of
-events that may not satisfy the precision standard of operational
-early warning. CAMEO and GDELT are referenced in this thesis as
-illustrations of the scale-versus-precision trade-off and as sources
-of comparative taxonomy patterns.
+GDELT [10] sits at the opposite end of the methodology spectrum.
+The Global Database of Events, Language, and Tone is automatically
+generated using the CAMEO event coding framework [27], which is a
+broad four-digit hierarchical taxonomy covering both cooperative
+and conflictual events. GDELT's scale is impressive — billions of
+events — but the automated extraction is comparatively coarse and
+produces a high volume of records that does not always meet the
+precision standard of operational early warning. I cite GDELT and
+CAMEO here as the canonical example of the scale-versus-precision
+trade-off, and as a source of comparative taxonomic patterns, but
+not as a direct input to my system.
 
 The taxonomy of African violent events presented in this thesis is
 synthesised from ACLED and UCDP frames with additional categories
@@ -1522,60 +1530,69 @@ and specific technology choices are deferred to Chapter 5.
 
 ## 4.1 Design Principles
 
-Six principles guided the design — some I started with, others I
-learned during development.
+Six principles shaped the design. Some I committed to at the start
+of the project; others I learned during development. They are not
+in priority order — they are more like a set of habits I applied
+whenever a design question came up.
 
-**P1: Grounded supervision.** Every entity type in the schema must
-be something a human annotator can find verbatim in the source
-text. I learned this one the hard way. The original schema in the
-proposal had twenty-six entity types, and during the November pilot
-I tried to annotate a sample by hand using it. EVENT_TYPE (was this
-an "ambush" or a "raid"? often both, often neither) and COUNTRY
-(rarely written explicitly when a city or region name carries the
-country implicitly) had grounding rates below 60 percent. Training
-on labels you cannot consistently find in the text is asking the
-model to learn noise. Both got dropped from the NER schema and
-moved into the post-NER taxonomy step, where they belong.
+The first is *grounded supervision*. Every entity type in the
+schema has to be something a human annotator can find verbatim in
+the source text on a reliable majority of occurrences. I learned
+this one the hard way. The original twenty-six-type schema in the
+proposal looked clean on paper. During the November pilot I tried
+to annotate a sample by hand using it, and ran straight into
+EVENT_TYPE — was this an "ambush" or a "raid"? Often both. Often
+neither. The annotator was inferring from context what the article
+didn't say. COUNTRY had a similar problem: it is rarely written
+explicitly when a city or region name already carries the country
+implicitly. Grounding rates for both came in under 60 percent.
+Training on labels you cannot consistently find in the text is
+training the model to learn noise. Both got dropped from the NER
+schema and moved to the post-NER taxonomy step.
 
-**P2: Modular pipeline.** Each stage of the system has a defined
-input and output and no hidden state. Tokenise → NER → entity
-assembly → confidence filtering → KB enrichment → 5W1H structuring
-→ taxonomy classification → persist. Every arrow can be inspected,
-every stage can be unit-tested in isolation, and a bug in any one
+The second is *modular pipeline*. Each stage has a defined input
+and output and no hidden state. Tokenise, NER, entity assembly,
+confidence filtering, KB enrichment, 5W1H structuring, taxonomy
+classification, persist. Every arrow in that flow can be inspected;
+every stage can be unit-tested in isolation; a bug in any one
 stage can be isolated without rebuilding the rest. Joint models
-might be more accurate; they are markedly harder to debug at three
-in the morning when an analyst reports a regression.
+might be more accurate in the aggregate, but they are markedly
+harder to debug at three in the morning when an analyst reports
+that yesterday's run was off.
 
-**P3: Hybrid statistics and knowledge.** The learned model
+The third is *hybrid statistics and knowledge*. The learned model
 generalises over surface forms — it picks up that "ENDF",
 "Ethiopian National Defense Force", and "Ethiopian troops" all
 refer to the same kind of actor. A deterministic knowledge base
 handles the things rules are good at: looking up which country
-"Beledweyne" is in, expanding "JNIM" to its canonical name, deciding
-whether an actor + location pairing is geographically plausible.
-Where each tool is naturally strong, use it.
+"Beledweyne" is in, expanding "JNIM" to its canonical name,
+deciding whether an actor and a location are geographically
+plausible together. Pick each tool where it is naturally strongest.
 
-**P4: Confidence is first-class.** The NER component emits a
-confidence score for every span, derived from the averaged
-sub-token softmax probabilities. Downstream code can apply
-category-specific thresholds (DATE wants 0.80; WHAT tolerates 0.60),
-and the UI shows the confidence on hover. Hiding uncertainty is a
-disservice — an analyst who knows the model was unsure on the
-casualty figure can verify it, an analyst who thinks the figure is
-ground truth might not.
+The fourth, which I came to during user-acceptance testing, is
+that *confidence has to be first-class*. The NER component emits a
+confidence score for every extracted span, derived from the
+averaged sub-token softmax probabilities, and downstream code can
+apply category-specific thresholds (DATE wants 0.80, WHAT
+tolerates 0.60). The UI shows the confidence on hover. Hiding
+uncertainty is a disservice. An analyst who knows the model was
+unsure on a casualty figure will verify it; an analyst who thinks
+that figure is ground truth probably will not.
 
-**P5: Operational packaging.** The deliverable is not a Jupyter
-notebook. The model is wrapped in a documented HTTP API, the
+The fifth is *operational packaging*. The deliverable is not a
+Jupyter notebook. The model is behind a documented HTTP API, the
 analyst-facing UI sits on top of that API, and the whole stack
 comes up under `docker-compose up`. A user who has never run a
-Python script should be able to operate the system.
+Python script should still be able to drive it.
 
-**P6: Reproducibility.** Datasets, training runs, and the final
-deployment all rebuild from documented scripts and configuration.
-Random seeds are fixed where applicable; where they are not — for
-example, the diversity sampler uses Python's default random
+The sixth is *reproducibility*, which sounds like a corporate
+checkbox but is actually a working discipline. Datasets, training
+runs, and the final deployment all rebuild from documented scripts
+and configuration. Random seeds are fixed where I can fix them.
+Where I can't — the diversity sampler uses Python's default random
 generator — the random state is logged so the same subset can be
-reconstructed later.
+reconstructed later. This saved me at least twice during
+development when I had to re-derive an experiment from cold.
 
 ## 4.2 System Architecture
 
@@ -2372,34 +2389,40 @@ mid-training that I wanted to push the run further.
 
 ## 5.5 Focal Loss and Class Weighting
 
-The custom loss is implemented in `pipeline/loss.py`. The
-`FocalLoss` class extends `torch.nn.Module` and implements
-Algorithm 4.4. The principal points of the implementation are:
+`pipeline/loss.py` holds the custom loss code. Two classes live
+there: `FocalLoss`, which extends `torch.nn.Module` and implements
+Algorithm 4.4, and `ClassWeightedCrossEntropy`, a simpler weighted
+cross-entropy used as the ablation baseline in §6.6.
 
-- Logits and targets are flattened to two-dimensional and
-  one-dimensional tensors respectively before the loss is computed.
-- The ignore mask (target == -100) is applied before any softmax
-  computation to keep the loss numerically stable.
-- Label smoothing, when enabled, distributes mass across the
-  vocabulary; the focal modulating factor remains applied to the
-  smoothed distribution.
-- The per-class weights are passed in as a 1D tensor on the same
-  device as the logits; they are picked up by indexing.
+A few implementation choices in `FocalLoss` are worth flagging.
+Logits arrive shaped `[N, C]` and targets shaped `[N]`; both get
+flattened before any softmax, because PyTorch's `log_softmax` is
+faster on contiguous 2D tensors and the per-token granularity is
+all we need for token classification. Ignored positions
+(`target == -100`) are masked before the softmax computation rather
+than after, which keeps the loss numerically stable when there are
+many padding tokens in a batch. Label smoothing, if turned on, is
+applied to the target distribution and the focal modulating factor
+still applies to the smoothed targets — that is, the focal term
+respects the smoothed label, not the original one-hot. Per-class
+weights are passed in as a 1D tensor on the same device as the
+logits and picked up by index.
 
-The `compute_class_weights` function in the same module computes
-inverse-frequency weights from a label-count dictionary:
+Class weights are computed once at the start of training by
+`compute_class_weights`, which takes a label-count dictionary and
+returns inverse-frequency weights:
 
 ```
 w_c = T / (C * max(f_c, 1))
 ```
 
-with optional normalisation. The training script logs the resulting
-O weight, the maximum weight, and the minimum weight to make the
-weighting transparent. The training-set label distribution and the
-resulting class weights are reproduced in Annex E.
-
-The `ClassWeightedCrossEntropy` class provides a non-focal weighted
-alternative for ablation.
+where T is the total token count over the training set, C is the
+number of classes, and `f_c` is the count of class c (clipped to a
+minimum of 1 to avoid division by zero on classes that happen to
+be absent from a particular fold). The training script logs the
+resulting O-class weight alongside the minimum and maximum weights,
+so the weighting is visible in the run log; Annex E reproduces the
+distribution and the derived weights for the production run.
 
 ## 5.6 Backend Services and API
 
@@ -2778,11 +2801,26 @@ same early-stopping, same random seeds.
 | **Focal loss + class weights**   | **2**      | **0.0074** | **96.7 %**   |
 | Focal loss + class weights + smoothing (β=0.1) | 2 | 0.0076 | 96.6 % |
 
-The combination of focal loss with class weights produces the lowest
-validation loss. Label smoothing alone does not deliver further
-improvement and introduces slight calibration changes that are
-neutral for downstream use; it is retained in the production
-configuration for its regularisation properties.
+Reading the table from top to bottom, the trend is consistent:
+each ingredient that explicitly addresses class imbalance lowers
+the validation loss further. Plain cross entropy is the baseline
+at 0.0102. Class-weighted cross entropy alone drops that to 0.0085;
+focal loss alone drops it to 0.0079. The combination — focal loss
+with inverse-frequency class weights — reaches 0.0074, which is
+the lowest validation loss across any configuration I tried. Token
+accuracy on that combination is 96.7 percent, and the model
+converges to its best checkpoint in two epochs. These are the
+numbers that motivate the rest of the chapter; per-entity
+breakdowns in §6.5 explain where the accuracy is actually concentrated.
+
+Adding label smoothing (β = 0.1) on top of the winning
+configuration sounds like it should help, and the literature
+backs that intuition for many tasks, but in my runs it nudged the
+validation loss up to 0.0076 with no meaningful gain in
+calibration. I kept label smoothing in the production
+configuration anyway — its regularising effect is mild and the
+slight loss penalty is well within the run-to-run variation noise
+floor — but it is not the reason the system works.
 
 ## 6.5 Per-Entity Analysis
 
@@ -3079,47 +3117,51 @@ it fails, I sat down with 300 validation-set events on which the
 model made at least one mistake and read them one at a time. Five
 patterns emerged, listed below in order of frequency.
 
-**Boundary errors (38 percent).** The model gets the entity *type*
-right but the *span* slightly wrong — usually by truncating a
-qualifier. "At least 12 civilians" gets clipped to "12 civilians";
-"approximately 200 displaced" loses the "approximately". Almost all
-boundary errors fall on VICTIM and CASUALTIES, which is consistent
-with the per-entity F1 in Table 6.7. Strict span-level scoring
-counts these as misses, which makes the headline numbers look
-worse than they actually are operationally: an analyst reading the
-output sees "12 civilians" and knows what was meant.
+The largest single category, at roughly 38 percent of all errors,
+is boundary mismatch. The model gets the entity *type* right but
+the *span* slightly wrong — usually by truncating a qualifier. "At
+least 12 civilians" gets clipped to "12 civilians";
+"approximately 200 displaced" loses the "approximately". Almost
+all of these fall on VICTIM and CASUALTIES, which is consistent
+with the lower per-entity F1 for those two in Table 6.7. Strict
+span-level scoring counts boundary mismatches as full misses, which
+makes the headline numbers look harsher than the analyst's actual
+experience. Reading "12 civilians" in the output, the analyst
+knows what was meant.
 
-**Type confusion between location entities (24 percent).** REGION
-and CITY, or REGION and DISTRICT, get swapped. Figure 6.4 shows
-the pattern. The hardest cases are the cities that double as
-regional capitals — Goma is both a city and the de-facto centre of
-North Kivu province, so a sentence like "fighting in Goma" can
-reasonably be read either way without more context. The model
-defaults to CITY for these, which is right slightly more often than
-not but produces consistent confusion under strict scoring.
+Roughly a quarter of errors are type confusion between the three
+location entities. REGION and CITY, or REGION and DISTRICT, get
+swapped — see Figure 6.4. The hardest cases involve cities that
+double as regional capitals or districts. Goma is both a city and
+the de-facto centre of North Kivu province, so "fighting in Goma"
+can be tagged either way without more context. The model defaults
+to CITY for ambiguous cases, which is more often right than wrong,
+but it produces a consistent stream of confusions when strict
+scoring is applied.
 
-**Missed entities (19 percent).** The model produces no prediction
-where there should have been one. Most misses are unusual victim
-phrasings — "Christian worshippers", "internally displaced
-schoolgirls", "the bus driver's family" — that the augmentation
-templates do not cover and that ACLED notes phrase more
-generically. Action verbs in the passive voice ("were ambushed",
-"were displaced") also get missed more often than active equivalents.
+About 19 percent of errors are missed entities — the model
+produces no prediction where it should have. Most of these are
+unusual victim phrasings ("Christian worshippers", "internally
+displaced schoolgirls", "the bus driver's family") that the
+augmentation templates don't cover and that ACLED notes phrase
+more generically. Passive-voice action verbs are also disproportionately
+missed: "were ambushed" and "were displaced" trip the model more
+often than active equivalents like "ambushed" and "displaced".
 
-**Spurious entities (12 percent).** The model invents an entity
-where there is none. The biggest single trigger is the WHEN
-category: phrases like "this morning", "earlier", "in recent days"
-get tagged as DATE even when they are vague and the gold annotator
-left them un-tagged. Tightening the WHEN threshold to 0.85 trims
-most of these at the cost of about 1.2 F1 on legitimate DATE
-recall — a trade-off I left to the operator's confidence
-threshold.
+Spurious entities — predictions where no gold annotation exists —
+account for another 12 percent. The biggest single source is the
+WHEN category. Vague phrases like "this morning", "earlier", and
+"in recent days" get tagged as DATE even when the gold annotator
+left them untagged. Raising the WHEN threshold to 0.85 cuts most
+of these at the cost of about 1.2 F1 on legitimate DATE recall,
+which is a trade-off I left to the operator rather than baking it
+into the production threshold.
 
-**Confidence-related drops (7 percent).** The model predicts the
-entity correctly but its averaged sub-token confidence sits below
-the category threshold, so the post-processor filters it out
-(§4.7). Lowering the threshold would recover most of these at the
-cost of precision; this is the cleanest dial to turn for
+The remaining 7 percent are confidence-related drops: the model
+gets the entity right but its averaged sub-token confidence sits
+just below the category threshold, so the post-processor filters
+it out (§4.7). Lowering the threshold would recover most of these
+at the cost of precision. This is the cleanest dial to turn for
 recall-favouring deployments.
 
 ```
