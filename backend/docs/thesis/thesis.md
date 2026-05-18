@@ -805,67 +805,82 @@ The principal limitations of the work are the following.
 
 ## 1.7 Application of Results
 
-The deliverables of this thesis have several immediate and prospective
-applications across the African early warning, humanitarian, security,
-and research ecosystems.
+The primary intended user is the AU-CEWS analyst whose backlog
+this thesis set out to address. The same set of capabilities is
+useful, with little or no modification, to the regional economic
+communities running their own monitoring functions (ECOWAS, IGAD,
+SADC) and to national early-warning centres in member states. The
+taxonomy-aware analytics support queries at any level of the
+hierarchy — "all political violence in West Africa this quarter",
+"suicide bombings attributed to JNIM in Mali in 2026", "election
+violence in countries with elections in the past ninety days" —
+which is the kind of slicing that briefing-writers need on demand.
 
-**Operational early warning.** AU-CEWS, regional economic communities,
-and national early warning centres can use the system to accelerate
-the conversion of news into structured event records, freeing analyst
-attention for interpretation and decision support. The hierarchical
-taxonomy supports multi-level queries from broad categories
-("political violence in West Africa this quarter") to specific event
-types ("suicide bombings attributed to JNIM in Mali").
+Beyond the early-warning case, the event store is structured around
+fields humanitarian organisations care about (actor, victim,
+location, casualty count, displacement). An NGO doing protection
+analysis or needs assessment can run aggregations over the same
+data; the schema does not need to be redesigned to serve them.
 
-**Humanitarian response.** Humanitarian organisations require detailed
-information about violence affecting civilian populations and
-humanitarian access. The event store, with its actor, victim,
-location, and casualty fields, provides a base for protection
-analysis, needs assessment, and access mapping.
+Peace-support operations and national security services are a more
+sensitive case. Open-source extraction is not a substitute for
+classified intelligence, and I would not present it as one. The
+useful framing is that VioNER lowers the cost of doing OSINT
+systematically — a junior analyst with VioNER on their workstation
+can do, in a morning, the volume of structured reading that a few
+years ago would have taken a small team. Whether that fits any
+particular service's workflow is a question for them.
 
-**Security and defence analysis.** Peace support operations and
-national security services can use the system to monitor non-state
-armed groups, track cross-border threats, and inform operational
-planning, recognising that automated output supplements rather than
-replaces classified intelligence streams.
+For academic researchers, the annotated dataset, the four-level
+taxonomy, and the extracted event corpus are the reusable
+artefacts. Conflict-studies quantitative work has historically
+been bottlenecked by hand-coded data; an open BERT-based extractor
+plus a curated knowledge base shifts where that bottleneck sits.
 
-**Research.** Academic researchers and policy institutes can use the
-annotated dataset, the taxonomy, and the extracted event corpus as
-inputs to quantitative conflict studies, comparative analyses, and
-methodological development in domain-specific NLP.
-
-**Capacity building.** The open architecture, documented annotation
-schema, and reproducible deployment lower the technical barrier for
-African universities, research centres, and government bodies to adopt
-and adapt the system to their own monitoring needs.
-
-The breadth of these applications underlines that even with the
-acknowledged limitations, the artefact produced by this thesis
-contributes value beyond its strict research contributions.
+Finally, the open architecture and documented deployment are a
+modest capacity-building contribution. An African university or
+research centre with the means to run Docker and a GPU can deploy
+their own instance, fine-tune on their own annotated data, and
+adapt the taxonomy without having to start from scratch.
 
 ## 1.8 Organization of the Rest of the Thesis
 
-The remainder of this thesis will be organised as follows. Chapter 2
-will review relevant literature, covering the foundations of
-information extraction and named entity recognition, the transformer
-architecture and BERT, techniques for handling class imbalance in
-token classification, and the conflict-event database landscape that
-informs the taxonomy. Chapter 3 will review prior systems most
-directly related to this work, including violence-specific event
-extraction systems and the closest African-context predecessor, and
-will identify the specific gaps that VioNER bridges.
-Chapter 4 will present the proposed solution, including the high-level
-system architecture, the entity schema, the hierarchical taxonomy, the
-knowledge base, the training pipeline, the inference pipeline, and
-the web-application architecture. Chapter 5 will describe the
-implementation, including the technology stack, data preparation,
-model training, focal-loss objective, backend services, and
-frontend application. Chapter 6 will present the experimental
-results, including dataset statistics, training dynamics, overall and
-per-entity performance, ablation studies, error analysis, and user
-acceptance feedback. Chapter 7 will conclude the thesis with a
-summary of contributions, recommendations, and a prioritised future
-work programme that addresses the limitations identified in Section 1.6.
+The next two chapters cover the literature. Chapter 2 will work
+through the relevant theory — information and event extraction,
+named entity recognition, transformers and BERT, class-imbalance
+methods, the conflict-event database tradition, and event-oriented
+knowledge representation — at a level sufficient to support the
+decisions made in Chapter 4. Chapter 3 will then narrow to the
+specific prior systems VioNER builds on or distinguishes itself
+from, ending with the gap analysis that motivates the rest of the
+work.
+
+The middle of the thesis is the system itself. Chapter 4 will lay
+out the design: the architecture, the entity schema, the
+hierarchical taxonomy, the knowledge base, the training pipeline,
+the inference pipeline, and the web application that ties them
+together. Chapter 5 will document how each of those parts is
+actually built — the technology stack, the data preparation, the
+training implementation, the focal-loss code, the back-end
+services, the front-end, the containerised deployment. The
+separation between Chapter 4 (what and why) and Chapter 5 (how)
+is deliberate; readers interested in the design without the
+implementation detail can stop after Chapter 4.
+
+Chapter 6 will then report the evaluation: dataset statistics,
+training dynamics, overall and per-entity performance, the
+focal-loss ablation, the impact of the knowledge-base layer,
+latency measurements, end-to-end demonstration on real articles,
+user-acceptance feedback, and an honest error analysis. The
+chapter closes with a discussion, a threats-to-validity section,
+and a brief account of the experiments I tried first and
+abandoned.
+
+Chapter 7 will wrap up — a summary anchored back to the analyst
+queue of §1.2, explicit answers to the four research questions of
+§1.3, a list of contributions, recommendations for organisations
+considering adoption, and a prioritised future-work programme that
+addresses the limitations of §1.6 and the threats of §6.13.
 
 \pagebreak
 
