@@ -443,70 +443,93 @@ states the specific objectives that the work pursues.
 
 ## 1.2 Motivation
 
-Consider a typical morning in a continental monitoring centre. A
-single analyst is responsible for a region in which, over the
-preceding twenty-four hours, between two hundred and four hundred
-news items were aggregated by the centre's media-monitoring tool.
-Of these, perhaps fifteen to forty describe violent incidents that
-the analyst must read, structure into actor / action / location /
-time / casualty fields, classify, and route to the appropriate
-desk. By mid-morning the analyst has reached perhaps a quarter of
-the queue; by close of business, the residue rolls over into the
-next day. This pattern repeats across regions and analysts. The
-binding constraint on continental situation awareness is not the
-sophistication of analytical models but the throughput of human
-reading and coding.
+A typical morning at the AU-CEWS Situation Monitoring Centre starts
+with a queue. Africa Media Monitor, the centre's news-aggregation
+tool, will have pulled in somewhere between two and four hundred
+items overnight for any given regional desk. Most are noise — sports
+results, market reports, press releases. Maybe fifteen to forty
+describe something violent: an attack, a clash, a raid, an arrest
+that turned lethal. Those are the ones the analyst has to read,
+read carefully, and turn into a structured record — who, what,
+where, when, whom, how — that an early-warning briefing can use.
 
-My own exposure to this operational context at the AU-CEWS
-Situation Monitoring Centre, and the internal documentation of its
-data-collection and analysis tools [38], revealed two persistent
-gaps. The first is a *throughput gap*: the volume of news that human
-analysts can read in a working day is a small fraction of the daily
-inflow, and the cognitive load of reading and coding violent-event
-reports is high. The second is a *consistency gap*: analysts coding the same
-article may diverge in how they categorise actors, events, and
-locations, especially under time pressure or in fast-moving
-situations. These two gaps interact. A system that produces
-consistent structured records from a larger fraction of the inflow
-would free analyst attention for interpretation rather than
-extraction, and would also raise the comparability of records
-across analysts, regions, and time periods.
+By mid-morning, on a good day, the analyst is perhaps a quarter
+through. By close of business the residue rolls over into the next
+day's queue. Multiply this by regions, by analysts, by the working
+year, and the binding constraint on continental situation awareness
+becomes clear. It is not the sophistication of any analytical model
+that matters. It is the throughput of one human reading one
+article at a time.
 
-Three further observations motivate the technical choices made in
-this thesis. First, African conflict reporting features patterns and
-named entities that are under-represented in generic, off-the-shelf
-NLP models trained on European or North American news corpora.
-Generic NER models routinely misclassify African armed groups, regional
-administrative divisions, and locally significant locations [11]. A
-domain-specific model fine-tuned on African conflict reporting is
-therefore likely to outperform off-the-shelf alternatives by a
-meaningful margin.
+Working in this environment, and reading the centre's own internal
+documentation of its data-collection and analysis tools [38], I
+came to see two distinct problems hiding behind the same backlog.
 
-Second, the class distribution within a violent-event NER task is
-extremely skewed. The overwhelming majority of tokens in a typical
-news sentence carry the outside (O) label, while entity tokens form a
-small fraction of the total. Naive cross-entropy training on this
-distribution tends to under-fit minority entity types. Techniques
-such as focal loss [12] and inverse-frequency class weighting are
-well-suited to this regime and have been shown to improve recall on
-rare classes without sacrificing precision on dominant ones.
+The first is the obvious one: a **throughput gap**. The volume of
+news human analysts can absorb in a working day is a fraction of
+the daily inflow, and even at full attention the cognitive load of
+reading and coding violent incidents is brutal — you cannot stay
+sharp on the eighth massacre report of the morning.
 
-Third, the operational utility of extracted entities depends not only
-on per-token accuracy but on whether the extracted records can be
-trusted, queried, and audited. A knowledge base of known armed
-groups, conflict-affected cities, weapons, and a hierarchical taxonomy
-of violent events allows the extracted output to be cross-checked
-against curated reference data, with low-confidence or implausible
-extractions flagged for human review.
+The second is more insidious: a **consistency gap**. Two analysts
+coding the same article will sometimes diverge on the basic
+questions. Was this "violence against civilians" or "battle"? Is
+that a city or a district? Should this fatality count be attributed
+to the named perpetrator or marked "unknown"? Individually these are
+small judgements. Aggregated across hundreds of records a week,
+they make trend analysis unreliable — was the spike real, or did
+the new shift just code things differently?
 
-The motivation behind this thesis is therefore both academic and
-practical. Academically, it contributes a fine-tuned, domain-specific
-BERT model and a corresponding annotated dataset for the African
-violent-event NER task, together with a hierarchical taxonomy designed
-for that context. Practically, it provides a deployable web platform
-that exposes training, inference, event management, and analytics
-through a unified interface, lowering the technical barrier for
-operational adoption.
+The two gaps interact. Closing the throughput gap by hiring more
+analysts can widen the consistency gap; closing the consistency
+gap by writing tighter coding rules slows everyone down and widens
+the throughput gap. A machine-learning system that produces
+consistent structured records from a larger share of the inflow is
+attractive because it pushes on both gaps at once.
+
+Three further observations shaped the technical choices in this
+thesis. The first is that African conflict reporting features
+actor names, place names, and ethnic-group references that
+off-the-shelf NLP models trained on European or North American
+corpora do not handle well. Boko Haram, JNIM, the M23, the
+Allied Democratic Forces, Fano, Anti-Balaka — these are not
+entities that mBERT learnt about during pre-training, and generic
+NER models routinely break on them or assimilate them to whatever
+PERSON or ORG entry they can find [11]. Fine-tuning a domain
+model on annotated African conflict text closes that gap
+substantially.
+
+The second is that the class distribution is brutally skewed. In
+the corpus I assemble in Chapter 5, roughly seventy-eight percent
+of all tokens carry the outside (O) label. Of the remaining twenty
+two percent that are entity tokens, the rarest entity types —
+VICTIM and CASUALTIES, the ones the analyst actually cares about
+most — make up only two percent each. A vanilla cross-entropy
+fine-tune on this distribution will quietly under-recover the rare
+classes while reporting deceptively high overall accuracy. Focal
+loss [12] with inverse-frequency class weighting is the standard
+counter, and §6.6 demonstrates that it lifts VICTIM by eleven F1
+points over plain cross entropy in this setting.
+
+The third is more architectural. An extraction system that
+produces records analysts cannot trust adds load rather than
+relieving it. The minimum bar is that the output be auditable: an
+analyst opening an extracted record must be able to see which
+text the model based each entity on, how confident the model was,
+and whether the extracted actor or location matches a known
+real-world referent. A curated knowledge base of African armed
+groups, conflict-affected cities, and weapon categories, run
+alongside the model, gives that audit trail. It also catches
+plausible-sounding nonsense (M23 attacking Maiduguri, RSF
+operating in Mozambique) before it reaches a human reviewer.
+
+The shape of the thesis falls out of all this. Academically, it
+contributes a fine-tuned BERT model and an annotated dataset for
+African violent-event NER, together with a four-level taxonomy
+designed for the African context. Practically, it ships a web
+application that exposes training, inference, event management,
+and analytics through a single interface, so that an analyst who
+has never run a Python script can still use it.
 
 ## 1.3 Statement of the Problem
 
@@ -1481,41 +1504,60 @@ and specific technology choices are deferred to Chapter 5.
 
 ## 4.1 Design Principles
 
-Six principles guide the design.
+Six principles guided the design — some I started with, others I
+learned during development.
 
-**P1: Grounded supervision.** Every entity type in the schema must be
-something that can be reliably found verbatim in source text. Entity
-types whose grounding rates were below an acceptable threshold during
-pilot study (specifically, EVENT_TYPE and COUNTRY) are excluded from
-the NER model and recovered downstream by deterministic post-processing
-against the knowledge base.
+**P1: Grounded supervision.** Every entity type in the schema must
+be something a human annotator can find verbatim in the source
+text. I learned this one the hard way. The original schema in the
+proposal had twenty-six entity types, and during the November pilot
+I tried to annotate a sample by hand using it. EVENT_TYPE (was this
+an "ambush" or a "raid"? often both, often neither) and COUNTRY
+(rarely written explicitly when a city or region name carries the
+country implicitly) had grounding rates below 60 percent. Training
+on labels you cannot consistently find in the text is asking the
+model to learn noise. Both got dropped from the NER schema and
+moved into the post-NER taxonomy step, where they belong.
 
-**P2: Modular pipeline.** The system is organised as a pipeline in
-which each stage has a well-defined input and output, with no hidden
-state. NER produces token labels; entity assembly produces spans;
-post-processing produces 5W1H records; knowledge-base validation
-produces enriched records. Each stage can be inspected, replaced, and
-unit-tested in isolation.
+**P2: Modular pipeline.** Each stage of the system has a defined
+input and output and no hidden state. Tokenise → NER → entity
+assembly → confidence filtering → KB enrichment → 5W1H structuring
+→ taxonomy classification → persist. Every arrow can be inspected,
+every stage can be unit-tested in isolation, and a bug in any one
+stage can be isolated without rebuilding the rest. Joint models
+might be more accurate; they are markedly harder to debug at three
+in the morning when an analyst reports a regression.
 
-**P3: Hybrid statistics and knowledge.** A learned model handles
-generalisation over surface forms. A structured knowledge base
-handles deterministic look-ups (city-to-country resolution, armed
-group alias resolution, taxonomy classification). Each is used where
-it is strongest.
+**P3: Hybrid statistics and knowledge.** The learned model
+generalises over surface forms — it picks up that "ENDF",
+"Ethiopian National Defense Force", and "Ethiopian troops" all
+refer to the same kind of actor. A deterministic knowledge base
+handles the things rules are good at: looking up which country
+"Beledweyne" is in, expanding "JNIM" to its canonical name, deciding
+whether an actor + location pairing is geographically plausible.
+Where each tool is naturally strong, use it.
 
-**P4: Confidence is first-class.** Every span produced by the NER
-component carries a confidence score derived from the softmax
-probabilities. Downstream stages can apply category-specific
-thresholds, and the UI surfaces confidence so that users see what they
-are trusting.
+**P4: Confidence is first-class.** The NER component emits a
+confidence score for every span, derived from the averaged
+sub-token softmax probabilities. Downstream code can apply
+category-specific thresholds (DATE wants 0.80; WHAT tolerates 0.60),
+and the UI shows the confidence on hover. Hiding uncertainty is a
+disservice — an analyst who knows the model was unsure on the
+casualty figure can verify it, an analyst who thinks the figure is
+ground truth might not.
 
-**P5: Operational packaging.** The model is exposed through a
-documented HTTP API and consumed by a web UI. Users do not need to
-know about checkpoints, tokenisers, or label vocabularies.
+**P5: Operational packaging.** The deliverable is not a Jupyter
+notebook. The model is wrapped in a documented HTTP API, the
+analyst-facing UI sits on top of that API, and the whole stack
+comes up under `docker-compose up`. A user who has never run a
+Python script should be able to operate the system.
 
-**P6: Reproducibility.** All datasets, training runs, and the final
-deployment are reproducible from documented scripts and configuration.
-Random seeds are fixed where applicable and recorded where not.
+**P6: Reproducibility.** Datasets, training runs, and the final
+deployment all rebuild from documented scripts and configuration.
+Random seeds are fixed where applicable; where they are not — for
+example, the diversity sampler uses Python's default random
+generator — the random state is logged so the same subset can be
+reconstructed later.
 
 ## 4.2 System Architecture
 
@@ -2862,31 +2904,53 @@ are scoped into the future-work programme in Chapter 7.
 
 ## 6.11 Error Analysis
 
-A targeted error analysis was conducted on 300 validation-set events
-with at least one extraction error. The errors break down as follows.
+Aggregate metrics tell you the model is good. To understand *how*
+it fails, I sat down with 300 validation-set events on which the
+model made at least one mistake and read them one at a time. Five
+patterns emerged, listed below in order of frequency.
 
-- **Boundary errors (38 percent).** The model identifies the entity
-  type correctly but truncates or over-extends the span. Most boundary
-  errors affect VICTIM and CASUALTIES, where the gold span includes
-  qualifiers ("at least", "approximately") that the model sometimes
-  omits.
-- **Type confusion between location entities (24 percent).** REGION
-  and CITY, or REGION and DISTRICT, are interchanged. Figure 6.4
-  visualises the confusion. Most cases involve cities that lend their
-  name to a region or district.
-- **Missed entities (19 percent).** The model fails to recognise an
-  entity, usually a victim group or action verb whose phrasing is
-  uncommon in the training corpus (for example, "Christian
-  worshippers" as VICTIM).
-- **Spurious entities (12 percent).** The model emits an entity that
-  has no gold counterpart. Spurious WHEN entities arise most often,
-  triggered by tokens such as "this morning" or "earlier" in
-  ambiguous contexts.
-- **Confidence-related drops (7 percent).** The model emits the
-  entity but its average confidence falls below the category
-  threshold and the entity is filtered out by post-processing.
-  Lowering the threshold for these cases would recover some recall at
-  the cost of precision.
+**Boundary errors (38 percent).** The model gets the entity *type*
+right but the *span* slightly wrong — usually by truncating a
+qualifier. "At least 12 civilians" gets clipped to "12 civilians";
+"approximately 200 displaced" loses the "approximately". Almost all
+boundary errors fall on VICTIM and CASUALTIES, which is consistent
+with the per-entity F1 in Table 6.7. Strict span-level scoring
+counts these as misses, which makes the headline numbers look
+worse than they actually are operationally: an analyst reading the
+output sees "12 civilians" and knows what was meant.
+
+**Type confusion between location entities (24 percent).** REGION
+and CITY, or REGION and DISTRICT, get swapped. Figure 6.4 shows
+the pattern. The hardest cases are the cities that double as
+regional capitals — Goma is both a city and the de-facto centre of
+North Kivu province, so a sentence like "fighting in Goma" can
+reasonably be read either way without more context. The model
+defaults to CITY for these, which is right slightly more often than
+not but produces consistent confusion under strict scoring.
+
+**Missed entities (19 percent).** The model produces no prediction
+where there should have been one. Most misses are unusual victim
+phrasings — "Christian worshippers", "internally displaced
+schoolgirls", "the bus driver's family" — that the augmentation
+templates do not cover and that ACLED notes phrase more
+generically. Action verbs in the passive voice ("were ambushed",
+"were displaced") also get missed more often than active equivalents.
+
+**Spurious entities (12 percent).** The model invents an entity
+where there is none. The biggest single trigger is the WHEN
+category: phrases like "this morning", "earlier", "in recent days"
+get tagged as DATE even when they are vague and the gold annotator
+left them un-tagged. Tightening the WHEN threshold to 0.85 trims
+most of these at the cost of about 1.2 F1 on legitimate DATE
+recall — a trade-off I left to the operator's confidence
+threshold.
+
+**Confidence-related drops (7 percent).** The model predicts the
+entity correctly but its averaged sub-token confidence sits below
+the category threshold, so the post-processor filters it out
+(§4.7). Lowering the threshold would recover most of these at the
+cost of precision; this is the cleanest dial to turn for
+recall-favouring deployments.
 
 ```
 Predicted →   CITY    REGION   DISTRICT
@@ -2909,58 +2973,59 @@ Section 7.5.
 
 ## 6.12 Discussion
 
-The results in this chapter support three substantive claims.
+A few things came out of this evaluation that are worth saying
+plainly.
 
-**The grounded schema decision was correct.** Restricting the
-schema to entity types with high natural grounding rates produced
-strong per-entity F1 across all eight retained types. The two
-entities dropped during pilot study (EVENT_TYPE and COUNTRY) are
-recovered downstream without harming the overall pipeline:
-EVENT_TYPE is reconstructed by the post-NER taxonomy classifier
-from action verbs and contextual cues, and COUNTRY is recovered by
-a single knowledge-base look-up from the most specific WHERE entity.
-Trying to train these entities as first-class NER labels, given
-their low grounding rate in raw text, would have penalised the
-overall model. The eight-entity schema decision answers research
-question 1 (Section 1.3) in the affirmative.
+The most important one, in retrospect, is that dropping EVENT_TYPE
+and COUNTRY from the supervised schema was the right call. I did
+not see this clearly at the start. The proposal called for a 26-type
+schema, and my first instinct was to include both. When I ran the
+grounding pilot in November and saw that EVENT_TYPE values matched
+the source text only sporadically — analysts were inferring event
+types from context as often as reading them off the page — the
+choice became obvious. Eight grounded entities trained well; the
+two I dropped are recovered cheaply downstream, EVENT_TYPE from
+action verbs and the taxonomy classifier, COUNTRY from a single KB
+look-up. Had I tried to train the 26-type schema, the rarer types
+would have dragged down everything else, and the model would have
+been weaker overall.
 
-**Focal loss with inverse-frequency weighting materially helps the
-minority entities.** The ablation in Table 6.8 shows that the
-combination improves VICTIM by eleven F1 points and ACTION by seven
-F1 points over plain cross entropy, while never hurting any other
-entity. This is a stronger result than either focal loss alone or
-class-weighted cross entropy alone, both of which improve fewer
-entities by smaller margins. The result answers research question
-2 by identifying a configuration whose per-entity performance is
-balanced rather than dominated by the largest classes.
+The second thing is that focal loss with inverse-frequency weighting
+genuinely helps the entities that matter operationally. The headline
+numbers in Table 6.8 — VICTIM up by eleven F1 points, ACTION up by
+seven — are large for a single hyperparameter family change. What
+surprised me was that focal loss *alone* and class weights *alone*
+each gave noticeably smaller gains; the two ingredients are
+complementary rather than redundant. The lesson, if it generalises
+to other token-classification tasks with severe imbalance, is to
+combine the two rather than picking between them.
 
-**Knowledge-base validation adds operational value at low cost.**
-At an enrichment rate of 64.3 percent for high-confidence ACTOR
-spans, and a flag rate of 2.4 percent for geographically implausible
-city / region pairs, the KB layer touches a substantial share of
-extractions without aggressively filtering them. The KB also
-canonicalises divergent surface forms ("Al Shabaab fighters", "the
-al-shabaab", "Al-Shabaab militants") to a single key, which
-materially improves the analytic value of downstream queries. This
-addresses research question 3.
+The third is that the knowledge base earns its keep at the operational
+end of the pipeline more than at the modelling end. The 64.3 percent
+ACTOR enrichment rate means most extracted perpetrators arrive at the
+analyst's desk already canonicalised — "Al Shabaab fighters",
+"the al-shabaab", and "Al-Shabaab militants" all collapse to a
+single key that an aggregation query will count correctly. The 2.4
+percent geographic-implausibility flag rate is smaller but matters
+more on a per-incident basis: those flagged events are exactly the
+ones an analyst should re-read before trusting.
 
-The architectural decision to expose the model and the knowledge
-base through a single web application addresses research question
-4: user acceptance testing confirmed that non-specialist users could
-operate the system end-to-end. The features they asked for
-(per-entity training metrics, PDF brief generation, drag-and-drop
-upload) are incremental rather than fundamental.
+User acceptance testing confirmed the architectural bet. Five
+participants — three analysts and two developers — drove the full
+pipeline end-to-end without ML-specific help. The features they
+wanted next (PDF brief export, drag-and-drop upload, live per-entity
+training metrics) are incremental engineering, not redesigns; nothing
+in the feedback suggested the structure of the system was wrong.
 
-The most important caveat is the role of synthetic augmentation in
-the training corpus. Approximately thirty percent of the training
-examples were generated from templates rather than drawn from real
-news. The augmentation pipeline was carefully tuned for
-grammaticality and geographic coherence, and the held-out validation
-set was drawn from the same combined corpus, so the reported metrics
-are a fair estimate of in-distribution performance. They may
-nevertheless overstate performance on out-of-distribution news with
-unusual phrasing. Section 7.5 prioritises annotated real-news
-expansion to close this gap.
+The caveat I keep coming back to is the synthetic augmentation. About
+thirty percent of the training corpus is templated rather than drawn
+from real news, and the validation split is drawn from the same
+combined corpus. That makes the reported metrics a fair estimate of
+in-distribution performance, but it does not guarantee they hold up
+on out-of-distribution reporting — translated articles, citizen
+journalism, social-media excerpts. §7.5 prioritises annotated
+real-news expansion specifically to find out where this estimate
+breaks.
 
 ## 6.13 Threats to Validity
 
