@@ -632,44 +632,51 @@ and exposes the full capability through a documented web platform.
 
 ### Specific Objectives
 
-The following specific objectives operationalise the general objective.
+Translating the general objective into concrete deliverables, the
+work breaks down as follows.
 
-1. Review the literature on information extraction, event
-   extraction, named entity recognition, transformer-based language
-   models, and conflict event coding, and position the work with
-   respect to it.
-2. Define a grounded eight-entity BIO schema (ACTOR, VICTIM, ACTION,
-   DATE, REGION, CITY, DISTRICT, CASUALTIES) and document inclusion
-   and exclusion rules for each.
-3. Construct a four-level hierarchical taxonomy of violent events
-   tailored to African conflict patterns, with approximately ninety
-   five terminal categories and explicit decision rules for ambiguous
-   cases.
-4. Assemble a training corpus of approximately fifty thousand examples
-   derived from ACLED event descriptions, combining stratified
-   diversity sampling of real records with template-based augmentation
-   to address vocabulary gaps and class imbalance.
-5. Implement a training pipeline that fine-tunes a `bert-base-cased`
-   model on the corpus, using focal loss with inverse-frequency class
-   weighting, gradient clipping, learning-rate scheduling, and early
-   stopping.
-6. Curate a knowledge base of African armed groups, conflict-affected
-   cities and regions, weapons, and the four-level taxonomy, and
-   integrate it as a validation layer over raw NER output.
-7. Implement a FastAPI service that exposes the trained model and
-   knowledge base through routes for training management, inference,
-   event storage, analytics, and knowledge base administration.
-8. Implement a React-based front-end application that allows non-expert
-   users to fine-tune models, run inference on documents, browse
-   stored events, and review analytics.
-9. Evaluate the system end to end on a held-out validation set and on
-   representative real-world articles, reporting overall and per-entity
-   metrics, latency, and qualitative observations from user acceptance
-   testing.
-10. Document limitations of the current implementation and recommend a
-    concrete programme of future work, including hierarchical event
-    classification at inference time and natural-language question
-    answering against the event store.
+1. Survey the literature on information extraction, event extraction,
+   named entity recognition, and transformer-based language models,
+   alongside the conflict-event-coding tradition, and locate the
+   present work against both bodies of work.
+2. Settle on a BIO schema. I land on eight entities — ACTOR,
+   VICTIM, ACTION, DATE, REGION, CITY, DISTRICT, CASUALTIES — chosen
+   for how reliably each can be grounded in the source text rather
+   than for theoretical neatness. Each comes with explicit inclusion
+   and exclusion rules.
+3. Build a four-level taxonomy of violent events that fits African
+   conflict patterns. The result has roughly ninety-five terminal
+   categories. Where two categories overlap or shade into each
+   other, the taxonomy carries an explicit decision rule rather than
+   leaving the choice to the annotator's intuition.
+4. Assemble the training corpus. Around fifty thousand examples,
+   pulled from ACLED event descriptions, with two-stage construction:
+   stratified diversity sampling first, then template-based
+   augmentation to plug vocabulary gaps and lift the rare classes
+   off the floor.
+5. Build the training pipeline. A `bert-base-cased` fine-tune driven
+   by focal loss with inverse-frequency class weighting, gradient
+   clipping, a warmup-plus-plateau learning-rate schedule, and early
+   stopping on validation loss.
+6. Curate the knowledge base — African armed groups, conflict cities
+   and regions, weapon types, and the four-level taxonomy itself —
+   and wire it into the pipeline as a validation layer that sits on
+   top of the raw NER output rather than inside the model.
+7. Stand up the back-end. A FastAPI service exposes the trained
+   model and the KB through routes covering training management,
+   inference, event storage, analytics, and KB administration.
+8. Stand up the front-end too. A React application that lets a
+   non-expert user fine-tune models, run inference on documents,
+   browse the stored events, and read the analytics views, without
+   having to know what a checkpoint is.
+9. Evaluate end to end. The held-out validation split gives the
+   headline metrics; a handful of real-world articles give the
+   qualitative check; the user-acceptance test gives the third
+   perspective. All three are reported.
+10. Acknowledge what the current implementation cannot do, and lay
+    out a concrete future-work programme — including learned
+    hierarchical classification at inference time and natural-language
+    question answering against the event store.
 
 ## 1.5 Methods
 
@@ -949,15 +956,17 @@ knowledge-base validation are rule-driven.
 
 For the purposes of this thesis, NER means deciding for every token
 in a sentence whether it belongs to an entity I care about and, if
-so, which entity type. Before deep learning, the dominant approach
-combined hand-engineered features (capitalisation patterns,
-gazetteers, surrounding part-of-speech tags) with a sequence model
-that knew how to make a structured prediction over the whole
-sentence — Hidden Markov Models, Maximum Entropy Markov Models, and
-later Conditional Random Fields (CRFs) [17]. CRFs became the
-workhorse because they model how successive labels constrain each
-other, which matters when entities span multiple tokens and a B-
-must be followed by I-, not by another B-.
+so, which one. The pre-deep-learning era handled this with a fairly
+fixed recipe: hand-engineered features (capitalisation, gazetteer
+hits, surrounding part-of-speech tags) fed into a sequence model
+capable of making one structured prediction over the whole sentence.
+Hidden Markov Models came first; Maximum Entropy Markov Models
+followed; Conditional Random Fields (CRFs) [17] eventually became
+the default. The reason CRFs took over the field is structural — a
+CRF can express the fact that BIO labels constrain each other (a
+B- token cannot legally be followed by another B-, an I- needs a
+preceding B- of the same type), which a per-token classifier cannot
+encode at all.
 
 I encode entities in BIO, the simplest of the standard schemes: a
 B- prefix on the first token of an entity, an I- prefix on each
@@ -1024,27 +1033,27 @@ the start of a sentence to a casualty count at the end — survive
 the encoding intact, and the architecture scales gracefully with
 parameter count and data.
 
-BERT [6] is the encoder half of the original transformer turned
-into a representation learner. Its pre-training task is
-deliberately self-supervised: a randomly masked 15 percent of the
-input tokens get hidden, the model is asked to predict them from
-the surrounding context, and an auxiliary next-sentence-prediction
-head is trained alongside on pairs of sentences. After that
-pre-training run, the encoder carries enough generic English
-structure that I can attach a small task-specific head and
-fine-tune the whole thing on a few tens of thousands of NER
-examples with sensible results.
+BERT [6] is, in essence, the encoder half of the original transformer
+repurposed as a representation learner. The pre-training objective is
+self-supervised by design — a random 15 percent of the input is
+masked, the model has to recover the masked tokens from surrounding
+context, and a secondary next-sentence-prediction task runs in
+parallel over sentence pairs. Once that pre-training has happened,
+the encoder has absorbed enough of the structure of general English
+that you can attach a small task-specific head and get reasonable
+results from fine-tuning on tens of thousands of examples rather than
+the millions a from-scratch model would need.
 
-For token classification specifically, the recipe is simple. BERT
-gives me one contextual vector per WordPiece token; I run a linear
-layer over each vector to produce logits across the seventeen-label
-vocabulary; I backpropagate a focal-loss objective with class
-weights (§2.4) through everything. The `bert-base-cased` checkpoint
-I use has twelve transformer layers, 768-dimensional hidden states,
-and roughly 110 million parameters. I use the cased variant
-deliberately: in English conflict reporting, capitalisation is
-extraordinarily informative for ACTOR and location entities, and
-the uncased variant throws that information away.
+The token-classification recipe is straightforward. BERT outputs a
+contextual vector for each WordPiece token; a linear layer over
+each vector produces logits across the seventeen-label space; I
+backpropagate focal loss with class weights (§2.4) through the
+whole stack. The checkpoint I fine-tune is `bert-base-cased` —
+twelve transformer layers, 768-dimensional hidden states, roughly
+110 million parameters. The cased variant matters here. English
+conflict reporting leans heavily on capitalisation to mark ACTOR
+mentions and place names ("Boko Haram", "North Kivu", "Al-Shabaab"),
+and the uncased variant simply throws that signal away.
 
 Two further properties of BERT influence the design of the present
 system. First, BERT uses WordPiece sub-word tokenisation; a single
@@ -1086,26 +1095,28 @@ on which a naive learner does worst.
 The literature gives three handles on this problem, and I take a
 position on each.
 
-**Re-sampling** the training set [24] is the textbook first response.
-Oversample the sentences that contain a rare entity, undersample
-the ones full of O. The wrinkle in token classification is that the
-oversampling decision lives at the example level — a single
-sentence — but the imbalance lives at the token level. Oversampling
-a sentence to recover one VICTIM token also pulls along thirty O
-tokens. My stratified diversity sampling (§5.3) is a compromise: it
-oversamples sentences that contain rare entity *types*, while
-selecting for entity-type diversity rather than entity-token count,
-so it grows the rare classes without pumping up O proportionally.
+**Re-sampling** the training set [24] is the textbook starting point —
+take more of the sentences that contain rare entities, take fewer of
+the O-heavy ones. There is a wrinkle in token classification, though,
+that the textbook framing misses. The unit of oversampling is the
+sentence, but the imbalance lives at the token. Pull one extra
+sentence into the corpus to recover a single VICTIM mention, and you
+have just brought thirty O tokens with it. The stratified diversity
+sampling in §5.3 is my compromise: oversample on rare entity *types*
+rather than rare entity *tokens*, and select for entity-type diversity
+within each sentence, so the rare classes grow without O growing in
+proportion.
 
-**Class-weighted cross entropy** [25] adjusts the loss rather than
-the sampler. Each class is given a weight, large for rare classes
-and small for the dominant ones, that multiplies its contribution
-to the gradient. Inverse-frequency weighting sets the weight to
-1/f_c (optionally normalised); effective-number weighting [26]
-smooths this with a corpus-sample-overlap correction. I use
-inverse-frequency weights, computed once from the training-set
-distribution at the start of training, with a maximum-weight cap to
-prevent the rarest classes from dominating gradient updates.
+The second handle is **class-weighted cross entropy** [25], which
+modifies the loss rather than the data. Each class gets a weight —
+larger for rare classes, smaller for common ones — that scales its
+contribution to the gradient. The simplest weighting scheme is
+inverse frequency, where class c gets a weight of 1/f_c, optionally
+normalised; effective-number weighting [26] refines this with a
+corpus-sample-overlap correction that softens the inverse-frequency
+extremes. I use plain inverse-frequency weights here, computed once
+from the training distribution before training begins, with a cap to
+keep the rarest classes from dominating gradient updates.
 
 **Focal loss** [12] takes a different angle. Originally proposed
 for dense object detection, where the foreground/background ratio
@@ -1174,26 +1185,28 @@ tagging: with O constituting roughly seventy-eight percent of
 tokens in this work's corpus, a degenerate model that predicts O
 everywhere would already achieve seventy-eight percent accuracy.
 
-**Span-level metrics** compare assembled entity spans rather than
-individual tokens. A predicted span (type t, start s, end e) is
-counted as a true positive if and only if a gold span exists with
-the same type and the same start and end positions. Partial
-overlaps count as a false positive (the prediction) and a false
-negative (the gold span). Per-entity precision is true positives
-divided by predicted spans; per-entity recall is true positives
-divided by gold spans; F1 is the harmonic mean. Macro F1 averages
-per-entity F1 with equal weight; micro F1 pools counts across
-entities before computing the single F1, weighting more populous
-entities more heavily.
+**Span-level metrics** work over assembled entity spans rather than
+individual tokens. A predicted span — type t, start s, end e — is a
+true positive only when there is a gold span with the same type and
+exactly the same boundaries. Anything that overlaps the gold span
+without matching it gets counted twice over: once as a false
+positive against the prediction and once as a false negative against
+the gold. Precision and recall fall out of the usual definitions
+applied to spans, and F1 is their harmonic mean. There are then two
+ways to average across entity types. Macro F1 weights each entity
+type equally; micro F1 pools the counts across all entity types
+before computing one F1, which gives more weight to the populous
+classes.
 
-The standard reference implementation of span-level NER evaluation
-is `seqeval` [39], which exposes both "default" (BIO with strict
-boundary matching) and "strict" variants. I report span-level
-precision, recall, and F1 with strict boundary matching
-to avoid inflated scores from partial credit, since downstream
-consumers of the extracted records (the knowledge-base validator,
-the event store, the analytics layer) treat boundary mismatches as
-distinct extractions rather than partial matches.
+For implementation, span-level NER evaluation in this thesis is
+done through `seqeval` [39], the de-facto reference library. It
+ships with a "default" BIO mode and a "strict" mode; I use strict
+boundary matching throughout. Partial credit is tempting but
+misleading here, because the downstream consumers of an extracted
+record — the KB validator, the event store, the analytics layer —
+all treat a boundary-mismatched span as a different extraction
+rather than a partial one. Strict scoring keeps the evaluation
+aligned with what the system actually does with the output.
 
 A subtle point arises with BIO encoding under sub-word tokenisation.
 The convention used here, with the first sub-word inheriting the
@@ -1860,16 +1873,16 @@ suicide bombing). It exists mainly to feed the post-NER taxonomy
 classifier in §4.4, which uses weapon and method signals to refine
 the Level 3 and Level 4 classification.
 
-Table 4.4 summarises the size of each knowledge-base resource. The
-knowledge base is also used by the validator component to attach
-metadata to extracted entities. For an ACTOR span that matches a
-known armed group alias, the validator attaches the canonical name,
-country, region, and group type. For a CITY span, it attaches the
-country and region. For a weapon mention, it attaches the category.
-Mismatches (for example, an actor whose known country of operation
-disagrees with the location extracted in the same sentence) lower the
-event's overall confidence score and are surfaced in the analytics
-view for manual review.
+Table 4.4 summarises how much each resource holds. The same data
+plays a second role downstream — the validator uses it to attach
+metadata to extracted entities. An ACTOR span that matches a known
+armed-group alias picks up that group's canonical name, country,
+region, and group type; a CITY span picks up its country and region;
+a weapon mention picks up its category. Where the KB notices a
+mismatch — say, an actor whose recorded country of operation does
+not agree with the location entity extracted in the same sentence —
+it lowers the event's overall confidence score and the analytics
+view surfaces it for manual review.
 
 *Table 4.4: Knowledge base content summary*
 
@@ -1883,22 +1896,28 @@ view for manual review.
 
 ## 4.6 Training Pipeline
 
-The training pipeline turns raw ACLED event records into a fine-tuned
-BERT model. Its main stages are preprocessing, sampling and
-augmentation, sub-word label alignment, loss configuration, and
-checkpointed training with early stopping.
+The pipeline takes raw ACLED event records on one end and produces a
+fine-tuned BERT model on the other. Conceptually there are five
+things happening in between — preprocessing the records into
+tokenised examples, sampling and augmenting the corpus, aligning
+word-level labels onto BERT's sub-word tokens, configuring the loss,
+and running checkpointed training with early stopping. Each gets its
+own subsection below.
 
 ### Preprocessing
 
-The raw input is a JSONL file of ACLED event records with fields
-including `event_id`, `event_date`, `notes` (the free-text
-description), `fatalities`, `actor1`, `location`, and `admin1`. The
-preprocessing module tokenises the notes field on whitespace and
-punctuation, then projects the structured columns onto BIO labels by
-mapping each column to its entity type and locating its value within
-the tokenised notes. Tokens that do not match any column value are
-labelled O. The output is a JSONL file with one record per event,
-each containing `tokens`, `labels`, `text`, and `entities` fields.
+The raw input arrives as a JSONL file of ACLED records. The fields
+that matter for this thesis are `event_id`, `event_date`, the
+free-text `notes` description, `fatalities`, `actor1`, `location`,
+and `admin1`; ACLED carries more than this, but the rest is unused.
+Preprocessing happens in two passes. First, the `notes` field is
+tokenised on whitespace and punctuation. Second, each structured
+column is projected onto BIO labels by looking up where its value
+appears inside the tokenised notes and tagging those positions with
+the column's entity type. Anything that does not match a column
+value stays as O. The output is a JSONL file in which every record
+carries four parallel fields — `tokens`, `labels`, `text`, and
+`entities`.
 
 ### Stratified diversity sampling
 
@@ -1922,12 +1941,16 @@ DATE, so I reverted.
 
 ### Augmentation
 
-Template-based augmentation adds approximately 15,000 synthetic
-examples to expand vocabulary coverage of action verbs and victim
-constructions. Templates are populated with knowledge-base entries
-(armed groups, cities, regions) and a curated lexicon of action verbs
-grouped into location-taking, victim-taking, and clash categories.
-The full template catalogue is in Annex E.
+On top of the sampled 35,000, the pipeline generates a further
+15,000 synthetic examples through template-based augmentation. The
+goal here is narrower than "more data" — it is to widen the
+vocabulary the model sees for action verbs and for the various ways
+a victim can be described, both of which are under-represented in
+ACLED's house style. Each template is filled in by sampling an
+armed group, city, and region from the knowledge base, then sampling
+a verb from a curated lexicon split into location-taking,
+victim-taking, and clash categories. Annex E reproduces the full
+template catalogue.
 
 The combined 50,000-example corpus is partitioned 80/20 into training
 (40,000) and validation (10,000) splits, preserving stratification
@@ -2031,20 +2054,24 @@ entity classes receive high weights.
 
 ### Checkpointing and early stopping
 
-After every epoch, the model and tokenizer are saved to
-`models/{model_name}_{timestamp}/epoch_{NN}/`. Whenever the
-validation loss improves by more than the early-stopping threshold,
-the checkpoint is also copied to `best/`. A `training_config.json`
-file at the root of the run records the current epoch, the best
-epoch, the best validation loss, and a flag indicating whether
-training has completed. This structure supports resumption from any
-epoch with the `--resume` flag and extension of completed runs with
-the `--extend-epochs` flag.
+At the end of each epoch the model and tokenizer get written out to
+`models/{model_name}_{timestamp}/epoch_{NN}/`. When the validation
+loss improves by more than the early-stopping threshold, the same
+checkpoint gets copied into a `best/` folder alongside the epoch
+directories — so the most recent best is always one path away. The
+run as a whole is described by a `training_config.json` file sitting
+at the root: which epoch is current, which one was the best so far,
+what the best validation loss was, and whether the run has finished.
+Two flags hang off that state. `--resume` picks an interrupted run
+back up from its most recent epoch; `--extend-epochs` lets a
+completed run keep going for additional epochs without starting
+over.
 
 ## 4.7 Inference and Post-Processing
 
-The inference pipeline transforms a raw input text into a structured
-5W1H record. Algorithm 4.5 describes the steps.
+At inference time the system has to go from a paragraph of news text
+to a 5W1H record an analyst can read. The full sequence of steps is
+captured in Algorithm 4.5.
 
 ```
 ---------------------------------------------------------------
@@ -2164,11 +2191,12 @@ accompanying repository.
 
 ## 5.1 Technology Stack
 
-The system is implemented in Python 3.11 for the back end and machine
-learning components, and in TypeScript with React 19 for the front
-end. PostgreSQL serves as the persistent data store. Docker Compose
-orchestrates the development environment. Table 5.1 and Table 5.2
-list the back-end and front-end stacks respectively.
+Two languages do the heavy lifting in this codebase. Python 3.11 is
+where the back end and the machine-learning code live; everything
+the user actually sees is TypeScript on top of React 19. Behind
+those, PostgreSQL handles persistence and Docker Compose stitches
+the local development environment together. The full back-end and
+front-end stacks are catalogued in Tables 5.1 and 5.2.
 
 *Table 5.1: Back-end technology stack*
 
@@ -2564,25 +2592,32 @@ Screenshots are reproduced in Annex D.
 
 ## 5.8 Containerised Deployment
 
-The system ships with a `docker-compose.yml` at the repository root
-that defines three services: `db` (PostgreSQL 16 with persistent
-volume), `backend` (Python image with the back-end source mounted and
-the model checkpoint mounted from the host), and `frontend` (Node
-image building and serving the Vite app). A health-checked startup
-order ensures that the back-end waits for the database to become
-ready before initialising.
+The whole system runs out of a `docker-compose.yml` at the
+repository root. Three services live in that file. There is `db`,
+which is PostgreSQL 16 with a persistent volume. There is
+`backend`, a Python image with the source mounted from the host and
+the model checkpoint mounted in beside it. And there is `frontend`,
+a Node image that builds and serves the Vite app. A health-checked
+startup order keeps the back-end from initialising until the
+database is actually ready to accept connections — without that, the
+service used to come up faster than Postgres and immediately crash.
 
-Environment variables drive configuration: `DATABASE_URL`,
-`MODEL_PATH`, `CORS_ORIGINS`, `JWT_SECRET`, and feature flags such as
-`ENABLE_DB_STORAGE`. A `.env.example` file documents the full set.
+Configuration is environment-variable-driven. The variables that
+matter day to day are `DATABASE_URL`, `MODEL_PATH`, `CORS_ORIGINS`,
+and `JWT_SECRET`; there are a few feature flags in the same place,
+including `ENABLE_DB_STORAGE`. A `.env.example` file in the repo
+documents the complete set so a new contributor can see at a glance
+what they need to fill in.
 
-Development workflow consists of two commands: `docker-compose up -d
-db` to start the database, then either running the back-end with
-`uvicorn main:app --reload` and the front-end with `npm run dev` for
-fast iteration, or running the entire stack with `docker-compose up`.
-For production, the stack can be built and pushed to a container
-registry; a production override file (not included in this thesis)
-configures TLS termination at the reverse proxy.
+Day-to-day development uses two commands. `docker-compose up -d db`
+starts the database in the background, then either `uvicorn
+main:app --reload` plus `npm run dev` runs the back-end and
+front-end natively on the host for fastest iteration, or
+`docker-compose up` brings the whole stack up inside containers.
+For production the stack gets built and pushed to a container
+registry. The production override file that puts TLS termination at
+the reverse proxy is intentionally not included in this thesis —
+deployment-specific secrets live there and they should not.
 
 \pagebreak
 
@@ -3337,13 +3372,14 @@ read, and the gaps that §7.5 prioritises closing.
 
 # 7. Conclusions, Recommendations, and Future Work
 
-What follows is the wrap-up: a brief summary of what was built, an
-explicit mapping from the research questions stated in Chapter 1 to
-the answers reached in Chapters 4 to 6, a bulleted list of
-contributions, recommendations for organisations considering
-adoption, and a prioritised programme of future work that addresses
-the limitations honestly acknowledged in Section 1.6 and the
-threats-to-validity discussion in Section 6.13.
+This is the wrap-up chapter. I use it for five things, more or less
+in this order: a short summary of what was actually built; an
+explicit walk through the research questions from Chapter 1 with
+the answers Chapters 4 to 6 produced; the list of contributions the
+thesis leaves behind; recommendations for anyone considering using
+or extending the system; and a future-work programme that picks up
+the limitations from §1.6 and the threats-to-validity material in
+§6.13 and turns them into a prioritised set of next steps.
 
 ## 7.1 Summary
 
@@ -3459,35 +3495,60 @@ without ML-specific assistance.
 
 ## 7.3 Contributions
 
-The contributions of this thesis are summarised below.
+Pulling the threads together, the thesis leaves behind a handful of
+artefacts that I think can stand on their own outside the
+dissertation.
 
-- **A grounded eight-entity BIO schema** for African violent-event
-  NER, derived from pilot analysis of grounding rates and supported
-  by inclusion and exclusion criteria for each entity type.
-- **A four-level hierarchical taxonomy of African violent events**
-  with approximately ninety-five terminal categories, documented
-  definitions, decision rules for ambiguous cases, and worked
-  examples (Annex B).
-- **A 50,000-example fine-tuning corpus** assembled by stratified
-  diversity sampling of ACLED records and template-based
-  augmentation, designed to mitigate vocabulary gaps and class
-  imbalance.
-- **A fine-tuned `bert-base-cased` model** for the task, trained
-  with focal loss and inverse-frequency class weighting, achieving
-  macro F1 0.887 and micro F1 0.909 on the held-out validation set.
-- **A curated knowledge base** of approximately 150 African armed
-  groups, 200 conflict-affected cities, 54 countries, and a weapons
-  catalogue, used both to validate raw NER output and to enrich
-  extracted records.
-- **An empirical ablation** demonstrating the contribution of focal
-  loss and class weighting to minority-class performance,
-  particularly for VICTIM (+11 F1 over plain cross entropy).
-- **A full FastAPI service and React/TypeScript front-end** that
-  expose the model and knowledge base for training, inference,
-  event management, analytics, and knowledge-base administration,
-  packaged with Docker Compose for reproducible deployment.
-- **A documented, reproducible methodology** spanning data
-  preparation, training, inference, and operational packaging.
+The first is the schema itself. The eight-entity BIO schema came out
+of pilot work on grounding rates, and the inclusion and exclusion
+criteria for each entity type are documented at the level of detail
+needed to annotate consistently — Annex A captures them. I think of
+this as a contribution because most published schemas in the violent
+events space gloss over the boundary between what should be tagged
+and what should not, and that boundary is where most disagreement
+between annotators ends up.
+
+Sitting under the schema is the four-level taxonomy of African
+violent events, with roughly ninety-five terminal categories,
+decision rules for the awkward cases, and worked examples. The full
+tree lives in Annex B. The taxonomy synthesises ACLED, UCDP, and the
+PMVE ontology, but it also adds the African-specific extensions
+(pastoralist / farmer clashes, communal cattle raiding) that none of
+those frameworks cover at this depth.
+
+On the data side, the fine-tuning corpus is the third artefact:
+50,000 examples produced by stratified diversity sampling of ACLED
+records combined with template-based augmentation. The corpus was
+designed against two known failure modes — vocabulary repetition and
+class imbalance — and the per-entity counts in Chapter 6 show that
+both were materially reduced. The trained model is the fourth: a
+`bert-base-cased` checkpoint fine-tuned with focal loss and
+inverse-frequency class weighting, reaching macro F1 0.887 and
+micro F1 0.909 on the held-out validation split.
+
+Sitting alongside the model is the knowledge base: around 150
+African armed groups (canonical names, aliases, country and region
+of operation), 200 conflict-affected cities mapped to country and
+region, the 54 African countries, and a catalogued weapons list. It
+plays two roles in the pipeline — validating raw NER output and
+enriching the extracted records — and is queryable independently
+through its own API.
+
+The ablation in Section 6.6 is, on its own, a smaller contribution
+but a useful one. It shows that focal loss combined with
+inverse-frequency class weighting improves VICTIM F1 by eleven
+points over plain cross entropy, and ACTION by seven, without
+hurting any other entity. The result is reproducible from the
+configurations recorded in the repository.
+
+Finally, the system itself. The FastAPI service and React /
+TypeScript front-end expose the model and knowledge base for
+training, inference, event management, analytics, and KB
+administration, and the whole thing is packaged with Docker Compose
+for reproducible local deployment. The methodology around it —
+how data was prepared, how training was driven, how inference is
+served — is documented in this thesis end-to-end, which is what
+makes the system reproducible rather than merely available.
 
 ## 7.4 Recommendations
 
@@ -3498,32 +3559,49 @@ as marketing claims than as the cautions I would offer in a
 conversation with someone about to deploy this work in their own
 context.
 
-1. **Treat extraction output as a triage layer, not a final
-   product.** The system produces high-quality first-pass
-   extractions but should not replace human analyst judgement on
-   decisions with significant consequences. Confidence scores and
-   KB-flagged inconsistencies should be surfaced in the analyst
-   workflow.
-2. **Invest in keeping the knowledge base current.** Armed groups
-   evolve (names change, splinter groups form, factions reconcile),
-   and the value of KB enrichment is directly proportional to the
-   currency of the KB. A small maintenance team (one to two
-   part-time domain experts) can keep the KB current with modest
-   effort.
-3. **Co-design taxonomy with operational consumers.** The taxonomy
-   in this thesis is principled, but operational use may reveal
-   gaps or duplications. A review cycle with end users every six
-   to twelve months is recommended.
-4. **Prefer batch over real-time processing in the near term.**
-   Inference latencies are well within the requirements of batch
-   ingestion of news, but pursuing real-time processing carries
-   engineering cost that does not, today, deliver proportionate
-   operational benefit.
-5. **Plan for multilingual extension as a priority.** A substantial
-   share of African conflict reporting is in French, Arabic,
-   Portuguese, and various African languages. Multilingual
-   extension (Section 7.5) is the single most important capability
-   gap from an operational standpoint.
+The first thing I would say is the obvious one — treat the extraction
+output as a triage layer rather than a final product. The model is
+good enough to triage incoming news into something an analyst can
+work with much faster than they could from raw articles, but it is
+not good enough to replace the analyst's judgement when a decision
+with real consequences is about to be made on top of an extraction.
+The confidence scores and the KB-flagged inconsistencies exist to
+make this triage decision visible, and they should be surfaced in
+whatever analyst workflow the system feeds into. Pretending the
+output is finished is the failure mode I would worry about most.
+
+Second: keep the knowledge base alive. Armed groups in Africa change
+names, splinter, recombine, and occasionally reconcile. Country and
+region affiliations shift too. The value the KB adds to extracted
+records is directly proportional to how current it is, and a stale
+KB does worse than no KB at all because it actively misleads the
+validator. One or two part-time domain experts, given access to the
+KB admin interface and a reasonable schedule of updates, can keep
+this in working order without anything heroic.
+
+Third — and this one is more cultural than technical — co-design the
+taxonomy with the people who actually use it. The four-level tree in
+this thesis is principled and well-defined, but operational use is
+the only place gaps and duplications actually surface. I would build
+in a review cycle with end users every six to twelve months, treat
+the taxonomy as a versioned document, and resist the urge to expand
+it faster than you can re-annotate the training data.
+
+A briefer point: for the near term, prefer batch processing over
+real time. The latencies in Section 6.8 are well inside what batch
+ingestion needs and well outside what a streaming product would
+demand, and the engineering cost of getting from the former to the
+latter is not, today, justified by the operational benefit. This may
+change as the model gets larger or the consumer base shifts.
+
+The last recommendation is the one I would prioritise above any of
+the others if I were starting over: plan for multilingual extension
+from the outset. A large share of African conflict reporting is in
+French, Arabic, Portuguese, and various African languages, and a
+monolingual extractor — even a good one — leaves that signal on the
+floor. Section 7.5 expands on the technical path; from an
+operational standpoint this is the single most important capability
+gap.
 
 ## 7.5 Future Work
 
@@ -3538,55 +3616,73 @@ solved for the system to be useful.
 
 ### High priority
 
-- **Multilingual extraction.** Extend the model to French, Arabic,
-  and Portuguese using XLM-RoBERTa or AfroLM as the backbone, with
-  parallel corpora drawn from African news outlets and ACLED's
-  multilingual coverage.
-- **Learned hierarchical event classification.** Replace the rule-based
-  taxonomy classifier in Section 4.4 with a supervised model
-  trained on event-labelled descriptions. A two-stage approach
-  (Level 1 first, then Level 2/3/4 conditional on Level 1) is a
-  natural starting point.
-- **Natural-language question answering against the event store.**
-  Implement a Q&A interface, either via templated SQL generation
-  from semantic parses or by fine-tuning a small Seq2Seq model on
-  paired question-query examples. The structured store, with its
-  rich schema, makes this tractable.
-- **Refined boundary modelling.** Add a span-level CRF or biaffine
-  span classifier on top of the BERT representations to address the
-  boundary errors identified in Section 6.11.
+The thing I would do first is multilingual extension. A multilingual
+backbone like XLM-RoBERTa or AfroLM, fine-tuned on parallel corpora
+drawn from African news outlets and ACLED's multilingual coverage,
+would push the system into French, Arabic, and Portuguese and would
+materially widen its operational reach. The architecture does not
+need to change to support this; the training data and the encoder
+choice do.
+
+Closely behind that is replacing the rule-based taxonomy classifier
+in Section 4.4 with a learned hierarchical event classifier trained
+on event-labelled descriptions. A two-stage approach — Level 1 first,
+then Level 2/3/4 conditional on Level 1 — is the natural starting
+point. The rule-based version was the right thing to ship for this
+thesis, but it does not scale gracefully when the taxonomy grows.
+
+A third direction, less of an extraction problem and more of a
+product one, is natural-language question answering against the
+event store. Templated SQL generation from semantic parses is the
+cheaper route; fine-tuning a small Seq2Seq model on paired
+question-query examples is the more flexible one. The structured
+store, with its rich per-event schema, makes either approach
+tractable.
+
+Last among the high-priority items: refining boundary modelling. A
+span-level CRF or a biaffine span classifier on top of the BERT
+representations would address the boundary-error category in Section
+6.11, which is the single largest contributor to the F1 gap on
+DISTRICT and VICTIM.
 
 ### Medium priority
 
-- **Active learning and human-in-the-loop annotation.** Build an
-  annotation interface that selects low-confidence extractions or
-  KB-flagged inconsistencies for human review, retraining the model
-  periodically on the corrected data.
-- **Coreference resolution across sentences.** Many articles
-  describe the same incident across multiple sentences; resolving
-  coreferent actors, victims, and locations would improve recall
-  and reduce duplicate event records.
-- **Better KB schema and provenance.** Expand the KB to include
-  weapon-to-group affiliations, group-to-group rivalries, and
-  per-entry provenance and confidence, supporting richer downstream
-  analyses.
-- **PDF brief generation.** Generate weekly or on-demand briefings
-  from the event store in PDF form, as requested in user
-  acceptance testing.
+There are four directions I would group as medium priority. The
+first is an active-learning loop with human-in-the-loop annotation:
+an interface that selects low-confidence extractions or KB-flagged
+inconsistencies for human review and feeds the corrected data back
+into a periodic retraining pass. The second is coreference
+resolution across sentences — many news articles describe the same
+incident across two or three sentences, and resolving coreferent
+actors, victims, and locations would improve recall and reduce
+duplicates in the event store.
+
+A third is expanding the KB schema and provenance. The current KB
+covers groups, locations, and weapons; extending it to include
+weapon-to-group affiliations, group-to-group rivalries, and
+per-entry provenance and confidence would support richer downstream
+analyses and would give the validator more to work with. The fourth
+is the PDF-brief generator that the user-acceptance testers asked
+for — weekly or on-demand summaries pulled from the event store —
+which is the most user-visible of the medium-priority items.
 
 ### Lower priority
 
-- **Real-time stream processing.** Investigate Kafka- or
-  Kinesis-based stream processing for high-throughput, low-latency
-  deployments.
-- **Image and video extraction.** Multimodal extraction from
-  images and videos accompanying news reports.
-- **Predictive analytics on the accumulated event store.** Apply
-  forecasting models to predict short-term spikes in violence,
-  conditioning on the structured event history.
-- **Production hardening.** High availability, multi-region
-  replication, role-based access control, audit logging, and other
-  enterprise concerns for sustained operational deployment.
+The lower-priority items are interesting in different ways but none
+of them are blocking. Kafka- or Kinesis-based stream processing
+would help if a future consumer needed real-time ingestion at
+high throughput, though the latency budgets in Section 6.8 already
+cover most realistic batch loads. Multimodal extraction — pulling
+event information from images and videos accompanying news reports —
+is technically interesting but operationally orthogonal; the
+analysts I spoke with would happily defer it. Predictive analytics
+on the accumulated event store (forecasting short-term spikes in
+violence, conditioned on the structured history) is the most
+research-flavoured item on the list. And production hardening —
+high availability, multi-region replication, role-based access
+control, audit logging — is enterprise plumbing rather than
+research, but would be the gating work before any sustained
+operational deployment.
 
 Reading the list back, what jumps out to me is how much of it is
 incremental engineering rather than fundamental research. That is
