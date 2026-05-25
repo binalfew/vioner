@@ -506,7 +506,7 @@ most — make up only two percent each. A vanilla cross-entropy
 fine-tune on this distribution will quietly under-recover the rare
 classes while reporting deceptively high overall accuracy. Focal
 loss [12] with inverse-frequency class weighting is the standard
-counter, and §6.6 demonstrates that it lifts VICTIM by eleven F1
+counter, and Section 6.6 demonstrates that it lifts VICTIM by eleven F1
 points over plain cross entropy in this setting.
 
 The third is more architectural. An extraction system that
@@ -596,7 +596,7 @@ questions.
 ### Significance of the Study
 
 The most direct significance is operational. Analyst time at AU-CEWS
-is, as §1.2 argued, the binding constraint on continental situation
+is, as Section 1.2 argued, the binding constraint on continental situation
 awareness during fast-moving crises; even a partial reduction in the
 cost of producing a structured event record translates almost one to
 one into faster, broader, and more consistent monitoring. That is
@@ -887,11 +887,11 @@ with a discussion section, a threats-to-validity section, and a
 brief account of the experiments I tried first and abandoned.
 
 Finally, Chapter 7 wraps up. There is a summary anchored back to
-the analyst queue of §1.2, explicit answers to the four research
-questions of §1.3, a contributions list, recommendations for
+the analyst queue of Section 1.2, explicit answers to the four research
+questions of Section 1.3, a contributions list, recommendations for
 organisations considering adoption, and a prioritised future-work
-programme that addresses the limitations of §1.6 and the threats
-of §6.13.
+programme that addresses the limitations of Section 1.6 and the threats
+of Section 6.13.
 
 \pagebreak
 
@@ -916,7 +916,7 @@ pipeline; in current research the lines blur, with joint and
 end-to-end models bundling two or more sub-tasks into a single
 neural network. I take the textbook side. Pipeline. Debuggability
 beats marginal accuracy at the scale this thesis operates at.
-§4.2 makes that choice concrete.
+Section 4.2 makes that choice concrete.
 
 Event Extraction is the sub-task I care about most. Ahn's
 definition [3] is the operational one I use: an event is a verb or
@@ -936,7 +936,7 @@ every reported event. For news text this is a near-perfect fit:
 journalists are trained to answer those questions in roughly the
 first paragraph, and analysts read for exactly those slots. I adopt
 5W1H, leave event-type classification to a post-NER step against
-the taxonomy in §4.4, and so avoid baking a fixed event-type
+the taxonomy in Section 4.4, and so avoid baking a fixed event-type
 inventory into the supervised learning problem itself.
 
 Hogenboom and colleagues survey event extraction methods for decision
@@ -974,7 +974,7 @@ continuation token, and an O label everywhere else. For a schema
 with k entity types, BIO produces 2k + 1 labels — in my case,
 seventeen. Variants like BIOES or BILOU add explicit single-token
 and final-token labels to give the decoder more structure to lean
-on. I chose plain BIO for two reasons: the entity types in §4.3
+on. I chose plain BIO for two reasons: the entity types in Section 4.3
 are short enough that the extra labels would mostly be redundant,
 and seqeval-style evaluation tooling supports plain BIO without
 configuration.
@@ -1017,7 +1017,7 @@ My target is English-language reporting of African events rather
 than African-language reporting, so I use `bert-base-cased`, but
 the entity schema is strictly richer than MasakhaNER's four types,
 and an African-pre-trained backbone is a natural future swap
-(§7.5).
+(Section 7.5).
 
 ## 2.3 Transformer Models and BERT
 
@@ -1047,7 +1047,7 @@ the millions a from-scratch model would need.
 The token-classification recipe is straightforward. BERT outputs a
 contextual vector for each WordPiece token; a linear layer over
 each vector produces logits across the seventeen-label space; I
-backpropagate focal loss with class weights (§2.4) through the
+backpropagate focal loss with class weights (Section 2.4) through the
 whole stack. The checkpoint I fine-tune is `bert-base-cased` —
 twelve transformer layers, 768-dimensional hidden states, roughly
 110 million parameters. The cased variant matters here. English
@@ -1102,7 +1102,7 @@ that the textbook framing misses. The unit of oversampling is the
 sentence, but the imbalance lives at the token. Pull one extra
 sentence into the corpus to recover a single VICTIM mention, and you
 have just brought thirty O tokens with it. The stratified diversity
-sampling in §5.3 is my compromise: oversample on rare entity *types*
+sampling in Section 5.3 is my compromise: oversample on rare entity *types*
 rather than rare entity *tokens*, and select for entity-type diversity
 within each sentence, so the rare classes grow without O growing in
 proportion.
@@ -1349,7 +1349,7 @@ where the source has structure, you should use it; an infobox is a
 gift compared to a paragraph. Second, embedding extracted facts in
 an ontology — not just storing them as rows — gives the result
 analytical leverage that flat records do not. The four-level
-taxonomy in §4.4 is my answer to that second observation, applied
+taxonomy in Section 4.4 is my answer to that second observation, applied
 to a free-text extraction setting where I do not get YAGO's
 infobox luxury.
 
@@ -1391,7 +1391,7 @@ adversarial, the source is not authoritative, and there is no
 structured platform-side metadata to lean on — so I do not adopt
 their pipelines. The architectural lesson I do take is the
 explicit pairing of structured platform data with unstructured text;
-the knowledge base in §4.5 plays the role that Eventful or Eventbrite
+the knowledge base in Section 4.5 plays the role that Eventful or Eventbrite
 plays in Becker's setting.
 
 Aratefeh and Khreich [34] survey event detection on Twitter
@@ -1466,7 +1466,7 @@ conditioned on the parent label — and global classifiers that
 predict the whole path at once. The cascade is easier to debug and
 train incrementally; the global model can recover from a wrong
 upper-level prediction. Either is a meaningful upgrade over the
-rule-based fallback I currently use, and §7.5 prioritises the
+rule-based fallback I currently use, and Section 7.5 prioritises the
 cascade variant.
 
 ## 3.5 Summary of Gaps Addressed
@@ -1696,7 +1696,7 @@ output by combining the NER result with deterministic knowledge.
 The schema is the single most consequential design choice in the
 thesis. Get it wrong and the supervised learning problem is set up
 against you; get it right and the model has a fighting chance. The
-P1 grounding rule (§4.1) does most of the work: an entity type is
+P1 grounding rule (Section 4.1) does most of the work: an entity type is
 in the schema if and only if a human annotator can find it
 verbatim in the source text on a reliable majority of occurrences.
 Anything that fails that test gets pushed downstream to
@@ -1745,7 +1745,7 @@ two or three pieces — "Beledweyne" might become "Beled", "##wey",
 "##ne", each with its own row in the input. The labels have to be
 projected onto the sub-words consistently or training will see
 inconsistent signals across runs. The convention I use, formalised
-as Algorithm 4.1 in §4.6, carries the original word's label to the
+as Algorithm 4.1 in Section 4.6, carries the original word's label to the
 first sub-word, rewrites any leading B- to I- on subsequent
 sub-words (because only the first sub-word can be the *start* of
 the entity), and assigns -100 to special tokens like [CLS], [SEP],
@@ -1842,7 +1842,7 @@ out of three dictionaries: armed groups, locations, and weapons. I
 considered loading it from Postgres at startup but the lookup volume
 during inference is high and an in-memory dict has obvious latency
 advantages; the trade-off is that adding or editing a KB entry
-requires a service restart, which the analyst-facing flows in §5.6
+requires a service restart, which the analyst-facing flows in Section 5.6
 handle gracefully.
 
 The armed-groups dictionary has roughly 150 entries. Each entry
@@ -1870,7 +1870,7 @@ The weapons dictionary is the smallest. It groups weapon mentions
 into categories (firearms, explosives, edged weapons, fire / arson,
 heavy weapons) and tactical methods (ambush, raid, mass shooting,
 suicide bombing). It exists mainly to feed the post-NER taxonomy
-classifier in §4.4, which uses weapon and method signals to refine
+classifier in Section 4.4, which uses weapon and method signals to refine
 the Level 3 and Level 4 classification.
 
 Table 4.4 summarises how much each resource holds. The same data
@@ -2428,7 +2428,7 @@ mid-training that I wanted to push the run further.
 `pipeline/loss.py` holds the custom loss code. Two classes live
 there: `FocalLoss`, which extends `torch.nn.Module` and implements
 Algorithm 4.4, and `ClassWeightedCrossEntropy`, a simpler weighted
-cross-entropy used as the ablation baseline in §6.6.
+cross-entropy used as the ablation baseline in Section 6.6.
 
 A few implementation choices in `FocalLoss` are worth flagging.
 Logits arrive shaped `[N, C]` and targets shaped `[N]`; both get
@@ -2663,7 +2663,7 @@ downstream consumer notices. A predicted span counts as correct
 only if its type, start, and end exactly match a gold span;
 partial overlaps count as a false positive plus a false negative.
 The strictness of this scoring is the right choice for the
-operational consumers I have in mind, but as discussed in §6.11 it
+operational consumers I have in mind, but as discussed in Section 6.11 it
 does make some of the headline numbers look slightly worse than
 they read on inspection.
 
@@ -2686,7 +2686,7 @@ in Table 6.2.
 The interesting story is in the entity-level distribution, not in
 the headline counts. Table 6.3 shows what each entity type is worth
 as a share of the entity-token total — and it is exactly the
-imbalance §2.4 warned about.
+imbalance Section 2.4 warned about.
 
 *Table 6.3: Entity-level frequency in the full pre-processed corpus*
 
@@ -2708,10 +2708,10 @@ each. Step back one level and the imbalance gets worse: the O label
 percent of all tokens. A naive cross-entropy fine-tune on this
 distribution will report deceptively high overall accuracy while
 quietly under-recovering exactly the rare entities an analyst cares
-about most. This is the table that motivates §6.6's ablation.
+about most. This is the table that motivates Section 6.6's ablation.
 
 After running the corpus through the diversity sampler and the
-template augmenter (§5.3), the production training corpus is 50,000
+template augmenter (Section 5.3), the production training corpus is 50,000
 examples split 80 / 20 into 40,000 training and 10,000 validation.
 Augmented examples make up about thirty percent of this corpus and
 push the share of ACTION, VICTIM, and CASUALTIES tokens up to
@@ -2855,7 +2855,7 @@ the lowest validation loss across any configuration I tried. Token
 accuracy on that combination is 96.7 percent, and the model
 converges to its best checkpoint in two epochs. These are the
 numbers that motivate the rest of the chapter; per-entity
-breakdowns in §6.5 explain where the accuracy is actually concentrated.
+breakdowns in Section 6.5 explain where the accuracy is actually concentrated.
 
 Adding label smoothing (β = 0.1) on top of the winning
 configuration sounds like it should help, and the literature
@@ -2923,12 +2923,12 @@ volume.
 
 DISTRICT and VICTIM trail at 0.826 and 0.817. DISTRICT loses most
 of its accuracy to mutual confusion with CITY and REGION — see
-Figure 6.4 in §6.11. VICTIM is the harder problem because it is
+Figure 6.4 in Section 6.11. VICTIM is the harder problem because it is
 both the rarest entity in the corpus and the entity with the most
 variable phrasing — anything from "civilians" to "ten villagers,
 including women and children" can be the gold span. Augmentation
 and inverse-frequency weighting move the floor up by 11 F1 points
-relative to plain cross entropy (§6.6) but they do not eliminate
+relative to plain cross entropy (Section 6.6) but they do not eliminate
 the structural noise.
 
 The macro F1 of 0.887 means every entity type, including the
@@ -3011,7 +3011,7 @@ flagged cases, most turned out to be either genuine cross-border
 incidents the article was reporting on (one side names a city in
 country A, the other names a region in country B) or extraction
 errors at the edges where REGION and CITY are mutually confused —
-the same confusion pattern §6.11 talks about. Either way, the flag
+the same confusion pattern Section 6.11 talks about. Either way, the flag
 correctly surfaces the events where an analyst should re-read
 before trusting.
 
@@ -3118,7 +3118,7 @@ where the surface form "Al Shabaab fighters" is canonicalised to
 
 ## 6.10 User Acceptance Testing
 
-The numbers in §6.4 to §6.9 say the model works. They do not say
+The numbers in Section 6.4 to Section 6.9 say the model works. They do not say
 whether anyone can actually use it. To find out, I ran a small
 user-acceptance test with five participants: two early-warning
 analysts (the primary intended audience), one academic conflict
@@ -3205,7 +3205,7 @@ into the production threshold.
 The remaining 7 percent are confidence-related drops: the model
 gets the entity right but its averaged sub-token confidence sits
 just below the category threshold, so the post-processor filters
-it out (§4.7). Lowering the threshold would recover most of these
+it out (Section 4.7). Lowering the threshold would recover most of these
 at the cost of precision. This is the cleanest dial to turn for
 recall-favouring deployments.
 
@@ -3282,7 +3282,7 @@ the model that came out of that run actually scored lower on
 rare-entity F1 than later runs on smaller corpora, because the
 duplication of common phrasing in ACLED notes was drowning out the
 rare entities. That is what motivated the stratified diversity
-sampler in §5.3. In November 2025 I also spent the better part of
+sampler in Section 5.3. In November 2025 I also spent the better part of
 a week trying to learn EVENT_TYPE as a first-class NER label on the
 original 26-type schema. The grounding pilot at the end of that
 month was the conversation-ender — only about 58 percent of
@@ -3290,9 +3290,9 @@ EVENT_TYPE annotations could be located verbatim in the source
 text, and the model's per-entity F1 plateaued around 0.4 no matter
 what I tried. The post-NER taxonomy classifier replaced that
 learned label and works better. The hybrid statistics-plus-rules
-approach in §4.7, which initially felt like a compromise, turned
+approach in Section 4.7, which initially felt like a compromise, turned
 out to be a genuine improvement. By December the schema had
-settled at the eight entity types reported in §4.3, and most of
+settled at the eight entity types reported in Section 4.3, and most of
 the subsequent work was on training-pipeline ergonomics — early
 stopping, ReduceLROnPlateau, the focal-loss variant — rather than
 on the schema itself.
@@ -3303,7 +3303,7 @@ from real news, and the validation split is drawn from the same
 combined corpus. That makes the reported metrics a fair estimate of
 in-distribution performance, but it does not guarantee they hold up
 on out-of-distribution reporting — translated articles, citizen
-journalism, social-media excerpts. §7.5 prioritises annotated
+journalism, social-media excerpts. Section 7.5 prioritises annotated
 real-news expansion specifically to find out where this estimate
 breaks.
 
@@ -3351,7 +3351,7 @@ VICTIM improvement from focal loss with weighting was measured on
 out-of-distribution data. The choice of `bert-base-cased` rather
 than a multilingual or African-pre-trained backbone is the other
 half of this limitation — the system is bound to English-language
-reporting until that swap happens (§7.5).
+reporting until that swap happens (Section 7.5).
 
 On conclusion validity, the per-entity F1 numbers I report are
 single-run point estimates. I did not formally measure variation
@@ -3366,7 +3366,7 @@ load test.
 
 None of these threats undermines the headline claims of the
 chapter. They are the conditions under which the numbers should be
-read, and the gaps that §7.5 prioritises closing.
+read, and the gaps that Section 7.5 prioritises closing.
 
 \pagebreak
 
@@ -3378,8 +3378,8 @@ explicit walk through the research questions from Chapter 1 with
 the answers Chapters 4 to 6 produced; the list of contributions the
 thesis leaves behind; recommendations for anyone considering using
 or extending the system; and a future-work programme that picks up
-the limitations from §1.6 and the threats-to-validity material in
-§6.13 and turns them into a prioritised set of next steps.
+the limitations from Section 1.6 and the threats-to-validity material in
+Section 6.13 and turns them into a prioritised set of next steps.
 
 ## 7.1 Summary
 
@@ -3419,12 +3419,12 @@ implausible. Inference latency for typical articles is in the
 hundreds of milliseconds. User acceptance testing returned a 4.4 /
 5.0 mean across six task dimensions.
 
-The ten specific objectives stated in §1.4 are addressed across
+The ten specific objectives stated in Section 1.4 are addressed across
 Chapters 2, 4, and 5 (literature review, schema, taxonomy, data,
-training), §4.5 and §5.6 (knowledge base), §5.6 and §5.7 (back-end
-and front-end), Chapter 6 (evaluation), and §1.6 plus this
+training), Section 4.5 and Section 5.6 (knowledge base), Section 5.6 and Section 5.7 (back-end
+and front-end), Chapter 6 (evaluation), and Section 1.6 plus this
 chapter (limitations and future work). The four research questions
-of §1.3 are answered in detail in the section that follows.
+of Section 1.3 are answered in detail in the section that follows.
 
 ## 7.2 Answers to the Research Questions
 
@@ -3991,7 +3991,7 @@ ontology [29], extended with African-specific categories (notably
 pastoralist-farmer clashes and communal cattle raiding) that the
 three external frameworks do not cover at this depth. It was
 maintained as a separate working document during development and is
-preserved here verbatim as the canonical reference for §4.4. Level 4
+preserved here verbatim as the canonical reference for Section 4.4. Level 4
 subtypes are listed only where they apply.
 
 ### Level 1: POLITICAL VIOLENCE

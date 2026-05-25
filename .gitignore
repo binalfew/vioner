@@ -89,3 +89,6 @@ htmlcov/
 
 # Office lock files (Word/Excel/PowerPoint create these when a file is open)
 ~$*
+
+# Generated pandoc reference template (regenerated on every thesis build)
+backend/docs/thesis/reference.docx

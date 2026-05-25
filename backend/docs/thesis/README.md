@@ -5,36 +5,41 @@ project, prepared for submission to the Department of Computer
 Science, College of Natural Sciences, Addis Ababa University.
 
 - `thesis.md` — authoritative source (markdown).
-- `thesis.docx` — generated Word version (`pandoc thesis.md -o thesis.docx`).
+- `thesis.docx` — generated Word version. Build with `build_thesis.py`.
+- `build_thesis.py` — build script (generates `reference.docx` and `thesis.docx`).
+- `reference.docx` — pandoc reference template; regenerated on each build.
 
 ## Regenerating the Word version
 
 ```bash
 cd backend/docs/thesis
-pandoc thesis.md -o thesis.docx
-# Alternative with a reference template for AAU formatting:
-pandoc thesis.md \
-  --reference-doc=aau-thesis-template.docx \
-  -o thesis.docx
+# from inside the backend venv so python-docx is on PATH:
+python build_thesis.py
 ```
 
-**Note on the Table of Contents:** the TOC is now a **static** table
-inside `thesis.md`. Pandoc is invoked WITHOUT `--toc` so it does not
-emit a Word TOC field; this prevents the "This document contains
-fields that may refer to other files. Do you want to update the
-fields?" prompt when Word opens the file.
+The script does the following on a temp copy (source `thesis.md` is
+never mutated):
 
-Trade-off vs. the AAU guideline:
-- AAU §4.1f says the TOC "must be generated automatically and not
-  manually". A static TOC violates this letter; if your committee is
-  strict, switch back: in `thesis.md`, replace the static TOC block
-  with an HTML comment placeholder, then build with
-  `pandoc thesis.md -o thesis.docx --toc --toc-depth=3`.
-- Page numbers in the static TOC are **estimates**. Update them
-  manually in Word against the actual rendered page numbers (apply
-  AAU page layout first, then revise the TOC entries).
+1. Builds `reference.docx` programmatically with the AAU CS formatting:
+   A4 paper, 1.3" left / 1" other margins, Times New Roman 12 pt, 1.5
+   line spacing, justified body paragraphs, and Heading 1-4 styles.
+2. Moves the Table of Contents block so it sits immediately after the
+   cover/signature page and before the Abstract. The static TOC table
+   is dropped; the heading is kept as the anchor for the real TOC.
+3. Runs pandoc with `--reference-doc=reference.docx`.
+4. Inserts a real Word TOC field (`TOC \o "1-3" \h \z \u \b "TOC_RANGE"`)
+   at that heading, scoped to a bookmark covering Abstract → end of
+   body so the title page and the TOC heading itself are excluded
+   from the entries. Sets `<w:updateFields w:val="true"/>` so Word
+   repaginates the TOC silently on first open; every entry hyperlinks
+   to its heading.
+5. Applies a 0.5 pt single-line black border to every table (pandoc
+   emits borderless tables by default, which is not acceptable under
+   AAU CS formatting).
+6. Clears any direct paragraph-alignment overrides on body paragraphs
+   so the justified Normal style wins uniformly.
 
-The List of Tables, List of Figures, and List of Algorithms are also
+The List of Tables, List of Figures, and List of Algorithms remain
 manual tables in `thesis.md`; update them whenever a numbered figure,
 table, or algorithm is added or removed.
 
