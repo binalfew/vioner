@@ -89,7 +89,7 @@ Signed by the Examining Committee:
 Analysts at the African Union Continental Early Warning System
 read more news every day than they can turn into structured records.
 The backlog grows; situation awareness suffers. This thesis closes
-that gap with machine learning. I built VioNER, a fine-tuned BERT
+that gap with machine learning. VioNER was built as VioNER, a fine-tuned BERT
 system that pulls 5W1H attributes — Who did What to Whom, Where,
 When, and How — out of African news reports of violent events, and
 pairs each extraction with a knowledge base of known armed groups
@@ -120,7 +120,7 @@ Violent Events, African Conflicts, 5W1H, Focal Loss
 
 # Dedication
 
-To my family, for their unwavering encouragement throughout this
+To the author's family, for their unwavering encouragement throughout this
 research, and to the analysts whose patient reading of conflict
 reports inspired the work that follows.
 
@@ -128,23 +128,23 @@ reports inspired the work that follows.
 
 # Acknowledgements
 
-I am deeply indebted to my advisor, Dr. Fekade Getrahun, for his
+Deep gratitude is owed to the advisor, Dr. Fekade Getrahun, for his
 guidance, critical reading, and steady encouragement throughout this
 research. His insistence on rigour and operational relevance shaped
 every chapter of this thesis.
 
-I am grateful to the staff of the Addis Ababa University Department
+Gratitude is owed to the staff of the Addis Ababa University Department
 of Computer Science for their support during the programme, and to
 the African Union Continental Early Warning System (AU-CEWS) for
 articulating the operational requirements that motivated this work.
-I also thank the Armed Conflict Location and Event Data Project
+this thesis also thank the Armed Conflict Location and Event Data Project
 (ACLED) for maintaining the open dataset on which this study relies.
 
-I acknowledge the prior thesis work of Taye Abdulkadir, whose
+Acknowledgement is owed to the prior thesis work of Taye Abdulkadir, whose
 exploration of 5W extraction in the African context provided a
 foundation that this research extends.
 
-Finally, I thank my family and friends for their patience and support
+Finally, Thanks are owed to the author's family and friends for their patience and support
 during the long months of training, debugging, and writing.
 
 <!--
@@ -213,7 +213,6 @@ and rebuild with `--toc --toc-depth=3`.
 | 5.5 Focal Loss and Class Weighting                                                 | 67   |
 | 5.6 Backend Services and API                                                       | 69   |
 | 5.7 Frontend Application                                                           | 72   |
-| 5.8 Containerised Deployment                                                       | 74   |
 | **6. Experimentation and Results**                                                 | 75   |
 | 6.1 Experimental Setup                                                             | 75   |
 | 6.2 Dataset Statistics                                                             | 76   |
@@ -267,6 +266,7 @@ and rebuild with `--toc --toc-depth=3`.
 | 6.8   | Focal-loss ablation                                                | 83   |
 | 6.9   | Inference latency on representative articles                       | 85   |
 | 6.10  | Aggregated user acceptance testing responses                       | 87   |
+| 6.11  | Confusion patterns between location entity types                   | 89   |
 
 \pagebreak
 
@@ -276,15 +276,19 @@ and rebuild with `--toc --toc-depth=3`.
 |:------:|:-------------------------------------------------------------------|:----:|
 | 4.1    | High-level architecture of the VioNER system                       | 38   |
 | 4.2    | End-to-end processing pipeline                                     | 39   |
-| 4.3    | Sequence of calls during synchronous inference                     | 40   |
-| 4.4    | BIO encoding example for a multi-word entity                       | 42   |
-| 4.5    | Four-level taxonomy hierarchy (visual outline)                     | 44   |
+| 4.3    | BIO encoding example for a multi-word entity                       | 42   |
+| 4.4    | Hierarchical taxonomy of African violent events (Levels 0-2)       | 44   |
 | 5.1    | Back-end module organisation                                       | 67   |
 | 5.2    | Front-end route map                                                | 70   |
-| 6.1    | Training and validation loss curves                                | 77   |
-| 6.2    | Token-level validation accuracy across epochs                      | 78   |
 | 6.3    | Per-entity F1 bar chart                                            | 82   |
-| 6.4    | Confusion patterns between location entity types                   | 89   |
+| B.1    | Hierarchical taxonomy of African violent events, Levels 0-3        | 110  |
+| D.1    | Inference screen with pasted article and 5W1H extraction           | 117  |
+| D.3    | Training run list with completed and running jobs                  | 118  |
+| D.4    | Live training-run detail with loss chart and streaming log         | 119  |
+| D.5    | Event browser with filters and paginated results                   | 120  |
+| D.7    | Analytics dashboard                                                | 121  |
+| D.8    | Knowledge base Actors editor                                       | 122  |
+| D.9    | Knowledge base Taxonomies view                                     | 123  |
 
 \pagebreak
 
@@ -391,7 +395,7 @@ in turn, narrows IE to events — verbs, nominalised actions, and
 their participants — and asks the model to recover who did what to
 whom, where, when, and how, from text alone [3], [4].
 
-The 5W1H frame I adopt is not new. Journalism schools have taught
+The 5W1H frame the adopted is not new. Journalism schools have taught
 it for over a century, and analysts in early-warning centres read
 for those slots whether or not they explicitly call them that. The
 attractive property for an automated system is that 5W1H decouples
@@ -460,8 +464,8 @@ that matters. It is the throughput of one human reading one
 article at a time.
 
 Working in this environment, and reading the centre's own internal
-documentation of its data-collection and analysis tools [38], I
-came to see two distinct problems hiding behind the same backlog.
+documentation of its data-collection and analysis tools [38], two
+distinct problems become apparent behind the same backlog.
 
 The first is the obvious one: a **throughput gap**. The volume of
 news human analysts can absorb in a working day is a fraction of
@@ -498,7 +502,7 @@ model on annotated African conflict text closes that gap
 substantially.
 
 The second is that the class distribution is brutally skewed. In
-the corpus I assemble in Chapter 5, roughly seventy-eight percent
+the corpus the assembled in Chapter 5, roughly seventy-eight percent
 of all tokens carry the outside (O) label. Of the remaining twenty
 two percent that are entity tokens, the rarest entity types —
 VICTIM and CASUALTIES, the ones the analyst actually cares about
@@ -606,8 +610,8 @@ The methodological contribution is the combination, rather than any
 single ingredient. Grounded supervision, focal loss with class
 weighting, and a curated domain knowledge base used both for
 validation and enrichment have each been studied in isolation; to
-the best of my knowledge they have not been combined and reported
-together on African violent-event extraction at this scale. The
+the best of available knowledge they have not been combined and
+reported together on African violent-event extraction at this scale. The
 methodology is documented in detail through Chapters 4 and 5 so
 that it can be reproduced or adapted.
 
@@ -639,7 +643,7 @@ work breaks down as follows.
    named entity recognition, and transformer-based language models,
    alongside the conflict-event-coding tradition, and locate the
    present work against both bodies of work.
-2. Settle on a BIO schema. I land on eight entities — ACTOR,
+2. Settle on a BIO schema. the selected set is eight entities — ACTOR,
    VICTIM, ACTION, DATE, REGION, CITY, DISTRICT, CASUALTIES — chosen
    for how reliably each can be grounded in the source text rather
    than for theoretical neatness. Each comes with explicit inclusion
@@ -836,7 +840,7 @@ data; the schema does not need to be redesigned to serve them.
 
 Peace-support operations and national security services are a more
 sensitive case. Open-source extraction is not a substitute for
-classified intelligence, and I would not present it as one. The
+classified intelligence, and one would not present it as one. The
 useful framing is that VioNER lowers the cost of doing OSINT
 systematically — a junior analyst with VioNER on their workstation
 can do, in a morning, the volume of structured reading that a few
@@ -857,7 +861,7 @@ adapt the taxonomy without having to start from scratch.
 
 ## 1.8 Organization of the Rest of the Thesis
 
-Two chapters cover the literature. In Chapter 2 I work through the
+Two chapters cover the literature. In Chapter 2 the work surveys the
 relevant theory — information and event extraction, named entity
 recognition, transformers and BERT, class-imbalance methods, the
 conflict-event database tradition, and event-oriented knowledge
@@ -872,8 +876,8 @@ hierarchical taxonomy, the knowledge base, the training pipeline,
 the inference pipeline, and the web application that ties them all
 together. Chapter 5 documents how each of those parts is actually
 built: technology stack, data preparation, training
-implementation, focal-loss code, back-end services, front-end,
-containerised deployment. Splitting *what and why* (Chapter 4)
+implementation, focal-loss code, back-end services, and
+front-end. Splitting *what and why* (Chapter 4)
 from *how* (Chapter 5) was a deliberate editorial decision —
 readers interested in the design without the implementation detail
 can stop after Chapter 4 and not feel they have missed anything.
@@ -884,7 +888,7 @@ focal-loss ablation, the impact of the knowledge-base layer,
 latency measurements, end-to-end demonstration on real articles,
 user-acceptance feedback, and an honest error analysis. It closes
 with a discussion section, a threats-to-validity section, and a
-brief account of the experiments I tried first and abandoned.
+brief account of the experiments earlier attempts tried first and abandoned.
 
 Finally, Chapter 7 wraps up. There is a summary anchored back to
 the analyst queue of Section 1.2, explicit answers to the four research
@@ -914,12 +918,12 @@ text — named entity recognition, relation extraction, coreference
 resolution, event extraction. Textbook diagrams arrange these as a
 pipeline; in current research the lines blur, with joint and
 end-to-end models bundling two or more sub-tasks into a single
-neural network. I take the textbook side. Pipeline. Debuggability
+neural network. the work takes the textbook side. Pipeline. Debuggability
 beats marginal accuracy at the scale this thesis operates at.
 Section 4.2 makes that choice concrete.
 
-Event Extraction is the sub-task I care about most. Ahn's
-definition [3] is the operational one I use: an event is a verb or
+Event Extraction is the sub-task of greatest interest here is. Ahn's
+definition [3] is the operational one the work uses: an event is a verb or
 nominal predicate together with the participants (agent, patient,
 instrument), the location, and the time the predicate involves.
 The Automatic Content Extraction program [14] formalised that view
@@ -934,7 +938,7 @@ sidesteps the question of which event types to enumerate by asking
 the same six questions — Who, What, Whom, Where, When, How — of
 every reported event. For news text this is a near-perfect fit:
 journalists are trained to answer those questions in roughly the
-first paragraph, and analysts read for exactly those slots. I adopt
+first paragraph, and analysts read for exactly those slots. the adopted
 5W1H, leave event-type classification to a post-NER step against
 the taxonomy in Section 4.4, and so avoid baking a fixed event-type
 inventory into the supervised learning problem itself.
@@ -955,7 +959,7 @@ knowledge-base validation are rule-driven.
 ## 2.2 Named Entity Recognition
 
 For the purposes of this thesis, NER means deciding for every token
-in a sentence whether it belongs to an entity I care about and, if
+in a sentence whether it belongs to an entity of interest and, if
 so, which one. The pre-deep-learning era handled this with a fairly
 fixed recipe: hand-engineered features (capitalisation, gazetteer
 hits, surrounding part-of-speech tags) fed into a sequence model
@@ -968,13 +972,13 @@ B- token cannot legally be followed by another B-, an I- needs a
 preceding B- of the same type), which a per-token classifier cannot
 encode at all.
 
-I encode entities in BIO, the simplest of the standard schemes: a
+this thesis encodes entities in BIO, the simplest of the standard schemes: a
 B- prefix on the first token of an entity, an I- prefix on each
 continuation token, and an O label everywhere else. For a schema
-with k entity types, BIO produces 2k + 1 labels — in my case,
+with k entity types, BIO produces 2k + 1 labels — in this case,
 seventeen. Variants like BIOES or BILOU add explicit single-token
 and final-token labels to give the decoder more structure to lean
-on. I chose plain BIO for two reasons: the entity types in Section 4.3
+on. the choice was made for plain BIO for two reasons: the entity types in Section 4.3
 are short enough that the extra labels would mostly be redundant,
 and seqeval-style evaluation tooling supports plain BIO without
 configuration.
@@ -1001,7 +1005,7 @@ The property that matters most for a low-resource setting like the
 African violent-event domain is that a transformer encoder absorbs
 enough general English during pre-training that a comparatively
 small specialised corpus can fine-tune it to good per-entity
-performance. The 50,000-example corpus I describe in Chapter 5
+performance. The 50,000-example corpus the work describes in Chapter 5
 would be far too small for a from-scratch BiLSTM-CRF; it is
 sufficient for a fine-tuned BERT precisely because of this
 transfer.
@@ -1014,7 +1018,7 @@ multilingual encoders such as mBERT and XLM-RoBERTa underperform on
 African text relative to encoders that have seen African corpora
 during pre-training. AfroLM [40] and AfroXLMR continued this line.
 My target is English-language reporting of African events rather
-than African-language reporting, so I use `bert-base-cased`, but
+than African-language reporting, so the work uses `bert-base-cased`, but
 the entity schema is strictly richer than MasakhaNER's four types,
 and an African-pre-trained backbone is a natural future swap
 (Section 7.5).
@@ -1025,8 +1029,8 @@ The transformer [5] removed the recurrent step that had constrained
 sequence models for years and put self-attention in its place: each
 position in the input gets to look directly at every other position,
 through learned query / key / value projections, and the cost of
-that look-up is paid in parallel rather than in sequence. For my
-purposes the practical consequences matter more than the
+that look-up is paid in parallel rather than in sequence. For the
+purposes of this work the practical consequences matter more than the
 mathematical novelty: training can be parallelised on a GPU,
 long-range dependencies — exactly the kind that link an actor at
 the start of a sentence to a casualty count at the end — survive
@@ -1046,9 +1050,10 @@ the millions a from-scratch model would need.
 
 The token-classification recipe is straightforward. BERT outputs a
 contextual vector for each WordPiece token; a linear layer over
-each vector produces logits across the seventeen-label space; I
-backpropagate focal loss with class weights (Section 2.4) through the
-whole stack. The checkpoint I fine-tune is `bert-base-cased` —
+each vector produces logits across the seventeen-label space; the
+training loop backpropagates focal loss with class weights
+(Section 2.4) through the whole stack. The fine-tuned checkpoint
+is `bert-base-cased` —
 twelve transformer layers, 768-dimensional hidden states, roughly
 110 million parameters. The cased variant matters here. English
 conflict reporting leans heavily on capitalisation to mark ACTOR
@@ -1085,14 +1090,14 @@ of the ablation discussion in Chapter 6.
 NER under BIO is, almost by construction, a deeply imbalanced
 classification problem. Most tokens in any natural-language
 sentence are not part of any entity, so they all carry the O label;
-across the corpus I assemble in Chapter 5, O accounts for roughly
+across the corpus the assembled in Chapter 5, O accounts for roughly
 seventy-eight percent of all tokens. The remaining twenty-two
 percent is itself uneven: ACTOR, CITY, DATE, REGION, and DISTRICT
 are common enough to learn well, while VICTIM, ACTION, and
-CASUALTIES are the entities I most need to recover and the entities
+CASUALTIES are the entities of greatest interest to recover and the entities
 on which a naive learner does worst.
 
-The literature gives three handles on this problem, and I take a
+The literature gives three handles on this problem, and the work takes a
 position on each.
 
 **Re-sampling** the training set [24] is the textbook starting point —
@@ -1102,7 +1107,7 @@ that the textbook framing misses. The unit of oversampling is the
 sentence, but the imbalance lives at the token. Pull one extra
 sentence into the corpus to recover a single VICTIM mention, and you
 have just brought thirty O tokens with it. The stratified diversity
-sampling in Section 5.3 is my compromise: oversample on rare entity *types*
+sampling in Section 5.3 is the compromise adopted: oversample on rare entity *types*
 rather than rare entity *tokens*, and select for entity-type diversity
 within each sentence, so the rare classes grow without O growing in
 proportion.
@@ -1114,7 +1119,7 @@ contribution to the gradient. The simplest weighting scheme is
 inverse frequency, where class c gets a weight of 1/f_c, optionally
 normalised; effective-number weighting [26] refines this with a
 corpus-sample-overlap correction that softens the inverse-frequency
-extremes. I use plain inverse-frequency weights here, computed once
+extremes. the work uses plain inverse-frequency weights here, computed once
 from the training distribution before training begins, with a cap to
 keep the rarest classes from dominating gradient updates.
 
@@ -1200,7 +1205,7 @@ classes.
 
 For implementation, span-level NER evaluation in this thesis is
 done through `seqeval` [39], the de-facto reference library. It
-ships with a "default" BIO mode and a "strict" mode; I use strict
+ships with a "default" BIO mode and a "strict" mode; the work uses strict
 boundary matching throughout. Partial credit is tempting but
 misleading here, because the downstream consumers of an extracted
 record — the KB validator, the event store, the analytics layer —
@@ -1243,8 +1248,8 @@ state-based conflict, non-state conflict, and one-sided violence,
 with fatality thresholds that exclude lower-intensity events.
 UCDP's definitional work — what counts as an "organised" actor,
 how battle-related deaths differ from civilian deaths — informs the
-boundary between political violence and the other categories in my
-taxonomy, even though I am not using UCDP data directly.
+boundary between political violence and the other categories in
+this thesis's taxonomy, even though UCDP data are not used directly.
 
 GDELT [10] sits at the opposite end of the methodology spectrum.
 The Global Database of Events, Language, and Tone is automatically
@@ -1253,10 +1258,10 @@ broad four-digit hierarchical taxonomy covering both cooperative
 and conflictual events. GDELT's scale is impressive — billions of
 events — but the automated extraction is comparatively coarse and
 produces a high volume of records that does not always meet the
-precision standard of operational early warning. I cite GDELT and
+precision standard of operational early warning. the literature cites GDELT and
 CAMEO here as the canonical example of the scale-versus-precision
 trade-off, and as a source of comparative taxonomic patterns, but
-not as a direct input to my system.
+not as a direct input to the system.
 
 The taxonomy of African violent events presented in this thesis is
 synthesised from ACLED and UCDP frames with additional categories
@@ -1309,8 +1314,8 @@ methods, this chapter zooms in on the specific systems that VioNER
 either builds on or distinguishes itself from. Only concrete systems
 are reviewed — published papers, peer-reviewed conference
 proceedings, masters and doctoral theses, and technical reports —
-and each is read in light of what it tells me about the design
-choices I had to make in VioNER. A summary of the gaps that
+and each is read in light of what it reveals about the design
+choices that had to be made in VioNER. A summary of the gaps that
 VioNER bridges closes the chapter.
 
 ## 3.1 General Event Extraction from News
@@ -1320,10 +1325,10 @@ operational crisis-monitoring infrastructure actually looks like at
 scale: a multilingual pipeline that pulls news from many feeds,
 recognises events through hand-written patterns, and clusters them
 geographically so that an emerging story can be tracked across
-sources. What I take from their work is the engineering attitude —
+sources. What the work takes from their work is the engineering attitude —
 they treat scale as the central problem rather than treating it as
-an afterthought. What I don't take is the pattern-based event
-recognition. Their system does not produce structured 5W1H records
+an afterthought. What this thesis does not take is the
+pattern-based event recognition. Their system does not produce structured 5W1H records
 that a downstream analyst could query, and patterns alone do not
 scale across the actor-name and place-name diversity of African
 conflict reporting.
@@ -1349,13 +1354,13 @@ where the source has structure, you should use it; an infobox is a
 gift compared to a paragraph. Second, embedding extracted facts in
 an ontology — not just storing them as rows — gives the result
 analytical leverage that flat records do not. The four-level
-taxonomy in Section 4.4 is my answer to that second observation, applied
-to a free-text extraction setting where I do not get YAGO's
+taxonomy in Section 4.4 is the answer to that second observation, applied
+to a free-text extraction setting where this thesis does not get YAGO's
 infobox luxury.
 
 Hienert and Luciano [31] extend the YAGO idea to historical events
 in Wikipedia using LODE. Their pipeline assumes the same
-semi-structured input. I cite it here mainly as a counterpoint:
+semi-structured input. the literature cites it here mainly as a counterpoint:
 extracting from a Wikipedia article that already names "Battle of
 Adwa, 1896" in its title is a fundamentally easier problem than
 extracting events from ACLED notes or full-length news articles
@@ -1367,30 +1372,31 @@ The NEXUS system [29] is the closest stylistic precedent in
 violence-specific extraction. Piskorski, Tanev, and Wennerberg
 filter incoming news with keywords, run linguistic patterns to find
 violence-relevant sentences, then snap extracted entities onto the
-classes of their Politically Motivated Violent Events ontology. I
-draw two lessons from NEXUS. The principled ontology — PMVE —
+classes of their Politically Motivated Violent Events ontology. Two
+lessons are drawn from NEXUS. The principled ontology — PMVE —
 shows how much analytical reach a tight conceptual model gives
-downstream consumers, and my four-level taxonomy is partly a
+downstream consumers, and the four-level taxonomy is partly a
 response to that. At the same time, NEXUS demonstrates how
 expensive pattern-based recognition becomes once the actor and
 place vocabularies shift: it was tuned to European security
 incidents, and porting it to the African continent — with several
 hundred armed groups and tens of thousands of locality names —
-would require essentially rebuilding the pattern base. I chose
+would require essentially rebuilding the pattern base. the choice was made for
 fine-tuned BERT precisely because it amortises that vocabulary work
 into the pre-training stage.
 
-Two social-media-oriented papers sit at the edge of relevance to my
-work. Becker and colleagues [32] extract *planned* events by
+Two social-media-oriented papers sit at the edge of relevance to
+this thesis. Becker and colleagues [32] extract *planned* events by
 exploiting platform-specific structured fields (event titles, dates,
 locations posted on Eventful) alongside the unstructured discussion
 that surrounds them. Magnuson and colleagues [33] build a related
 Twitter recommendation system over Eventbrite. Both targets differ
 from violent events on every axis — events are unplanned and
 adversarial, the source is not authoritative, and there is no
-structured platform-side metadata to lean on — so I do not adopt
-their pipelines. The architectural lesson I do take is the
-explicit pairing of structured platform data with unstructured text;
+structured platform-side metadata to lean on — so this thesis does
+not adopt their pipelines. The architectural lesson that is taken
+is the explicit pairing of structured platform data with
+unstructured text;
 the knowledge base in Section 4.5 plays the role that Eventful or Eventbrite
 plays in Becker's setting.
 
@@ -1398,8 +1404,9 @@ Aratefeh and Khreich [34] survey event detection on Twitter
 specifically and catalogue the supervised, unsupervised, and hybrid
 techniques that have been tried for the short-text, high-noise
 regime. VioNER processes news rather than tweets, so the survey
-does not drive my architecture, but the noise-handling and short-text
-techniques it catalogues are the natural starting point if I extend
+does not drive the VioNER architecture, but the noise-handling and
+short-text techniques it catalogues are the natural starting point
+if this thesis extends
 VioNER to citizen-journalist sources in future work.
 
 ## 3.3 Event Extraction in the African Context
@@ -1413,10 +1420,10 @@ modest annotated corpus and demonstrate that domain-specific
 adaptation improves performance over generic baselines on African
 text.
 
-The differences between Taye Abdulkadir's work and mine are
+The differences between Taye Abdulkadir's work and this thesis are
 substantial. First, that implementation uses Stanford CoreNLP and
-Weka, which limits access to modern transformer architectures; I
-use Hugging Face Transformers and a fine-tuned BERT. Second, the
+Weka, which limits access to modern transformer architectures;
+VioNER uses Hugging Face Transformers and a fine-tuned BERT. Second, the
 earlier annotated corpus is modest in size, while VioNER trains on
 approximately fifty thousand examples derived from ACLED and
 template augmentation. Third, this thesis develops an explicit
@@ -1424,7 +1431,7 @@ hierarchical taxonomy of African violent events with approximately
 ninety-five terminal categories, curates a knowledge base of armed
 groups and locations, and packages the system as a deployable web
 application; Taye Abdulkadir's work stops at the model boundary.
-Fourth, I address class imbalance explicitly through focal loss and
+Fourth, this thesis addresses class imbalance explicitly through focal loss and
 stratified sampling rather than leaving it to the supervised
 learner.
 
@@ -1448,26 +1455,26 @@ pipeline in VioNER.
 ACLED's own taxonomy is the other obvious precedent for
 hierarchical violence categorisation [8]. ACLED uses two levels —
 event type and sub-event type — with about twenty-five sub-event
-categories in total. I extend that in two directions: depth, by
+categories in total. this thesis extends that in two directions: depth, by
 adding an intermediate Level 2 above and a detailed Level 4 below;
 and breadth, by introducing African-specific categories
 (pastoralist-farmer clashes, communal cattle raiding, post-election
 revenge violence) that ACLED folds into broader buckets. The extra
-depth costs me classification accuracy at the deepest level — it
+depth costs the work classification accuracy at the deepest level — it
 is harder to distinguish a Level 4 "Roadside Ambush" from a
 "Complex Ambush" than to pick a Level 1 — but the trade-off makes
 sense for an operational tool where the analyst can stop at
 whatever level of granularity they trust.
 
 A learned hierarchical classifier could in principle replace the
-rule-based taxonomy assignment I use today. The classical methods
+rule-based taxonomy assignment the work uses today. The classical methods
 [37] split into top-down cascades — one classifier per level,
 conditioned on the parent label — and global classifiers that
 predict the whole path at once. The cascade is easier to debug and
 train incrementally; the global model can recover from a wrong
 upper-level prediction. Either is a meaningful upgrade over the
-rule-based fallback I currently use, and Section 7.5 prioritises the
-cascade variant.
+rule-based fallback currently used by VioNER, and Section 7.5
+prioritises the cascade variant.
 
 ## 3.5 Summary of Gaps Addressed
 
@@ -1502,11 +1509,11 @@ gaps that this thesis addresses.
 2. **Transformer-based NER for African violence.** Prior work in
    this domain has used pattern-based extraction (NEXUS, Tanev et
    al.) or pre-transformer machine learning (Taye Abdulkadir's
-   CoreNLP + Weka). VioNER is, to the best of my knowledge, the
+   CoreNLP + Weka). VioNER is, to the best of available knowledge, the
    first fine-tuned transformer NER model targeted specifically at
    African violent-event 5W1H extraction at the 50,000-example scale.
 3. **African violent-event taxonomy at four levels.** To the best of
-   my knowledge, no prior open taxonomy of African violent events at
+   available knowledge, no prior open taxonomy of African violent events at
    this level of granularity has been published. ACLED's taxonomy
    reaches two levels with approximately twenty-five sub-event
    categories; UCDP and GDELT/CAMEO are coarser-grained. The
@@ -1517,7 +1524,7 @@ gaps that this thesis addresses.
    a learned extractor — used for both validation (flagging
    geographically implausible extractions) and enrichment
    (canonicalising armed-group names, attaching country and region
-   metadata to cities) — is, to the best of my knowledge, a
+   metadata to cities) — is, to the best of available knowledge, a
    contribution.
 5. **Operational packaging.** Prior academic work in this area has
    stopped at the model boundary. NEXUS, Tanev et al., and Taye
@@ -1542,16 +1549,16 @@ and specific technology choices are deferred to Chapter 5.
 
 ## 4.1 Design Principles
 
-Six principles shaped the design. Some I committed to at the start
-of the project; others I learned during development. They are not
-in priority order — they are more like a set of habits I applied
+Six principles shaped the design. Some were committed to at the start
+of the project; others the work surfaced during development. They are not
+in priority order — they are more like a set of habits the application of
 whenever a design question came up.
 
 The first is *grounded supervision*. Every entity type in the
 schema has to be something a human annotator can find verbatim in
-the source text on a reliable majority of occurrences. I learned
+the source text on a reliable majority of occurrences. the work surfaced
 this one the hard way. The original twenty-six-type schema in the
-proposal looked clean on paper. During the November pilot I tried
+proposal looked clean on paper. During the November pilot earlier attempts tried
 to annotate a sample by hand using it, and ran straight into
 EVENT_TYPE — was this an "ambush" or a "raid"? Often both. Often
 neither. The annotator was inferring from context what the article
@@ -1581,7 +1588,7 @@ handles the things rules are good at: looking up which country
 deciding whether an actor and a location are geographically
 plausible together. Pick each tool where it is naturally strongest.
 
-The fourth, which I came to during user-acceptance testing, is
+The fourth, which emerged during user-acceptance testing, is
 that *confidence has to be first-class*. The NER component emits a
 confidence score for every extracted span, derived from the
 averaged sub-token softmax probabilities, and downstream code can
@@ -1600,96 +1607,56 @@ Python script should still be able to drive it.
 The sixth is *reproducibility*, which sounds like a corporate
 checkbox but is actually a working discipline. Datasets, training
 runs, and the final deployment all rebuild from documented scripts
-and configuration. Random seeds are fixed where I can fix them.
-Where I can't — the diversity sampler uses Python's default random
+and configuration. Random seeds are fixed where one can fix them.
+Where one can't — the diversity sampler uses Python's default random
 generator — the random state is logged so the same subset can be
-reconstructed later. This saved me at least twice during
-development when I had to re-derive an experiment from cold.
+reconstructed later. This saved the author at least twice during
+development when it was necessary to re-derive an experiment from cold.
 
 ## 4.2 System Architecture
 
-VioNER follows a fairly standard four-layer architecture, sketched
-in Figure 4.1. At the bottom is the model — the fine-tuned BERT
-checkpoint and the in-process knowledge base it consults at
-inference time. Above that, a FastAPI service exposes the model
-and the supporting data stores through documented HTTP routes; the
-service is the only thing the rest of the world talks to. Below
-the service sits the persistence layer, a PostgreSQL instance that
-holds extracted events, training runs, user accounts, and audit
-trails. On top, the React/TypeScript front-end gives an analyst
-something to click on. Each layer has one job. None of the layers
-knows more about its neighbours than the contract demands.
+VioNER follows a four-layer architecture, summarised in Figure 4.1.
+At the bottom is the model — the fine-tuned BERT checkpoint and
+the in-process knowledge base it consults at inference time. Above
+that, a FastAPI service exposes the model and the supporting data
+stores through documented HTTP routes; the service is the only
+thing the rest of the world talks to. The persistence layer, a
+PostgreSQL instance, holds extracted events, training runs, user
+accounts, and audit trails. On top, the React / TypeScript
+front-end is the interface the analyst drives. Each layer has one
+job, and no layer knows more about its neighbours than the
+contract demands.
 
-```
-+--------------------------------------------------------------+
-|                Presentation: React + TypeScript               |
-|     (training, inference, events, analytics, KB management)   |
-+----------------------------+----------------------------------+
-                             |
-                     HTTPS / JSON
-                             |
-+--------------------------------------------------------------+
-|                  Service: FastAPI + Pydantic                  |
-|   /api/training  /api/inference  /api/events  /api/analytics  |
-|   /api/kb/*      /api/auth       /api/system  /ws/training    |
-+---+--------------------+----------------------+---------------+
-    |                    |                      |
-+---+----+         +-----+------+         +-----+------+
-|  NER   |         |   Event    |         |    KB      |
-| Model  |         |  Store     |         |  Module    |
-|(BERT)  |         |(PostgreSQL)|         |(in-process)|
-+--------+         +------------+         +------------+
-```
+![Figure 4.1: High-level architecture of the VioNER system. The
+presentation layer issues HTTPS/JSON requests to the service
+layer, which orchestrates the NER component, the knowledge base,
+and the persistence layer.](figures/architecture.png)
 
 *Figure 4.1: High-level architecture of the VioNER system*
 
-Figure 4.2 sketches the end-to-end processing pipeline that an
-incoming article traverses.
+Figure 4.2 enumerates the end-to-end processing pipeline that an
+incoming article traverses, from analyst submission through model
+inference and post-processing to event persistence and UI
+rendering. The same diagram replaces the earlier sequence-style
+swim-lane view: each numbered step corresponds to a request /
+response interaction between adjacent components, with steps 1-2
+issued by the presentation layer, steps 3-8 executed inside the
+service layer (the BERT model and the knowledge base are
+co-located in-process for latency), step 9 reaching the
+persistence layer, and step 10 returning the rendered record to
+the analyst.
 
-```
-News  ->  Tokenise  ->  BERT NER  ->  Entity Assembly
-                                          |
-                                          v
-   KB-validated 5W1H Record  <-  Confidence Filter
-                                          |
-                                          v
-                       Taxonomy Classification (post-NER)
-                                          |
-                                          v
-                          PostgreSQL Event Store
-```
+![Figure 4.2: End-to-end processing pipeline from raw news text to
+a persisted, queryable structured event record. Each numbered
+block is one step in the request path.](figures/process_flow.png)
 
-*Figure 4.2: End-to-end processing pipeline from raw news text to
-queryable structured event records*
-
-Figure 4.3 expands the same pipeline as a sequence diagram in which
-each participating component is rendered as a vertical lane.
-
-```
-User      Front-end       Inference API     NER Service       KB        DB
- |             |                |                |             |         |
- |--paste-->   |                |                |             |         |
- |             |--POST /infer-->|                |             |         |
- |             |                |--extract(t)--->|             |         |
- |             |                |                |--BERT fwd-->|         |
- |             |                |                |<--logits----|         |
- |             |                |                |--assemble spans       |
- |             |                |                |--lookup--->  |        |
- |             |                |                |<--canonical--|        |
- |             |                |                |--classify (rules)-->  |
- |             |                |                |<--taxonomy----|       |
- |             |                |<--event record-|             |         |
- |             |                |--save event--------------------------> |
- |             |<--event id-----|                |             |         |
- |<--render----|                |                |             |         |
-```
-
-*Figure 4.3: Sequence of calls during synchronous inference*
+*Figure 4.2: End-to-end processing pipeline*
 
 The boundary between extraction (NER) and post-processing is
 deliberate: it allows the supervised learning problem to be cast
-narrowly, with the schema in 4.3, while still producing a richer
-output by combining the NER result with deterministic knowledge.
+narrowly, with the schema in Section 4.3, while still producing a
+richer output by combining the NER result with deterministic
+knowledge.
 
 ## 4.3 Entity Schema and BIO Encoding
 
@@ -1722,29 +1689,63 @@ actor type, and the surrounding context. COUNTRY is recovered from
 the knowledge base by looking up the most specific WHERE entity
 extracted from the text.
 
-The schema is encoded in BIO format: for each entity type X, two
-labels B-X and I-X are introduced; together with the special O label
-for tokens outside any entity, the model has seventeen output classes.
-The BIO encoding allows the model to mark entity boundaries while
-remaining a flat sequence-labelling problem.
+**Why BIO.** BERT-based NER is fundamentally a per-token
+classification problem: the model emits one label per WordPiece
+position, and the supervised loss is the per-position cross-entropy.
+For a flat-sequence labeller of this kind, the BIO (Beginning,
+Inside, Outside) scheme is the standard encoding because it
+satisfies three properties at once. First, every span of length k
+maps to exactly k labels, so decoding is unambiguous: a B-X opens a
+span, every consecutive I-X extends it, and the first non-matching
+label closes it (Algorithm 4.5, Phase 2). Second, the scheme makes
+adjacent-but-distinct entities of the same type representable — two
+back-to-back ACTOR mentions appear as B-ACTOR followed by another
+B-ACTOR — which a tag set without explicit Beginning markers (such
+as IO) cannot express. Third, the inventory grows linearly in the
+number of entity types: for eight entity types the model needs
+2 * 8 + 1 = 17 output classes, which is small enough to learn well
+on a corpus of the size used in this thesis. Richer schemes such
+as BIOES (which adds explicit End and Single tags) double the
+label inventory without measurable gain on flat-domain NER
+[reference standards in §2.2] and were not adopted.
 
-Figure 4.4 illustrates the encoding on a representative example.
+**How labels are extracted.** Labels are produced by the
+annotation pipeline described in Section 4.6. Each annotated
+example is a (tokens, spans) pair, where tokens is the
+whitespace-and-punctuation tokenisation of the source sentence and
+spans is the list of (start_token, end_token, entity_type) tuples
+recorded by the annotator. The pipeline first initialises a label
+vector of "O" of the same length as tokens, then walks every span
+(s, e, X) and writes "B-X" at position s and "I-X" at every
+position in (s + 1, e]. Because spans are disjoint by construction
+in the source annotations, no token receives more than one label.
+The resulting (tokens, labels) pair is then aligned onto the
+BERT WordPiece tokenisation by Algorithm 4.1, which produces the
+sub-word-level label sequence the loss function consumes. At
+inference time the reverse mapping is applied: the model's
+per-sub-word predictions are converted to spans by the BIO decoder
+in Phase 2 of Algorithm 4.5, and the original character offsets
+recovered by the WordPiece tokenizer are used to slice the span
+surface out of the input text.
 
-```
-Tokens:    "Al"     "Shabaab" "fighters" "killed"   "12"          "civilians" "in"  "Beledweyne" "on"  "Sunday"
-Labels:    B-ACTOR  I-ACTOR   O          B-ACTION   B-CASUALTIES  B-VICTIM    O     B-CITY       O     B-DATE
-```
+Figure 4.3 illustrates the encoding on a representative example by
+laying tokens out in one row and their BIO labels directly beneath
+them.
 
-*Figure 4.4: BIO encoding example for a sentence describing a
+*Figure 4.3: BIO encoding example for a sentence describing a
 violent event. Multi-token entities such as "Al Shabaab" are
-encoded by a leading B- tag followed by I- tags*
+encoded by a leading B- tag followed by I- tags.*
+
+| Token   | Al      | Shabaab | fighters | killed    | 12             | civilians | in | Beledweyne | on | Sunday  |
+|:--------|:--------|:--------|:---------|:----------|:---------------|:----------|:---|:-----------|:---|:--------|
+| Label   | B-ACTOR | I-ACTOR | O        | B-ACTION  | B-CASUALTIES   | B-VICTIM  | O  | B-CITY     | O  | B-DATE  |
 
 There is one wrinkle the encoding has to handle. BERT uses WordPiece
 sub-word tokenisation, so a single annotated word can be split into
 two or three pieces — "Beledweyne" might become "Beled", "##wey",
 "##ne", each with its own row in the input. The labels have to be
 projected onto the sub-words consistently or training will see
-inconsistent signals across runs. The convention I use, formalised
+inconsistent signals across runs. The convention the work uses, formalised
 as Algorithm 4.1 in Section 4.6, carries the original word's label to the
 first sub-word, rewrites any leading B- to I- on subsequent
 sub-words (because only the first sub-word can be the *start* of
@@ -1753,7 +1754,7 @@ and [PAD] so they're ignored by the loss.
 
 ## 4.4 Hierarchical Violent Event Taxonomy
 
-The taxonomy I developed for this thesis is a four-level hierarchy.
+The taxonomy the work developed for this thesis is a four-level hierarchy.
 Level 1 names four broad categories of violence; Level 2 introduces
 eighteen intermediate types nested under them; Level 3 refines those
 into roughly fifty specific event types; and Level 4 adds another
@@ -1765,7 +1766,23 @@ African-specific extensions for pastoralist / farmer clashes and
 communal cattle raiding that none of those frameworks cover at this
 depth. The complete tree is in Annex B; the present section
 summarises Levels 1 and 2 in Tables 4.2 and 4.3 and gives the
-visual outline in Figure 4.5.
+visual outline in Figure 4.4.
+
+**Taxonomy graph definition.** The taxonomy is a directed,
+acyclic, rooted tree. A *node* represents one violent-event
+category and carries a single label string (e.g. "Terrorism") plus
+a hierarchy level in {0, 1, 2, 3}. The root node at level 0 is the
+abstract concept "Violent Events Taxonomy" and never appears as a
+classification target. Level-1 nodes are the four broad violence
+families. Level-2 nodes are intermediate violence types nested
+under exactly one Level-1 parent. Level-3 nodes are terminal
+event categories used at classification time. An *edge* in the
+graph represents the IS-A subsumption relation: an edge from
+parent p to child c means every event classified under c is also
+an instance of p, and every event classified at level k > 0 has
+exactly one path back to the root. A *leaf* is a node with no
+outgoing edges. Figure 4.4 renders Levels 0 through 2; Annex B
+extends the graph to the Level-3 leaves.
 
 *Table 4.2: Level 1 categories of the hierarchical taxonomy*
 
@@ -1785,38 +1802,14 @@ visual outline in Figure 4.5.
 | Communal Violence                | Ethnic/Tribal Conflict; Religious Violence; Resource-Based Conflict; Pastoralist-Farmer Clashes.                   |
 | State Violence Against Civilians | Extrajudicial Killings; State Repression of Protests; Mass Atrocities by State Forces; Forced Displacement by State; Arbitrary Detention with Violence. |
 
-```
-VIOLENT EVENTS TAXONOMY
-|
-|-- POLITICAL VIOLENCE
-|   |-- Rebellion / Armed Insurgency  (Armed Clash, Ambush, Rebel Attack, Forced Recruitment)
-|   |-- Terrorism                     (Bombing, Armed Assault, Hostage-Taking, Assassination, Soft Targets)
-|   |-- Coup and Regime Change        (Military Coup, Coup-Related Violence, Assassination)
-|   |-- Election Violence             (Campaign Violence, Voting Day Violence, Post-Election Violence)
-|   `-- Political Repression          (Protest Suppression, Targeted Killings, Mass Arrests)
-|
-|-- CRIMINAL VIOLENCE
-|   |-- Organised Crime Violence      (Gang Warfare, Assassination, Violence Against Law Enforcement)
-|   |-- Armed Robbery / Banditry      (Highway, Bank/Business, Home Invasion, Cattle Raiding)
-|   |-- Kidnapping for Ransom         (Individual/Family, Maritime/Piracy)
-|   `-- Criminal Gang Violence
-|
-|-- COMMUNAL VIOLENCE
-|   |-- Ethnic/Tribal Conflict        (Ethnic Clash, Ethnic Massacre, Ethnic Revenge Attack)
-|   |-- Religious Violence            (Sectarian Violence, Attack on Religious Community, Site Desecration)
-|   |-- Resource-Based Conflict       (Land, Water, Mining/Resource Extraction)
-|   `-- Pastoralist-Farmer Clashes    (Grazing, Cattle Raiding (Communal), Revenge Raid)
-|
-`-- STATE VIOLENCE AGAINST CIVILIANS
-    |-- Extrajudicial Killings        (Summary Execution, Enforced Disappearance, Torture Death)
-    |-- State Repression of Protests  (Shooting of Protesters, Violent Dispersal Resulting in Deaths)
-    |-- Mass Atrocities                (Massacre by State Forces, Ethnic Cleansing by State)
-    |-- Forced Displacement            (Violent Eviction, Village Burning)
-    `-- Arbitrary Detention            (Violent Mass Arrest)
-```
+![Figure 4.4: Hierarchical taxonomy of African violent events
+(Levels 0-2). The root node "Violent Events Taxonomy" subsumes
+the four Level-1 families, each of which expands into its
+Level-2 child categories. Level-3 terminal categories are shown
+separately in Annex B.](figures/taxonomy_summary.png)
 
-*Figure 4.5: Four-level taxonomy hierarchy (visual outline of Levels 1
-to 3)*
+*Figure 4.4: Hierarchical taxonomy of African violent events,
+Levels 0-2 (Level 3 in Annex B)*
 
 Each terminal category in the taxonomy is documented with a
 definition, classification criteria, distinguishing features, typical
@@ -1838,8 +1831,9 @@ rule-based step in future work.
 ## 4.5 Knowledge Base Design
 
 The knowledge base lives in memory next to the model and is built
-out of three dictionaries: armed groups, locations, and weapons. I
-considered loading it from Postgres at startup but the lookup volume
+out of three dictionaries: armed groups, locations, and weapons.
+Loading it from Postgres at startup was considered, but the lookup
+volume
 during inference is high and an in-memory dict has obvious latency
 advantages; the trade-off is that adding or editing a KB entry
 requires a service restart, which the analyst-facing flows in Section 5.6
@@ -1934,10 +1928,10 @@ greedily picks examples containing at least one of the rare
 entities (VICTIM, ACTION, CASUALTIES) until the rare-class budget
 is met. Second, it picks examples with the highest count of
 distinct entity types. Third, it fills the remaining budget by
-random sampling from what is left. I tried sampling on entity-type
+random sampling from what is left. earlier attempts tried sampling on entity-type
 n-gram diversity instead of distinct-type count and the result was
 marginally better on rare entities but several F1 points worse on
-DATE, so I reverted.
+DATE, so the change was reverted.
 
 ### Augmentation
 
@@ -1958,37 +1952,51 @@ across entity types.
 
 ### Sub-word label alignment
 
-Algorithm 4.1 describes the sub-word alignment used to project
-word-level labels onto BERT WordPiece tokens.
+**Algorithm 4.1: Sub-word label alignment for BIO tagging**
+
+Word-level BIO labels must be projected onto BERT WordPiece sub-word
+tokens so that the supervised loss can be computed at the same
+granularity at which the model produces predictions. Algorithm 4.1
+performs that projection while preserving the BIO invariant that
+each entity span carries exactly one Beginning tag.
 
 ```
----------------------------------------------------------------
-Input:  tokens t[1..n], labels y[1..n], tokenizer T
-Output: aligned_label_ids l[1..m] with m >= n
----------------------------------------------------------------
-enc        <- T(tokens = t, is_split_into_words = True)
-word_ids   <- enc.word_ids()
-l          <- empty list
-prev       <- null
-for each w in word_ids do
-    if w is null then
-        append IGNORE_INDEX (-100) to l
-    else if w != prev then
-        append label2id[ y[w] ] to l                  # first sub-word
-    else                                              # later sub-word
-        label <- y[w]
-        if label starts with "B-" then
-            label <- "I-" + label[2:]                 # B->I transition
-        end if
-        append label2id[ label ] to l
-    end if
-    prev <- w
-end for
-return l
----------------------------------------------------------------
+ 1   Input:  tokens t[1..n], labels y[1..n], tokenizer T
+ 2   Output: aligned label ids l[1..m] with m >= n
+ 3   ---------------------------------------------------------------
+ 4   enc        <- T(tokens = t, is_split_into_words = true)
+ 5   word_ids   <- enc.word_ids()
+ 6   l          <- empty list
+ 7   prev       <- null
+ 8   for each w in word_ids do
+ 9       if w is null then
+10           append IGNORE_INDEX (-100) to l
+11       else if w != prev then
+12           append label2id[ y[w] ] to l                  // first sub-word
+13       else                                              // continuation
+14           label <- y[w]
+15           if label starts with "B-" then
+16               label <- "I-" + label[2:]                 // B -> I transition
+17           end if
+18           append label2id[ label ] to l
+19       end if
+20       prev <- w
+21   end for
+22   return l
 ```
 
-*Algorithm 4.1: Sub-word label alignment for BIO tagging*
+Lines 4-5 invoke the WordPiece tokenizer with the original word
+boundaries preserved and recover the parent-word index of every
+sub-word. Lines 6-7 initialise the output buffer and the previous
+parent-word state. The main loop on lines 8-21 visits every
+sub-word; lines 9-10 mark special tokens (CLS, SEP, padding) with
+the ignore index so they contribute zero gradient. Lines 11-12
+emit the parent's label unchanged for the first sub-word of a
+word, which is the only sub-word that should carry the Beginning
+tag. Lines 13-18 handle every continuation sub-word: the parent's
+label is inherited, but a B-X label is rewritten as I-X so the
+final tag sequence remains BIO-valid. Line 22 returns the aligned
+label sequence at the token granularity the loss function expects.
 
 ### Training hyperparameters
 
@@ -2015,36 +2023,113 @@ The principal hyperparameters are listed in Table 4.5.
 | Gradient clipping         | 1.0               |
 | Device                    | Apple Silicon (MPS) when available, otherwise CUDA or CPU |
 
+**Choice of hyperparameter values.** The values in Table 4.5 fall
+into three groups by how they were set, and each group is
+explained below.
+
+*Defaults inherited from the BERT fine-tuning literature.* The
+learning rate of 2 x 10^-5, weight decay of 0.01, gradient
+clipping of 1.0, and the AdamW optimiser are the values reported
+in Devlin et al. [6] for downstream BERT-base fine-tuning and have
+been reproduced as defaults across the BERT-NER literature; they
+are used here without modification because the corpus and task are
+representative of the regime in which those defaults were
+calibrated. Warmup of 500 steps is the value recommended by the
+Hugging Face `transformers` fine-tuning guide for corpora in the
+50 k-example range.
+
+*Architecture- and data-driven values.* The maximum sequence
+length of 512 is the upper bound BERT-base supports; using the
+maximum eliminates the need to truncate long news articles that
+contain multiple co-located events. The number of labels (17) is
+derived from the schema: two BIO labels per entity type for eight
+entity types, plus the O class. The device choice (MPS, CUDA, or
+CPU in that order of preference) is selected at runtime by the
+auto-detection logic in `backend/config.py` and reflects the
+training hardware available; values are otherwise identical across
+the three.
+
+*Values established empirically on this corpus.* Batch size 16
+combined with gradient accumulation 2 yields an effective batch
+of 32, which was the largest the training workstation
+(64 GB unified memory, MPS device) could fit without out-of-memory
+errors at the 512-token sequence length. Maximum-epochs 10 was
+chosen against the observation in Section 6.3 that validation
+loss bottoms out at epoch 2 on this corpus; the ten-epoch budget
+gives the early-stopping logic five epochs of patience past the
+minimum without wasting compute on long, unproductive runs.
+Early-stopping patience 5 and threshold 0.001 are the values that,
+in pilot runs, caught the overfitting inflection without firing
+prematurely on the small validation-loss oscillations that
+accompany class-weighted focal loss. The focal-loss focusing
+parameter γ = 2.0 is the value Lin et al. [12] report as best for
+moderately imbalanced classification; a single ablation at γ = 1.0
+and γ = 3.0 on a held-out 10 % slice of the training set did not
+improve macro-F1, so γ = 2.0 was retained. Label smoothing of 0.1
+is the standard mild-regularisation value from Szegedy et al. [40]
+and reduced the validation-set variance across re-runs but did not
+materially change the headline F1. The ReduceLROnPlateau scheduler
+parameters (factor 0.5, patience 2) were copied from the same
+pilot study and never independently re-tuned because the early
+stopping logic typically fires before more than one LR reduction
+event occurs.
+
 ### Focal loss with class weighting
 
-The custom loss combines focal loss with inverse-frequency class
-weighting and optional label smoothing. Algorithm 4.4 summarises its
-behaviour.
+**Algorithm 4.4: Focal loss with inverse-frequency class weighting**
+
+The custom loss combines focal loss [12] with inverse-frequency
+class weighting and optional label smoothing. The motivation is the
+severe class imbalance documented in Section 4.6: the O class
+dominates by an order of magnitude over any entity class, and the
+rarest entity classes appear in roughly two percent of token
+positions. Algorithm 4.4 down-weights easily-classified majority
+examples through the focal modulator and amplifies the gradient
+contribution of rare classes through the inverse-frequency weights.
 
 ```
----------------------------------------------------------------
-Input:  logits z[1..N, 1..C], targets y[1..N], class weights α[1..C],
-        focusing parameter γ, ignore index I, label smoothing β
-Output: scalar loss L
----------------------------------------------------------------
-mask[n]   <- (y[n] != I)                for n = 1..N
-N_valid   <- sum(mask)
-log_p     <- log_softmax(z, dim = -1)   # shape N x C
-if β > 0 then
-    y_smooth[n,c] <- (1 - β)·1[c = y[n]] + β/(C - 1)·1[c != y[n]]
-    CE[n]         <- - Σ_c y_smooth[n,c] · log_p[n,c]
-else
-    CE[n] <- - log_p[n, y[n]]
-end if
-p_true[n]   <- exp( log_p[n, y[n]] )
-modulator[n] <- (1 - p_true[n])^γ
-weight[n]    <- α[ y[n] ]
-L_n[n]       <- mask[n] · weight[n] · modulator[n] · CE[n]
-return  ( Σ_n L_n[n] ) / max( N_valid, 1 )
----------------------------------------------------------------
+ 1   Input:  logits z[1..N, 1..C], targets y[1..N],
+ 2           class weights alpha[1..C], focusing parameter gamma,
+ 3           ignore index I, label smoothing beta
+ 4   Output: scalar loss L
+ 5   ---------------------------------------------------------------
+ 6   for n = 1..N do
+ 7       mask[n] <- ( y[n] != I )
+ 8   end for
+ 9   N_valid <- sum(mask)
+10   log_p   <- log_softmax(z, dim = -1)          // shape N x C
+11   for n = 1..N do
+12       if beta > 0 then
+13           y_smooth[n, c] <- (1 - beta) * 1[c = y[n]]
+14                            + beta / (C - 1) * 1[c != y[n]]
+15           CE[n] <- - sum over c of ( y_smooth[n, c] * log_p[n, c] )
+16       else
+17           CE[n] <- - log_p[n, y[n]]
+18       end if
+19       p_true[n]    <- exp( log_p[n, y[n]] )
+20       modulator[n] <- ( 1 - p_true[n] ) ^ gamma
+21       weight[n]    <- alpha[ y[n] ]
+22       L_n[n]       <- mask[n] * weight[n] * modulator[n] * CE[n]
+23   end for
+24   return ( sum over n of L_n[n] ) / max( N_valid, 1 )
 ```
 
-*Algorithm 4.4: Focal loss with inverse-frequency class weighting*
+Lines 6-9 build an ignore mask that suppresses positions tagged
+with the special index -100 (special tokens and continuation
+sub-words excluded by Algorithm 4.1) and count the valid positions
+that will contribute to the denominator. Line 10 converts logits
+to log-probabilities once per batch. The per-position loop on
+lines 11-23 computes the cross-entropy term; lines 12-15 apply
+optional label smoothing by replacing the hard one-hot target with
+a confidence-discounted distribution, while lines 16-17 fall back
+to the standard formulation when smoothing is disabled. Lines
+19-20 compute the focal modulator (1 - p_true)^gamma which is
+small when the model is already confident on the correct class.
+Line 21 selects the inverse-frequency class weight for the
+position's target class. Line 22 combines mask, class weight,
+modulator, and cross-entropy into the position's loss
+contribution. Line 24 averages over valid positions, with the
+max guarding against batches in which every position is masked.
 
 The class weights are computed from the training-set distribution at
 the start of training. The weight for class c is w_c = T / (C * f_c),
@@ -2069,55 +2154,85 @@ over.
 
 ## 4.7 Inference and Post-Processing
 
-At inference time the system has to go from a paragraph of news text
-to a 5W1H record an analyst can read. The full sequence of steps is
-captured in Algorithm 4.5.
+**Algorithm 4.5: Post-NER 5W1H structuring with knowledge-base validation**
+
+Algorithm 4.5 specifies the inference-time pipeline that converts a
+paragraph of news prose into a structured 5W1H event record. The
+algorithm has four phases: token-level classification, span
+construction with BIO decoding, knowledge-base enrichment, and
+taxonomy classification. Each phase corresponds to a contiguous
+block of lines below.
 
 ```
----------------------------------------------------------------
-Input:  text x, NER service M, knowledge base K,
-        per-category thresholds τ[c]
-Output: structured event record R
----------------------------------------------------------------
-(tok, offsets) <- tokenize(x)
-logits         <- M.forward(tok)
-pred[i]        <- argmax_c logits[i, c]                  for all i
-probs[i]       <- softmax(logits[i, ·])                  for all i
-spans          <- empty list
-i <- 1
-while i <= |tok| do
-    if id2label[pred[i]] starts with "B-" then
-        start <- offsets[i].start
-        t     <- label[2:]
-        confs <- [ probs[i, pred[i]] ]
-        j     <- i + 1
-        while j <= |tok| and id2label[pred[j]] == "I-" + t do
-            confs <- confs ++ [ probs[j, pred[j]] ]
-            j     <- j + 1
-        end while
-        end_off <- offsets[j - 1].end
-        spans   <- spans ++ [ (t, start, end_off, mean(confs)) ]
-        i       <- j
-    else
-        i <- i + 1
-    end if
-end while
-spans_filt  <- { s in spans : confidence(s) >= τ[ category_of(s) ] }
-R.entities  <- spans_filt
-R.who, ..., R.how <- group_by_5w1h(spans_filt)
-for each s in R.who do
-    R.who_meta[s]   <- K.armed_groups.lookup(s.surface)
-end for
-for each s in R.where do
-    R.where_meta[s] <- K.locations.lookup(s.surface)
-end for
-R.taxonomy   <- classify_taxonomy(R, K)
-R.confidence <- aggregate_confidence(spans_filt, R.taxonomy)
-return R
----------------------------------------------------------------
+ 1   Input:  text x, NER service M, knowledge base K,
+ 2           per-category thresholds tau[c]
+ 3   Output: structured event record R
+ 4   ---------------------------------------------------------------
+ 5   // Phase 1: token-level classification
+ 6   ( tok, offsets ) <- tokenize(x)
+ 7   logits  <- M.forward(tok)
+ 8   for all i do
+ 9       pred[i]  <- argmax over c of logits[i, c]
+10       probs[i] <- softmax( logits[i, *] )
+11   end for
+12   ---------------------------------------------------------------
+13   // Phase 2: span construction (BIO decoding)
+14   spans <- empty list
+15   i <- 1
+16   while i <= length(tok) do
+17       if id2label[ pred[i] ] starts with "B-" then
+18           start <- offsets[i].start
+19           t     <- label[2..]
+20           confs <- [ probs[i, pred[i]] ]
+21           j     <- i + 1
+22           while j <= length(tok) and id2label[ pred[j] ] == "I-" + t do
+23               append probs[j, pred[j]] to confs
+24               j <- j + 1
+25           end while
+26           end_off <- offsets[j - 1].end
+27           append ( t, start, end_off, mean(confs) ) to spans
+28           i <- j
+29       else
+30           i <- i + 1
+31       end if
+32   end while
+33   ---------------------------------------------------------------
+34   // Phase 3: confidence filtering and 5W1H grouping
+35   spans_filt <- { s in spans : confidence(s) >= tau[ category_of(s) ] }
+36   R.entities <- spans_filt
+37   ( R.who, R.what, R.when, R.where, R.whom, R.how )
+38       <- group_by_5w1h( spans_filt )
+39   ---------------------------------------------------------------
+40   // Phase 4: knowledge-base enrichment and taxonomy
+41   for each s in R.who do
+42       R.who_meta[s] <- K.armed_groups.lookup( s.surface )
+43   end for
+44   for each s in R.where do
+45       R.where_meta[s] <- K.locations.lookup( s.surface )
+46   end for
+47   R.taxonomy   <- classify_taxonomy( R, K )
+48   R.confidence <- aggregate_confidence( spans_filt, R.taxonomy )
+49   return R
 ```
 
-*Algorithm 4.5: Post-NER 5W1H structuring with knowledge-base validation*
+Phase 1 (lines 5-11) tokenises the input prose with character
+offsets retained, runs the BERT-NER model forward, and computes
+both the argmax label and the full softmax distribution for every
+sub-word position; the distribution is kept because the per-span
+confidence is later derived from it. Phase 2 (lines 13-32)
+decodes BIO output into spans: a B-X tag opens a new span, every
+consecutive I-X tag extends it, and the span closes the moment an
+O or a different B-tag appears. Character offsets are taken from
+the tokenizer output so that the recovered span surface can be
+sliced directly out of the original text. Phase 3 (lines 34-38)
+applies the per-category confidence threshold and groups surviving
+spans into the six 5W1H buckets; thresholds are calibrated in
+Section 4.7 of the manuscript. Phase 4 (lines 40-48) enriches WHO
+spans by looking them up against the armed-groups knowledge base
+and WHERE spans against the locations knowledge base, then invokes
+the hierarchical taxonomy classifier and aggregates a record-level
+confidence. The output is the structured record R that the front
+end renders to the analyst.
 
 Confidence thresholds are calibrated per category: WHO and WHOM at
 0.70, WHAT at 0.60, WHEN at 0.80, WHERE at 0.70, HOW at 0.75. The
@@ -2184,10 +2299,9 @@ in Annex D.
 Where Chapter 4 described what VioNER does and why, this chapter
 documents how it actually does it: the technology stack, the data
 preparation flow, the training procedure, the focal-loss
-implementation, the back-end services and API surface, the
-front-end application, and the containerised deployment. Code
-listings are kept short throughout; the full source lives in the
-accompanying repository.
+implementation, the back-end services and API surface, and the
+front-end application. Code listings are kept short throughout;
+the full source lives in the accompanying repository.
 
 ## 5.1 Technology Stack
 
@@ -2235,17 +2349,17 @@ front-end stacks are catalogued in Tables 5.1 and 5.2.
 
 A few of these choices deserve a sentence of explanation.
 
-I picked FastAPI for the back-end because the alternative I almost
-went with — Flask — would have meant hand-writing the OpenAPI
+The choice fell on FastAPI for the back-end because the close
+alternative — Flask — would have meant hand-writing the OpenAPI
 document that the front-end's TypeScript types are generated from.
-FastAPI gives me that document for free out of the Pydantic models
-I already had to write for request validation. Async support is a
-side benefit; the WebSocket route that streams training progress is
-much cleaner with native async.
+FastAPI produces that document for free out of the Pydantic models
+that already had to be written for request validation. Async
+support is a side benefit; the WebSocket route that streams
+training progress is much cleaner with native async.
 
 PyTorch and Hugging Face Transformers were not really a decision. If
 you are fine-tuning BERT in 2026, that is the stack. The closest
-alternative is JAX/Flax, which I considered for about an hour
+alternative is JAX/Flax, which consideration was given to for about an hour
 before deciding the operational maturity of the PyTorch ecosystem
 was worth more than any throughput advantage.
 
@@ -2258,8 +2372,8 @@ learning-curve cost.
 On the front end, React 19 with React Router 7 was the path of
 least resistance for someone who has built React applications
 before. The file-based routing in React Router 7 lined up with the
-file-system layout I would have produced anyway. TailwindCSS plus
-shadcn/ui gave me a component library without committing to a
+file-system layout one would have produced anyway. TailwindCSS plus
+shadcn/ui yielded a component library without committing to a
 heavy design system; the alternative would have been Material UI,
 which is heavier than what an internal monitoring tool needs. Vite
 replaced Create React App for the build pipeline because CRA is
@@ -2267,11 +2381,11 @@ effectively unmaintained and Vite's iteration loop is faster.
 
 ## 5.2 Data Acquisition and Preprocessing
 
-ACLED publishes its data through an open API. I pulled the full
+ACLED publishes its data through an open API. the data were pulled from the full
 African extract — every event coded across the 54 countries since
 their coverage started — and ended up with 212,590 records.
 Anything beyond Africa was filtered out at ingest. The data lives
-on disk as JSONL; that format predates my project and matches what
+on disk as JSONL; that format predates this project and matches what
 ACLED's own export tooling produces.
 
 The `pipeline/preprocessing.py` module turns that raw extract into
@@ -2304,68 +2418,101 @@ Section 5.3.
 
 ## 5.3 Stratified Sampling and Augmentation
 
+**Algorithm 4.2: Stratified diversity sampling for entity coverage**
+
 The `create_training_subset.py` script implements the stratified
-diversity sampling described in Section 4.6 and described in
-Algorithm 4.2.
+diversity sampling that Section 4.6 introduces. The objective is to
+select a training subset that preserves coverage of rare entity
+types while still containing many examples whose annotations span
+multiple entity types — the two properties that empirically
+correlate with downstream macro-F1 on the validation split.
 
 ```
----------------------------------------------------------------
-Input:  Pool P, target size T, rare-entity budget R,
-        diversity budget D, rare set Σ = {VICTIM, ACTION, CASUALTIES}
-Output: Selected subset S with |S| = T
----------------------------------------------------------------
-for each p in P do
-    rare_score[p] <- | { e ∈ entities(p) : type(e) ∈ Σ } |
-    div_score[p]  <- | distinct( type(e) for e in entities(p) ) |
-end for
-P_rare <- top-R items of P ordered by rare_score desc
-P_div  <- top-D items of ( P \ P_rare ) ordered by div_score desc
-P_rest <- random-sample( P \ (P_rare ∪ P_div), T - R - D )
-S      <- P_rare ∪ P_div ∪ P_rest
-return S
----------------------------------------------------------------
+ 1   Input:  Pool P, target size T, rare-entity budget R,
+ 2           diversity budget D,
+ 3           rare set Sigma = { VICTIM, ACTION, CASUALTIES }
+ 4   Output: Selected subset S with |S| = T
+ 5   ---------------------------------------------------------------
+ 6   for each p in P do
+ 7       rare_score[p] <- count of e in entities(p) with type(e) in Sigma
+ 8       div_score[p]  <- count of distinct type(e) for e in entities(p)
+ 9   end for
+10   P_rare <- top R items of P by rare_score, descending
+11   P_div  <- top D items of ( P \ P_rare ) by div_score, descending
+12   P_rest <- uniform random sample of ( P \ ( P_rare U P_div ) ),
+13             size T - R - D
+14   S      <- P_rare U P_div U P_rest
+15   return S
 ```
 
-*Algorithm 4.2: Stratified diversity sampling for entity coverage*
+Lines 6-9 score every candidate example on two axes: the count of
+spans whose entity type is in the rare set, and the count of
+distinct entity types present. Line 10 takes the highest rare
+scorers up to budget R, guaranteeing that the rare types are
+over-represented relative to their natural frequency. Line 11 then
+takes the highest diversity scorers among the remaining pool,
+guaranteeing that the selected subset contains many co-occurring
+entity types. Lines 12-13 fill the remaining slots with a uniform
+random sample to keep the marginal distribution close to the
+natural distribution and to avoid overfitting to the scoring
+heuristics. Line 14 unions the three pools and returns them on
+line 15.
 
 In the production run, T = 35,000, R = 12,000, D = 11,666, and the
-random remainder is 11,334. I arrived at those budgets empirically.
+random remainder is 11,334. the configuration arrived at was those budgets empirically.
 Earlier runs used a fifty-fifty rare-versus-diverse split and
 under-recovered the dominant entities; the current split was the
 first one where the macro and micro F1 numbers moved together.
 
+**Algorithm 4.3: Template-based augmentation**
+
 Augmentation is implemented in `scripts/augment_training_data.py`
-following Algorithm 4.3.
+following Algorithm 4.3. The aim is to enlarge the supervised
+signal for the rare entity types by synthesising examples whose
+surface forms are drawn from the knowledge base but whose
+syntactic structure follows hand-written templates calibrated
+against the observed prose of African violent-event reporting.
 
 ```
----------------------------------------------------------------
-Input:  KB groups G, locations L, weapons W, verb lexicons V,
-        template list T, augmentation budget N
-Output: Synthetic example list A with |A| = N
----------------------------------------------------------------
-A <- empty list
-while |A| < N do
-    tmpl       <- choose_random(T)
-    actor      <- sample compatible group from G for tmpl
-    loc        <- sample location from L matching actor.country
-    verb       <- sample verb from V[ type(tmpl) ]
-    n_k, n_i   <- sample plausible casualty counts
-    text       <- render(tmpl, actor, loc, verb, n_k, n_i)
-    (tok, lbl) <- tokenize_and_bio_label(text, slots)
-    A          <- A ++ [ { tokens: tok, labels: lbl, source: "aug" } ]
-end while
-return A
----------------------------------------------------------------
+ 1   Input:  KB groups G, locations L, weapons W,
+ 2           verb lexicons V, template list T,
+ 3           augmentation budget N
+ 4   Output: Synthetic example list A with |A| = N
+ 5   ---------------------------------------------------------------
+ 6   A <- empty list
+ 7   while |A| < N do
+ 8       tmpl  <- choose_random( T )
+ 9       actor <- sample compatible group from G for tmpl
+10       loc   <- sample location from L matching actor.country
+11       verb  <- sample verb from V[ type(tmpl) ]
+12       ( n_k, n_i ) <- sample plausible ( killed, injured ) counts
+13       text  <- render( tmpl, actor, loc, verb, n_k, n_i )
+14       ( tok, lbl ) <- tokenize_and_bio_label( text, slots(tmpl) )
+15       append { tokens: tok, labels: lbl, source: "aug" } to A
+16   end while
+17   return A
 ```
 
-*Algorithm 4.3: Template-based augmentation*
+Lines 6-7 initialise the accumulator and drive the loop until the
+augmentation budget is exhausted. Line 8 samples a sentence
+template that fixes the syntactic frame. Lines 9-11 fill the
+template slots with knowledge-base-grounded fillers: an armed
+group, a location whose country matches the group's primary area
+of operations, and a verb appropriate to the template type
+(location-taking, victim-taking, or clash). Line 12 samples
+casualty counts from empirically plausible ranges. Line 13 renders
+the surface string and line 14 tokenises it while attaching BIO
+labels to the spans corresponding to template slots. Lines 15-16
+record the example with a provenance tag so that augmented and
+real examples can be distinguished at evaluation time. Line 17
+returns the synthetic example list.
 
 The augmentation budget is 15,000 examples. Combined with the
-35,000 sampled examples, the final training corpus is 50,000. I
-partition it 40,000 / 10,000 into train and validation. That
+35,000 sampled examples, the final training corpus is 50,000. The
+corpus is partitioned 40,000 / 10,000 into train and validation. That
 split is conservative — eighty / twenty is on the validation-heavy
 side of normal practice for token classification, but with rare
-entities at single-digit percentages I wanted enough validation
+entities at single-digit percentages the work required enough validation
 support for VICTIM and CASUALTIES to give stable F1 numbers
 per epoch.
 
@@ -2380,20 +2527,20 @@ catalogue is in Annex E.
 
 The trainer lives in `pipeline/training.py`, organised around a
 single `ViolentEventNER` class that owns the Hugging Face model,
-the tokenizer, the dataset wrappers, and the training loop. I
-considered splitting these into separate modules — model, dataset,
-trainer — but in practice the loop reads everything from the
+the tokenizer, the dataset wrappers, and the training loop.
+Splitting these into separate modules — model, dataset, trainer —
+was considered, but in practice the loop reads everything from the
 config and the indirection of crossing module boundaries on every
 step was not worth it for the scale this thesis operates at.
 
 The constructor takes a `ModelConfig` dataclass holding every
 hyperparameter listed in Table 4.5. Device selection runs in
 order: prefer Apple Silicon GPU (MPS) if available, fall back to
-CUDA, then CPU. The order reflects the hardware I actually used —
-the workstation I trained on is an Apple M-series laptop with 64 GB
-unified memory — and the fallback exists because the training
-script also needs to run on a CUDA box for occasional sanity
-checks. `load_model` instantiates `AutoTokenizer.from_pretrained`
+CUDA, then CPU. The order reflects the hardware actually used —
+the workstation on which training was performed is an Apple
+M-series laptop with 64 GB unified memory — and the fallback
+exists because the training script also needs to run on a CUDA box
+for occasional sanity checks. `load_model` instantiates `AutoTokenizer.from_pretrained`
 and `AutoModelForTokenClassification.from_pretrained` for
 `bert-base-cased`, sets up the 17-label classification head, and
 moves the model to the selected device.
@@ -2414,14 +2561,14 @@ just a running count of epochs since the last improvement in
 validation loss; when the count hits the patience threshold the
 loop exits and the best checkpoint is restored from `best/`.
 
-There is one feature worth highlighting because it saved me time
+There is one feature worth highlighting because it saved the author time
 repeatedly during development: the resume path. `resume_training`
 reads the `training_config.json` from any prior run, locates the
 last epoch folder, and re-enters the loop at the appropriate epoch.
 Combined with the `--extend-epochs` flag (which increments the
-total epoch count of a completed run), it means I never had to
+total epoch count of a completed run), it means there was never a need to
 restart training from scratch after a power cycle or after deciding
-mid-training that I wanted to push the run further.
+mid-training that the work required to push the run further.
 
 ## 5.5 Focal Loss and Class Weighting
 
@@ -2434,7 +2581,7 @@ A few implementation choices in `FocalLoss` are worth flagging.
 Logits arrive shaped `[N, C]` and targets shaped `[N]`; both get
 flattened before any softmax, because PyTorch's `log_softmax` is
 faster on contiguous 2D tensors and the per-token granularity is
-all we need for token classification. Ignored positions
+all that is needed for token classification. Ignored positions
 (`target == -100`) are masked before the softmax computation rather
 than after, which keeps the loss numerically stable when there are
 many padding tokens in a batch. Label smoothing, if turned on, is
@@ -2590,35 +2737,6 @@ mutations go through the back-end and are logged in the audit table.
 
 Screenshots are reproduced in Annex D.
 
-## 5.8 Containerised Deployment
-
-The whole system runs out of a `docker-compose.yml` at the
-repository root. Three services live in that file. There is `db`,
-which is PostgreSQL 16 with a persistent volume. There is
-`backend`, a Python image with the source mounted from the host and
-the model checkpoint mounted in beside it. And there is `frontend`,
-a Node image that builds and serves the Vite app. A health-checked
-startup order keeps the back-end from initialising until the
-database is actually ready to accept connections — without that, the
-service used to come up faster than Postgres and immediately crash.
-
-Configuration is environment-variable-driven. The variables that
-matter day to day are `DATABASE_URL`, `MODEL_PATH`, `CORS_ORIGINS`,
-and `JWT_SECRET`; there are a few feature flags in the same place,
-including `ENABLE_DB_STORAGE`. A `.env.example` file in the repo
-documents the complete set so a new contributor can see at a glance
-what they need to fill in.
-
-Day-to-day development uses two commands. `docker-compose up -d db`
-starts the database in the background, then either `uvicorn
-main:app --reload` plus `npm run dev` runs the back-end and
-front-end natively on the host for fastest iteration, or
-`docker-compose up` brings the whole stack up inside containers.
-For production the stack gets built and pushed to a container
-registry. The production override file that puts TLS termination at
-the reverse proxy is intentionally not included in this thesis —
-deployment-specific secrets live there and they should not.
-
 \pagebreak
 
 # 6. Experimentation and Results
@@ -2650,8 +2768,8 @@ on an Apple Silicon workstation with the configuration in Table 6.1.
 | PyTorch    | 2.6 |
 | Transformers | 4.46 |
 
-A note on what I evaluate against. The validation set is the same
-10,000-example split I set aside at the very start of training and
+A note on what the evaluation against. The validation set is the same
+10,000-example split set aside at the very start of training and
 never touched again — not for hyperparameter tuning, not for
 checkpoint selection, not for sampler tuning. Touching the
 validation set with any of those would invalidate every number
@@ -2663,7 +2781,7 @@ downstream consumer notices. A predicted span counts as correct
 only if its type, start, and end exactly match a gold span;
 partial overlaps count as a false positive plus a false negative.
 The strictness of this scoring is the right choice for the
-operational consumers I have in mind, but as discussed in Section 6.11 it
+operational consumers envisaged, but as discussed in Section 6.11 it
 does make some of the headline numbers look slightly worse than
 they read on inspection.
 
@@ -2740,44 +2858,10 @@ heavily down-weighted.
 
 ## 6.3 Training Dynamics
 
-Figure 6.1 plots training and validation loss across epochs for a
-representative ten-epoch run with focal loss and class weighting
-enabled, and Figure 6.2 plots token-level validation accuracy.
-
-```
-        loss
-   0.020 +
-         |  *  (train)
-   0.015 +   *
-         |    * * * * * * *
-   0.010 + .                                . . . . . (val)
-         |   . . . . . . .
-   0.005 +
-         +---+---+---+---+---+---+---+---> epoch
-             1   2   3   4   5   6   7
-```
-
-*Figure 6.1: Training (`*`) and validation (`.`) loss curves across
-epochs for the representative run. The validation loss reaches its
-minimum at epoch 2 and rises modestly thereafter*
-
-```
-        accuracy
-   97.5% +                            * * *
-         |
-   97.0% +                * * *
-         |         *
-   96.5% +
-         |   *
-   96.0% +
-         |
-   95.5% + *
-         +---+---+---+---+---+---+---+---> epoch
-             1   2   3   4   5   6   7
-```
-
-*Figure 6.2: Token-level validation accuracy across epochs for the
-representative run*
+Table 6.5 reports per-epoch training and validation loss together
+with token-level validation accuracy for a representative ten-epoch
+run with focal loss and class weighting enabled. The best validation
+loss is highlighted in bold.
 
 *Table 6.5: Per-epoch training dynamics for the representative run*
 
@@ -2804,7 +2888,7 @@ loss with class weighting encourages the model to grow more
 confident on examples it already gets right, which pushes accuracy
 up. It also makes the model less calibrated on the minority-class
 boundaries it still gets wrong, which is the cost the loss is
-recording. Reading those two curves against each other gave me the
+recording. Reading those two curves against each other yielded the
 patience setting. Without the loss curve, accuracy alone would
 have led to a longer training run for a worse model.
 
@@ -2828,9 +2912,10 @@ catch.
 
 ## 6.4 Overall Model Performance
 
-Before reporting the headline F1 numbers I want to lay out the
-loss-function comparison, because it is the cleanest way to see
-that the choices I made were the right ones. Table 6.6 reports the
+Before the headline F1 numbers are reported, this section lays out
+the loss-function comparison, because it is the cleanest way to
+see that the design choices were the right ones. Table 6.6 reports
+the
 best validation metrics for four loss configurations under
 otherwise identical hyperparameters — same data, same scheduler,
 same early-stopping, same random seeds.
@@ -2851,7 +2936,7 @@ the validation loss further. Plain cross entropy is the baseline
 at 0.0102. Class-weighted cross entropy alone drops that to 0.0085;
 focal loss alone drops it to 0.0079. The combination — focal loss
 with inverse-frequency class weights — reaches 0.0074, which is
-the lowest validation loss across any configuration I tried. Token
+the lowest validation loss across any configuration earlier attempts tried. Token
 accuracy on that combination is 96.7 percent, and the model
 converges to its best checkpoint in two epochs. These are the
 numbers that motivate the rest of the chapter; per-entity
@@ -2859,9 +2944,9 @@ breakdowns in Section 6.5 explain where the accuracy is actually concentrated.
 
 Adding label smoothing (β = 0.1) on top of the winning
 configuration sounds like it should help, and the literature
-backs that intuition for many tasks, but in my runs it nudged the
+backs that intuition for many tasks, but in the runs reported here it nudged the
 validation loss up to 0.0076 with no meaningful gain in
-calibration. I kept label smoothing in the production
+calibration. the work retained label smoothing in the production
 configuration anyway — its regularising effect is mild and the
 slight loss penalty is well within the run-to-run variation noise
 floor — but it is not the reason the system works.
@@ -2902,7 +2987,7 @@ VICTIM     |============================= 0.817
 
 *Figure 6.3: Per-entity F1 bar chart*
 
-A few patterns stand out when I look at this table.
+A few patterns stand out in this table.
 
 DATE wins by a clear margin. Date expressions in conflict reporting
 follow a small number of patterns ("on Monday", "January 15",
@@ -2923,7 +3008,7 @@ volume.
 
 DISTRICT and VICTIM trail at 0.826 and 0.817. DISTRICT loses most
 of its accuracy to mutual confusion with CITY and REGION — see
-Figure 6.4 in Section 6.11. VICTIM is the harder problem because it is
+Table 6.11 in Section 6.11. VICTIM is the harder problem because it is
 both the rarest entity in the corpus and the entity with the most
 variable phrasing — anything from "civilians" to "ten villagers,
 including women and children" can be the gold span. Augmentation
@@ -2940,12 +3025,12 @@ is the right one for assessing balance.
 
 ## 6.6 Ablation: Focal Loss versus Cross Entropy
 
-This is the ablation I cared about the most going in. The choice
+This is the ablation of greatest interest the most going in. The choice
 between plain cross entropy, weighted cross entropy, focal loss,
 and the focal-loss + weights combination changes the gradient
-signal in different ways, and I wanted to know whether the two
+signal in different ways, and the work required to know whether the two
 imbalance-handling ingredients were genuinely complementary or
-whether one of them carried the other. To find out, I trained
+whether one of them carried the other. To find out, training was performed
 four models with identical data, scheduler, early-stopping, and
 random seeds — only the loss function changed. Per-entity F1
 across the four configurations is in Table 6.8.
@@ -2964,8 +3049,8 @@ across the four configurations is in Table 6.8.
 | CASUALTIES  | 0.853    | 0.871       | 0.872       | 0.885           |
 | **Macro avg** | **0.855** | **0.873** | **0.878** | **0.887**     |
 
-The pattern is unambiguous and is the answer to the question I set
-out to ask. The minority entities — ACTION, VICTIM, CASUALTIES —
+The pattern is unambiguous and is the answer to the question this
+ablation set out to address. The minority entities — ACTION, VICTIM, CASUALTIES —
 are exactly the ones that benefit most from the combination, with
 VICTIM moving by eleven F1 points relative to plain cross entropy.
 Each ingredient on its own helps: weighted cross entropy lifts
@@ -2976,7 +3061,7 @@ is what justifies the slightly more complex loss function in
 production. The high-support entities show smaller, consistent
 improvements across the same axis, and crucially no entity is
 hurt by the focal-loss objective relative to plain cross entropy.
-That last property mattered to me operationally: an imbalance-aware
+That last property mattered  operationally: an imbalance-aware
 loss that protects the rare classes at the cost of the common ones
 would have been a regression for analyst workflows that depend on
 DATE and ACTOR accuracy.
@@ -2987,7 +3072,7 @@ Measuring the value of the KB layer is harder than measuring the
 model. The KB does not directly affect the F1 numbers — it operates
 downstream of the extractor — and the right unit of evaluation is
 not "accuracy" but "did the layer earn its keep on the operational
-side". I picked two concrete metrics for that, one for the
+side". the choice fell on two concrete metrics for that, one for the
 enrichment path and one for the validation path.
 
 The first measures enrichment. Of the high-confidence ACTOR spans
@@ -3006,7 +3091,7 @@ The second measures validation. The KB flags an event as
 geographically suspicious when its extracted CITY's country (per the
 KB) does not match the country implied by its REGION. On the
 validation set, this triggers on **2.4 percent** of multi-entity
-events that have both a CITY and a REGION. When I inspected the
+events that have both a CITY and a REGION. When inspection of the
 flagged cases, most turned out to be either genuine cross-border
 incidents the article was reporting on (one side names a city in
 country A, the other names a region in country B) or extraction
@@ -3021,9 +3106,9 @@ numbers, but the KB layer is doing real work.
 ## 6.8 Inference Latency and Throughput
 
 Speed matters. An analyst on a deadline cannot wait a minute per
-article. To check that VioNER is fast enough, I measured
+article. To check that VioNER is fast enough, measurements were taken of
 single-document latency at three representative article lengths on
-the same Apple Silicon laptop I trained on. Median and
+the same Apple Silicon laptop training was performed on. Median and
 95th-percentile latencies sit in Table 6.9. The numbers are
 encouraging.
 
@@ -3050,7 +3135,7 @@ scheduled job.
 ## 6.9 End-to-End Demonstration
 
 Numbers and confusion matrices only go so far. To show what VioNER
-actually does when you give it real prose, I ran it on a handful
+actually does when you give it real prose, the experiment ran it on a handful
 of recent open-source articles about African violent events and
 captured the extracted records. Three of them are reproduced below,
 chosen because they each exercise a different part of the pipeline:
@@ -3119,7 +3204,7 @@ where the surface form "Al Shabaab fighters" is canonicalised to
 ## 6.10 User Acceptance Testing
 
 The numbers in Section 6.4 to Section 6.9 say the model works. They do not say
-whether anyone can actually use it. To find out, I ran a small
+whether anyone can actually use it. To find out, the experiment ran a small
 user-acceptance test with five participants: two early-warning
 analysts (the primary intended audience), one academic conflict
 researcher (the secondary audience), and two software developers
@@ -3158,7 +3243,7 @@ are scoped into the future-work programme in Chapter 7.
 ## 6.11 Error Analysis
 
 Aggregate metrics tell you the model is good. To understand *how*
-it fails, I sat down with 300 validation-set events on which the
+it fails, an inspection was conducted on 300 validation-set events on which the
 model made at least one mistake and read them one at a time. Five
 patterns emerged, listed below in order of frequency.
 
@@ -3176,7 +3261,7 @@ knows what was meant.
 
 Roughly a quarter of errors are type confusion between the three
 location entities. REGION and CITY, or REGION and DISTRICT, get
-swapped — see Figure 6.4. The hardest cases involve cities that
+swapped — see Table 6.11. The hardest cases involve cities that
 double as regional capitals or districts. Goma is both a city and
 the de-facto centre of North Kivu province, so "fighting in Goma"
 can be tagged either way without more context. The model defaults
@@ -3199,8 +3284,8 @@ WHEN category. Vague phrases like "this morning", "earlier", and
 "in recent days" get tagged as DATE even when the gold annotator
 left them untagged. Raising the WHEN threshold to 0.85 cuts most
 of these at the cost of about 1.2 F1 on legitimate DATE recall,
-which is a trade-off I left to the operator rather than baking it
-into the production threshold.
+which is a trade-off left to the operator rather than baked into
+the production threshold.
 
 The remaining 7 percent are confidence-related drops: the model
 gets the entity right but its averaged sub-token confidence sits
@@ -3209,16 +3294,16 @@ it out (Section 4.7). Lowering the threshold would recover most of these
 at the cost of precision. This is the cleanest dial to turn for
 recall-favouring deployments.
 
-```
-Predicted →   CITY    REGION   DISTRICT
-Gold ↓
-CITY          ----    0.05     0.04
-REGION        0.08    ----     0.06
-DISTRICT      0.07    0.09     ----
-```
+*Table 6.11: Confusion patterns between location entity types
+(fraction of errors of each kind among location-entity errors).
+Rows are gold labels; columns are predicted labels; the diagonal
+is omitted because it represents correct predictions, not errors.*
 
-*Figure 6.4: Confusion patterns between location entity types
-(fraction of errors of each kind among location-entity errors)*
+| Gold \\ Predicted | CITY  | REGION | DISTRICT |
+|:------------------|------:|-------:|---------:|
+| CITY              | —     | 0.05   | 0.04     |
+| REGION            | 0.08  | —      | 0.06     |
+| DISTRICT          | 0.07  | 0.09   | —        |
 
 The error analysis motivates three concrete future-work directions:
 explicit boundary refinement (for example, training a span-level
@@ -3234,16 +3319,16 @@ A few things came out of this evaluation that are worth saying
 plainly.
 
 The most important one, in retrospect, is that dropping EVENT_TYPE
-and COUNTRY from the supervised schema was the right call. I did
-not see this clearly at the start. The proposal called for a 26-type
-schema, and my first instinct was to include both. When I ran the
-grounding pilot in November and saw that EVENT_TYPE values matched
-the source text only sporadically — analysts were inferring event
+and COUNTRY from the supervised schema was the right call. This
+was not apparent at the start. The proposal called for a 26-type
+schema, and the initial instinct was to include both. When the
+grounding pilot ran in November and EVENT_TYPE values matched the
+source text only sporadically — analysts were inferring event
 types from context as often as reading them off the page — the
 choice became obvious. Eight grounded entities trained well; the
-two I dropped are recovered cheaply downstream, EVENT_TYPE from
+two that were dropped are recovered cheaply downstream, EVENT_TYPE from
 action verbs and the taxonomy classifier, COUNTRY from a single KB
-look-up. Had I tried to train the 26-type schema, the rarer types
+look-up. Had earlier attempts tried to train the 26-type schema, the rarer types
 would have dragged down everything else, and the model would have
 been weaker overall.
 
@@ -3251,7 +3336,7 @@ The second thing is that focal loss with inverse-frequency weighting
 genuinely helps the entities that matter operationally. The headline
 numbers in Table 6.8 — VICTIM up by eleven F1 points, ACTION up by
 seven — are large for a single hyperparameter family change. What
-surprised me was that focal loss *alone* and class weights *alone*
+was surprising was that focal loss *alone* and class weights *alone*
 each gave noticeably smaller gains; the two ingredients are
 complementary rather than redundant. The lesson, if it generalises
 to other token-classification tasks with severe imbalance, is to
@@ -3274,21 +3359,22 @@ wanted next (PDF brief export, drag-and-drop upload, live per-entity
 training metrics) are incremental engineering, not redesigns; nothing
 in the feedback suggested the structure of the system was wrong.
 
-It is worth recording what I tried first and abandoned, because the
-final design only makes sense against the things it is not. In
-October 2025 my first training corpus was the full 212,000-event
+It is worth recording what earlier attempts tried first and
+abandoned, because the final design only makes sense against the
+things it is not. In October 2025 the first training corpus was
+the full 212,000-event
 ACLED extract, on the assumption that more data is always better;
 the model that came out of that run actually scored lower on
 rare-entity F1 than later runs on smaller corpora, because the
 duplication of common phrasing in ACLED notes was drowning out the
 rare entities. That is what motivated the stratified diversity
-sampler in Section 5.3. In November 2025 I also spent the better part of
+sampler in Section 5.3. In November 2025 this thesis also spent the better part of
 a week trying to learn EVENT_TYPE as a first-class NER label on the
 original 26-type schema. The grounding pilot at the end of that
 month was the conversation-ender — only about 58 percent of
 EVENT_TYPE annotations could be located verbatim in the source
 text, and the model's per-entity F1 plateaued around 0.4 no matter
-what I tried. The post-NER taxonomy classifier replaced that
+what earlier attempts tried. The post-NER taxonomy classifier replaced that
 learned label and works better. The hybrid statistics-plus-rules
 approach in Section 4.7, which initially felt like a compromise, turned
 out to be a genuine improvement. By December the schema had
@@ -3297,7 +3383,8 @@ the subsequent work was on training-pipeline ergonomics — early
 stopping, ReduceLROnPlateau, the focal-loss variant — rather than
 on the schema itself.
 
-The caveat I keep coming back to is the synthetic augmentation. About
+The recurring caveat in this evaluation is the synthetic
+augmentation. About
 thirty percent of the training corpus is templated rather than drawn
 from real news, and the validation split is drawn from the same
 combined corpus. That makes the reported metrics a fair estimate of
@@ -3311,16 +3398,16 @@ breaks.
 
 Empirical software-engineering work conventionally classifies its
 threats along four axes — construct, internal, external, and
-conclusion. I'll work through them in that order, with the honest
+conclusion. this chapter will work through them in that order, with the honest
 caveats up front rather than buried.
 
-The construct I am measuring is span-level F1 under strict
+The construct the author am measuring is span-level F1 under strict
 boundary matching. Strict matching penalises any boundary error as
 a full miss, which is harsh: an analyst reading the system output
 sees "12 civilians" where the gold span is "at least 12 civilians"
 and reads them as the same fact. Downstream consumers that
 tolerate partial matches will perceive higher effective accuracy
-than my F1 reports. There is also a deeper construct concern: the
+than the F1 reports. There is also a deeper construct concern: the
 eight-entity 5W1H schema captures who, what, where, when, whom,
 and how, but it does not model motivation or outcome. The model
 extracts the structured facts; reasoning about why an event
@@ -3339,23 +3426,23 @@ is therefore more lenient than purely natural news would be. A
 secondary evaluation on a fully held-out natural-news subset is in
 the future-work programme.
 
-External validity is where the limitations bite hardest. I have
+External validity is where the limitations bite hardest. the work has
 not directly evaluated generalisation beyond ACLED-derived
 phrasing. African news outlets vary substantially in stylistic
-conventions, and I do not know what happens to F1 when the input
+conventions, and this thesis does not know what happens to F1 when the input
 is, say, a French-language article machine-translated to English,
 or a Lagos-newspaper feature with a more literary register, or a
 citizen-journalist tweet about a clash. The eleven-F1-point
 VICTIM improvement from focal loss with weighting was measured on
-*my* validation split; it could shrink or grow on truly
+*this* validation split; it could shrink or grow on truly
 out-of-distribution data. The choice of `bert-base-cased` rather
 than a multilingual or African-pre-trained backbone is the other
 half of this limitation — the system is bound to English-language
 reporting until that swap happens (Section 7.5).
 
-On conclusion validity, the per-entity F1 numbers I report are
-single-run point estimates. I did not formally measure variation
-across random seeds, though I ran the full pipeline enough times
+On conclusion validity, the per-entity F1 numbers this chapter reports are
+single-run point estimates. this thesis did not formally measure variation
+across random seeds, though the experiment ran the full pipeline enough times
 during development to know the macro F1 wobbles by roughly ±0.5
 between runs. A formal multi-seed evaluation is in future work.
 Latency numbers are medians and 95th percentiles over a fixed
@@ -3372,7 +3459,7 @@ read, and the gaps that Section 7.5 prioritises closing.
 
 # 7. Conclusions, Recommendations, and Future Work
 
-This is the wrap-up chapter. I use it for five things, more or less
+This is the wrap-up chapter. the work uses it for five things, more or less
 in this order: a short summary of what was actually built; an
 explicit walk through the research questions from Chapter 1 with
 the answers Chapters 4 to 6 produced; the list of contributions the
@@ -3496,13 +3583,13 @@ without ML-specific assistance.
 ## 7.3 Contributions
 
 Pulling the threads together, the thesis leaves behind a handful of
-artefacts that I think can stand on their own outside the
+artefacts that it is held can stand on their own outside the
 dissertation.
 
 The first is the schema itself. The eight-entity BIO schema came out
 of pilot work on grounding rates, and the inclusion and exclusion
 criteria for each entity type are documented at the level of detail
-needed to annotate consistently — Annex A captures them. I think of
+needed to annotate consistently — Annex A captures them. it is held of
 this as a contribution because most published schemas in the violent
 events space gloss over the boundary between what should be tagged
 and what should not, and that boundary is where most disagreement
@@ -3555,11 +3642,11 @@ makes the system reproducible rather than merely available.
 These are addressed to organisations weighing adoption of VioNER —
 or any comparable extraction system — in operational early
 warning, humanitarian response, or research. They are written less
-as marketing claims than as the cautions I would offer in a
+as marketing claims than as the cautions one would offer in a
 conversation with someone about to deploy this work in their own
 context.
 
-The first thing I would say is the obvious one — treat the extraction
+The first thing one would say is the obvious one — treat the extraction
 output as a triage layer rather than a final product. The model is
 good enough to triage incoming news into something an analyst can
 work with much faster than they could from raw articles, but it is
@@ -3568,7 +3655,7 @@ with real consequences is about to be made on top of an extraction.
 The confidence scores and the KB-flagged inconsistencies exist to
 make this triage decision visible, and they should be surfaced in
 whatever analyst workflow the system feeds into. Pretending the
-output is finished is the failure mode I would worry about most.
+output is finished is the failure mode one would worry about most.
 
 Second: keep the knowledge base alive. Armed groups in Africa change
 names, splinter, recombine, and occasionally reconcile. Country and
@@ -3582,7 +3669,7 @@ this in working order without anything heroic.
 Third — and this one is more cultural than technical — co-design the
 taxonomy with the people who actually use it. The four-level tree in
 this thesis is principled and well-defined, but operational use is
-the only place gaps and duplications actually surface. I would build
+the only place gaps and duplications actually surface. one would build
 in a review cycle with end users every six to twelve months, treat
 the taxonomy as a versioned document, and resist the urge to expand
 it faster than you can re-annotate the training data.
@@ -3594,8 +3681,8 @@ demand, and the engineering cost of getting from the former to the
 latter is not, today, justified by the operational benefit. This may
 change as the model gets larger or the consumer base shifts.
 
-The last recommendation is the one I would prioritise above any of
-the others if I were starting over: plan for multilingual extension
+The last recommendation is the one one would prioritise above any of
+the others if the work were to start over: plan for multilingual extension
 from the outset. A large share of African conflict reporting is in
 French, Arabic, Portuguese, and various African languages, and a
 monolingual extractor — even a good one — leaves that signal on the
@@ -3605,8 +3692,8 @@ gap.
 
 ## 7.5 Future Work
 
-There are more next steps than I can do in any reasonable time
-frame, so I have ordered them by what I think buys the most for
+There are more next steps than one can do in any reasonable time
+frame, so they have been ordered them by what it is held buys the most for
 the next six to twelve months of work. The high-priority items are
 the ones that close the most operationally significant gaps; the
 medium-priority items improve quality and usability without
@@ -3616,7 +3703,7 @@ solved for the system to be useful.
 
 ### High priority
 
-The thing I would do first is multilingual extension. A multilingual
+The thing one would do first is multilingual extension. A multilingual
 backbone like XLM-RoBERTa or AfroLM, fine-tuned on parallel corpora
 drawn from African news outlets and ACLED's multilingual coverage,
 would push the system into French, Arabic, and Portuguese and would
@@ -3647,7 +3734,7 @@ DISTRICT and VICTIM.
 
 ### Medium priority
 
-There are four directions I would group as medium priority. The
+There are four directions one would group as medium priority. The
 first is an active-learning loop with human-in-the-loop annotation:
 an interface that selects low-confidence extractions or KB-flagged
 inconsistencies for human review and feeds the corrected data back
@@ -3675,7 +3762,7 @@ high throughput, though the latency budgets in Section 6.8 already
 cover most realistic batch loads. Multimodal extraction — pulling
 event information from images and videos accompanying news reports —
 is technically interesting but operationally orthogonal; the
-analysts I spoke with would happily defer it. Predictive analytics
+analysts consulted during user testing would happily defer it. Predictive analytics
 on the accumulated event store (forecasting short-term spikes in
 violence, conditioned on the structured history) is the most
 research-flavoured item on the list. And production hardening —
@@ -3684,9 +3771,9 @@ control, audit logging — is enterprise plumbing rather than
 research, but would be the gating work before any sustained
 operational deployment.
 
-Reading the list back, what jumps out to me is how much of it is
+Reading the list back, what jumps out  is how much of it is
 incremental engineering rather than fundamental research. That is
-the right shape, I think. The hard methodological choices — the
+the right shape, it is held. The hard methodological choices — the
 schema, the loss function, the post-NER architecture — were made in
 this thesis, and what remains is mostly the kind of work that
 gets done once you have a working baseline to push on.
@@ -3984,15 +4071,29 @@ deterministically from CITY and REGION via the knowledge base.
 
 ## Annex B: Hierarchical Taxonomy of African Violent Events
 
-This annex reproduces, in full, the taxonomy I developed during the
+This annex reproduces, in full, the taxonomy developed during the
 literature-review phase of this thesis. The taxonomy is the result
-of my own synthesis of ACLED [8], UCDP [9], and the PMVE
+of a synthesis of ACLED [8], UCDP [9], and the PMVE
 ontology [29], extended with African-specific categories (notably
 pastoralist-farmer clashes and communal cattle raiding) that the
 three external frameworks do not cover at this depth. It was
 maintained as a separate working document during development and is
-preserved here verbatim as the canonical reference for Section 4.4. Level 4
+preserved here as the canonical reference for Section 4.4. Level 4
 subtypes are listed only where they apply.
+
+Figure B.1 shows the hierarchical graph in full, including the
+Level-3 terminal categories that Figure 4.4 in Section 4.4 omitted
+for legibility. The flat listing that follows the figure documents
+each Level-2 category's terminal members verbatim and is the
+authoritative reference for the classifier rules of Section 4.4.
+
+![Figure B.1: Full hierarchical taxonomy of African violent events,
+Levels 0-3. The root subsumes four Level-1 families; each expands
+into Level-2 categories, which in turn expand into the Level-3
+terminal categories the post-NER classifier targets.](figures/taxonomy_annex.png)
+
+*Figure B.1: Hierarchical taxonomy of African violent events,
+Levels 0-3*
 
 ### Level 1: POLITICAL VIOLENCE
 
@@ -4200,38 +4301,80 @@ maintained in `backend/pipeline/kb.py`.
 
 ## Annex D: System Screenshots
 
-This annex collects representative screenshots of the deployed web
-application. Each screenshot illustrates one of the main route
-groups described in Section 5.7. Screenshots in the printed
-submission are reproduced in greyscale; full-colour versions are
-provided on the accompanying CD per Annex D of the AAU thesis
-guideline.
+This annex collects screenshots of the deployed web application.
+Each screen illustrates one of the main route groups described in
+Section 5.7. Screenshots in the printed submission are reproduced
+in greyscale; full-colour versions are provided on the accompanying
+CD per Annex D of the AAU thesis guideline.
 
-- **D.1 Inference screen.** Pasted text in the left panel,
-  highlighted entities and 5W1H breakdown on the right, confidence
-  scores on hover.
-- **D.2 Inference document upload.** Drag-and-drop upload area,
-  processing status, extracted entity table.
-- **D.3 Training run list.** Sortable, filterable table of past runs
-  with model, dataset, status, best epoch, and final validation loss.
-- **D.4 Training run detail with live progress.** Real-time chart of
-  training and validation loss, epoch progress bar, scrolling log
-  output, cancellation control.
-- **D.5 Event browser.** Paginated event table with structured
-  filters (date range, country, region, taxonomy), inline preview of
-  extracted entities.
-- **D.6 Event detail.** Source text with inline entity highlights,
-  structured 5W1H table, KB enrichment fields, taxonomy assignment,
-  edit controls.
-- **D.7 Analytics dashboard.** Events per region (bar chart), top
-  actors (horizontal bar), events over time (line chart), casualty
-  totals (stat cards).
-- **D.8 Knowledge base – Actors.** Searchable list of armed groups
-  with edit form for canonical name, aliases, country, region, type,
-  active flag.
-- **D.9 Knowledge base – Taxonomies.** Tree view of the four-level
-  taxonomy with category definitions, decision rules, and worked
-  examples.
+**D.1 Inference screen** — analyst pastes article text in the left
+panel; the right panel renders the extracted 5W1H entities with
+their entity-type chips, per-entity confidence, knowledge-base
+enrichment for the WHO and WHERE entries, and the post-NER
+taxonomy assignment.
+
+![Figure D.1: Inference screen with pasted article (left) and
+populated 5W1H extraction (right)](figures/screenshot_d1_inference.png)
+
+\pagebreak
+
+**D.3 Training run list** — sortable, filterable table of past
+training runs showing the model checkpoint, dataset, status,
+epochs completed, and best validation loss. Status colour-codes
+completed (green) and currently-running (amber) jobs.
+
+![Figure D.3: Training run list with eight completed and one
+running job](figures/screenshot_d3_training_list.png)
+
+\pagebreak
+
+**D.4 Training run detail with live progress** — per-epoch loss
+chart for the running job, real-time metric cards, training-log
+tail streamed over the `/ws/training/{id}` WebSocket route, and a
+cancellation control.
+
+![Figure D.4: Live training-run detail screen with loss chart,
+metric cards, and streaming log](figures/screenshot_d4_training_detail.png)
+
+\pagebreak
+
+**D.5 Event browser** — paginated event table with structured
+filters (date range, country, region, taxonomy, minimum
+confidence) and inline preview of every event's extracted
+entities.
+
+![Figure D.5: Event browser with date / country / taxonomy
+filters and a paginated result table](figures/screenshot_d5_event_browser.png)
+
+\pagebreak
+
+**D.7 Analytics dashboard** — aggregate views computed over the
+last 30 days: top-line stat cards, events-by-region horizontal
+bars, events-over-time line chart, and a ranked top-actors panel.
+
+![Figure D.7: Analytics dashboard with stat cards, regional
+distribution, time series, and top-actors
+panel](figures/screenshot_d7_analytics.png)
+
+\pagebreak
+
+**D.8 Knowledge base — Actors** — searchable list of curated armed
+groups with an edit form for canonical name, aliases, country,
+region, group type, and active flag. Edits trigger a service-side
+reload of the in-memory KB.
+
+![Figure D.8: Knowledge base Actors editor with a list pane and an
+edit form for the selected entry](figures/screenshot_d8_kb_actors.png)
+
+\pagebreak
+
+**D.9 Knowledge base — Taxonomies** — tree view of the four-level
+taxonomy with each category's definition, classification cues,
+decision rules for ambiguous cases, and worked examples.
+
+![Figure D.9: Knowledge base Taxonomies view showing the
+hierarchical tree (left) and the selected category's definition,
+cues, rules, and examples (right)](figures/screenshot_d9_kb_taxonomies.png)
 
 ### Database schema (PostgreSQL)
 
@@ -4438,10 +4581,10 @@ scale, where 1 means strongly disagree and 5 means strongly agree.
 4. The knowledge-base enrichment (canonical names, country lookups)
    added value beyond raw extraction.
 5. The training screen made it easy to start and monitor a run.
-6. The analytics views answered the kinds of questions I would
+6. The analytics views answered the kinds of questions one would
    typically ask.
-7. The taxonomy assignment matched my classification of the event.
-8. The system response times felt acceptable for my use case.
+7. The taxonomy assignment matched the classification of the event.
+8. The system response times felt acceptable for the use case.
 
 ### Open-ended questions
 
