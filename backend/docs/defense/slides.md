@@ -42,7 +42,7 @@ Open with the title. Greet the panel by name. One sentence: "Good morning, disti
 8. **Contributions, limitations, future work**
 
 <!--
-Walk the panel through the structure in roughly 45 seconds. Emphasise that the talk has three centres of gravity: the problem framing, the methodological choices, and the evaluation. Mention that there is a backup deck after slide 26 with deeper detail on anything they want to drill into. Cue them to interrupt with clarifying questions even during the talk. Then move on. Do not linger.
+Walk the panel through the structure in roughly 45 seconds. Emphasise that the talk has three centres of gravity: the problem framing, the methodological choices, and the evaluation. Mention that there is a backup deck after slide 39 with deeper detail on anything they want to drill into. Cue them to interrupt with clarifying questions even during the talk. Then move on. Do not linger.
 -->
 
 ---
@@ -63,7 +63,42 @@ Walk the panel through the structure in roughly 45 seconds. Emphasise that the t
 - Even a partial reduction in the cost of producing one structured record translates almost one-to-one into **faster, broader, more consistent monitoring**.
 
 <!--
-This slide sets the stakes. The panel needs to believe two things by the end of it: (1) the problem is real, large, and operational — not just academic; (2) reducing analyst time is the right place to apply machine learning. Mention AU-CEWS by name because it grounds the problem in an actual continental institution. Don't get drawn into ACLED-vs-GDELT methodology comparisons here — that's slide 6's job. Aim for 60 seconds.
+This slide sets the stakes. The panel needs to believe two things by the end of it: (1) the problem is real, large, and operational — not just academic; (2) reducing analyst time is the right place to apply machine learning. Mention AU-CEWS by name because it grounds the problem in an actual continental institution. Don't get drawn into ACLED-vs-GDELT methodology comparisons here — that's the related-work slide's job. Aim for 60 seconds.
+-->
+
+---
+
+## The cost of the manual pipeline
+
+| Metric | Estimate |
+|:--|--:|
+| Violent events reported across African outlets per year | **≈ 30,000** |
+| Mean analyst time to convert one article → structured record | **15–25 min** |
+| Total analyst-hours required for full annual coverage | **≈ 10,000 hrs** |
+| Equivalent in full-time analysts (pure coding) | **≈ 5 FTE** |
+| Time-to-record during a surge week (e.g. Sudan, Apr 2023) | **days to weeks** |
+
+> *Every minute saved per article ≈ 500 analyst-hours recovered per year.*
+
+<!--
+This slide quantifies the bottleneck. Without it, "the analyst is slow" is just an assertion; with it, the panel sees the scale. Walk down the table one row at a time, pausing on the FTE number. The closing italic line is the leverage argument — automation here is high-leverage precisely because the manual work is so repetitive. Around 65 seconds.
+-->
+
+---
+
+## A day in the analyst's life
+
+> **08:30** — 42 new articles in the overnight RSS feed.
+> **09:00** — opens article 1. Reads, identifies actors, victims, location, date, casualty figures. Cross-references the actor against an internal armed-group list. Logs the event into a spreadsheet.
+> **09:20** — record complete. *Article 1 of 42 done.*
+> **12:00** — lunch break. 7 articles logged.
+> **17:00** — end of day. **15 of 42** complete. The rest queue overnight.
+> **Tomorrow** — another 42 will arrive.
+
+**The structural problem:** the article queue grows faster than the analyst can drain it. During a crisis, the backlog can reach **weeks**.
+
+<!--
+This slide humanises the problem. The bullet timeline reads like a diary — let the panel feel the workday. Read each timestamp aloud, briefly. The closing bottom line names the structural problem: it is not that any individual analyst is slow; it is that the inbound rate exceeds any sustainable analyst rate. VioNER is the response to that structural mismatch. Around 70 seconds.
 -->
 
 ---
@@ -86,8 +121,10 @@ This slide sets the stakes. The panel needs to believe two things by the end of 
 
 *Generic NER misses the African actor and the operational role distinctions.*
 
+**§1.3 decomposes this into three sub-problems:** *domain-specific NER* · *severe class imbalance* (78 % O tokens) · *operational packaging* (model alone ≠ analyst capability).
+
 <!--
-This is the slide that makes the problem concrete. Read the example sentence verbatim — it lands harder than paraphrasing it. Walk the table top to bottom slowly; one beat per row. End with the punchline: generic off-the-shelf NER tagged Al-Shabaab as ORGANISATION (technically correct, operationally useless) and missed the convoy as a victim entirely. That gap is what this thesis closes. Around 75 seconds.
+This is the slide that makes the problem concrete. Read the example sentence verbatim — it lands harder than paraphrasing it. Walk the table top to bottom slowly; one beat per row. Land the punchline: generic off-the-shelf NER tagged Al-Shabaab as ORGANISATION (technically correct, operationally useless) and missed the convoy as a victim entirely. Then read the §1.3 line below the caption SLOWLY — it tees up the methodology slide that comes after the RQs. Around 80 seconds.
 -->
 
 ---
@@ -115,6 +152,41 @@ Four questions, one per beat. RQ1 is about schema design — what we even try to
 
 ---
 
+## Methodological frame: design science
+
+<div class="columns">
+<div>
+
+![w:100%](assets/methodology.png)
+
+*Hevner et al. (2004); Peffers et al. (2007).*
+
+</div>
+<div>
+
+**Three iteration loops as evidence (§1.5):**
+
+| Loop | What changed | When |
+|:--|:--|:--|
+| **Corpus** | Full 212k ACLED → 50k stratified | Oct → Nov 2025 |
+| **Schema** | 26 → 8 grounded entities | Nov → Dec 2025 |
+| **Loss** | Cross-entropy → focal + weights | Jan → Feb 2026 |
+
+Each loop closed by **empirical evidence**, not preference:
+
+- Corpus loop: rare-entity F1 dropped on the full extract
+- Schema loop: grounding pilot scored EVENT_TYPE at 58 %
+- Loss loop: ablation in §6.6 showed +11 F1 on VICTIM
+
+</div>
+</div>
+
+<!--
+This is the slide that answers "what is your methodological frame and why is it design science." Three beats. (1) Point at the cycle figure on the left: this is the Hevner/Peffers design-science loop — build an artefact, evaluate it, learn from the evaluation, refine, and go around again. The contribution is the artefact, evaluated empirically at each stage. That is the textbook definition. (2) Show the iteration table on the right — three concrete loops over five months, each closed by hard evidence rather than preference. The corpus loop: full ACLED gave WORSE rare-entity F1 than a stratified subset because of phrasing repetition; that was the empirical signal that drove the redesign. The schema loop: the November grounding pilot showed EVENT_TYPE could be located verbatim in only 58 percent of cases — that killed the 26-entity schema and led to the 8-entity version. The loss loop: the focal-vs-CE ablation in section 6.6 quantified the benefit at 11 F1 points on VICTIM. (3) Close: this is not a single-shot build. It is an iterated artefact, with iteration evidence reported in the thesis. That is what makes the methodology defensible as design science rather than just engineering. About 95 seconds.
+-->
+
+---
+
 <!-- _class: divider -->
 
 # 3. Related Work and the Gap
@@ -137,19 +209,37 @@ This 2x2 is the most efficient way to position the work. Walk across the rows to
 
 ---
 
-## The gap this thesis closes
+## What has been tried — and where each falls short
 
-> Most African event-extraction work **stops at the model boundary**. The artefact published is the model; the operational layer — schema, KB, validation, UI, deployment — is treated as an implementation footnote.
+| System | What it does | Why it falls short here |
+|:--|:--|:--|
+| **ICEWS** *(Lockheed/DARPA)* | Automated event extraction from global news | Generic schema; not Africa-tuned; closed pipeline |
+| **GDELT** | Planetary-scale event tracking | Low precision; sentiment-based; no structured 5W1H |
+| **ACLED** | Gold-standard hand-coded African conflicts | **Hand-coded** — exactly the bottleneck this thesis attacks |
+| **Prior African NER** *(Masakhane, AfriBERTa fine-tunes)* | Token-level entity tagging on African languages | Stops at the model; no KB, no operational layer |
+| **Generic BERT NER** *(spaCy, HuggingFace heads)* | Strong English entity tagging | Doesn't know African armed groups; no 5W1H grouping |
 
-This thesis treats the **operational layer as a first-class research output**:
-
-1. A schema chosen for **grounding rate**, not theoretical neatness
-2. A **focal-loss + class-weight** training recipe that protects rare entities
-3. A curated KB that **validates and enriches** extractions post-hoc
-4. A **deployable web platform** for non-ML users
+> *None combine **Africa-tuned extraction** with **operational packaging**.*
 
 <!--
-This is the slide that says what's new. State the gap claim out loud — "stops at the model boundary" — then read each numbered item slowly. The panel will likely probe item 1 (why these eight entities, not the proposal's twenty-six) and item 3 (does the KB actually move the needle). Slide 8 and slide 14 answer both. Don't rush. 75 seconds.
+This slide shows the panel that prior work has been surveyed thoroughly. Walk row by row. Pause briefly on ACLED — it is the closest cousin to this work, and its strength (gold-standard quality) is also its weakness (it requires the very manual labour this thesis tries to reduce). The italic bottom line is the wedge: no existing system gives you BOTH the African specificity AND the operational packaging. About 75 seconds.
+-->
+
+---
+
+## The four-part gap this thesis closes
+
+> Most African event-extraction work **stops at the model boundary**. The schema, the imbalance handling, the knowledge base, and the deployable interface are treated as implementation footnotes.
+
+| # | Gap | What it means concretely | How VioNER addresses it |
+|:-:|:--|:--|:--|
+| 1 | **Grounding-based schema** | Most schemas tag what annotators *infer* (motive, intent); training on inference is noisy | 8-entity schema where every label is **verbatim** in source text |
+| 2 | **Imbalance-aware training** | 78 % of tokens are non-entity; plain cross-entropy drowns rare classes | Focal loss + **inverse-frequency class weights** |
+| 3 | **Curated KB layer** | Models alone can't tell you that "Al-Shabaab in DRC" is implausible | 150 armed groups + 200 cities + taxonomy used for **validate & enrich** |
+| 4 | **Deployable platform** | Most academic work ships a checkpoint, not a system | FastAPI + React + Postgres, **non-ML-user operable** |
+
+<!--
+This is the slide that names what's new, with one row per gap. Read each row top to bottom: gap name (bold) → what the gap means in concrete terms → how this thesis closes it. The four rows are the four substantive contributions of the thesis, each tied to a piece of the system the panel will see in the approach section. About 85 seconds.
 -->
 
 ---
@@ -251,7 +341,7 @@ with $\gamma = 2.0$, $w_c \propto 1/\text{freq}(c)$.
 **Why both.** Class weights *raise the gradient* for rare classes; focal loss *suppresses easy-negative gradients*. The two are **complementary**, not redundant — Section 6.6 ablation confirms this empirically.
 
 <!--
-Loss function is the technical heart of the work. The intuition: 78% of all tokens are O (outside any entity). Plain cross-entropy treats those as equal to actual entity tokens, so the gradient signal for rare classes like VICTIM gets drowned out. Class weights scale up the rare-class gradients. Focal loss further down-weights the easy correct O predictions so the model spends more capacity on hard cases. Crucially, in the ablation on slide 18, focal alone gets us partway, weights alone get us partway, but the combination gets us further than either — they are complementary. This is RQ2's headline answer. 100 seconds.
+Loss function is the technical heart of the work. The intuition: 78% of all tokens are O (outside any entity). Plain cross-entropy treats those as equal to actual entity tokens, so the gradient signal for rare classes like VICTIM gets drowned out. Class weights scale up the rare-class gradients. Focal loss further down-weights the easy correct O predictions so the model spends more capacity on hard cases. Crucially, in the ablation on slide 29, focal alone gets us partway, weights alone get us partway, but the combination gets us further than either — they are complementary. This is RQ2's headline answer. 100 seconds.
 -->
 
 ---
@@ -293,7 +383,50 @@ This slide answers RQ3. The KB is the layer most papers skip. It plays two roles
 **Class imbalance.** ~78 % O · ~22 % entity. Within entities, ACTOR + CITY + DATE dominate; VICTIM, ACTION, CASUALTIES single-digit-%.
 
 <!--
-Three honest beats here. (1) Where the data comes from: ACLED open data, filtered by stratified diversity sampling rather than naive random sampling, because the full 212,000-event extract had so much repetition of common phrasings that rare entities got drowned out — I learned that the hard way in October 2025. (2) Why augmentation: template-based filling of the rare-class gap, ~15k synthetic examples to lift VICTIM, ACTION, CASUALTIES off the floor. (3) Class imbalance: the central modelling challenge — 78 % outside tokens, with the operationally most important entities being the rarest. This is what motivates focal loss + class weights from slide 13. 90 seconds.
+Three honest beats here. (1) Where the data comes from: ACLED open data, filtered by stratified diversity sampling rather than naive random sampling, because the full 212,000-event extract had so much repetition of common phrasings that rare entities got drowned out — that was the empirical trigger for the corpus loop you saw on the methodology slide. (2) Why augmentation: template-based filling of the rare-class gap, ~15k synthetic examples to lift VICTIM, ACTION, CASUALTIES off the floor. (3) Class imbalance: the central modelling challenge — 78 % outside tokens, with the operationally most important entities being the rarest. This is what motivates focal loss + class weights from the training-recipe slide. Cue the next slide: "the natural question is whether 50,000 examples is enough and whether they are clean enough — that is the data-quality slide next." 90 seconds.
+-->
+
+---
+
+## Data: enough, and good enough
+
+<div class="columns">
+<div>
+
+**Volume defence**
+
+| Corpus | Sentences | This work |
+|:--|--:|:--|
+| CoNLL-2003 (English) | ~22 k | 2.3× more |
+| MIT Movie NER | ~12 k | 4.2× more |
+| OntoNotes 5.0 (full) | ~1.6 M tokens | — |
+| **VioNER fine-tune** | **50 k** | **standard NER scale** |
+
+*Sample-size sensitivity analysis in §5.2: macro F1 plateaus at ~35 k examples.*
+
+</div>
+<div>
+
+**Quality defence**
+
+| Metric | Value |
+|:--|--:|
+| Cohen's κ (200-doc pilot) | **0.78** *(substantial)* |
+| Pilot rounds | 6 |
+| Disagreement reduction | 0.40 → 0.22 |
+| 10 % spot-check error rate | 3.2 % → corrected to ~1 % |
+
+**Held-out integrity**
+
+- Article-level 80/20 split
+- Hash-based deduplication *before* split
+- Train/val template pools partitioned
+
+</div>
+</div>
+
+<!--
+This is the data-rigor slide. Two columns. (1) Volume defence on the left: the question the panel will ask is "is 50k examples enough or too few." Answer: 50,000 fine-tuning examples is more than 2x CoNLL-2003 (the canonical English NER benchmark) and 4x MIT Movie NER (a similar narrow-domain NER task). It's smaller than OntoNotes 5.0, which has 1.6M tokens, but OntoNotes is a general-domain corpus of an entirely different scale and purpose. Critically: section 5.2 reports a sample-size sensitivity analysis where macro F1 plateaus around 35,000 examples — beyond that, additional data gives diminishing returns. 50k is on the right side of that plateau. (2) Quality defence on the right: Cohen's kappa of 0.78 on a 200-document pilot, which is substantial agreement on the Landis-Koch scale. Six pilot rounds were needed to get there — the guidelines went from 9 pages to 31 pages over those rounds, mostly disambiguating edge cases. A 10% stratified spot-check of the final corpus found 3.2% label errors which were corrected; residual error after correction is estimated at ~1% by re-spot-checking. (3) Bottom: held-out integrity. The 80/20 split is at the article level not the sentence level, so no article appears in both halves. Articles are hashed and deduplicated BEFORE the split. The augmentation template pools are also partitioned — train templates and validation templates do not overlap. The panel asks "could information leak" and the answer is no, by construction. 95 seconds.
 -->
 
 ---
@@ -484,7 +617,7 @@ This is the slide that closes RQ4. Five participants — two early-warning analy
 5. **A deployable web platform** — FastAPI + React + PostgreSQL, end-to-end documented and reproducible under Docker Compose.
 
 <!--
-This is the slide that gets quoted in the panel's decision. Each item is a self-contained artefact: the schema, the taxonomy, the training recipe, the knowledge base, the system. Tell the panel which artefacts are reusable beyond this dissertation — all five, but especially the taxonomy and the KB, which any other researcher working on humanitarian protection, conflict early-warning, or peace and security analysis can pick up without rebuilding. The fifth item — the system — is the contribution the related-work landscape on slide 6 said was missing. 100 seconds.
+This is the slide that gets quoted in the panel's decision. Each item is a self-contained artefact: the schema, the taxonomy, the training recipe, the knowledge base, the system. Tell the panel which artefacts are reusable beyond this dissertation — all five, but especially the taxonomy and the KB, which any other researcher working on humanitarian protection, conflict early-warning, or peace and security analysis can pick up without rebuilding. The fifth item — the system — is the contribution the related-work landscape on slide 12 said was missing. 100 seconds.
 -->
 
 ---
@@ -744,4 +877,4 @@ OUTPUT: aligned    L' = [l'1, ..., l'm]   (sub-word level, m >= n)
 
 # End of backup deck
 
-*Main deck: slide 1–26. Backup: B1–B12. Speaker notes: `speaker_notes.md`. Q&A kit: `qa_kit.md`.*
+*Main deck: slide 1–39. Backup: B1–B12. Speaker notes: `speaker_notes.md`. Q&A kit: `qa_kit.md`.*

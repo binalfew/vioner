@@ -200,12 +200,41 @@ def build_taxonomy_annex() -> None:
     _build_taxonomy("taxonomy_annex", include_leaves=True)
 
 
+def build_methodology_cycle() -> None:
+    """Defense-deck figure: design-science cycle with four nodes
+    (Build, Evaluate, Learn, Refine) arranged in a feedback loop.
+    Used on the methodology slide of the defense presentation."""
+    g = Digraph("methodology", format="png", engine="circo")
+    g.attr(splines="curved", normalize="true", nodesep="0.4",
+           fontname="Helvetica", fontsize="13", bgcolor="white",
+           pad="0.4", size="6,4!", ratio="fill")
+    g.attr("node", shape="circle", style="filled",
+           fontname="Helvetica Bold", fontsize="14",
+           width="1.4", fixedsize="true", penwidth="2")
+    g.attr("edge", color="#1F2A4A", fontname="Helvetica", fontsize="11",
+           fontcolor="#5A6378", penwidth="2.2", arrowsize="0.9")
+
+    g.node("build",  "Build",    fillcolor="#EAF2E3", color="#3D6A2E")
+    g.node("eval",   "Evaluate", fillcolor="#FDF2E0", color="#A66A1A")
+    g.node("learn",  "Learn",    fillcolor="#F2E6F2", color="#6B2A6B")
+    g.node("refine", "Refine",   fillcolor="#FBE0E0", color="#962525")
+
+    g.edge("build",  "eval")
+    g.edge("eval",   "learn")
+    g.edge("learn",  "refine")
+    g.edge("refine", "build")
+
+    _render(g, "methodology")
+
+
 def main() -> None:
     print("Building thesis figures (advisor comments C418, C438, C453, C747)")
     build_architecture()
     build_process_flow()
     build_taxonomy_summary()
     build_taxonomy_annex()
+    print("Building defense-deck figures")
+    build_methodology_cycle()
     print("Done.")
 
 

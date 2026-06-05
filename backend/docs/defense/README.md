@@ -8,11 +8,16 @@ Violent-Event Information from African News Reports*.
 
 | File | Purpose |
 |:--|:--|
-| `slides.md` | Source of truth — 26 main slides + 12 backup, with speaker notes inline as HTML comments. |
+| `slides.md` | Source of truth — 31 main slides + 12 backup, with speaker notes inline as HTML comments. |
 | `theme.css` | Custom Marp theme (navy + amber editorial palette, projection-safe type sizes). |
 | `build_slides.py` | Build script — wraps marp-cli, emits `slides.pptx` and `slides.pdf`. |
 | `speaker_notes.md` | Standalone full talking script (≈ 120-150 words per slide). Print double-sided for rehearsal. |
-| `qa_kit.md` | 15 anticipated panel questions with prepared answers and backup-slide flips. |
+| `qa_kit.md` | 41 anticipated panel questions with prepared answers and backup-slide flips. |
+| `formulas_explained.md` | Every formula in the thesis (focal loss, class weights, F1, Cohen's κ, …) explained term-by-term with worked numeric examples. |
+| `problem_domain.md` | Study guide for the problem statement — stakes, current solutions, the four-part gap, and how VioNER closes it. Includes per-system gap analysis, three elevator pitches, and Q&A scripts for problem-statement defense. |
+| `solution_architecture.md` | Study guide for the solution side — what VioNER is, the design-science methodology, the conceptual and technical contributions, the four-layer architecture, the trade-offs, the three iteration loops, and Q&A scripts for solution-and-architecture defense. |
+| `experimental_results.md` | Study guide for Chapter 6 — every table and number explained in plain English with worked examples. Walks through F1 calculations, the ablation table row by row, KB operational metrics, UAT scores, and error analysis. Includes Q&A scripts for results-defense and a quick-reference table for every number on every slide. |
+| `concepts_explained.md` | Beginner glossary — every ML/NER jargon term in the thesis explained with a one-sentence definition, a real-world analogy, a worked example, and what panellists mean when they say it. Covers F1, cross-entropy, focal loss, BERT, BIO encoding, epoch, val loss, Cohen's κ, and ~30 other concepts. One-page cheat sheet at the end. |
 | `assets/` | Symlinks to figures and screenshots from `../thesis/figures/`. |
 | `slides.pptx` | Generated — editable in PowerPoint. (Created by build.) |
 | `slides.pdf` | Generated — safe projector fallback. (Created by build.) |
@@ -84,19 +89,26 @@ slide numbers so you can find sections during rehearsal.
 
 ## Rehearsal pacing target
 
+31 main slides + section dividers, ≈29 minutes inside the 30-min slot.
+
 | Checkpoint | Slide | Target elapsed |
 |:--|:--|:--|
 | Outline complete | 2 | 1:15 |
-| Problem section done | 5 | 4:30 |
-| RQs presented | 7 | 6:30 |
-| Approach section done | 20 | 18:30 |
-| Headline result delivered | 22 | 19:30 |
-| UAT delivered | 29 | 24:00 |
-| Contributions | 31 | 25:30 |
-| Thanks | 34 | 27:00 |
+| Cost-of-pipeline slide done | 5 | 4:00 |
+| Day-in-life narrative done | 6 | 5:30 |
+| Problem section done | 7 | 7:00 |
+| RQs presented | 9 | 8:45 |
+| Methodology delivered | 10 | 10:20 |
+| Related work + gap done | 14 | 14:30 |
+| Approach section done | 25 | 23:00 |
+| Headline result delivered | 27 | 24:00 |
+| UAT delivered | 34 | 27:00 |
+| Contributions | 36 | 28:00 |
+| Thanks | 39 | 29:30 |
 
-If you hit slide 22 by minute 22 you are running 3 min slow — tighten
-transitions, drop one example per remaining slide.
+If you hit slide 27 by minute 25 you are running 1 min slow — tighten
+transitions, drop one example per remaining slide. If by minute 27, drop
+a backup-card flip and shorten the future-work commentary.
 
 ## Re-generating assets
 

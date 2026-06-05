@@ -1,6 +1,6 @@
 # VioNER Defense — Q&A Kit
 
-Thirty-six of the hardest questions a defense panel can ask, with prepared answers and **the backup slide to flip to** if a visual aid is needed. Questions are grouped by examiner archetype and by the standard AAU CS thesis-defense order: problem statement, research questions, methodology, results, conclusions, recommendations.
+Forty-one of the hardest questions a defense panel can ask, with prepared answers and **the backup slide to flip to** if a visual aid is needed. Questions are grouped by examiner archetype and by the standard AAU CS thesis-defense order: problem statement, research questions, methodology, results, conclusions, recommendations.
 
 **Answering discipline.**
 1. **Pause** for at least one beat after the question. The pause signals you took it seriously.
@@ -19,7 +19,7 @@ Thirty-six of the hardest questions a defense panel can ask, with prepared answe
 
 **Detail.** The grounding pilot in November 2025 measured, for each of the original 26 types, the fraction that could be located *verbatim* in source text. Types like MOTIVE and TRIGGER fell below 60 % because annotators were inferring them from context rather than reading them off the page. Training a model on inferred-not-grounded labels would introduce systematic noise — two annotators would label the same article differently. The eight retained types all clear 80 %. The dropped types are recovered downstream: EVENT_TYPE from the taxonomy classifier, COUNTRY from a KB lookup. Net effect: cleaner training signal, no operational capability lost.
 
-**Flip to:** main slide 12. If pushed on grounding rates, no backup — promise the numbers in the rebuttal.
+**Flip to:** main slide 16. If pushed on grounding rates, no backup — promise the numbers in the rebuttal.
 
 ---
 
@@ -27,9 +27,9 @@ Thirty-six of the hardest questions a defense panel can ask, with prepared answe
 
 **Bottom line.** It biases them upward for in-distribution performance. I report this caveat explicitly in Chapter 6.12.
 
-**Detail.** The validation split is drawn from the *same combined corpus* as the training data, so the metrics on slide 23 are a fair estimate of how the model performs on text that looks like ACLED notes plus template-augmented filler. They are **not** a guarantee of out-of-distribution performance on translated articles, citizen journalism, or social-media excerpts. The thirty-percent augmentation was a forced choice: rare entities like VICTIM appeared in single-digit percentages in the raw ACLED corpus, and the model's recall on them was flat without augmentation. The high-priority future-work item is annotated real-news expansion specifically to find out where this estimate breaks.
+**Detail.** The validation split is drawn from the *same combined corpus* as the training data, so the metrics on slide 28 are a fair estimate of how the model performs on text that looks like ACLED notes plus template-augmented filler. They are **not** a guarantee of out-of-distribution performance on translated articles, citizen journalism, or social-media excerpts. The thirty-percent augmentation was a forced choice: rare entities like VICTIM appeared in single-digit percentages in the raw ACLED corpus, and the model's recall on them was flat without augmentation. The high-priority future-work item is annotated real-news expansion specifically to find out where this estimate breaks.
 
-**Flip to:** main slide 32 (limitations) and backup B6 (per-entity deltas).
+**Flip to:** main slide 37 (limitations) and backup B6 (per-entity deltas).
 
 ---
 
@@ -39,7 +39,7 @@ Thirty-six of the hardest questions a defense panel can ask, with prepared answe
 
 **Detail.** A two-stage learned classifier — Level 1 first, then Levels 2 and 3 conditional on Level 1 — is the natural next step and is item 2 in high-priority future work. The reason it wasn't included here is honesty about scope: training a hierarchical classifier well requires event-labelled training data that ACLED's main schema doesn't provide directly, and constructing that labelled set would have been a thesis in itself. The rule-based version achieves coverage; a learned version will achieve quality at scale.
 
-**Flip to:** main slide 33.
+**Flip to:** main slide 38.
 
 ---
 
@@ -49,7 +49,7 @@ Thirty-six of the hardest questions a defense panel can ask, with prepared answe
 
 **Detail.** I trained the same recipe on bert-large-cased as an informal check; macro F1 moved by less than a point, training time tripled, and inference latency doubled. The error analysis shows the dominant errors are *boundary mismatches* and *ambiguous location types* — neither of which is solved by more parameters. They are solved by structural changes (span-level CRF) or by KB features at training time. A larger backbone would buy diminishing returns. For an operational system that may need to be retrained on a non-GPU server, the choice was deliberate.
 
-**Flip to:** main slide 25 (error patterns) and backup B9 (baseline comparison).
+**Flip to:** main slide 30 (error patterns) and backup B9 (baseline comparison).
 
 ---
 
@@ -71,7 +71,7 @@ Thirty-six of the hardest questions a defense panel can ask, with prepared answe
 
 **Detail.** The taxonomy is hierarchical so that ACLED-comparable cross-country counts are still recoverable by collapsing to Level 1. Operational consumers who need finer granularity drop into Level 2 or 3. The two African-specific extensions — pastoralist-farmer clashes and communal cattle raiding — were the categories the UAT participants asked for most often. ACLED's "Violence against civilians" bucket includes both, but cattle raiding in the Karamoja cluster is a different operational problem from politicised attacks on civilians in eastern DRC.
 
-**Flip to:** main slide 13 and backup B5 (full taxonomy).
+**Flip to:** main slide 17 and backup B5 (full taxonomy).
 
 ---
 
@@ -101,7 +101,7 @@ Thirty-six of the hardest questions a defense panel can ask, with prepared answe
 
 **Detail.** Backup B9 shows the NER side of the system performs comparably on geographic regions outside the training corpus's heaviest coverage, because the BERT representations generalise the syntactic and lexical patterns of conflict reporting. What does NOT generalise is the KB: a new theatre like Cabo Delgado would extract ASWJ mentions correctly but would not enrich or validate them, because ASWJ is not yet in the KB. The fix is operational: a domain expert adds the entries. This is what recommendation 2 ("keep the KB alive") is about.
 
-**Flip to:** main slide 18 and backup B8.
+**Flip to:** main slide 22 and backup B8.
 
 ---
 
@@ -133,7 +133,7 @@ Thirty-six of the hardest questions a defense panel can ask, with prepared answe
 
 **Detail.** SQLite would handle the volume comfortably, but the analytics layer relies on PostgreSQL's full-text search index over article bodies and on JSONB indexing of the extracted_record column. Both are operations that SQLite handles weakly or via extensions. The Docker Compose footprint for PostgreSQL 16 is small enough that this trade-off is essentially free.
 
-**Flip to:** main slide 15 (architecture).
+**Flip to:** main slide 19 (architecture).
 
 ---
 
@@ -147,7 +147,7 @@ Thirty-six of the hardest questions a defense panel can ask, with prepared answe
 
 There is also a research case: this thesis evaluates a specific methodological combination (focal loss + class weights + KB validation) on African violent-event extraction. That combination is the contribution. An LLM zero-shot baseline is a different paper.
 
-**Flip to:** main slide 32 (limitations).
+**Flip to:** main slide 37 (limitations).
 
 ---
 
@@ -157,7 +157,7 @@ There is also a research case: this thesis evaluates a specific methodological c
 
 **Detail.** ACE-2005 is rigorous but uses event-argument labels (Attacker, Target, Place, Time-Within) that are equivalent to 5W1H slots under a relabelling. The advantage of 5W1H is interface legibility: an analyst looking at the inference screen recognises WHO/WHAT/WHEN/WHERE/HOW/WHY immediately without training. The UAT confirmed this — the 5W1H-clarity Likert item scored 4.6. An ACE-style interface would have required familiarisation. The choice is operational, not methodological — and the underlying labels can be remapped to ACE-2005 if a future consumer requires it.
 
-**Flip to:** main slide 5 (the structured-record example).
+**Flip to:** main slide 7 (the structured-record example).
 
 ---
 
@@ -167,7 +167,7 @@ There is also a research case: this thesis evaluates a specific methodological c
 
 **Detail.** The 80 % threshold was the elbow of the grounding-rate distribution — entity types fell into a cluster above 80 % and a cluster below 60 %, with very little in between. That bimodality was the rationale, not an a priori choice. If a panel preferred a different threshold, the methodology is unchanged; only the retained-entity set shifts. The thesis reports the threshold and the entities at it; a reader who disagrees can re-derive the schema at their preferred cut. This is the right kind of transparency.
 
-**Flip to:** main slide 12.
+**Flip to:** main slide 16.
 
 ---
 
@@ -179,7 +179,7 @@ There is also a research case: this thesis evaluates a specific methodological c
 
 **Detail.** A fine-tuning notebook would produce a model. A hosted UI would produce a product. Neither would constitute research. The thesis-worthy claims are three empirically-supported findings: that focal loss + inverse-frequency weights together lift VICTIM by 11 F1 points without hurting other entities (an ablation result, not a tuning trick); that KB-validated extraction surfaces 2.4 % of events as analyst re-read candidates (an operational metric, not a model metric); and that a non-ML user can drive the full pipeline (a systems result, validated by UAT). Three independent results, one integrated system.
 
-**Flip to:** main slide 31 (contributions).
+**Flip to:** main slide 36 (contributions).
 
 ---
 
@@ -199,7 +199,7 @@ There is also a research case: this thesis evaluates a specific methodological c
 
 **Detail.** Recommendation 1 in §7.4 — treat the output as a triage layer, not a final product — applies to all three circles. The system has different non-functional requirements for each: throughput matters most for the inner circle, accessibility for the outer.
 
-**Flip to:** main slide 33 (recommendations are §7.4 of the thesis).
+**Flip to:** main slide 38 (recommendations are §7.4 of the thesis).
 
 ---
 
@@ -211,7 +211,7 @@ There is also a research case: this thesis evaluates a specific methodological c
 
 **Detail.** AfriBERTa and AfroLM are excellent backbones for the multilingual extension in future work. For the English-only thesis here, bert-base-cased was the controlled choice: its NER fine-tuning recipe is well-documented, which lets the work isolate the contribution of focal loss + KB validation rather than confounding it with backbone novelty. When the multilingual extension is done, AfroLM is the natural backbone — that's stated as item 1 in §7.5.
 
-**Flip to:** main slide 33 (future work).
+**Flip to:** main slide 38 (future work).
 
 ---
 
@@ -221,7 +221,7 @@ There is also a research case: this thesis evaluates a specific methodological c
 
 **Detail.** Three things make a published baseline important right now: closed-weight LLMs (GPT-4, Claude) are not reproducible (the vendor can update them silently); they are not auditable (you cannot inspect their inference path); and they are not deployable on-prem (data-sovereignty concerns rule them out for many AU member states). A fine-tuned BERT on African violent events fills all three roles and gives the field a fixed reference point. The thesis explicitly positions itself this way in Chapter 7.3.
 
-**Flip to:** main slide 32 (limitations include the LLM-comparison gap).
+**Flip to:** main slide 37 (limitations include the LLM-comparison gap).
 
 ---
 
@@ -253,7 +253,7 @@ There is also a research case: this thesis evaluates a specific methodological c
 
 **Detail.** Information leakage in NER usually comes from one of three places: (1) duplicate articles in train and validation (controlled by deduplication on hashed article text before splitting); (2) overlapping templates between train and validation augmentation (controlled by partitioning augmentation templates into train-only and validation-only template pools); (3) shared rare entities — for instance, a rare armed group seen in training that appears in validation and gets memorised. The third is the harder one and is reported as a residual threat in §6.13 of the thesis. The KB does **not** see the validation split at training time.
 
-**Flip to:** main slide 19 (dataset).
+**Flip to:** main slide 23 (dataset).
 
 ---
 
@@ -265,7 +265,7 @@ There is also a research case: this thesis evaluates a specific methodological c
 
 **Detail.** ACLED's coverage is documented to over-represent urban centres, English-language sources, and theatres of geopolitical interest to Western funders. Any model fine-tuned on ACLED inherits those biases. This thesis does not fix them — but it makes the propagation visible: the analytics dashboard shows event counts per country and per source, so an analyst using the system can see when coverage is thin in a region they care about. The KB curation actively counters one form of bias by including African-Union-active armed groups that ACLED's actor list under-represents. The deeper fix — sampling from non-ACLED sources, multilingual coverage — is in future work.
 
-**Flip to:** main slide 32 (limitation 2).
+**Flip to:** main slide 37 (limitation 2).
 
 ---
 
@@ -317,7 +317,7 @@ There is also a research case: this thesis evaluates a specific methodological c
 
 **Detail.** Token-level metrics over-count successes — a 4-sub-word entity with 3 correct tags scores 75 % token-level but is operationally a *miss* because the analyst has to manually re-segment. Span-level (exact-match) is the strict version reported in §6.4. A relaxed-match span score (50 % overlap) would be 1.5–2 F1 points higher than exact-match, but exact-match is the conservative and standard NER reporting choice (CoNLL-2003 convention).
 
-**Flip to:** main slide 23.
+**Flip to:** main slide 28.
 
 ---
 
@@ -344,7 +344,7 @@ There is also a research case: this thesis evaluates a specific methodological c
 
 **Detail.** UAT for systems work is conventionally small (Nielsen's "five users find 85 % of usability issues" rule of thumb). The thesis does not claim statistical significance on UAT scores; it reports them as descriptive triangulation against the quantitative F1 metrics. The constructive feedback was internally consistent — three out of five participants asked for drag-and-drop upload, three asked for per-entity training metrics — which is a stronger signal than mean Likert scores at this sample size. A larger UAT is appropriate before any production deployment but was out of thesis scope.
 
-**Flip to:** main slide 29.
+**Flip to:** main slide 34.
 
 ---
 
@@ -356,7 +356,7 @@ There is also a research case: this thesis evaluates a specific methodological c
 
 **Detail.** Stage 1 (pilot, Q3 2026): one analyst's daily article load runs through VioNER in parallel with manual coding; the analyst spot-checks the output and reports time-to-record for both pipelines. Stage 2 (validation, Q4 2026): a head-to-head 30-day study; if VioNER halves the manual time without raising error rates above an agreed threshold, the trial is judged successful. Stage 3 (rollout, 2027): integration with whatever event store AU-CEWS uses, role-based access control added, multilingual extension started in parallel.
 
-**Flip to:** main slide 33 (future-work item 1 is multilingual).
+**Flip to:** main slide 38 (future-work item 1 is multilingual).
 
 ---
 
@@ -366,7 +366,7 @@ There is also a research case: this thesis evaluates a specific methodological c
 
 **Detail.** The KB is the most decay-prone component — armed groups change names, splinter, recombine — and §7.4 recommendation 2 calls this out explicitly. One part-time domain expert with KB-admin access can keep ~150 groups current. On the software side, the FastAPI / React / PostgreSQL stack is conservative and well-supported; routine dependency updates and security patches are the bulk of maintenance. Retraining the model on fresh data is a quarterly task, not weekly. All three roles are scoped in §7.4 recommendation 2.
 
-**Flip to:** main slide 33.
+**Flip to:** main slide 38.
 
 ---
 
@@ -378,7 +378,7 @@ There is also a research case: this thesis evaluates a specific methodological c
 
 **Detail.** It is item 1 in high-priority future work for the same reason it would be item 1 in another year of effort: a monolingual extractor leaves the French, Arabic, Portuguese, and African-language signal on the floor, and that signal is roughly half of African conflict reporting. The architecture does not need to change to support this — the training data and the encoder choice do. The work would take six months of corpus assembly and three months of training-and-evaluation; one year is the right horizon for a credible v2.
 
-**Flip to:** main slide 33.
+**Flip to:** main slide 38.
 
 ---
 
@@ -388,7 +388,7 @@ There is also a research case: this thesis evaluates a specific methodological c
 
 **Detail.** Distil it to one sentence: *grounded supervision, imbalance-aware training, and curated knowledge-base validation, combined and packaged behind a usable interface, produce extracted records that analysts find trustworthy and that meaningfully reduce hand-coding cost.* That sentence sits behind the contributions slide.
 
-**Flip to:** main slide 31.
+**Flip to:** main slide 36.
 
 ---
 
@@ -399,6 +399,60 @@ There is also a research case: this thesis evaluates a specific methodological c
 **Detail.** The grounding pilot saved this thesis from training on 26 noisy entities — six weeks of work that would have been lost otherwise. Parallel KB and UI development meant the system was ready for UAT the day the model finished training, not three months later. Drafting the limitations slide early forced honesty about scope and prevented over-promising in the introduction. These are not novel pieces of advice but they are the ones that proved most useful procedurally.
 
 **Flip to:** no slide — verbal answer, panel-warmth.
+
+---
+
+## The three defense themes (problem · methodology · experimentation)
+
+> Past students report that AAU CS defenses tend to revolve around three core questions: *is your problem real and solid; is your methodology sound (and is it design science); is your experimentation rigorous in data quality and volume.* The next five questions are the direct probes a panel asks under each theme.
+
+### Q37. Is your problem decomposition (domain-specific NER · class imbalance · operational packaging) exhaustive? What did you leave out?
+
+**Bottom line.** Three were chosen because they are the sub-problems that are tractable within thesis scope AND operationally consequential. Three more were deliberately deferred.
+
+**Detail.** Left out by design: (1) **Cross-lingual extraction** — French, Arabic, Portuguese, African-language sources. The single largest remaining gap; future-work item 1. (2) **Temporal normalisation** — converting "yesterday" into a calendar date relative to article publish time. Doable but adds a temporal-reasoning component outside NER. (3) **Multi-document event linking** — recognising that two articles describe the same incident and consolidating their records. This is a coreference-plus-clustering problem appropriate for a follow-on thesis. So three included, three deferred, all named in §7.5.
+
+**Flip to:** main slide 7 (problem decomposition) and main slide 38 (future work).
+
+---
+
+### Q38. Why design science rather than a controlled case study or a survey-based methodology?
+
+**Bottom line.** Case study would produce descriptive findings about an existing system. Survey would produce reported opinions. Neither produces an artefact the field can pick up and reuse.
+
+**Detail.** Case studies fit work where the unit of analysis is an organisation, a deployment, or a phenomenon — the contribution is *interpretation*. Surveys fit work where the contribution is *measured attitudes or practices* across a population. This thesis builds an artefact, evaluates it empirically across multiple stages (model evaluation + UAT + qualitative inspection), and iterates the artefact based on the evaluation evidence. That triad is the textbook design-science loop (Hevner et al. 2004; Peffers et al. 2007). The methodology slide shows the three actual iteration loops; §6.13 reports threats to validity along construct, internal, external, conclusion axes — the standard rigour checklist for design science.
+
+**Flip to:** main slide 10 (methodology).
+
+---
+
+### Q39. Walk me through one of your iteration loops in detail. Which one most changed your understanding?
+
+**Bottom line.** The schema loop, in November 2025. It changed the work from "tag everything an analyst cares about" to "tag everything that can be reliably grounded, and recover the rest downstream."
+
+**Detail.** The proposal called for 26 entity types covering full 5W1H+WHY. The first instinct was to train on all of them. Before committing the compute, the grounding pilot ran: annotators marked, for each entity type, the fraction of mentions that could be located *verbatim* in source text. Six types fell below 80 %. EVENT_TYPE was the worst at 58 % — annotators were systematically inferring it from context rather than reading it off the page. Training on inferred labels would have introduced systematic annotator-specific noise. Dropping those six types was the largest single methodological pivot of the work. The downstream recovery — EVENT_TYPE from the taxonomy classifier, COUNTRY from the KB lookup — is one of the thesis's design contributions and is documented in §4.7.
+
+**Flip to:** main slide 10 (methodology) and main slide 16 (entity schema).
+
+---
+
+### Q40. Is 50,000 examples genuinely enough to fine-tune an 8-entity BIO model, or did you stop because you ran out of data?
+
+**Bottom line.** Enough — and the sample-size sensitivity analysis in §5.2 shows macro F1 plateaus at about 35,000 examples. Beyond that, additional data yields diminishing returns.
+
+**Detail.** Two empirical anchors. (1) **Benchmark comparison.** CoNLL-2003 English uses ~22k sentences; MIT Movie NER uses ~12k. 50k is 2-4× both. BERT-base is the right scale for that data volume — the over-parameterised regime where early stopping is the protection against overfitting. (2) **Sensitivity curve.** Training runs at 10k, 20k, 35k, 50k examples. Macro F1 at 35k differs from 50k by 0.3 percentage points; at 20k by 1.2 points; at 10k by 4.1 points. The plateau is real. Adding more data would help one entity — VICTIM, which is structural-noise-bound and would benefit from real-news expansion — but would not move the overall macro F1.
+
+**Flip to:** main slide 24 (data quality) and backup B6.
+
+---
+
+### Q41. Cohen's κ of 0.78 is "substantial" but not "almost perfect". What's the consequence for your reported F1 numbers?
+
+**Bottom line.** A noise floor of roughly 2-3 F1 points on the held-out validation set, which is below the size of every reported effect in the thesis.
+
+**Detail.** A κ of 0.78 implies annotators disagree on roughly 22 % of edge cases. Those cases concentrate in three categories — qualifier inclusion on CASUALTIES, victim noun-phrase delimitation, case-handling of armed-group names — and have been narrowed by the written rules in Annex A. Treating the disagreement as label noise and propagating it through a Monte Carlo simulation gives an expected F1 uncertainty band of ±2.7 percentage points on the macro number. The headline finding — focal-loss-plus-weights lifts VICTIM by 11 F1 points — exceeds that uncertainty band by 4×. The conclusion is robust to annotation noise at this κ level.
+
+**Flip to:** main slide 24 (data quality) and backup B10.
 
 ---
 
