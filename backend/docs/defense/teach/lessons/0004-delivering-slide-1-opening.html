@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 4 — Delivering Slide 1: The Opening</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --accent-soft:#A14747;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --success-soft:#E6F0E6;
+  --warn:#8B5A2B;
+  --beat:#1A365D;
+  --beat-soft:#E8EEF5;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:42rem;margin:0 auto;padding:3.5rem 1.5rem 6rem}
+.eyebrow{
+  font-family:"Inter","SF Pro Text",system-ui,sans-serif;
+  text-transform:uppercase;
+  letter-spacing:0.18em;
+  font-size:0.72rem;
+  color:var(--accent);
+  font-weight:600;
+}
+h1{
+  font-family:"Iowan Old Style","Charter",Georgia,serif;
+  font-size:2.3rem;
+  font-weight:700;
+  line-height:1.18;
+  margin:0.4rem 0 0.6rem;
+  letter-spacing:-0.012em;
+}
+h2{
+  font-family:"Iowan Old Style","Charter",Georgia,serif;
+  font-size:1.45rem;
+  margin:3rem 0 0.6rem;
+  font-weight:700;
+  border-bottom:1px solid var(--rule);
+  padding-bottom:0.4rem;
+}
+h3{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:1rem;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.05em;
+  margin:1.6rem 0 0.4rem;
+  color:var(--accent);
+}
+p,li{font-size:1.05rem}
+.subtitle{
+  color:var(--ink-soft);
+  font-style:italic;
+  font-size:1.1rem;
+  margin:0 0 1.4rem;
+}
+.meta{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.78rem;
+  color:var(--ink-soft);
+  letter-spacing:0.02em;
+  border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);
+  padding:0.6rem 0;
+  margin-bottom:2.2rem;
+  display:flex;
+  flex-wrap:wrap;
+  gap:1.2rem;
+}
+.meta span strong{color:var(--ink)}
+.callout{
+  background:#FFF;
+  border:1px solid var(--rule);
+  padding:1rem 1.3rem;
+  margin:1.2rem 0;
+  border-radius:4px;
+}
+.callout.win{border-left:3px solid var(--success)}
+.callout.warn{border-left:3px solid var(--warn)}
+.callout.beat{border-left:3px solid var(--beat)}
+code{
+  font-family:"JetBrains Mono","SF Mono",Menlo,monospace;
+  font-size:0.92em;
+  background:#F0EBE0;
+  padding:0.06em 0.36em;
+  border-radius:3px;
+}
+/* Slide 1 visual mockup */
+.slide-mock{
+  background:linear-gradient(180deg,#FFF 0%,#FBF7F0 100%);
+  border:1px solid var(--rule);
+  border-radius:6px;
+  padding:2.4rem 2.2rem;
+  margin:1.4rem 0;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  text-align:center;
+  min-height:14rem;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.slide-mock .badge{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.65rem;
+  text-transform:uppercase;
+  letter-spacing:0.12em;
+  color:var(--accent);
+  margin-bottom:0.5rem;
+  font-weight:600;
+}
+.slide-mock .system-title{
+  font-family:"Iowan Old Style",Georgia,serif;
+  font-size:2.2rem;
+  font-weight:700;
+  color:var(--ink);
+  margin:0.4rem 0;
+  letter-spacing:-0.02em;
+}
+.slide-mock .system-sub{
+  font-family:"Iowan Old Style",Georgia,serif;
+  font-size:1.05rem;
+  color:var(--ink-soft);
+  font-style:italic;
+  margin:0.2rem 0 1.4rem;
+}
+.slide-mock .candidate{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.92rem;
+  color:var(--ink);
+  margin:0.4rem 0 0.2rem;
+  font-weight:600;
+}
+.slide-mock .candidate-meta{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.78rem;
+  color:var(--ink-soft);
+  margin:0;
+}
+/* Beat script */
+.beat-script{
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-radius:6px;
+  padding:1.4rem 1.6rem;
+  margin:1.4rem 0;
+}
+.beat{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:0.9rem;
+  align-items:start;
+  padding:0.9rem 0;
+  border-bottom:1px dashed var(--rule);
+}
+.beat:last-child{border-bottom:0}
+.beat-num{
+  background:var(--beat);
+  color:#FFF;
+  width:2.1rem;
+  height:2.1rem;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:"Inter",system-ui,sans-serif;
+  font-weight:600;
+  font-size:0.85rem;
+}
+.beat-content .label{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.72rem;
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  color:var(--beat);
+  font-weight:600;
+  margin-bottom:0.25rem;
+  display:flex;
+  gap:0.7rem;
+  align-items:baseline;
+}
+.beat-content .label .secs{
+  color:var(--ink-soft);
+  font-weight:400;
+  font-style:italic;
+}
+.beat-content .text{
+  font-size:1.06rem;
+  line-height:1.55;
+  margin:0.2rem 0;
+}
+.beat-content .text em.key{
+  background:var(--highlight);
+  font-style:normal;
+  padding:0 0.18em;
+  border-radius:2px;
+  font-weight:600;
+}
+.beat-content .micro{
+  margin-top:0.4rem;
+  font-size:0.85rem;
+  color:var(--ink-soft);
+  font-style:italic;
+}
+/* Hero number */
+.hero-number{
+  background:var(--highlight);
+  border:2px solid var(--accent);
+  border-radius:6px;
+  padding:1.3rem 1.4rem;
+  margin:1.3rem 0;
+  text-align:center;
+}
+.hero-number .label{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.7rem;
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  color:var(--accent);
+  font-weight:600;
+  margin-bottom:0.4rem;
+  display:block;
+}
+.hero-number .n{
+  font-family:"Iowan Old Style",Georgia,serif;
+  font-size:2.6rem;
+  font-weight:700;
+  color:var(--accent);
+  line-height:1;
+  margin:0.3rem 0;
+  font-feature-settings:"tnum";
+}
+.hero-number .note{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.88rem;
+  color:var(--ink-soft);
+  font-style:italic;
+  margin-top:0.4rem;
+}
+/* Three-part frame */
+.frame{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:0.5rem;
+  margin:1rem 0;
+}
+.frame-step{
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-radius:5px;
+  padding:0.65rem 0.9rem;
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:0.7rem;
+  align-items:center;
+}
+.frame-step .arrow{
+  font-family:"Inter",system-ui,sans-serif;
+  font-weight:700;
+  font-size:1.05rem;
+  color:var(--accent);
+  width:1.5rem;
+  text-align:center;
+}
+.frame-step strong{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.78rem;
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+  color:var(--accent);
+}
+.frame-step span{
+  display:block;
+  font-size:0.95rem;
+  color:var(--ink);
+}
+/* Anxiety protocol */
+.protocol{
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-left:3px solid var(--beat);
+  border-radius:4px;
+  padding:1.1rem 1.3rem;
+  margin:1.2rem 0;
+}
+.protocol h4{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.95rem;
+  margin:0 0 0.6rem;
+  color:var(--beat);
+}
+.protocol ol{padding-left:1.3rem;margin:0.4rem 0}
+.protocol ol li{padding:0.2rem 0;font-size:0.97rem}
+.protocol ol li strong{color:var(--beat)}
+/* Body language */
+.bl-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0.6rem;
+  margin:0.7rem 0;
+}
+.bl-card{
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-radius:5px;
+  padding:0.7rem 0.95rem;
+}
+.bl-card h5{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.74rem;
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+  color:var(--accent);
+  margin:0 0 0.3rem;
+  font-weight:600;
+}
+.bl-card p{font-size:0.92rem;margin:0.15rem 0;color:var(--ink)}
+.bl-card .no{color:var(--accent);font-size:0.84rem;margin-top:0.3rem;font-style:italic}
+/* Timer */
+.timer-box{
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-radius:6px;
+  padding:1.3rem;
+  margin:1.3rem 0;
+  text-align:center;
+}
+.timer-display{
+  font-family:"JetBrains Mono","SF Mono",monospace;
+  font-size:2.6rem;
+  font-weight:700;
+  color:var(--accent);
+  margin:0.3rem 0;
+  font-feature-settings:"tnum";
+}
+.timer-buttons{display:flex;gap:0.6rem;justify-content:center;margin-top:0.7rem}
+.timer-buttons button{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.92rem;
+  font-weight:600;
+  padding:0.55rem 1.3rem;
+  border:1px solid var(--accent);
+  background:var(--accent);
+  color:#FFF;
+  border-radius:4px;
+  cursor:pointer;
+  transition:background 120ms;
+}
+.timer-buttons button:hover{background:var(--accent-soft)}
+.timer-buttons button.secondary{background:#FFF;color:var(--accent)}
+.timer-buttons button.secondary:hover{background:#FBFAF7}
+.timer-verdict{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.95rem;
+  margin-top:0.7rem;
+  min-height:1.4rem;
+  font-weight:600;
+}
+.timer-verdict.win{color:var(--success)}
+.timer-verdict.over{color:var(--warn)}
+/* Quiz */
+.quiz{
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-radius:6px;
+  padding:1.4rem;
+  margin:1.4rem 0;
+}
+.quiz h4{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.95rem;
+  margin:0 0 0.8rem;
+  color:var(--accent);
+}
+.quiz .qstem{font-size:1.02rem;margin-bottom:0.7rem}
+.choices{list-style:none;padding:0;margin:0}
+.choices li{
+  margin:0.45rem 0;
+  padding:0.55rem 0.8rem;
+  border:1px solid var(--rule);
+  border-radius:4px;
+  cursor:pointer;
+  background:#FBFAF7;
+  font-size:0.98rem;
+  transition:background 120ms,border-color 120ms;
+}
+.choices li:hover{background:#F0EBE0}
+.choices li.right{background:#E6F0E6;border-color:var(--success);color:var(--success);font-weight:600}
+.choices li.wrong{background:#F5DEDE;border-color:var(--accent);color:var(--accent)}
+.feedback{
+  margin-top:0.6rem;
+  font-size:0.93rem;
+  font-style:italic;
+  color:var(--ink-soft);
+  min-height:1.2rem;
+}
+.checklist{list-style:none;padding:0}
+.checklist li{
+  padding:0.5rem 0 0.5rem 1.8rem;
+  position:relative;
+  font-size:1rem;
+  border-bottom:1px dashed var(--rule);
+}
+.checklist li:before{
+  content:"☐";
+  position:absolute;
+  left:0;
+  top:0.45rem;
+  font-size:1.1rem;
+  color:var(--accent);
+}
+.footer-note{
+  margin-top:3rem;
+  padding:1.2rem 1.4rem;
+  background:#FFF;
+  border:1px dashed var(--rule);
+  border-radius:6px;
+  font-size:0.95rem;
+}
+.footer-note strong{color:var(--accent)}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft)}
+a:hover{color:var(--accent-soft)}
+@media print{
+  body{background:#FFF;font-size:11pt}
+  .wrap{max-width:none;padding:0 1in}
+  .quiz,.choices li,.timer-buttons button{cursor:auto}
+  .choices li{break-inside:avoid}
+  h2{break-after:avoid}
+  .hero-number,.slide-mock,.beat-num,.beat-content .text em.key,.protocol{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .timer-buttons{display:none}
+  .meta{display:block}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">Lesson 04 · Slide 1 — Opening</div>
+<h1>Deliver the opening 45 seconds with composure</h1>
+<p class="subtitle">Slide 1 is the highest-anxiety moment of the entire defence. Voice not yet warm, nerves at peak, the panel forming their first impression. This lesson gives you a delivery you can deliver even shaking.</p>
+
+<div class="meta">
+  <span><strong>Mission link.</strong> Survive the riskiest 45 seconds. Plant the headline.</span>
+  <span><strong>Skill type.</strong> Composure + presentation craft.</span>
+  <span><strong>Time.</strong> 15 minutes.</span>
+</div>
+
+<p><a href="0003-delivering-slide-2-roadmap.html">Lesson 3</a> taught you to frame the talk on slide 2. But slide 2 is the second moment, not the first. Before any of that comes the opening — slide 1, where you walk in, greet the panel, and have to be the most composed you've been all day. This lesson teaches you three things: the script, the headline-plant, and a concrete anxiety-management protocol for the moments before you speak.</p>
+
+<h2>1 · What's on the screen</h2>
+
+<p>The panel sees this. It's a static title slide — they're not looking at the text after the first three seconds. They're looking at <em>you</em>.</p>
+
+<div class="slide-mock">
+<div class="badge">Slide 1 of 22</div>
+<div class="system-title">VioNER</div>
+<div class="system-sub">Violent-event Named Entity Recognition for African News</div>
+<div class="candidate">Binalfew Kassa</div>
+<p class="candidate-meta">Master's Thesis Defence · AAU Computer Science Department · 2026</p>
+</div>
+
+<div class="callout warn">
+<strong>Where the panel's attention is.</strong> For the first 3 seconds they read the slide. From second 4 onward they are watching you — your posture, your eye contact, your voice. The slide content matters less than how you appear during the opening 45 seconds. This is a delivery moment, not a content moment.
+</div>
+
+<h2>2 · Before you speak — the first-5-seconds protocol</h2>
+
+<p>You will be nervous. That is normal. Nervous can still look composed if you do exactly this in the first five seconds after taking your position:</p>
+
+<div class="protocol">
+<h4>The first-5-seconds protocol</h4>
+<ol>
+<li><strong>Anchor your feet.</strong> Stand still. Shoulder-width. Don't pace, don't shift weight. This single move signals composure to the panel before you say anything.</li>
+<li><strong>One anchor breath.</strong> Slow inhale through the nose for three seconds. Slow exhale through the mouth for three seconds. The panel reads this as a confident pause. You use it to slow your heart rate.</li>
+<li><strong>Eye contact with the chair.</strong> Find the most senior panel member. One second of direct eye contact. This says "I'm ready."</li>
+<li><strong>Now speak.</strong> Start with the greeting (Beat 1 below). Not before. Don't rush past these four steps because they feel slow — they feel slow to you but the panel reads them as composure.</li>
+</ol>
+</div>
+
+<p>This protocol is the difference between a defender who looks scared and one who looks ready. Practice it before each rehearsal so it becomes automatic.</p>
+
+<h2>3 · The 45-second script, in three beats</h2>
+
+<p>Three short paragraphs. Each ~15 seconds. The structure: greet and name the work → roadmap and plant 0.909 → state the three-part frame.</p>
+
+<div class="beat-script">
+
+<div class="beat">
+<div class="beat-num">1</div>
+<div class="beat-content">
+<div class="label">Beat 1 — greet and name the work <span class="secs">~15 seconds</span></div>
+<div class="text">"<em class="key">Good morning, distinguished examiners. I'm Binalfew Kassa.</em> The thesis I'm presenting today is <em class="key">VioNER — Violent-event Named Entity Recognition.</em> It's an <em class="key">end-to-end, deployable system</em> that converts English-language news about violent events in Africa into <em class="key">structured, queryable 5W1H records.</em>"</div>
+<div class="micro">The greeting is non-negotiable. "Good morning" or "good afternoon" depending on slot. Land your name slowly — first impression beats everything else here.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">2</div>
+<div class="beat-content">
+<div class="label">Beat 2 — roadmap and plant the headline <span class="secs">~15 seconds</span></div>
+<div class="text">"In the next thirty minutes I'll cover the <em class="key">problem</em>, the <em class="key">four-part contribution</em>, the <em class="key">evidence</em>, and the <em class="key">limits I own honestly.</em> The <em class="key">headline result I want to plant early: micro F1 of 0.909 on held-out data</em>, with rare-entity recovery that actually saves analyst time."</div>
+<div class="micro">"Plant early" is the strategic verb. It signals: this is the number to remember. Everything later in the talk will land against this reference point.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">3</div>
+<div class="beat-content">
+<div class="label">Beat 3 — the three-part frame <span class="secs">~15 seconds</span></div>
+<div class="text">"The frame for the whole talk: a <em class="key">real operational bottleneck</em>, methodologically <em class="key">open in the literature</em>, closed by an <em class="key">integrated artefact I built and evaluated end-to-end.</em>"</div>
+<div class="micro">End the sentence on "end-to-end". Pause briefly. Then advance to slide 2 and deliver the roadmap (lesson 3). The transition from slide 1 to slide 2 is seamless — Beat 3 here primes the integration thread there.</div>
+</div>
+
+</div>
+
+<h2>4 · The 0.909 plant — what it's doing</h2>
+
+<p>Stating the headline number on slide 1 looks innocuous. It is doing strategic work.</p>
+
+<div class="hero-number">
+<span class="label">The number to plant</span>
+<div class="n">0.909</div>
+<div class="note">micro F1 on held-out 10,000-example validation set · slide 16's headline arrives prepared</div>
+</div>
+
+<div class="callout">
+<strong>Three reasons to plant 0.909 in slide 1, not save it for slide 16.</strong>
+<ul>
+<li><strong>Anchor effect.</strong> Once stated, every later number in the talk gets compared to it. The +11 F1 ablation lift, the per-entity F1s, the macro F1 — all land against this anchor.</li>
+<li><strong>Composure signal.</strong> Stating your best number early says "I'm not hiding anything; this work earned its result." Holding it for slide 16 looks like you're saving it for impact, which the panel reads as theatrical.</li>
+<li><strong>Pre-empts the "is this any good?" question.</strong> By minute 1 the panel has a benchmark for what your model achieves. Every subsequent claim is calibrated against that benchmark.</li>
+</ul>
+</div>
+
+<p>Notice the script doesn't say <em>"my best result is 0.909"</em> or <em>"I want to highlight 0.909"</em>. It says <em>"the headline result I want to plant early."</em> The word "plant" tells the panel <em>this is intentional, not boastful</em>.</p>
+
+<h2>5 · The three-part frame</h2>
+
+<p>The last sentence of slide 1 is a compressed argument shape. Memorise these three parts in order — they're the spine of the entire talk.</p>
+
+<div class="frame">
+<div class="frame-step"><div class="arrow">1</div><div><strong>Real operational bottleneck</strong><span>Analysts at AU-CEWS, ACLED, UNHCR doing 15-25 min/article. About 30,000 events/year. The problem is real.</span></div></div>
+<div class="frame-step"><div class="arrow">2</div><div><strong>Methodologically open in the literature</strong><span>The four operational gaps haven't been closed by any existing system. Slides 6-7 demonstrate this.</span></div></div>
+<div class="frame-step"><div class="arrow">3</div><div><strong>Closed by an integrated artefact, evaluated end-to-end</strong><span>The five contributions, integrated and tested with UAT. Slides 10-19 present them.</span></div></div>
+</div>
+
+<p>If you remember nothing else from slide 1, remember those three steps. They are what the rest of the talk delivers, and stating them upfront tells the panel <em>"this is the argument I'm making"</em>.</p>
+
+<h2>6 · Body language for the opening</h2>
+
+<p>Four concrete techniques. Each is small. Together they decide whether you look ready or rattled.</p>
+
+<div class="bl-grid">
+
+<div class="bl-card">
+<h5>Hands</h5>
+<p>At your sides, or one resting on the podium. Move them naturally as you speak.</p>
+<p class="no">Not in pockets. Not crossed. Not gripping the slide remote like a stress ball.</p>
+</div>
+
+<div class="bl-card">
+<h5>Eyes</h5>
+<p>Rotate across the panel. Settle on one face for 5-7 seconds, then move to the next.</p>
+<p class="no">Not on your notes. Not on the slide. Not on the floor.</p>
+</div>
+
+<div class="bl-card">
+<h5>Voice</h5>
+<p>Project to the back wall of the room. Slightly louder than feels natural.</p>
+<p class="no">Not into the podium microphone if there is no mic. Not at conversation volume.</p>
+</div>
+
+<div class="bl-card">
+<h5>Pace</h5>
+<p>Slower than normal speech. 130-150 words per minute. Pause briefly between beats.</p>
+<p class="no">Not racing through to get it over with. Not pausing so long the panel wonders if you froze.</p>
+</div>
+
+</div>
+
+<h2>7 · Timed practice</h2>
+
+<p>The whole 45-second script, end to end. Including the first-5-seconds protocol — start the timer when you start the anchor breath, stop when you finish "end-to-end" on Beat 3. Target: 50-65 seconds (the protocol adds ~5 sec to the 45 sec script).</p>
+
+<div class="timer-box">
+<div class="timer-display" id="timer">0.0 s</div>
+<div class="timer-buttons">
+<button id="startBtn">Start (begin anchor breath)</button>
+<button id="stopBtn" class="secondary" disabled>Stop (after "end-to-end")</button>
+<button id="resetBtn" class="secondary">Reset</button>
+</div>
+<div class="timer-verdict" id="verdict"></div>
+</div>
+
+<div class="callout">
+<strong>The hardest part of slide 1.</strong> The first 10 seconds, while you're still warming up. If you can deliver Beat 1 without a tremor in your voice, the rest of the talk is downhill. Practice Beat 1 cold — that is, walking into the room from another activity and delivering it immediately. That simulates the actual moment.
+</div>
+
+<h2>8 · Quiz</h2>
+
+<div class="quiz" id="quiz1">
+<h4>Q1. Why is 0.909 stated on slide 1, not saved for slide 16?</h4>
+<p class="qstem">Pick the strongest reason.</p>
+<ul class="choices" data-answer="c">
+<li data-key="a">Because the panel might miss the number if it's only stated once on slide 16.</li>
+<li data-key="b">Because slide 16 is too late in the talk — the panel won't be paying attention.</li>
+<li data-key="c">It anchors every later number to this benchmark, signals composure (no number-hiding), and pre-empts the "is this any good?" question by minute 1.</li>
+<li data-key="d">Because the headline number is the most important thing to mention, and slide 1 is the most-watched slide.</li>
+</ul>
+<p class="feedback" id="fb1"></p>
+</div>
+
+<div class="quiz" id="quiz2">
+<h4>Q2. You take your position at the front of the room. What do you do in the next 5 seconds, BEFORE speaking?</h4>
+<p class="qstem">Pick the right protocol.</p>
+<ul class="choices" data-answer="b">
+<li data-key="a">Immediately begin the greeting. Any silence makes you look unprepared.</li>
+<li data-key="b">Anchor your feet, take one slow breath, make eye contact with the chair, then begin. The pause reads as composure, not hesitation.</li>
+<li data-key="c">Glance at your notes one final time, then start.</li>
+<li data-key="d">Smile at every panel member in turn before you start. It establishes warmth.</li>
+</ul>
+<p class="feedback" id="fb2"></p>
+</div>
+
+<div class="quiz" id="quiz3">
+<h4>Q3. The three-part frame on Beat 3 is:</h4>
+<p class="qstem">Recall the exact three steps in order.</p>
+<ul class="choices" data-answer="a">
+<li data-key="a">Real operational bottleneck → methodologically open in the literature → closed by an integrated artefact, evaluated end-to-end.</li>
+<li data-key="b">Theoretical problem → academic gap → engineering solution.</li>
+<li data-key="c">Research question → methodology → results.</li>
+<li data-key="d">Problem → contribution → evidence.</li>
+</ul>
+<p class="feedback" id="fb3"></p>
+</div>
+
+<h2>9 · Fluency checklist</h2>
+
+<p>Tick each mentally. The opening is one-shot — you only get one chance per defence. Drill until all seven are ticked.</p>
+
+<ul class="checklist">
+<li>I can execute the first-5-seconds protocol (anchor feet, one breath, eye contact with chair, then speak) without rushing.</li>
+<li>I can deliver Beat 1 with no voice tremor, even cold.</li>
+<li>I can state "micro F1 of 0.909 on held-out data" without stumbling on the number.</li>
+<li>I can recite the three-part frame in order: bottleneck → open in literature → integrated artefact.</li>
+<li>I end Beat 3 on "end-to-end" with a clean stop — no trailing "so" or "um".</li>
+<li>I make eye contact with at least two panel members during the 45 seconds.</li>
+<li>I can explain in one sentence WHY 0.909 is planted in slide 1 and not saved for slide 16.</li>
+</ul>
+
+<div class="callout win">
+<strong>If all seven are ticked,</strong> your opening 45 seconds — the riskiest moment of the entire defence — is armoured. From slide 2 onward, you have momentum. The panel has heard you sound composed and seen you state a substantial headline number. The rest of the talk lands inside that frame.
+</div>
+
+<h2>Where to go next</h2>
+
+<p>When you're ready, ask:</p>
+<ul>
+<li><em>"Teach me what to say on slide 22 — the close."</em> (Restating the five contributions, the final ask, calm landing.)</li>
+<li><em>"Drill me cold on slide 1 — I'll deliver it from memory and you score it."</em></li>
+<li><em>"Teach me how to handle a panellist who interrupts during slide 1."</em> (Rare but high-stakes.)</li>
+<li><em>"Teach me the slide-to-slide transitions"</em> (1 → 2, 2 → 3, etc — the small gaps between slides).</li>
+</ul>
+
+<div class="footer-note">
+<strong>Authority for this lesson.</strong> Verbatim script from <code>VioNER_Defense_Slides_study_guide.md</code> slide 1 entry. Headline-anchor reasoning from <code>experimental_results.md</code> §6.4 (where 0.909 is sourced). The first-5-seconds protocol draws on standard speaker-training material (Patrick Winston, <em>"How to Speak"</em>, MIT, 2018; Nancy Duarte, <em>Resonate</em>, 2010, ch. 2 on the opening).
+</div>
+
+</div>
+
+<script>
+// Quiz wiring
+document.querySelectorAll('.quiz').forEach(function(q){
+  var list=q.querySelector('.choices');
+  var ans=list.getAttribute('data-answer');
+  var fb=q.querySelector('.feedback');
+  list.querySelectorAll('li').forEach(function(li){
+    li.addEventListener('click',function(){
+      list.querySelectorAll('li').forEach(function(x){x.classList.remove('right','wrong');});
+      if(li.getAttribute('data-key')===ans){
+        li.classList.add('right');
+        fb.textContent='Correct — this is the move.';
+      } else {
+        li.classList.add('wrong');
+        fb.textContent='Not the strongest answer — try again.';
+      }
+    });
+  });
+});
+
+// Timer
+(function(){
+  var display=document.getElementById('timer');
+  var startBtn=document.getElementById('startBtn');
+  var stopBtn=document.getElementById('stopBtn');
+  var resetBtn=document.getElementById('resetBtn');
+  var verdict=document.getElementById('verdict');
+  var startTime=null,timer=null,elapsed=0;
+  function tick(){
+    elapsed=(performance.now()-startTime)/1000;
+    display.textContent=elapsed.toFixed(1)+' s';
+  }
+  startBtn.addEventListener('click',function(){
+    startTime=performance.now();
+    timer=setInterval(tick,50);
+    startBtn.disabled=true;
+    stopBtn.disabled=false;
+    verdict.textContent='';
+    verdict.className='timer-verdict';
+  });
+  stopBtn.addEventListener('click',function(){
+    clearInterval(timer);
+    startBtn.disabled=false;
+    stopBtn.disabled=true;
+    var t=elapsed;
+    if(t<45){
+      verdict.textContent='Under 45 s — you skipped or rushed the anchor protocol. Re-run including the 5-second prep.';
+      verdict.className='timer-verdict over';
+    } else if(t<=65){
+      verdict.textContent='Between 45 and 65 s — on target. Composed opening, ready for the day.';
+      verdict.className='timer-verdict win';
+    } else if(t<=80){
+      verdict.textContent='Between 65 and 80 s — slow down naturally is fine, but cut a beat of filler before the next rep.';
+      verdict.className='timer-verdict over';
+    } else {
+      verdict.textContent='Over 80 s — significant padding. Re-read the script and cut to the verbatim before the next rep.';
+      verdict.className='timer-verdict over';
+    }
+  });
+  resetBtn.addEventListener('click',function(){
+    clearInterval(timer);
+    startBtn.disabled=false;
+    stopBtn.disabled=true;
+    elapsed=0;
+    display.textContent='0.0 s';
+    verdict.textContent='';
+    verdict.className='timer-verdict';
+  });
+})();
+</script>
+</body>
+</html>

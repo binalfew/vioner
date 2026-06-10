@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Focal Loss — Quick Reference Card</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})"></script>
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --highlight:#F5EBC9;
+  --grid:#E8E1D2;
+}
+*{box-sizing:border-box}
+html{font-size:15px}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;
+  line-height:1.5;
+}
+.card{
+  max-width:46rem;
+  margin:1.5rem auto;
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-radius:8px;
+  padding:1.8rem 2rem;
+  box-shadow:0 1px 4px rgba(0,0,0,0.04);
+}
+.header{
+  border-bottom:2px solid var(--accent);
+  padding-bottom:0.6rem;
+  margin-bottom:1.2rem;
+}
+.eyebrow{
+  font-family:"Inter",system-ui,sans-serif;
+  text-transform:uppercase;
+  letter-spacing:0.18em;
+  font-size:0.7rem;
+  color:var(--accent);
+  font-weight:600;
+}
+h1{
+  font-family:"Iowan Old Style","Charter",Georgia,serif;
+  font-size:1.55rem;
+  margin:0.25rem 0 0;
+}
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0.9rem 1.4rem;
+  margin:0.8rem 0;
+}
+.cell{
+  background:var(--paper);
+  border:1px solid var(--grid);
+  border-radius:5px;
+  padding:0.7rem 0.9rem;
+}
+.cell h3{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.74rem;
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+  color:var(--accent);
+  margin:0 0 0.4rem;
+  font-weight:600;
+}
+.cell p,.cell li{font-size:0.92rem;margin:0.2rem 0}
+.cell ul{margin:0.2rem 0 0;padding-left:1.1rem}
+.formula{
+  background:var(--highlight);
+  padding:0.7rem 0.9rem;
+  border-radius:5px;
+  text-align:center;
+  margin:0.8rem 0;
+  font-size:1.03rem;
+}
+.attacks{margin:0.6rem 0}
+.atk{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:0.7rem;
+  align-items:start;
+  padding:0.55rem 0;
+  border-bottom:1px dashed var(--grid);
+  font-size:0.92rem;
+}
+.atk:last-child{border-bottom:0}
+.atk .num{
+  background:var(--accent);
+  color:#FFF;
+  width:1.6rem;
+  height:1.6rem;
+  border-radius:50%;
+  font-size:0.78rem;
+  font-family:"Inter",system-ui,sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:600;
+}
+.atk .q{font-weight:600;color:var(--ink)}
+.atk .a{color:var(--ink-soft)}
+.kw{background:var(--highlight);padding:0 0.18em;border-radius:2px}
+.numbers{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:0.7rem;
+  margin:0.7rem 0 0.4rem;
+}
+.numbers .n{
+  background:var(--accent);
+  color:#FFF;
+  text-align:center;
+  padding:0.55rem 0.4rem;
+  border-radius:5px;
+}
+.numbers .n strong{display:block;font-size:1.3rem;font-family:"Iowan Old Style",Georgia,serif}
+.numbers .n span{font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;opacity:0.85}
+.section-h{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.78rem;
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  color:var(--accent);
+  margin:1.3rem 0 0.5rem;
+  font-weight:600;
+  border-bottom:1px solid var(--grid);
+  padding-bottom:0.25rem;
+}
+.foot{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.72rem;
+  color:var(--ink-soft);
+  margin-top:1rem;
+  border-top:1px dashed var(--grid);
+  padding-top:0.5rem;
+  text-align:right;
+}
+@media print{
+  body{background:#FFF}
+  .card{box-shadow:none;border:0;margin:0;max-width:none;padding:0.5in}
+  .numbers .n{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .formula{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="card">
+
+<div class="header">
+<div class="eyebrow">Quick reference · VioNER defense kit</div>
+<h1>Focal Loss</h1>
+</div>
+
+<div class="numbers">
+<div class="n"><strong>γ = 2</strong><span>focusing parameter</span></div>
+<div class="n"><strong>α<sub>cap</sub> = 10</strong><span>class weight cap</span></div>
+<div class="n"><strong>+11 F1</strong><span>VICTIM gain over CE</span></div>
+<div class="n"><strong>§6.6</strong><span>thesis ablation</span></div>
+</div>
+
+<div class="formula">
+$$\mathcal{L}_{\text{focal}} \;=\; \alpha_y \;\times\; (1 - p_y)^\gamma \;\times\; -\log p_y$$
+</div>
+
+<div class="grid">
+<div class="cell">
+<h3>Cross-entropy term</h3>
+<p>$-\log p_y$ — the "surprise". Big when the model gave low probability to the true class.</p>
+</div>
+<div class="cell">
+<h3>Focal factor</h3>
+<p>$(1-p_y)^\gamma$ — collapses to ~0 when $p_y$ is near 1. Suppresses easy-correct tokens.</p>
+</div>
+<div class="cell">
+<h3>Class weight $\alpha_y$</h3>
+<p>Per-class multiplier; inverse-frequency with cap at 10. Boosts rare classes <em>across</em> the dataset.</p>
+</div>
+<div class="cell">
+<h3>What "production loss" means</h3>
+<p>All three multiplied together, plus label smoothing β = 0.1 on the target distribution.</p>
+</div>
+</div>
+
+<div class="section-h">The 30-second pitch</div>
+<p style="font-size:0.94rem">"Focal loss is cross-entropy multiplied by a $(1-p_y)^2$ focusing factor that suppresses easy-correct tokens, paired with inverse-frequency class weights so rare classes contribute meaningfully to the gradient. The ablation in §6.6 shows the combination lifted VICTIM F1 by 11 points over plain cross-entropy without hurting any other entity."</p>
+
+<div class="section-h">Three attacks, three answers</div>
+<div class="attacks">
+
+<div class="atk">
+<div class="num">1</div>
+<div>
+<div class="q">Why γ = 2?</div>
+<div class="a">Literature default <span class="kw">(Lin et al. 2017)</span>. Tested γ = 1 (smaller gains) and γ = 3 (training instability). γ = 2 is the empirically stable choice.</div>
+</div>
+</div>
+
+<div class="atk">
+<div class="num">2</div>
+<div>
+<div class="q">Why cap at 10?</div>
+<div class="a">Uncapped, VICTIM hits α ≈ 22 → early-epoch gradients blow up → optimiser overshoots. <span class="kw">Empirically</span>, 10 keeps rare classes elevated without destabilising training.</div>
+</div>
+</div>
+
+<div class="atk">
+<div class="num">3</div>
+<div>
+<div class="q">Why focal + class weights, not just one?</div>
+<div class="a">They attack different aspects: class weights rebalance <span class="kw">across</span> classes; focal loss rebalances <span class="kw">within</span> a class. Combination gives +11 on VICTIM; focal alone +8; weights alone +7.</div>
+</div>
+</div>
+
+</div>
+
+<div class="section-h">Focal factor values to memorise</div>
+<table style="width:100%;border-collapse:collapse;font-size:0.92rem">
+<tr style="background:var(--highlight)">
+<th style="text-align:left;padding:0.4rem 0.6rem;font-family:'Inter',system-ui;font-weight:600;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em">$p_y$ (model confidence)</th>
+<th style="text-align:right;padding:0.4rem 0.6rem;font-family:'Inter',system-ui;font-weight:600;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em">$(1-p_y)^2$ (factor)</th>
+<th style="text-align:left;padding:0.4rem 0.6rem;font-family:'Inter',system-ui;font-weight:600;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em">Effect</th>
+</tr>
+<tr><td style="padding:0.35rem 0.6rem">0.2 (hard)</td><td style="padding:0.35rem 0.6rem;text-align:right">0.64</td><td style="padding:0.35rem 0.6rem">Almost full CE — model learns from this</td></tr>
+<tr><td style="padding:0.35rem 0.6rem">0.5 (uncertain)</td><td style="padding:0.35rem 0.6rem;text-align:right">0.25</td><td style="padding:0.35rem 0.6rem">Partial weighting</td></tr>
+<tr><td style="padding:0.35rem 0.6rem">0.9 (easy-correct)</td><td style="padding:0.35rem 0.6rem;text-align:right">0.01</td><td style="padding:0.35rem 0.6rem">Suppressed — barely contributes</td></tr>
+<tr><td style="padding:0.35rem 0.6rem">0.99 (very easy)</td><td style="padding:0.35rem 0.6rem;text-align:right">0.0001</td><td style="padding:0.35rem 0.6rem">Effectively zero</td></tr>
+</table>
+
+<div class="section-h">Where this lives</div>
+<p style="font-size:0.88rem;color:var(--ink-soft);margin:0.3rem 0">
+<strong>Thesis:</strong> §2.4 (definitions) · §5.5 (production config) · §6.6 (ablation Table 6.8)
+<br><strong>Defense slides:</strong> Slide 12 (training recipe) · Slide 18 (ablation result)
+<br><strong>Defense kit:</strong> <code>concepts_explained.md</code> §D1 · <code>formulas_explained.md</code> §A.4, §A.6
+</p>
+
+<div class="foot">Reference card · keep open in a tab during the dry-run</div>
+</div>
+
+</body>
+</html>

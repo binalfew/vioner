@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 1 — Defending Focal Loss in 90 Seconds</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})"></script>
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --accent-soft:#A14747;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --warn:#8B5A2B;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:42rem;margin:0 auto;padding:3.5rem 1.5rem 6rem}
+.eyebrow{
+  font-family:"Inter","SF Pro Text",system-ui,sans-serif;
+  text-transform:uppercase;
+  letter-spacing:0.18em;
+  font-size:0.72rem;
+  color:var(--accent);
+  font-weight:600;
+}
+h1{
+  font-family:"Iowan Old Style","Charter",Georgia,serif;
+  font-size:2.3rem;
+  font-weight:700;
+  line-height:1.18;
+  margin:0.4rem 0 0.6rem;
+  letter-spacing:-0.012em;
+}
+h2{
+  font-family:"Iowan Old Style","Charter",Georgia,serif;
+  font-size:1.45rem;
+  margin:3rem 0 0.6rem;
+  font-weight:700;
+  border-bottom:1px solid var(--rule);
+  padding-bottom:0.4rem;
+}
+h3{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:1rem;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.05em;
+  margin:1.6rem 0 0.4rem;
+  color:var(--accent);
+}
+p,li{font-size:1.05rem}
+.subtitle{
+  color:var(--ink-soft);
+  font-style:italic;
+  font-size:1.1rem;
+  margin:0 0 1.4rem;
+}
+.meta{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.78rem;
+  color:var(--ink-soft);
+  letter-spacing:0.02em;
+  border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);
+  padding:0.6rem 0;
+  margin-bottom:2.2rem;
+  display:flex;
+  flex-wrap:wrap;
+  gap:1.2rem;
+}
+.meta span strong{color:var(--ink)}
+blockquote{
+  margin:1.4rem 0;
+  padding:1rem 1.3rem;
+  background:#FFF;
+  border-left:3px solid var(--accent);
+  font-style:italic;
+  color:var(--ink-soft);
+  font-size:1.05rem;
+}
+blockquote.pitch{
+  background:var(--highlight);
+  border-left-color:var(--accent);
+  font-size:1.1rem;
+  color:var(--ink);
+  font-style:normal;
+  line-height:1.55;
+}
+.callout{
+  background:#FFF;
+  border:1px solid var(--rule);
+  padding:1rem 1.3rem;
+  margin:1.2rem 0;
+  border-radius:4px;
+}
+.callout.warn{border-left:3px solid var(--warn)}
+.callout.win{border-left:3px solid var(--success)}
+.attack{
+  background:#FFF;
+  border:1px solid var(--rule);
+  padding:1rem 1.3rem 0.8rem;
+  margin:1rem 0;
+  border-radius:4px;
+}
+.attack .q{
+  font-family:"Inter",system-ui,sans-serif;
+  font-weight:600;
+  font-size:0.95rem;
+  color:var(--accent);
+  margin-bottom:0.5rem;
+}
+.attack .a{margin:0.4rem 0 0.6rem;font-size:1.03rem}
+.attack .micro{font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+table{border-collapse:collapse;width:100%;margin:1rem 0;font-size:0.97rem}
+th,td{text-align:left;padding:0.55rem 0.7rem;border-bottom:1px solid var(--rule)}
+th{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft)}
+code{
+  font-family:"JetBrains Mono","SF Mono",Menlo,monospace;
+  font-size:0.92em;
+  background:#F0EBE0;
+  padding:0.06em 0.36em;
+  border-radius:3px;
+}
+.figure{
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-radius:6px;
+  padding:1.4rem;
+  margin:1.6rem 0;
+  text-align:center;
+}
+.figure svg{max-width:100%;height:auto}
+.figure figcaption{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.85rem;
+  color:var(--ink-soft);
+  margin-top:0.6rem;
+  font-style:italic;
+}
+/* Quiz */
+.quiz{
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-radius:6px;
+  padding:1.4rem;
+  margin:1.4rem 0;
+}
+.quiz h4{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.95rem;
+  margin:0 0 0.8rem;
+  color:var(--accent);
+}
+.quiz .qstem{font-size:1.02rem;margin-bottom:0.7rem}
+.choices{list-style:none;padding:0;margin:0}
+.choices li{
+  margin:0.45rem 0;
+  padding:0.55rem 0.8rem;
+  border:1px solid var(--rule);
+  border-radius:4px;
+  cursor:pointer;
+  background:#FBFAF7;
+  font-size:0.98rem;
+  transition:background 120ms,border-color 120ms;
+}
+.choices li:hover{background:#F0EBE0}
+.choices li.right{background:#E6F0E6;border-color:var(--success);color:var(--success);font-weight:600}
+.choices li.wrong{background:#F5DEDE;border-color:var(--accent);color:var(--accent)}
+.feedback{
+  margin-top:0.6rem;
+  font-size:0.93rem;
+  font-style:italic;
+  color:var(--ink-soft);
+  min-height:1.2rem;
+}
+.checklist{list-style:none;padding:0}
+.checklist li{
+  padding:0.5rem 0 0.5rem 1.8rem;
+  position:relative;
+  font-size:1rem;
+  border-bottom:1px dashed var(--rule);
+}
+.checklist li:before{
+  content:"☐";
+  position:absolute;
+  left:0;
+  top:0.45rem;
+  font-size:1.1rem;
+  color:var(--accent);
+}
+hr{
+  border:0;
+  border-top:1px solid var(--rule);
+  margin:2.4rem 0;
+}
+.footer-note{
+  margin-top:3rem;
+  padding:1.2rem 1.4rem;
+  background:#FFF;
+  border:1px dashed var(--rule);
+  border-radius:6px;
+  font-size:0.95rem;
+}
+.footer-note strong{color:var(--accent)}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft)}
+a:hover{color:var(--accent-soft)}
+@media print{
+  body{background:#FFF;font-size:11pt}
+  .wrap{max-width:none;padding:0 1in}
+  .quiz,.choices li{cursor:auto}
+  .choices li{break-inside:avoid}
+  h2{break-after:avoid}
+  blockquote.pitch{background:#F5EBC9 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .meta{display:block}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">Lesson 01 · Focal loss</div>
+<h1>Defend focal loss in 90 seconds</h1>
+<p class="subtitle">From "I understand focal loss" to "I can deliver it under pressure" — the bridge a defense needs.</p>
+
+<div class="meta">
+  <span><strong>Mission link.</strong> Defend modelling decisions without stumbling.</span>
+  <span><strong>Difficulty.</strong> Delivery, not theory.</span>
+  <span><strong>Time.</strong> 12–15 minutes.</span>
+</div>
+
+<p>You already understand the <em>mechanics</em>: focal loss multiplies cross-entropy by $(1 - p_y)^\gamma$ to suppress easy-correct tokens. You can do the row-by-row arithmetic in the worked example in <code>concepts_explained.md</code> §D1. Mission accomplished there.</p>
+
+<p>The gap now is <strong>fluent oral delivery</strong>. A panel question is not a homework problem — you have ten seconds before silence becomes uncomfortable. This lesson compresses everything you know about focal loss into <em>one rehearsable 30-second pitch</em>, <em>three pre-loaded follow-up answers</em>, and <em>one whiteboard sketch you can produce from memory</em>.</p>
+
+<p>That is the whole lesson. By the end you should be able to recite the pitch without notes and answer any of the three follow-ups in one breath.</p>
+
+<h2>1 · The 30-second pitch (memorise this verbatim)</h2>
+
+<p>This is what you say if a panellist asks <em>"What is focal loss and why did you use it?"</em>. Three sentences. About 30 seconds at calm delivery speed.</p>
+
+<blockquote class="pitch">
+"Focal loss is cross-entropy multiplied by a $(1 - p_y)^2$ focusing factor that suppresses tokens the model already gets right, so the optimiser concentrates on the hard ones. We combined it with inverse-frequency class weights so the rare classes — VICTIM, ACTION, CASUALTIES — contribute meaningfully to the gradient rather than being drowned out by the 78% O tokens. The ablation in section 6.6 shows the combination lifted VICTIM F1 by 11 points over plain cross-entropy without hurting any other entity. That is the empirical defence for the loss-function contribution."
+</blockquote>
+
+<div class="callout">
+<strong>Why these three sentences and not others?</strong>
+<ul>
+<li>Sentence 1 names <em>what</em> focal loss is in one mathematical idea (the focusing factor).</li>
+<li>Sentence 2 explains <em>why we pair it with class weights</em> — anticipating the inevitable "why not just one or the other?" follow-up.</li>
+<li>Sentence 3 closes with the <em>quantified empirical claim</em> (+11 F1) — the headline that makes the contribution defensible.</li>
+</ul>
+The pitch is structured so that even if the panel cuts you off after the second sentence, you have already delivered the key technical content.
+</div>
+
+<h3>Dry-run protocol</h3>
+<ol>
+<li>Read the pitch aloud three times, slowly.</li>
+<li>Cover it and recite from memory. Don't paraphrase — match the wording.</li>
+<li>Time yourself. If you finish in less than 25 seconds you're rushing; over 40 seconds you're padding.</li>
+<li>Now imagine a panellist asks <em>"What is focal loss?"</em> mid-sip of coffee. Deliver the pitch from memory.</li>
+</ol>
+
+<h2>2 · The three predicted follow-ups</h2>
+
+<p>If your pitch is good, the panel will pursue exactly one of three follow-ups. Pre-load the answer to each — one or two sentences, no improvisation.</p>
+
+<div class="attack">
+<div class="q">Attack 1. "Why $\gamma = 2$ and not $\gamma = 1$ or $\gamma = 3$?"</div>
+<div class="a">"$\gamma = 2$ is the literature default from Lin et al. 2017 — the original focal loss paper. We tested $\gamma = 1$, which gave smaller gains because the focusing factor was too gentle, and $\gamma = 3$, which destabilised training because the suppression of easy tokens was too aggressive. $\gamma = 2$ is the empirically stable choice."</div>
+<div class="micro">Land the citation (Lin et al. 2017). It moves the question from "did you arbitrarily pick this?" to "you followed the established literature."</div>
+</div>
+
+<div class="attack">
+<div class="q">Attack 2. "Why cap class weights at 10?"</div>
+<div class="a">"Without the cap, the rarest class weight comes out around 22 — VICTIM was the binding case. That made early-epoch gradients too large, the optimiser overshot, and training destabilised. Empirically, 10 keeps rare classes elevated enough to learn but small enough that training remains stable."</div>
+<div class="micro">"Empirically" is the magic word — it concedes the choice was tuned, not derived, which is honest and disarms the "is this arbitrary?" line of attack.</div>
+</div>
+
+<div class="attack">
+<div class="q">Attack 3. "Why focal loss <em>and</em> class weights — wouldn't one suffice?"</div>
+<div class="a">"They attack different aspects of the same imbalance. Class weights rebalance <em>across</em> classes — VICTIM tokens get a per-token boost. Focal loss rebalances <em>within</em> a class — easy tokens get suppressed regardless of which class they're in. The ablation in section 6.6 shows the combination beats either alone — focal alone gave +8 F1 on VICTIM, weights alone gave +7, but combined we got +11."</div>
+<div class="micro">The "across vs within" framing is the conceptual key. Memorise that exact phrase.</div>
+</div>
+
+<h2>3 · The whiteboard sketch</h2>
+
+<p>If a panellist hands you a marker and asks <em>"show me the focusing factor"</em>, this is what you draw. One axis, one curve, one annotation.</p>
+
+<div class="figure">
+<svg viewBox="0 0 480 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Focal factor curve">
+<!-- Axes -->
+<line x1="60" y1="240" x2="440" y2="240" stroke="#1c1916" stroke-width="1.5"/>
+<line x1="60" y1="240" x2="60" y2="30" stroke="#1c1916" stroke-width="1.5"/>
+<!-- Axis labels -->
+<text x="250" y="270" font-family="Iowan Old Style, Georgia, serif" font-size="14" text-anchor="middle" fill="#1c1916">
+  $p_y$ — model's probability on true label
+</text>
+<text x="22" y="135" font-family="Iowan Old Style, Georgia, serif" font-size="14" text-anchor="middle" fill="#1c1916" transform="rotate(-90 22 135)">
+  focal factor (1 - $p_y$)²
+</text>
+<!-- Tick marks -->
+<line x1="60" y1="240" x2="60" y2="245" stroke="#1c1916"/>
+<text x="60" y="258" font-family="Iowan Old Style, Georgia, serif" font-size="12" text-anchor="middle">0</text>
+<line x1="440" y1="240" x2="440" y2="245" stroke="#1c1916"/>
+<text x="440" y="258" font-family="Iowan Old Style, Georgia, serif" font-size="12" text-anchor="middle">1</text>
+<line x1="60" y1="240" x2="55" y2="240" stroke="#1c1916"/>
+<text x="48" y="244" font-family="Iowan Old Style, Georgia, serif" font-size="12" text-anchor="end">0</text>
+<line x1="60" y1="30" x2="55" y2="30" stroke="#1c1916"/>
+<text x="48" y="34" font-family="Iowan Old Style, Georgia, serif" font-size="12" text-anchor="end">1</text>
+<!-- The curve: (1-p)^2 from p=0 to p=1, mapped to svg coords -->
+<!-- x: p in [0,1] → 60 + p*380 ; y: factor in [0,1] → 240 - factor*210 -->
+<path d="M 60 30 Q 250 240 440 240" stroke="#7B1E1E" stroke-width="2.5" fill="none"/>
+<!-- Annotation lines -->
+<line x1="364" y1="240" x2="364" y2="232" stroke="#3d3935" stroke-dasharray="3 2"/>
+<text x="364" y="225" font-family="Iowan Old Style, Georgia, serif" font-size="11" text-anchor="middle" fill="#3d3935">easy, p=0.8</text>
+<text x="364" y="212" font-family="Iowan Old Style, Georgia, serif" font-size="11" text-anchor="middle" fill="#7B1E1E" font-weight="bold">factor ≈ 0.04</text>
+<line x1="250" y1="240" x2="250" y2="190" stroke="#3d3935" stroke-dasharray="3 2"/>
+<text x="250" y="180" font-family="Iowan Old Style, Georgia, serif" font-size="11" text-anchor="middle" fill="#3d3935">uncertain, p=0.5</text>
+<text x="250" y="166" font-family="Iowan Old Style, Georgia, serif" font-size="11" text-anchor="middle" fill="#7B1E1E" font-weight="bold">factor = 0.25</text>
+<line x1="136" y1="240" x2="136" y2="75" stroke="#3d3935" stroke-dasharray="3 2"/>
+<text x="136" y="65" font-family="Iowan Old Style, Georgia, serif" font-size="11" text-anchor="middle" fill="#3d3935">hard, p=0.2</text>
+<text x="136" y="51" font-family="Iowan Old Style, Georgia, serif" font-size="11" text-anchor="middle" fill="#7B1E1E" font-weight="bold">factor = 0.64</text>
+</svg>
+<figcaption>The focusing factor as a function of the model's confidence on the true label. Near $p_y = 1$ the factor collapses to zero — easy tokens are suppressed. Near $p_y = 0$ the factor approaches one — hard tokens contribute their full cross-entropy loss to the gradient.</figcaption>
+</div>
+
+<h3>Talking points while you draw it</h3>
+<ol>
+<li>Draw the axes first. Label <em>x</em>: $p_y$ — model's probability on the true label. Label <em>y</em>: focal factor.</li>
+<li>Draw the curve from top-left to bottom-right, dipping sharply in the middle.</li>
+<li>Annotate three points: <em>p = 0.2 → factor ≈ 0.64</em> (hard, contributes most of CE), <em>p = 0.5 → 0.25</em> (medium), <em>p = 0.9+ → ≈ 0.01</em> (easy, suppressed).</li>
+<li>Say: <em>"This is the dimmer switch between the model's confidence and how much that token contributes to learning. Plain cross-entropy is a constant factor of 1 — every token contributes the same. Focal loss dims the easy ones."</em></li>
+</ol>
+
+<h2>4 · Quiz — match attack to answer</h2>
+
+<p>Tap each option to test yourself. The page tells you immediately whether you're right.</p>
+
+<div class="quiz" id="quiz1">
+<h4>Q1. A panellist asks: "Why pair focal loss with class weights instead of using just one of them?"</h4>
+<p class="qstem">Pick the best one-sentence answer.</p>
+<ul class="choices" data-answer="b">
+<li data-key="a">"Because the ablation in section 6.6 says so."</li>
+<li data-key="b">"Class weights rebalance across classes; focal loss rebalances within a class. They attack different aspects of the imbalance, so the combination beats either alone — focal alone gave +8 F1 on VICTIM, weights alone +7, combined +11."</li>
+<li data-key="c">"Focal loss alone wasn't enough on rare classes, so we added class weights as a safety net."</li>
+<li data-key="d">"Class weights handle the rare entities; focal loss handles all the rest."</li>
+</ul>
+<p class="feedback" id="fb1"></p>
+</div>
+
+<div class="quiz" id="quiz2">
+<h4>Q2. "Why $\gamma = 2$?"</h4>
+<p class="qstem">Pick the most defensible one-sentence answer.</p>
+<ul class="choices" data-answer="c">
+<li data-key="a">"It was the value that gave the best result in my experiments."</li>
+<li data-key="b">"Higher gammas would have helped more but training was unstable."</li>
+<li data-key="c">"It's the literature default from Lin et al. 2017. We tested $\gamma = 1$ and $\gamma = 3$ — $\gamma = 1$ gave smaller gains, $\gamma = 3$ destabilised training."</li>
+<li data-key="d">"$\gamma$ is the focusing parameter — we just used the value that's standard in object detection."</li>
+</ul>
+<p class="feedback" id="fb2"></p>
+</div>
+
+<div class="quiz" id="quiz3">
+<h4>Q3. "Class weights and focal loss — is one of them redundant?"</h4>
+<p class="qstem">Which phrase belongs in your one-sentence answer?</p>
+<ul class="choices" data-answer="b">
+<li data-key="a">"One handles common classes, the other handles rare ones."</li>
+<li data-key="b">"Across-class rebalancing versus within-class hard-mining."</li>
+<li data-key="c">"Focal loss is more important — class weights are a small boost on top."</li>
+<li data-key="d">"They are slightly redundant but I kept both for safety."</li>
+</ul>
+<p class="feedback" id="fb3"></p>
+</div>
+
+<h2>5 · The fluency checklist</h2>
+
+<p>Before you close this tab, mentally tick each box. If you can't tick all five, do another rep on the section that broke down.</p>
+
+<ul class="checklist">
+<li>I can recite the 30-second pitch from memory, no notes.</li>
+<li>I can answer Attack 1 ($\gamma = 2$ choice) with the Lin et al. 2017 citation.</li>
+<li>I can answer Attack 2 (cap at 10) with the word "empirically" and the "rarest class hit ~22" framing.</li>
+<li>I can answer Attack 3 (focal + weights) with the "across versus within" phrase.</li>
+<li>I can draw the focal factor curve and label three points on it without prompting.</li>
+</ul>
+
+<div class="callout win">
+<strong>If all five are ticked,</strong> you have moved focal loss from <em>understood</em> to <em>defensible under panel pressure</em>. That is the gap this lesson exists to close.
+</div>
+
+<h2>Want to go deeper?</h2>
+
+<p>Ask your teacher (me) any of the following — these are natural next lessons if you want to keep building:</p>
+<ul>
+<li><em>"Teach me how to defend the ablation table on slide 18."</em></li>
+<li><em>"Teach me the focal loss vs effective-number-weighting decision."</em></li>
+<li><em>"Teach me the whiteboard derivation of $-\log p_y$ behaviour as $p_y \to 0$."</em></li>
+<li><em>"Quiz me cold — fire panel questions and I'll respond verbally."</em></li>
+</ul>
+
+<div class="footer-note">
+<strong>Authority for this lesson.</strong> All claims above are sourced from your own thesis defense kit: <code>concepts_explained.md</code> §D1 (focal loss with worked example), <code>formulas_explained.md</code> §A.4 and §A.6 (production loss equations), <code>experimental_results.md</code> §6.6 (ablation table). The $\gamma = 2$ citation is Lin et al. 2017 (ICCV); label smoothing is Szegedy et al. 2016 (CVPR).
+</div>
+
+</div>
+
+<script>
+document.querySelectorAll('.quiz').forEach(function(q){
+  var list=q.querySelector('.choices');
+  var ans=list.getAttribute('data-answer');
+  var fb=q.querySelector('.feedback');
+  list.querySelectorAll('li').forEach(function(li){
+    li.addEventListener('click',function(){
+      list.querySelectorAll('li').forEach(function(x){x.classList.remove('right','wrong');});
+      if(li.getAttribute('data-key')===ans){
+        li.classList.add('right');
+        fb.textContent='Correct — this is the phrasing to use.';
+      } else {
+        li.classList.add('wrong');
+        fb.textContent='Not the strongest answer — try again.';
+      }
+    });
+  });
+});
+</script>
+</body>
+</html>

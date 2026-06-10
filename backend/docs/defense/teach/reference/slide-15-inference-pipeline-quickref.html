@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Slide 15 Quick Reference — The Inference Pipeline (Worked Example)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+@page{size:A4;margin:14mm}
+:root{
+  --ink:#1c1916;
+  --ink-soft:#4a4744;
+  --paper:#FFF;
+  --rule:#CFC8B8;
+  --accent:#7B1E1E;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --pipe:#7B5B1E;
+  --who:#3F6B3F;
+  --what:#7B1E1E;
+  --when:#5B3D7B;
+  --where:#3D6B8B;
+  --how:#8B5A2B;
+}
+*{box-sizing:border-box}
+html{font-size:10.5pt}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter",Georgia,serif;line-height:1.42}
+.wrap{max-width:185mm;margin:0 auto;padding:0}
+header{border-bottom:2px solid var(--accent);padding-bottom:6px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline;gap:1rem}
+header h1{font-family:"Iowan Old Style",Georgia,serif;font-size:16pt;font-weight:700;margin:0;letter-spacing:-0.01em}
+header .eye{font-family:"Inter","SF Pro Text",system-ui,sans-serif;font-size:8pt;color:var(--accent);text-transform:uppercase;letter-spacing:0.14em;font-weight:600}
+header .target{font-family:"Inter",sans-serif;font-size:8.5pt;color:var(--ink-soft)}
+.hero{background:var(--highlight);border:1.5px solid var(--accent);border-radius:4px;padding:7px 12px;margin:8px 0;text-align:center;font-size:10pt;font-weight:600;font-style:italic;line-height:1.45}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:7mm;margin-top:6px}
+h2{font-family:"Iowan Old Style",Georgia,serif;font-size:10.5pt;margin:8px 0 4px;border-bottom:1px solid var(--rule);padding-bottom:2px;color:var(--accent)}
+h3{font-family:"Inter",sans-serif;font-size:8pt;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);margin:6px 0 3px;font-weight:600}
+p,li{font-size:9.5pt;margin:2px 0}
+ul{margin:2px 0 2px 14px;padding:0}
+ul.tight li{margin:1px 0}
+em.k{background:#FFEFC0;font-style:normal;padding:0 2px;border-radius:2px;font-weight:600;color:var(--accent)}
+em.t{font-family:"JetBrains Mono",monospace;font-style:normal;font-weight:700;color:var(--accent);font-size:8.7pt}
+em.g{color:var(--success);font-style:normal;font-weight:600}
+/* Pipeline */
+.pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin:4px 0}
+.step{background:#FAF7F0;border:1px solid var(--rule);border-left:2.5px solid var(--pipe);border-radius:3px;padding:4px 5px;text-align:center}
+.step .n{font-family:"Inter",sans-serif;font-size:6.5pt;text-transform:uppercase;letter-spacing:0.05em;color:var(--pipe);font-weight:700;display:block}
+.step .name{font-family:"Iowan Old Style",Georgia,serif;font-size:8pt;font-weight:700;line-height:1.2;color:var(--ink)}
+.step.bert{border-left-color:var(--what)}
+.step.kb{border-left-color:var(--where)}
+.step.tax{border-left-color:var(--when)}
+.step.ui{border-left-color:var(--who)}
+/* Latency */
+.lat{margin:5px 0}
+.lat-bar{display:flex;height:22px;border-radius:3px;overflow:hidden;border:1px solid var(--rule)}
+.lat-bar .seg{display:flex;align-items:center;justify-content:center;font-family:"Inter",sans-serif;font-size:7.5pt;font-weight:700;color:#FFF}
+.lat-bar .seg.bert{background:var(--what);flex-basis:75%}
+.lat-bar .seg.kb{background:var(--where);flex-basis:15%}
+.lat-bar .seg.other{background:var(--ink-soft);flex-basis:10%}
+.lat-leg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;margin-top:3px;font-size:7.5pt}
+.lat-leg .l{color:var(--ink-soft)}
+.lat-leg .l b{color:var(--ink)}
+/* Sentence + chips */
+.sentence{background:#FAF7F0;border:1px solid var(--rule);border-radius:3px;padding:5px 8px;font-family:"Iowan Old Style",Georgia,serif;font-size:9.5pt;font-style:italic;line-height:1.45;margin:4px 0}
+.sentence em{font-style:normal;padding:0 2px;border-radius:2px;font-weight:600}
+.sentence em.who{background:#E6F0E6;color:var(--who)}
+.sentence em.what{background:#F5E6E6;color:var(--what)}
+.sentence em.when{background:#EEE8F5;color:var(--when)}
+.sentence em.where{background:#E8EEF5;color:var(--where)}
+.sentence em.how{background:#F5EFE2;color:var(--how)}
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-top:3px}
+.chip{background:#FFF;border:1px solid var(--rule);border-radius:3px;padding:4px 6px}
+.chip.who{border-left:2.5px solid var(--who)}
+.chip.what{border-left:2.5px solid var(--what)}
+.chip.when{border-left:2.5px solid var(--when)}
+.chip.where{border-left:2.5px solid var(--where)}
+.chip.how{border-left:2.5px solid var(--how)}
+.chip .cat{font-family:"Inter",sans-serif;font-size:6.5pt;text-transform:uppercase;letter-spacing:0.04em;font-weight:700;display:block;margin-bottom:1px}
+.chip.who .cat{color:var(--who)}
+.chip.what .cat{color:var(--what)}
+.chip.when .cat{color:var(--when)}
+.chip.where .cat{color:var(--where)}
+.chip.how .cat{color:var(--how)}
+.chip .v{font-family:"Iowan Old Style",Georgia,serif;font-size:8.5pt;font-weight:700;color:var(--ink);display:block}
+.chip .n{font-family:"Inter",sans-serif;font-size:7pt;color:var(--ink-soft);font-style:italic;margin-top:1px;display:block;line-height:1.3}
+.chip .n b{color:var(--accent);font-style:normal}
+/* Flourishes */
+.flour{display:grid;grid-template-columns:auto 14px auto 1fr;gap:5px;padding:3px 0;border-bottom:1px dashed var(--rule);font-size:8.5pt;align-items:center}
+.flour:last-child{border:0}
+.flour .raw{font-family:"JetBrains Mono",monospace;font-size:7.8pt;background:#FAF7F0;padding:1px 5px;border-radius:2px;color:var(--ink-soft);white-space:nowrap;font-weight:600}
+.flour .arr{font-family:"Iowan Old Style",Georgia,serif;font-size:9pt;color:var(--accent);font-weight:700;text-align:center}
+.flour .res{font-family:"JetBrains Mono",monospace;font-size:7.8pt;color:var(--success);background:#E6F0E6;padding:1px 5px;border-radius:2px;white-space:nowrap;font-weight:700}
+.flour .why{font-family:"Iowan Old Style",Georgia,serif;font-size:7.8pt;color:var(--ink-soft);font-style:italic;line-height:1.3}
+/* Beats */
+.beats{margin:3px 0}
+.b{display:grid;grid-template-columns:18px 1fr;gap:6px;padding:3px 0;border-bottom:1px dashed var(--rule);font-size:9pt}
+.b:last-child{border:0}
+.b .n{background:var(--accent);color:#FFF;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-family:"Inter",sans-serif;font-size:7pt;font-weight:700;margin-top:2px}
+.b .t{line-height:1.4}
+.b .t b{color:var(--accent)}
+.b .t .secs{font-family:"Inter",sans-serif;font-size:7pt;color:var(--ink-soft);font-style:italic;letter-spacing:0.04em}
+/* Numbers */
+.nums{display:grid;grid-template-columns:auto 1fr auto;gap:2px 6px;font-size:8.5pt;margin-top:3px}
+.nums .l{font-family:"Inter",sans-serif;text-transform:uppercase;font-size:6.5pt;letter-spacing:0.05em;color:var(--ink-soft);font-weight:700}
+.nums .d{font-style:italic;color:var(--ink-soft);font-size:8.5pt;line-height:1.3}
+.nums .n{color:var(--accent);font-weight:700;text-align:right;font-feature-settings:"tnum"}
+.nums .sep{grid-column:1 / -1;border-top:1px dashed var(--rule);height:0;margin:1px 0}
+/* Attacks */
+.attack{background:#FAF7F0;border:1px solid var(--rule);border-radius:3px;padding:5px 7px;margin:3px 0;font-size:8.7pt}
+.attack .q{font-family:"Inter",sans-serif;font-size:7.5pt;color:var(--accent);font-weight:700;margin-bottom:2px}
+.attack .a{line-height:1.35}
+footer{margin-top:8px;border-top:1px solid var(--rule);padding-top:4px;font-family:"Inter",sans-serif;font-size:6.5pt;color:var(--ink-soft);display:flex;justify-content:space-between}
+@media print{html{font-size:10pt}.hero{font-size:9.5pt}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+<div>
+<div class="eye">Slide 15 · Defense quick reference</div>
+<h1>The inference pipeline — 10 steps, one sentence, six chips</h1>
+</div>
+<div class="target">Target: 90 s · Window 80–105 s · Beats: 4</div>
+</header>
+
+<div class="hero">Close: "That's what 'integration evaluated end-to-end' looks like in one article — schema, model, KB, taxonomy, platform, all touching one record."</div>
+
+<h2>The 10-step pipeline · recite as a list</h2>
+<div class="pipeline">
+<div class="step"><span class="n">1</span><span class="name">Article in</span></div>
+<div class="step"><span class="n">2</span><span class="name">Tokenise</span></div>
+<div class="step bert"><span class="n">3</span><span class="name">BERT forward</span></div>
+<div class="step"><span class="n">4</span><span class="name">BIO decode</span></div>
+<div class="step"><span class="n">5</span><span class="name">Confidence filter</span></div>
+<div class="step"><span class="n">6</span><span class="name">5W1H group</span></div>
+<div class="step kb"><span class="n">7</span><span class="name">KB validate + enrich</span></div>
+<div class="step tax"><span class="n">8</span><span class="name">Taxonomy classify</span></div>
+<div class="step ui"><span class="n">9</span><span class="name">Persist</span></div>
+<div class="step ui"><span class="n">10</span><span class="name">Render chips</span></div>
+</div>
+
+<div class="lat">
+<div class="lat-bar">
+<div class="seg bert">BERT · ~75 %</div>
+<div class="seg kb">KB · ~15 %</div>
+<div class="seg other">~10 %</div>
+</div>
+<div class="lat-leg">
+<div class="l"><b>~112 ms</b> · 110 M-param matrix mults</div>
+<div class="l"><b>~22 ms</b> · in-memory dict + alias</div>
+<div class="l"><b>~15 ms</b> · other 7 steps combined</div>
+</div>
+</div>
+
+<h2>The worked example · six chips</h2>
+<div class="sentence">"<em class="who">Al-Shabaab</em> <em class="what">attacked</em> a convoy near <em class="where">Mogadishu</em> on <em class="when">Tuesday</em>, killing <em class="how">twelve soldiers</em>."</div>
+<div class="chips">
+<div class="chip who"><span class="cat">WHO · Perp</span><span class="v">Al-Shabaab</span><span class="n">⇒ <b>al_shabaab (SO)</b></span></div>
+<div class="chip who"><span class="cat">WHO · Vict</span><span class="v">soldiers</span><span class="n">⇒ combatant</span></div>
+<div class="chip what"><span class="cat">WHAT</span><span class="v">attacked</span><span class="n">⇒ armed attack</span></div>
+<div class="chip when"><span class="cat">WHEN</span><span class="v">Tuesday</span><span class="n">⇒ <b>2026-06-09</b></span></div>
+<div class="chip where"><span class="cat">WHERE</span><span class="v">Mogadishu</span><span class="n">⇒ <b>Somalia (SO)</b></span></div>
+<div class="chip how"><span class="cat">HOW</span><span class="v">twelve soldiers</span><span class="n">⇒ <b>{12, "at least"}</b></span></div>
+</div>
+
+<div class="cols">
+<div>
+
+<h2>The 90-second script · four beats</h2>
+<div class="beats">
+<div class="b"><div class="n">1</div><div class="t"><b>Pipeline (~25 s).</b> <em class="t">Article in. Tokenise. BERT forward. BIO decode. Confidence filter. 5W1H group. KB validate-and-enrich. Taxonomy classify. Persist. Render chips.</em><br><span class="secs">Read as list. Small pause each. Drill until muscle memory.</span></div></div>
+<div class="b"><div class="n">2</div><div class="t"><b>Latency (~20 s).</b> Forward pass <em class="k">~75 %</em> of <em class="k">150 ms</em>. KB <em class="k">~15 %</em>. Everything else <em class="k">~10 %</em>, <em class="k">because the KB is in-memory</em>.<br><span class="secs">3 numbers. No per-step math. In-memory line = engineering payoff.</span></div></div>
+<div class="b"><div class="n">3</div><div class="t"><b>Worked ex (~30 s).</b> Sentence + six chips. Pace the three flourishes: <em class="k">Tuesday → calendar</em> · <em class="k">Mogadishu → Somalia</em> · <em class="k">twelve + "at least" preserved</em>.<br><span class="secs">Pause on each flourish. They are the slide's highest-bandwidth moments.</span></div></div>
+<div class="b"><div class="n">4</div><div class="t"><b>Close (~15 s).</b> <em class="k">That's what "integration evaluated end-to-end" looks like in one article — schema, model, KB, taxonomy, platform, all touching one record. With the system explained, we move to the evidence.</em><br><span class="secs">Verbatim slide-14 callback. Pivot to slide 16.</span></div></div>
+</div>
+
+<h2>Three normalisation flourishes</h2>
+<div class="flour"><span class="raw">"Tuesday"</span><span class="arr">→</span><span class="res">2026-06-09</span><span class="why">Publication-anchored ISO date. Without ⇒ range-query analytics broken.</span></div>
+<div class="flour"><span class="raw">"Mogadishu"</span><span class="arr">→</span><span class="res">Somalia (SO)</span><span class="why">CITY → COUNTRY via KB's 200-city map. Without ⇒ per-country counts miss city-level.</span></div>
+<div class="flour"><span class="raw">"twelve soldiers"</span><span class="arr">→</span><span class="res">{12, "at least"}</span><span class="why">Integer + qualifier. Without ⇒ over-state confidence or drop hedged counts.</span></div>
+
+<h2>Mnemonic — 4 clusters of 10 steps</h2>
+<ul class="tight">
+<li><b>Intake</b> (1–2): article in · tokenise</li>
+<li><b>Model</b> (3): BERT forward pass</li>
+<li><b>Post-proc</b> (4–6): BIO decode · confidence filter · 5W1H group</li>
+<li><b>Augment</b> (7–8): KB validate+enrich · taxonomy classify</li>
+<li><b>Deliver</b> (9–10): persist · render chips</li>
+</ul>
+
+</div>
+<div>
+
+<h2>Pre-loaded interrupts</h2>
+
+<div class="attack">
+<div class="q">Q · "Why is BERT 75 % of latency?"</div>
+<div class="a"><em class="k">110 M params on CPU</em> — matrix mults dominate. Other steps ~10 % combined. <em class="k">Paste, wait, read</em> cadence ⇒ 150 ms is well inside operational target. CPU was the deployment-target choice (non-ML engineers, standard server).</div>
+</div>
+
+<div class="attack">
+<div class="q">Q · "What does 'normalised' mean for the date?"</div>
+<div class="a">Relative dates anchored to <em class="k">article's publication date</em>. Friday-published "Tuesday" ⇒ prior Tuesday's ISO date. Absolute dates parsed directly. Without ⇒ range-query analytics can't filter by date.</div>
+</div>
+
+<div class="attack">
+<div class="q">Q · "How is 'at least' preserved?"</div>
+<div class="a">Post-processor parses CASUALTIES into <em class="t">{killed: 12, qualifier: 'at least'}</em>. Examples: "as many as 30" ⇒ <em class="t">{30, "as many as"}</em>; "dozens" ⇒ <em class="t">{null, "dozens"}</em>. Hedging preserved ⇒ analytics neither over-states confidence nor drops hedged counts.</div>
+</div>
+
+<div class="attack">
+<div class="q">Q · "What if KB lookup fails?"</div>
+<div class="a">Record still persists with <em class="k">raw surface form. No fabrication.</em> Slide 13's two guarantees: validation never blocks; enrichment never invents. New armed groups land exactly here.</div>
+</div>
+
+<h2>Reserved numbers</h2>
+<div class="nums">
+<div class="l">~150 ms</div><div class="d">End-to-end CPU latency per article</div><div class="n">total</div>
+<div class="sep"></div>
+<div class="l">~75 %</div><div class="d">BERT forward share · ~112 ms</div><div class="n">BERT</div>
+<div class="sep"></div>
+<div class="l">~15 %</div><div class="d">KB lookup share · ~22 ms · in-memory</div><div class="n">KB</div>
+<div class="sep"></div>
+<div class="l">~10 %</div><div class="d">All other 7 steps combined · ~15 ms</div><div class="n">other</div>
+<div class="sep"></div>
+<div class="l">110 M</div><div class="d">bert-base-cased parameter count</div><div class="n">params</div>
+<div class="sep"></div>
+<div class="l">10</div><div class="d">Steps in the pipeline list</div><div class="n">steps</div>
+<div class="sep"></div>
+<div class="l">§5.5</div><div class="d">Pipeline · §6.8 latency · §4.5 worked example</div><div class="n">refs</div>
+</div>
+
+<h2>Delivery traps to avoid</h2>
+<ul class="tight">
+<li>Stumbling on steps 4–6 (BIO decode / confidence filter / 5W1H group) ⇒ panel reads "doesn't know own pipeline". Drill list eyes-closed × 5.</li>
+<li>Per-step millisecond math in Beat 2 ⇒ overruns budget. Three numbers + in-memory line is enough.</li>
+<li>Rushing the three normalisation flourishes ⇒ they are the slide's highest-bandwidth moments. Pause on each.</li>
+<li>Adding a fourth flourish (e.g. KB enrichment of Al-Shabaab) ⇒ steals slide 13's payoff. Three is the right number.</li>
+<li>Deploying per-entity F1 numbers ⇒ steals slide 17's payoff. Slide 15 demonstrates capability; slide 17 measures it.</li>
+<li>Skipping the slide-14 verbatim callback in Beat 4 ⇒ demonstration sits in isolation. The callback is what makes it satisfy the prior claim.</li>
+</ul>
+
+</div>
+</div>
+
+<footer>
+<span>VioNER defense — slide 15 quick reference</span>
+<span>10 steps · 1 sentence · 6 chips · 3 flourishes · 150 ms</span>
+</footer>
+
+</div>
+</body>
+</html>

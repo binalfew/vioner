@@ -33,6 +33,502 @@ The document is organised by what you encounter as the model runs end-to-end:
 
 ---
 
+# Section 0 · The big picture before the big picture — WHEN and WHY each concept matters
+
+**Read this section first.** It answers the two questions you most need for defense:
+
+1. **PURPOSE** — *Why does each concept exist?* What problem does it solve?
+2. **STAGE** — *When in VioNER's pipeline is each concept actually used?* Training? Validation? Inference?
+
+If you can keep this stage-map straight in your head, you will never confuse a training-time concept with an inference-time concept during the defense — and almost every confusing panellist question can be answered by *"which stage are you asking about?"*
+
+## The four stages of VioNER
+
+VioNER's life has four distinct stages. Each uses *different* concepts:
+
+```
+   ┌─────────────────────────────────────────┐
+   │  STAGE 1 — ANNOTATION                   │  (one-time, before any model exists)
+   │  Humans label gold data.                │
+   │  Cohen's κ checks label reliability.    │
+   └─────────────────────────────────────────┘
+                     │
+                     ▼
+   ┌─────────────────────────────────────────┐
+   │  STAGE 2 — TRAINING                     │  (one-time per trained model)
+   │  Model learns from the gold data        │
+   │  using a LOSS FUNCTION as its signal.   │  ← this is where CE, focal loss,
+   │  Outputs a trained checkpoint.          │     class weights, smoothing live
+   └─────────────────────────────────────────┘
+                     │
+                     ▼
+   ┌─────────────────────────────────────────┐
+   │  STAGE 3 — VALIDATION                   │  (after each epoch + final reporting)
+   │  We measure model quality with F1,      │  ← F1, precision, recall live HERE,
+   │  precision, recall on held-out data.    │     not in training
+   └─────────────────────────────────────────┘
+                     │
+                     ▼
+   ┌─────────────────────────────────────────┐
+   │  STAGE 4 — INFERENCE                    │  (every time an analyst uses the system)
+   │  Trained model produces predictions     │
+   │  on new articles. No learning happens.  │
+   └─────────────────────────────────────────┘
+```
+
+## Which concepts live in which stage
+
+| Concept | Stage 1 — Annotation | Stage 2 — Training | Stage 3 — Validation | Stage 4 — Inference |
+|:--|:-:|:-:|:-:|:-:|
+| BIO encoding | ✅ (annotators apply it) | ✅ (labels feed loss) | ✅ (predicted vs gold) | ✅ (model outputs BIO) |
+| Cohen's κ | ✅ **measured here** | — | — | — |
+| Stratified sampling | ✅ (decides corpus) | — | — | — |
+| Forward pass | — | ✅ | ✅ | ✅ |
+| Softmax | — | ✅ | ✅ | ✅ |
+| **Cross-entropy (CE)** | — | ✅ **driver** | ✅ *monitor only* | — |
+| **Focal loss** | — | ✅ **driver** | — | — |
+| **Class weights** | — | ✅ **driver** | — | — |
+| **Label smoothing** | — | ✅ **driver** | — | — |
+| Gradient | — | ✅ | — | — |
+| Backpropagation | — | ✅ | — | — |
+| Gradient descent | — | ✅ | — | — |
+| AdamW optimiser | — | ✅ | — | — |
+| Learning rate | — | ✅ | — | — |
+| Early stopping | — | ✅ (uses val loss) | ✅ (provides val loss) | — |
+| **F1 score** | — | — | ✅ **judge** | — |
+| **Precision, Recall** | — | — | ✅ **judge** | — |
+| **Macro / Micro F1** | — | — | ✅ **judge** | — |
+| Confusion matrix | — | — | ✅ | — |
+| Confidence score | — | — | ✅ | ✅ |
+| KB validation / enrichment | — | — | — | ✅ |
+
+> **Read the column "Stage 2 — Training" carefully.** This is where the loss functions live. All four — CE, focal, class weights, label smoothing — are TRAINING-TIME concepts. The model never sees them during validation or inference; they only existed to teach it.
+
+> **Read the column "Stage 3 — Validation" carefully.** This is where F1, precision, recall live. The model doesn't compute F1 during training; F1 is a *judge* we apply *after* training to assess the trained model.
+
+## The PURPOSE of each concept — anchored to its stage
+
+This is the single most important table. If you internalise it, you can answer almost any panellist question.
+
+### Stage 1 concepts (Annotation)
+
+| Concept | Purpose — in plain English |
+|:--|:--|
+| **Cohen's κ** | *"Are our gold labels reliable enough to train on?"* — Checked once, before training begins. κ = 0.78 says yes. |
+| **Stratified sampling** | *"How do we build the training corpus so rare classes aren't drowned out?"* — Done once when assembling the 50,000-example corpus. |
+
+### Stage 2 concepts (Training) — the loss family
+
+| Concept | Purpose — in plain English |
+|:--|:--|
+| **Cross-entropy (CE)** | *"Give the model a single number that says 'you were this wrong on this batch'. That number is what backpropagation uses to compute gradients."* — The baseline loss. |
+| **Focal loss** | *"Make the loss pay less attention to tokens the model already gets right, so the optimiser concentrates on the hard ones."* — Solves the easy-tokens-dominate-the-gradient problem. |
+| **Inverse-frequency class weights** | *"Multiply each token's loss by a per-class weight so rare classes contribute meaningfully to the gradient, not drowned out by the 78% O tokens."* — Solves the rare-classes-get-no-gradient problem. |
+| **Label smoothing** | *"Soften the gold labels (0.9 on true class, 0.1 spread) so the model doesn't become overconfident and produces better-calibrated probabilities later."* — A regularisation safety net. |
+
+**One paragraph for the defense:** *"The loss function is the signal the model uses to learn. Plain cross-entropy treats all tokens equally; that fails on imbalanced data. Focal loss adds a focusing factor to suppress easy tokens. Class weights add a per-class multiplier to boost rare classes. Label smoothing softens the targets. The four together are the production loss in section 5.5 of the thesis. The §6.6 ablation proves the combination beats every alternative."*
+
+### Stage 3 concepts (Validation) — the metric family
+
+| Concept | Purpose — in plain English |
+|:--|:--|
+| **F1 score** | *"Give us a SINGLE number per entity type that says 'how good is the trained model?', balancing precision and recall."* — Used to compare configurations, pick the best checkpoint, and report headline results. |
+| **Precision** | *"Of the entities the model predicted, what fraction were correct?"* — Tells us how trustworthy the model's positive predictions are. |
+| **Recall** | *"Of the entities that actually existed, what fraction did the model recover?"* — Tells us how thorough the model is. |
+| **Macro F1** | *"How does the model perform if every entity type counts equally?"* — The right number for assessing balance across entity types. 0.887. |
+| **Micro F1** | *"How does the model perform on a per-span basis, weighted by frequency?"* — The right number for estimating overall throughput. 0.909. |
+| **Confusion matrix** | *"What KIND of errors does the model make?"* — Diagnoses systematic confusions like DISTRICT-vs-CITY. |
+
+**One paragraph for the defense:** *"F1 is the standard NER quality metric. It's the harmonic mean of precision (correctness of predictions) and recall (completeness of recovery). I report it per-entity (Table 6.7), as macro and micro averages (slide 16), and across loss configurations (slide 18). F1 is computed on the held-out validation set after training; the optimiser doesn't see F1 directly — it sees the loss."*
+
+### Stage 4 concepts (Inference)
+
+| Concept | Purpose — in plain English |
+|:--|:--|
+| **Confidence score** | *"How sure is the model about its prediction?"* — Used to filter low-confidence predictions and to show the analyst where to focus review. |
+| **KB validation** | *"Is this extracted record geographically plausible?"* — Flags Al-Shabaab-in-DRC for analyst re-read. |
+| **KB enrichment** | *"Can we canonicalise this actor mention?"* — Maps surface variants to a single KB identifier. |
+
+## A worked example — VioNER's full lifecycle, with the WHY for each step
+
+This walks through every stage end-to-end with the **rationale** for each step. Read it as a *"why we do what we do"* guide, not a procedural list. For each step you'll see **what happens + why it's needed + what would go wrong without it**. **If a panellist asks you "walk me through how VioNER actually works", deliver this with the WHYs.**
+
+---
+
+### Stage 1 — Annotation (October–November 2025)
+
+#### Step 1.1 — Two human annotators label 200 pilot documents using the 8-entity BIO schema
+
+- **Why two annotators (not one)?** Because the model can only be as good as the labels it learns from. If two equally-skilled humans disagree on what the labels should be, training on those labels would inject systematic noise the model can't learn around.
+- **Why a 200-doc pilot before the full corpus?** Large enough to detect systematic disagreement; small enough to redo if the initial guidelines fail. This is the rehearsal, not the show.
+- **What would go wrong without this step?** We'd have no idea whether our gold standard is trustworthy. Every F1 number we report later would be against a moving target.
+
+#### Step 1.2 — Compute Cohen's κ on the pilot
+
+- **Why κ rather than raw agreement?** Because raw agreement is inflated by the dominance of the O class — two annotators would agree on ~64% of tokens just by both labelling them O. κ subtracts out that chance baseline so the number reflects actual annotator skill on the harder edge cases.
+- **Why this matters for the contribution claim:** κ = **0.78** = "substantial agreement" on the Landis-Koch scale. This confirms the labels are clean enough to train a model on.
+- **What would go wrong without κ?** We'd report F1 numbers without knowing whether the variation came from the model or from inconsistent labels.
+
+#### Step 1.3 — Assemble the training corpus via stratified diversity sampling + template augmentation
+
+- **Why stratified sampling, not random?** Because if we randomly sampled 50k from ACLED's 212k events, we'd over-represent common event types (raids in well-covered theatres) and under-represent rare ones. The model would over-learn common patterns and under-learn rare ones — exactly the operationally important entities like VICTIM and ACTION.
+- **Why templated augmentation on top?** Because even after stratification, VICTIM/ACTION/CASUALTIES appear in single-digit token percentages. The model needs more examples of varied rare-class phrasing. Templates synthesise sentences that plug those vocabulary gaps.
+- **Result:** 35,000 stratified ACLED + 15,000 augmented = 50,000 total.
+- **What would go wrong without this step?** We'd train a model that's great at *common event in common theatre* and useless at the rare entities the analyst actually needs to extract.
+
+#### Step 1.4 — Apply BIO encoding to every token
+
+- **Why BIO and not just entity labels?** Because the model outputs one label per *token*, but entities can span multiple tokens. We need a scheme that lets multiple tokens belong to the same entity AND lets the decoder reconstruct entity boundaries.
+- **Why B- and I- separately?** Because without the B/I distinction, *"Christian worshippers and bus drivers"* would look like one VICTIM span; with B/I it's clearly two ("B-VICTIM I-VICTIM O B-VICTIM I-VICTIM").
+- **What would go wrong without BIO?** The model couldn't represent multi-token entities or distinguish adjacent same-type entities — exactly the cases African news headlines tend to produce.
+
+---
+
+### Stage 2 — Training (January–February 2026)
+
+#### Step 2.1 — Compute inverse-frequency class weights ONCE before training starts
+
+> **Quick terminology check.** *"Class" here means **BIO label** — one of the 17 discrete answers the model picks per token (O, B-ACTOR, I-ACTOR, B-VICTIM, ..., I-CASUALTIES).* VioNER has **17 classes** (= 17 BIO labels), so it computes **17 class weights**, one per class. *(Concept entry A5 in this document explains the class/label/entity-type distinction in full.)*
+
+- **Why class weights at all?** Because 78% of training tokens are O. Without reweighting, the gradient signal from O tokens collectively dominates each batch — the model becomes great at O and mediocre at VICTIM. Class weights are how we say *"VICTIM tokens matter more per-token than O tokens."*
+- **Why ONCE and not continuously?** Because the corpus is fixed; the class distribution doesn't change during training. Recomputing every batch would be wasteful and produce identical numbers.
+- **Why this specific formula** $\alpha_c = T / (C \cdot f_c)$**?** Let's break it down piece by piece — *what each symbol means, what the formula actually computes, and why it has the shape it does.*
+
+  **What each symbol stands for:**
+
+  | Symbol | Reads as | What it means in VioNER | Example value |
+  |:-:|:--|:--|:--|
+  | **$\alpha_c$** | "alpha sub c" | The weight assigned to class $c$ — one number per class | $\alpha_{\text{O}} = 0.075$; $\alpha_{\text{B-VICTIM}} = 10$ |
+  | **$T$** | "T" | **Total** number of tokens in the training set (across all 17 classes combined) | $T \approx 2{,}000{,}000$ |
+  | **$C$** | "C" | Number of **C**lasses — i.e., 17 BIO labels | $C = 17$ |
+  | **$f_c$** | "f sub c" | **f**requency of class $c$ — how many tokens of this class appear in the training set | $f_{\text{O}} \approx 1{,}560{,}000$; $f_{\text{B-VICTIM}} \approx 5{,}500$ |
+
+  **Reading the formula in plain English:** *"For each class $c$, the weight is total-tokens divided by (number-of-classes × that-class's-frequency)."*
+
+  **The intuition — read the formula as a ratio.** Rearrange it:
+
+  $$\alpha_c \;=\; \frac{T}{C \cdot f_c} \;=\; \frac{T / C}{f_c} \;=\; \frac{\text{balanced expectation}}{\text{actual count of class } c}$$
+
+  - $T / C$ = if the corpus were perfectly balanced across all 17 classes, each class would have $T/C$ tokens. For VioNER: $2{,}000{,}000 / 17 \approx$ **117,647 tokens per class (under balance)**.
+  - $f_c$ = how many tokens this class actually has.
+
+  So the formula is literally **"balanced expectation divided by actual count"** — a ratio.
+
+  **What this ratio means for different classes:**
+
+  | Class's situation | $\alpha_c$ value | Reading |
+  |:--|:-:|:--|
+  | **Perfectly balanced**: $f_c = T/C$ | $\alpha_c = 1$ | *"Don't boost, don't dampen — this class is already at balance."* |
+  | **Rarer than balance**: $f_c < T/C$ | $\alpha_c > 1$ | *"Boost this class"* (proportional to how rare it is) |
+  | **More common than balance**: $f_c > T/C$ | $\alpha_c < 1$ | *"Dampen this class"* (proportional to how dominant it is) |
+
+  **The number 1 is the natural anchor.** Above 1 means *"boost"*; below 1 means *"dampen"*. Without this rescaling, the weights would just be tiny numbers (1/5,500 = 0.00018 for VICTIM) with no obvious reference point.
+
+  **Worked example with VioNER's actual numbers** (T = 2,000,000; C = 17; balanced expectation T/C ≈ 117,647 per class):
+
+  | Class | Actual count $f_c$ | $\alpha_c = 117{,}647 / f_c$ | After cap at 10 | Reading |
+  |:--|--:|--:|--:|:--|
+  | **O** | 1,560,000 | $117{,}647 / 1{,}560{,}000 = 0.075$ | 0.075 | O has ~13× more tokens than balanced — so its weight drops to 1/13 ≈ 0.075. The optimiser pays one-thirteenth as much per-O-token as it would under balance. |
+  | **B-ACTOR** | 48,000 | $117{,}647 / 48{,}000 = 2.45$ | 2.45 | B-ACTOR is ~2.45× rarer than balance — so its weight rises to 2.45. Each B-ACTOR token contributes 2.45× the balanced-class contribution. |
+  | **B-DATE** | 32,000 | $117{,}647 / 32{,}000 = 3.68$ | 3.68 | B-DATE is ~3.7× rarer than balance — boost to 3.68. |
+  | **B-VICTIM** | 5,500 | $117{,}647 / 5{,}500 = 21.39$ | **10.0** *(capped)* | B-VICTIM is ~21× rarer than balance. Uncapped weight would be 21.4; the cap pulls it to 10 (see the next bullet). |
+
+  **Why this particular formula and not** $\alpha_c = 1 / f_c$**?** The simpler "pure inverse" choice works mathematically but produces weights without a natural anchor — all the numbers come out tiny (e.g., 1/5,500 = 0.00018) and you can't tell what "normal" looks like at a glance. The formula $T/(C \cdot f_c)$ is just $1/f_c$ multiplied by the constant $T/C$. This rescaling has one big virtue: **balanced classes get $\alpha_c = 1$**, which makes every weight immediately interpretable as a ratio relative to balance. A weight of 10 means *"10× the balanced-class weight"*; a weight of 0.5 means *"half the balanced-class weight"*. The cap-at-10 rule is meaningful precisely because of this anchor.
+
+  **How $\alpha_c$ plugs into the actual training loss.** Once computed and held fixed, $\alpha_c$ is just a per-class multiplier on each token's loss. For one B-VICTIM token where the model predicted with probability $p_y$:
+
+  $$\text{token loss} \;=\; \alpha_{\text{B-VICTIM}} \;\times\; (1 - p_y)^2 \;\times\; (-\log p_y) \;=\; 10 \;\times\; \text{focal factor} \;\times\; \text{cross-entropy}$$
+
+  If you compared a B-VICTIM token to a B-ACTOR token at the **same** $p_y$, the B-VICTIM loss is $10 / 2.45 \approx 4 \times$ larger — so the gradient pulls 4× harder on the model's response to that B-VICTIM token. That is the per-class re-weighting in action.
+
+- **Why cap at 10?** Because without the cap, the rarest class weight comes out around 22, which makes early-epoch gradients too large and the optimiser overshoots. Empirically, 10 keeps rare classes elevated without destabilising training.
+- **Result:** VICTIM gets α = 10 (clipped from 22); O gets α = 0.075. VICTIM tokens are now ~130× more loss-impactful than O tokens.
+- **What would go wrong without class weights?** VICTIM F1 would land at ~0.71 instead of 0.82 — about 30% of victims missed entirely.
+
+#### Step 2.2 — Initialise BERT with pretrained weights
+
+- **Why pretrained and not random?** Because BERT already knows English (grammar, vocabulary, sentence structure) from its Wikipedia + BookCorpus pretraining. Starting from random would require months of GPU time to learn English from scratch. Pretrained gives us a head-start that lets us fine-tune in just 2 epochs.
+- **Why bert-base-cased specifically?** Because African armed-group names ("JNIM", "RSF") use capitalisation that the uncased variant would lose. We need case-sensitivity for our domain.
+- **What would go wrong without pretraining?** Two epochs would be wildly insufficient; we'd need months and orders of magnitude more data.
+
+#### Step 2.3 — For each batch of 16 examples, run the training loop
+
+- **Why batches at all?** Two reasons. Processing one example at a time would be slow because the GPU can parallelise across examples. Processing all 40,000 at once would blow memory. Batches balance these two constraints.
+- **Why 16 specifically?** Because that's the largest batch that fits in M2 Max memory at this sequence length. Larger batches crash; smaller batches underuse the hardware.
+- **Result:** 40,000 / 16 = 2,500 batches/epoch × 2 epochs = **5,000 total weight updates**.
+
+#### Step 2.4 — Forward pass: 16 sentences flow through BERT, producing logits
+
+- **Why a forward pass?** Because we need to know what the model would predict *before* we can measure how wrong it is. The forward pass is "ask the model."
+- **Why logits (raw scores) instead of probabilities directly?** Because logits can be any real number, which gives the model representational freedom. We convert them to probabilities in the next step.
+- **Result:** For each of the 16 × 128 = 2,048 tokens in the batch, BERT produces 17 logits (one per BIO label).
+
+#### Step 2.5 — Softmax converts logits to probabilities
+
+- **Why softmax?** Because the loss function (next step) needs probabilities, not raw scores. We need to ask *"what probability did the model give to the right answer?"* — that's only meaningful when the 17 numbers sum to 1.
+- **Why this specific formula** ($e^x$ / sum of $e^x$)**?** Because exponentials make all numbers positive and amplify the strongest signal, then normalisation makes them sum to 1 — exactly what we need for a probability distribution.
+- **Result:** For each token, 17 probabilities summing to 1. The model is now saying *"I'm 94% sure this is B-CITY, 4% B-REGION, ..."* per token.
+
+#### Step 2.6 — Compute the loss
+
+- **Why a loss at all?** Because the model can't learn without a signal that says *"you were this wrong on this batch."* The loss is that signal.
+- **Why this particular formula? Each ingredient solves a specific problem:**
+  - **Cross-entropy** ($-\log p_y$) → Without this, no learning signal at all. CE measures how surprised the model was by the right answer; higher surprise = bigger correction needed.
+  - **Focal factor** $(1 - p_y)^2$ → Without this, the loss gets dominated by easy-correct tokens that each contribute tiny per-token loss but exist in huge numbers. The focal factor suppresses them so the optimiser concentrates on hard tokens — which is where the rare entities live.
+  - **Class weight** $\alpha_y$ → Without this, rare-class tokens (VICTIM) get equal per-token loss to O tokens but exist in 130× smaller numbers. The gradient signal for VICTIM gets drowned out.
+  - **Label smoothing** → Without this, the model can drive its logits arbitrarily high to push $p_y \to 1$, becoming overconfident. Smoothing keeps logits bounded and confidence calibrated.
+- **Result: ONE scalar number for the whole batch — e.g., 0.20.** Let me unpack what this actually means and how we get there.
+
+  **Yes — really one number for the entire batch of 16 sentences.** The batch loss is a single scalar that summarises every token's per-token loss across all 16 sentences. Here is how we get from many per-token losses to one batch scalar:
+
+  | Aggregation step | What's produced | Shape / value |
+  |:--|:--|:--|
+  | Forward pass produces logits | One vector of 17 logits per token | `[16 sentences × 128 tokens × 17 classes]` = 34,816 logit values |
+  | Softmax → predicted probability on true label, $p_y$ | One probability per token | $[16 \times 128]$ = 2,048 probabilities |
+  | Per-token loss formula $\alpha_y \times (1-p_y)^\gamma \times -\log p_y$ | One loss per token | 2,048 per-token losses |
+  | Mask out padding tokens (sentences shorter than 128) | One loss per real token | typically ~1,800–2,000 real tokens |
+  | **Average across all real tokens** | **One scalar for the batch** | **0.20** |
+
+  Each batch has roughly 16 × 128 = 2,048 token positions, of which maybe 1,800–2,000 are real (the rest are padding for short sentences). The batch loss is the **mean per-token loss** across those real tokens.
+
+  **A concrete numerical walk-through.** Suppose this particular batch has, after applying the full focal-loss + class-weights formula:
+
+  | Token group | How many | Average per-token loss | Why this magnitude |
+  |:--|--:|--:|:--|
+  | Easy O tokens (model confidently correct) | 1,600 | 0.005 | Tiny because focal factor $(1-0.99)^2 = 0.0001$ suppresses them AND $\alpha_{\text{O}} = 0.075$ dampens further |
+  | Medium-difficulty entity tokens | 250 | 0.20 | Moderate — model is partially right; α boosts these |
+  | Hard rare-class tokens (VICTIM, ACTION, CASUALTIES) | 150 | 1.50 | Large — both because the model struggles AND $\alpha_{\text{VICTIM}} = 10$ boosts them |
+
+  Sum across real tokens:
+  $$1600 \times 0.005 \;+\; 250 \times 0.20 \;+\; 150 \times 1.50 \;=\; 8.0 + 50.0 + 225.0 \;=\; 283$$
+
+  Mean across the 2,000 real tokens:
+  $$\text{batch loss} \;=\; 283 \;/\; 2{,}000 \;=\; \mathbf{0.142}$$
+
+  Different batches produce different scalars — early-epoch batches might land at 0.40-0.80; mid-training around 0.10-0.30; late-training around 0.005-0.05. The specific number doesn't matter — only its trend over batches matters.
+
+  **Why does it have to be ONE scalar?**
+
+  Because backpropagation requires a single scalar to differentiate. The gradient is *"how does this one number change as I nudge each weight?"* — you can't ask that question of a list of 2,000 per-token losses; you can only ask it of one number derived from them. PyTorch's `loss.backward()` call literally requires `loss` to be a scalar tensor; you'll get an error if it isn't.
+
+  **Why mean and not sum?**
+
+  - **Sum** would scale with batch size — a batch of 16 produces a number ~16× larger than a batch of 1, which means gradient magnitudes would change every time we changed the batch size. We'd have to re-tune the learning rate.
+  - **Mean** stays roughly constant regardless of batch size, so the gradient magnitudes are stable. We can fix the learning rate once and reuse it across different batch sizes.
+
+  VioNER (and almost all modern training) uses mean.
+
+  > **One-sentence defence answer.** *"The batch loss is one scalar — the mean of per-token losses across about two thousand real tokens in the 16-sentence batch — and that single number is what backpropagation differentiates to produce gradients on all 110 million weights."*
+
+- **What would go wrong without each ingredient?** Plain CE → VICTIM F1 drops 11 points. No class weights → 7-point drop on VICTIM. No focal → 8-point drop. No smoothing → marginal F1 effect but worse confidence calibration downstream.
+
+- **When is the loss actually computed? — the training-loop rhythm.** This is a foundational point that gets easily missed:
+
+  **The loss is computed ONCE per batch.** Not once per token (we'd have 2,000+ losses per batch). Not once per epoch (we'd have only 2 losses total). **Once per batch — so 2,500 times per epoch.**
+
+  Here's the per-batch loop, with the loss computation step called out explicitly:
+
+  ```
+  Training proceeds batch by batch. For each batch of 16 sentences:
+
+      [Step 2.4]  Forward pass through BERT      →  logits
+      [Step 2.5]  Softmax                         →  per-token probabilities
+      [Step 2.6]  Compute the loss                →  ONE scalar (e.g., 0.20)
+                                                     ← LOSS COMPUTED HERE
+      [Step 2.7]  Backpropagation                 →  110M gradients
+      [Step 2.8]  AdamW updates the weights       →  weights nudged
+                                                     ← MODEL CHANGES HERE
+      Move to next batch. (Weights are now slightly different.)
+  ```
+
+  **Counting it out:**
+
+  | Quantity | Value | Why |
+  |:--|--:|:--|
+  | Training examples | 40,000 | 80% of the 50,000 corpus |
+  | Batch size | 16 | Largest that fits in memory |
+  | Batches per epoch | 2,500 | 40,000 ÷ 16 |
+  | Epochs | 2 | Convergence point per early-stopping |
+  | **Total batches across all training** | **5,000** | 2,500 × 2 |
+  | **Total loss computations during training** | **5,000** | One per batch |
+  | **Total weight updates** | **5,000** | One per batch |
+
+  So during training, the model's weights get nudged **5,000 times** — each nudge driven by ONE batch loss.
+
+  **A subtle point: every batch sees a slightly different model.** The first batch is evaluated against the initial pretrained BERT. After step 2.8 updates the weights, the second batch is evaluated against a *slightly modified* BERT. After 2,500 batches, the model has evolved a lot — which is why training loss tends to drop steadily across an epoch.
+
+  **What about validation loss?** Computed only **twice** during the whole training run (once at the end of epoch 1, once at the end of epoch 2). Purpose: monitoring for early stopping — no weight updates happen during validation.
+
+  | Loss type | When computed | How many times | What it drives |
+  |:--|:--|:-:|:--|
+  | **Training (batch) loss** | After each batch's forward pass | **5,000** (per batch) | Weight updates — this is the active learning signal |
+  | **Validation loss** | Once at the end of each epoch | **2** | Early-stopping decision only — no weights change |
+
+  > **One-sentence defence answer.** *"The loss is the per-batch training signal. It's computed once per batch — five thousand times in total across two epochs — and each computation drives one round of weight updates. Validation loss is computed only twice (once at end of each epoch) as a monitoring signal for early stopping."*
+
+- **Common confusion: loss uses ARITHMETIC mean, not harmonic mean.** Because F1 famously uses a *harmonic* mean (of precision and recall), some students assume the loss must also use a harmonic mean. **It doesn't.** The two metrics live in different worlds and use different averaging:
+
+  | Quantity | Mean type | Formula | Why this mean? |
+  |:--|:--|:--|:--|
+  | **Batch loss** | **Arithmetic** | $\frac{1}{N}\sum \text{token loss}_i$ | Per-token losses are non-negative magnitudes; each should contribute linearly. Arithmetic mean keeps the gradient computation clean. |
+  | **F1 score** | **Harmonic** | $\frac{2 P R}{P + R}$ | Precision and recall are competing ratios — harmonic mean punishes weakness on either side, so you can't ace one at the cost of the other. |
+
+  Concrete contrast — suppose you wanted to combine two values, $a = 1.0$ and $b = 0.1$:
+
+  | Mean | Calculation | Result |
+  |:--|:--|--:|
+  | Arithmetic | $(1.0 + 0.1) / 2$ | **0.55** (flattering) |
+  | Harmonic | $2 \times 1.0 \times 0.1 / 1.1$ | **0.18** (honest) |
+
+  For loss aggregation across tokens, we want fidelity (each token contributes proportionally) — arithmetic mean is correct. For F1, we want a metric that refuses to be gamed by high precision + low recall (or vice versa) — harmonic mean is correct.
+
+  **Side note: macro F1 is an arithmetic mean of harmonic means.** Each per-entity F1 (Table 6.7) is computed with the harmonic-mean formula. Macro F1 (0.887) is the arithmetic average of those 8 per-entity F1s. So *"macro F1 = arithmetic mean of harmonic means."* No single VioNER quantity uses *only* harmonic-mean aggregation — F1 uses it for P+R; everything else (loss, macro F1 across entities, epoch loss across batches) uses arithmetic.
+
+#### Step 2.7 — Backpropagation: walk backward from 0.20 to compute gradients on every weight
+
+- **Why do we need gradients?** Because the loss is one number but we have 110 million weights. We need to know which way to nudge *each individual weight* to reduce the loss. The gradient is that per-weight directional signal.
+- **Why backward (not forward)?** Because the loss is at the END of the computation; to figure out how each weight contributed, we have to trace BACK through every layer using the chain rule from calculus.
+- **Result:** 110 million gradient values, one per weight, computed automatically by PyTorch.
+
+#### Step 2.8 — Gradient descent (via AdamW): update each weight opposite to its gradient
+
+- **Why opposite to the gradient?** Because the gradient points uphill (the direction that *increases* loss). To decrease loss, we go opposite — downhill.
+- **Why a small step (learning rate 5×10⁻⁵)?** Because if we stepped too far, we'd overshoot the minimum and possibly land on a worse spot. Small steps converge reliably; large steps oscillate.
+- **Why AdamW specifically?** Because plain gradient descent uses the same step size for every weight, but some weights need bigger steps and some smaller. AdamW adapts the step size per weight based on recent gradient history — faster and more stable convergence.
+- **Result:** All 110M weights are now slightly different. The model has just become slightly less wrong on this batch.
+
+#### Step 2.9 — At the end of each epoch, briefly switch to validation mode
+
+- **Why check validation?** Because the training loss keeps falling regardless — the model can memorise training-specific examples without learning generalisable patterns. We need to know whether the model is getting better at *new* data, not just at training data.
+- **Why at the end of each epoch (not every batch)?** Because evaluating 10,000 examples takes time; doing it every batch would slow training to a crawl. Once per epoch is sufficient to catch overfitting early.
+
+---
+
+### Stage 3 — Validation (after each epoch + final reporting)
+
+#### Step 3.1 — Freeze the model and turn off dropout
+
+- **Why freeze?** Because we're evaluating, not training. No gradient updates should happen on validation data — that would be cheating (the validation set would leak into the training signal).
+- **Why turn off dropout?** Because during training, dropout randomly zeros out neurons to prevent overfitting. At evaluation we want the full network so we measure the model's *real* capability, not a sub-sampled version.
+
+#### Step 3.2 — Run all 10,000 held-out examples through the frozen model
+
+- **Why all 10k and not a sample?** Because we want the full quality picture, not an estimate. 10k is small enough to run quickly and large enough to give stable metrics.
+- **Why held-out specifically?** Because evaluating on training data would be flatteringly optimistic — the model may have memorised those examples. Held-out is the honest test of generalisation.
+
+#### Step 3.3 — For each token, argmax over the softmax distribution to predict a label
+
+- **Why argmax?** Because at evaluation time we want a single answer per token, not a distribution. The label with highest probability is the model's "best guess."
+
+#### Step 3.4 — Reconstruct entity spans from BIO labels
+
+- **Why reconstruct spans?** Because the analyst cares about whole entities ("at least 12 civilians"), not individual token labels. A B-VICTIM followed by two I-VICTIMs becomes one VICTIM span; the BIO decoder collapses the sequence into a span.
+
+#### Step 3.5 — Compare predicted spans to gold spans → count TP / FP / FN per entity
+
+- **Why span-level (not token-level)?** Because partial-correct spans don't help the analyst — they still have to edit. Strict span-level scoring is what the consumer actually experiences.
+- **Why per entity (not pooled)?** Because the model might be excellent on DATE but weak on VICTIM. Per-entity counts reveal where to focus improvements; pooled numbers hide that.
+
+#### Step 3.6 — Compute precision, recall, F1 per entity
+
+- **Why all three?** Each answers a different question.
+  - **Precision** — *"When the model said VICTIM, was it right?"* (correctness)
+  - **Recall** — *"Did the model find all the victims?"* (completeness)
+  - **F1** — *"Balanced quality combining both."* (the comparison number)
+- **Why F1 and not just accuracy?** Because 78% of tokens are O — a "predict O everywhere" model would already score 78% accuracy without learning anything. F1 ignores correct O predictions and measures only entity recovery, which is the operationally meaningful quantity.
+
+#### Step 3.7 — Aggregate to macro F1 and micro F1
+
+- **Why both?** Each answers a different question.
+  - **Macro F1** averages per-entity F1 equally: *"Does the model treat all entities fairly?"* — punishes weak rare-entity performance.
+  - **Micro F1** weights by frequency: *"What's the overall extraction quality on a typical batch?"* — dominated by high-support entities.
+- **Result:** Macro F1 = 0.887; Micro F1 = 0.909. Reported in §6.4 and on slide 16.
+
+#### Step 3.8 — Compute val loss as a monitoring signal
+
+- **Why compute loss again at validation?** For one purpose only: **early stopping**. We need to know when the model has stopped learning so we can halt training before it overfits.
+- **Why not optimise val loss?** Because that would re-introduce the validation set into training, defeating the held-out principle. Val loss is *observed*, not optimised.
+
+#### Step 3.9 — Early stopping decision
+
+- **Why early stopping at all?** Because training too long causes overfitting — the model memorises training-specific patterns that don't generalise. Once val loss stops improving, more training only hurts.
+- **Result for VioNER:** Val loss stopped improving after epoch 2 → stop → save epoch-2 checkpoint as the final deployed model.
+
+---
+
+### Stage 4 — Inference (production, every time an analyst uses the system)
+
+#### Step 4.1 — Analyst pastes an article into the inference UI
+
+- **Why a UI?** Because the analyst is not an ML engineer; they need a paste-an-article-get-results-back interface, not a Python REPL.
+
+#### Step 4.2 — Tokenise the article with WordPiece
+
+- **Why tokenise?** Because BERT processes tokens, not raw characters. We have to convert article text into the format BERT expects.
+- **Why WordPiece specifically?** Because it handles unknown words gracefully — *"Al-Shabaab"* becomes `["Al", "-", "Sha", "##baab"]` even if the full word wasn't in BERT's pretraining vocabulary.
+
+#### Step 4.3 — Forward pass through frozen BERT → softmax → argmax → predicted labels
+
+- **Why frozen?** Because the model has already learned; no further learning is needed or possible. Gold labels don't exist at inference time, so there's nothing to compute loss against.
+- **Why no class weights, no focal loss, no gradients?** Because those are all training-time concepts. None applies when the model is just making predictions on a real article. The training-time machinery exists to *shape* the trained model; at inference, the model is a fixed function we apply.
+
+#### Step 4.4 — Confidence filtering
+
+- **Why filter?** Because some predictions are confident and reliable; others are guesses that would mislead the analyst. Dropping low-confidence predictions means the analyst sees only the trustworthy ones.
+- **Why per-category thresholds?** Because different entity types have different uncertainty floors. CASUALTIES needs a higher threshold than DATE because misclassified casualty counts have higher operational cost than misclassified dates.
+
+#### Step 4.5 — BIO decode and 5W1H grouping
+
+- **Why decode at inference?** Because the analyst wants entities, not raw BIO labels. Decoding collapses contiguous B-I sequences into single spans the analyst can read.
+- **Why 5W1H grouping?** Because the analyst's mental model is WHO/WHAT/WHEN/WHERE/HOW, not 17 BIO label types. Grouping puts the output into the analyst's vocabulary.
+
+#### Step 4.6 — KB validation and enrichment
+
+- **Why validate?** Because the model doesn't know world facts. *Al-Shabaab in Goma* is geographically implausible, but the model can't tell — it only sees text. The KB injects external knowledge to flag suspicious extractions for the analyst to re-read.
+- **Why enrich?** Because surface variants ("Al Shabaab", "al-shabaab", "Al-Shabaab fighters") should aggregate to a single canonical entry; otherwise downstream analytics over-count distinct events as one and under-count one event as many.
+
+#### Step 4.7 — Persist to PostgreSQL, render chips to analyst
+
+- **Why persist?** Because the analyst wants to come back later, query historical events, run analytics. Without storage, every extraction is ephemeral and the analytics dashboard has nothing to show.
+- **Why render colour-coded chips?** Because the analyst is reviewing, not coding from scratch. Visual organisation by 5W1H category makes scanning fast — green for WHO, blue for WHERE, etc.
+
+**Total time: ~150 ms per article.** BERT forward pass ~75%; KB lookup ~15%; everything else ~10%.
+
+---
+
+### Reading the lifecycle in one sentence
+
+If a panellist asks you to summarise how VioNER works in a single sentence, this is the answer:
+
+> *"In annotation we make sure the gold labels are clean. In training we use class-weighted focal loss to teach the model — especially on rare classes the analyst cares about. In validation we measure quality with F1 on held-out data and stop training when val loss plateaus. In inference, the frozen model produces predictions enriched by the KB and delivered to the analyst at 150 ms per article."*
+
+Memorise that sentence. It's the single most useful one-liner for the defense.
+
+## What this means when a panellist asks you a question
+
+The first move on any technical question is: **which stage are they asking about?**
+
+| Panel question | Stage they're asking about | How to answer |
+|:--|:--|:--|
+| *"How does VioNER handle class imbalance?"* | Stage 2 — Training | Focal loss + class weights drive the gradient; ablation in §6.6 proves it works |
+| *"How do you know the model is any good?"* | Stage 3 — Validation | Macro F1 0.887 on held-out 10k; per-entity F1 in Table 6.7; ablation in Table 6.8 |
+| *"How fast is the system?"* | Stage 4 — Inference | 150 ms per article on CPU; details in §6.8 |
+| *"How reliable are your gold labels?"* | Stage 1 — Annotation | Cohen's κ = 0.78; pilot in §5.2 |
+| *"What's focal loss?"* | Stage 2 — Training | A loss function modification used during training; not at inference |
+| *"What's F1?"* | Stage 3 — Validation | A quality metric computed on the held-out validation set, not during training |
+| *"What's a class weight?"* | Stage 2 — Training | A per-class multiplier applied to the loss during training only |
+| *"What's a confidence score?"* | Stage 4 — Inference | Max softmax probability used to filter and to show analyst certainty |
+
+> **The most embarrassing wrong-frame answers:**
+> - *"F1 is what we optimise during training"* — **WRONG.** F1 is a validation metric. The optimiser sees loss, not F1.
+> - *"Class weights are applied at inference"* — **WRONG.** They're a training-time multiplier on the loss.
+> - *"Cross-entropy is the inference metric"* — **WRONG.** CE is the training loss; we never compute it during inference.
+> - *"Focal loss makes the model faster at inference"* — **WRONG.** Focal loss is a training-time choice. Inference uses the trained weights as a black-box function.
+
+If you get the stage right, you cannot embarrass yourself on these concepts.
+
+---
+
 # Section A · The big picture — what is this thesis even doing?
 
 ## A1. NER — Named Entity Recognition
@@ -126,6 +622,89 @@ The `##` prefix marks "this is a continuation of the previous token, not a new w
 **In the thesis.** §5.4 discusses tokenisation; §4.3 covers BIO encoding under sub-word tokenisation (the subtle case where labels have to propagate from the first sub-word to its continuations).
 
 **What a panellist means.** When they say "token" they almost always mean a sub-word piece, not a whole word. When they say "sequence length 128" they mean 128 sub-word tokens, which is roughly 80-90 words.
+
+---
+
+## A5. Class / Label / Category — what they all mean (and why we use them interchangeably)
+
+**In one sentence.** "Class", "label", and "category" all mean the same thing in NER — they are three names for **the discrete answer the model has to pick for each token**. In VioNER there are **17 classes** (= 17 BIO labels), and every token belongs to exactly one of them.
+
+**The analogy.** Imagine a multiple-choice test where every question has the same 17 options to choose from (option A through option Q). For each token, the model is answering one such multiple-choice question. The 17 options — O, B-ACTOR, I-ACTOR, B-VICTIM, I-VICTIM, B-ACTION, I-ACTION, ..., I-CASUALTIES — are the **classes** (also called **labels**, also called **categories** — all the same thing).
+
+**Worked example.** Take the token *"Mogadishu"* with gold label B-CITY:
+
+| Concept | What it is | For "Mogadishu" |
+|:--|:--|:--|
+| **The 17 classes** | The full set of possible labels the model can pick from | {O, B-ACTOR, I-ACTOR, B-VICTIM, I-VICTIM, ..., I-CASUALTIES} |
+| **The true class** *(= gold label)* | The class an annotator assigned to this token | **B-CITY** |
+| **The predicted class** | The class the model picks (= argmax of softmax) | **B-CITY** (if right), some other class (if wrong) |
+
+The model's job: pick the right class for every token.
+
+### Why does the same concept have three names?
+
+| Name | Comes from | Most common usage |
+|:--|:--|:--|
+| **Label** | The annotation tradition — what an annotator writes next to a token | When talking about annotation, gold labels, BIO labels |
+| **Class** | The classification literature — what the classifier picks from | When talking about training, the loss function, class weights, class imbalance |
+| **Category** | Everyday English | Looser usage; sometimes refers to entity types rather than labels |
+
+In VioNER they're interchangeable. *"17 classes"* = *"17 labels"* = *"17 BIO labels"* = *"17 categories"* — all the same set: {O, B-ACTOR, I-ACTOR, B-VICTIM, ..., I-CASUALTIES}.
+
+### Crucial distinction — class vs. entity type
+
+This is the single most common confusion. They are NOT the same:
+
+| Concept | Count in VioNER | What they are |
+|:--|:--|:--|
+| **Entity types** | **8** | The *kinds of things* we tag: ACTOR, VICTIM, ACTION, DATE, REGION, CITY, DISTRICT, CASUALTIES |
+| **Classes** (= BIO labels) | **17** | The *labels the model outputs* per token: O + B-/I- for each of the 8 entity types |
+
+The arithmetic: **8 entity types × 2 (B and I) + 1 (the shared O) = 17 classes**.
+
+So when:
+- The thesis says *"8 entity types"* — those are ACTOR, VICTIM, etc.
+- The thesis says *"17 BIO labels"* or *"17 classes"* — those are O, B-ACTOR, I-ACTOR, B-VICTIM, ...
+
+A panellist who slips between "8" and "17" depending on context is referring to either the entity types or the classes; if it's not clear, the safe move is to clarify which one they mean before answering.
+
+### "Class weight" now defined precisely
+
+A **class weight** $\alpha_c$ is a per-class multiplier on the loss — **one weight per class**, so 17 weights in total. Computed once from the training-set distribution.
+
+| Class | Token count | Weight $\alpha_c$ (with cap at 10) |
+|:--|--:|--:|
+| O | 1,560,000 | 0.075 |
+| B-DATE | 32,000 | 3.68 |
+| B-ACTOR | 48,000 | 2.45 |
+| B-VICTIM | 5,500 | 10.0 *(capped from 21.39)* |
+| ... (13 others) | ... | ... |
+
+Read: *"Each B-VICTIM token contributes 10 units of weighted loss; each O token contributes 0.075 units. A B-VICTIM token is therefore about 130× more loss-impactful than an O token."*
+
+### "Class imbalance" now defined precisely
+
+**Class imbalance** = some classes have many more tokens than others. In VioNER:
+
+- **O class**: ~1.56 million tokens (~78% of total)
+- **B-VICTIM class**: ~5,500 tokens (~0.3% of total)
+- **Ratio**: ~280 to 1
+
+That extreme imbalance is what makes generic NER training fail on VioNER's data — the gradient gets dominated by the common class. Focal loss + class weights exist specifically to counteract this.
+
+### "Per-class F1" now defined precisely
+
+When the thesis reports F1 *"per entity"* (Table 6.7), it's reporting one F1 per **entity type** — 8 numbers. When it reports F1 *"per class"*, it would be one F1 per **BIO label** — 17 numbers. Most NER papers (and the VioNER thesis) report per-entity F1 because the analyst cares about entity-level quality, not B/I distinctions.
+
+**In the thesis.** "Class" appears throughout Chapters 2 and 5; "label" throughout Chapter 4; "entity type" throughout Chapter 4. Same concept family, slightly different framings.
+
+**What a panellist means.**
+- *"Class imbalance"* — the 78% O vs 0.3% VICTIM distribution. The central modelling challenge in VioNER.
+- *"Class weight"* — a per-BIO-label multiplier on the loss (17 of them in VioNER).
+- *"Per-class F1"* — F1 per BIO label (17 numbers); usually less common in NER than per-entity F1 (8 numbers).
+- *"Multi-class classification"* — picking from more than 2 classes. NER is 17-class classification per token.
+- *"17 classes"* / *"17 labels"* / *"17 BIO tags"* — all the same: {O, B-ACTOR, I-ACTOR, ..., I-CASUALTIES}.
+- *"8 entity types"* / *"8 entities"* — the kinds-of-things layer: {ACTOR, VICTIM, ACTION, DATE, REGION, CITY, DISTRICT, CASUALTIES}.
 
 ---
 
@@ -828,17 +1407,103 @@ The model has 110 million **parameters** (the weights). It has roughly a dozen *
 
 **In one sentence.** Cohen's κ measures how often two annotators agreed on the same labels, corrected for the agreement you'd expect by chance.
 
-**The analogy.** Two doctors looking at the same X-ray. If both say "pneumonia" you have agreement — but they might agree just by random luck. κ asks: "would they agree this much by accident? No? Then their agreement is real."
+**The analogy.** Two doctors looking at the same X-ray. If both say "pneumonia" you have agreement — but they might agree just by random luck. κ asks: *"would they agree this much by accident? No? Then their agreement is real."*
 
 κ = 0 means agreement no better than chance. κ = 1 means perfect agreement. κ = 0.78 (VioNER's number) means substantial agreement on the Landis-Koch scale.
 
-**Worked example.** Two annotators labelling 200 documents. They agree on 92% of tokens (observed agreement). The chance agreement (what they'd agree on by random labelling, given the class distribution) is around 64%. Then:
+**The formula.**
 
-$$\kappa = \frac{0.92 - 0.64}{1 - 0.64} = \frac{0.28}{0.36} = \mathbf{0.78}$$
+$$\kappa = \frac{p_o - p_e}{1 - p_e}$$
 
-**In the thesis.** §5.2 (annotation), slide 24 (data quality).
+where:
+- $p_o$ = **observed agreement** = the fraction of items both annotators gave the same label to
+- $p_e$ = **expected agreement by chance** = the probability they would agree if they were each labelling randomly, given their individual label distributions
 
-**What a panellist means.** "Substantial agreement" = κ between 0.61 and 0.80 on the Landis-Koch scale. "Almost-perfect agreement" = κ above 0.80.
+---
+
+### How VioNER's 0.78 was actually calculated — step by step
+
+The thesis ran the pilot in November 2025: **two annotators independently labelled the same 200 documents** using the 8-entity BIO schema. Across those 200 documents, there were about **50,000 token-level decisions** per annotator (since each document averages ~250 tokens, and each token gets one of 17 BIO labels).
+
+For each token position $i$, we have:
+- Annotator A's label, $a_i \in \{$O, B-ACTOR, I-ACTOR, ..., B-CASUALTIES, I-CASUALTIES$\}$
+- Annotator B's label, $b_i$ (same label set)
+
+Now we compute κ in three steps.
+
+---
+
+#### Step 1: Build a confusion matrix and count observed agreement ($p_o$)
+
+A confusion matrix records every (annotator-A-label, annotator-B-label) combination. **The diagonal entries are tokens where both annotators agreed**; off-diagonal entries are disagreements.
+
+For VioNER's pilot, a (simplified) confusion matrix snippet looks like:
+
+| A \ B → | O | B-ACTOR | B-CITY | B-DATE | B-VICTIM | (others) | Row total |
+|:--|--:|--:|--:|--:|--:|--:|--:|
+| **O** | **38,540** | 60 | 45 | 30 | 50 | 75 | 38,800 |
+| **B-ACTOR** | 50 | **2,760** | 25 | 0 | 0 | 5 | 2,840 |
+| **B-CITY** | 30 | 30 | **2,400** | 5 | 0 | 15 | 2,480 |
+| **B-DATE** | 25 | 0 | 5 | **1,580** | 0 | 0 | 1,610 |
+| **B-VICTIM** | 60 | 0 | 0 | 0 | **210** | 5 | 275 |
+| **(others)** | 80 | 10 | 15 | 5 | 5 | (sum) | 3,995 |
+| **Column total** | 38,785 | 2,860 | 2,490 | 1,620 | 265 | (4,980) | **50,000** |
+
+**Read the diagonal:** 38,540 (both said O) + 2,760 (both said B-ACTOR) + 2,400 (both said B-CITY) + 1,580 (both said B-DATE) + 210 (both said B-VICTIM) + diagonal contributions from the other 12 labels (about 660 in total) = **~46,150 tokens where both annotators agreed**.
+
+$$p_o = \frac{\text{tokens where they agreed}}{\text{total tokens}} = \frac{46{,}150}{50{,}000} = \mathbf{0.923}$$
+
+So they agreed on about 92% of tokens. Sounds high — but most of that agreement is on the easy O class. We need to correct for that.
+
+---
+
+#### Step 2: Compute marginal probabilities and expected chance agreement ($p_e$)
+
+The **marginal probability** for each label is: what fraction of tokens did each annotator give that label?
+
+From the row totals (annotator A) and column totals (annotator B):
+
+| Label | $P(A = $ label $)$ | $P(B = $ label $)$ | Product $P(A) \times P(B)$ |
+|:--|--:|--:|--:|
+| O | 38,800 / 50,000 = **0.776** | 38,785 / 50,000 = **0.776** | 0.602 |
+| B-ACTOR | 2,840 / 50,000 = **0.057** | 2,860 / 50,000 = **0.057** | 0.0032 |
+| B-CITY | 2,480 / 50,000 = **0.0496** | 2,490 / 50,000 = **0.0498** | 0.0025 |
+| B-DATE | 1,610 / 50,000 = **0.0322** | 1,620 / 50,000 = **0.0324** | 0.0010 |
+| B-VICTIM | 275 / 50,000 = **0.0055** | 265 / 50,000 = **0.0053** | 0.000029 |
+| (other 12 labels) | (sum) | (sum) | ~0.030 |
+| **Total** | 1.000 | 1.000 | **$p_e \approx 0.639$** |
+
+The expected agreement is the **sum of products** across all 17 labels:
+
+$$p_e = \sum_{c} P(A = c) \times P(B = c) = 0.602 + 0.0032 + 0.0025 + 0.0010 + 0.000029 + \ldots \approx \mathbf{0.639}$$
+
+**The intuition:** if both annotators randomly assigned labels using their own distribution, they'd agree about 64% of the time **just by accident** — and almost all of that comes from both calling tokens O (because both label 78% of tokens as O, so 0.776 × 0.776 = 0.602 of the chance agreement is just from the O class).
+
+This is the chance baseline we need to subtract out. Raw agreement of 92% sounds impressive, but 64% of it would happen by random labelling alone — so the "real" agreement above chance is only the remaining slice.
+
+---
+
+#### Step 3: Plug into the formula
+
+$$\kappa = \frac{p_o - p_e}{1 - p_e} = \frac{0.923 - 0.639}{1 - 0.639} = \frac{0.284}{0.361} = \mathbf{0.787} \approx 0.78$$
+
+**The interpretation:** of the agreement that wasn't already guaranteed by chance, the two annotators captured about 79% — which is **substantial agreement** on the Landis-Koch scale.
+
+---
+
+### The plain-English version (for the defense)
+
+If a panellist asks *"how did you get to 0.78?"*, deliver this:
+
+> *"Two annotators independently labelled the same 200-document pilot using the 8-entity BIO schema. Across about 50,000 token decisions per annotator, they agreed on the same label about 92% of the time. But because 78% of tokens are O, you'd expect the two annotators to agree about 64% of the time just by random labelling, given those distributions. Cohen's kappa subtracts out that chance baseline: (0.92 − 0.64) / (1 − 0.64) = 0.78. That's substantial agreement on the Landis-Koch scale — confirmation that the labels are reliable enough to train on."*
+
+### Why this matters for the contribution claim
+
+Without κ, the headline F1 numbers we report later (0.909 micro, 0.887 macro) would be vulnerable to a *"how do you know your gold labels aren't noisy?"* attack. κ = 0.78 is the empirical answer: substantial agreement, well above the chance baseline, with disagreement low enough that residual label noise is much smaller than the effects the thesis claims (e.g., the +11 F1 VICTIM lift exceeds expected label noise by an order of magnitude).
+
+**In the thesis.** §5.2 (annotation methodology), slide 24 (data quality column).
+
+**What a panellist means.** "Substantial agreement" = κ between 0.61 and 0.80 on the Landis-Koch scale. "Almost-perfect agreement" = κ above 0.80. Common follow-ups: *"why not higher?"* — natural language is genuinely ambiguous on edge cases (qualifier inclusion, descriptive victim phrasings); 0.78 is near the practical ceiling without imposing mechanical rules that would hurt edge-case quality.
 
 ---
 

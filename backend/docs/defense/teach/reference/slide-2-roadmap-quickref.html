@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Slide 2 — Roadmap Delivery Card</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --highlight:#F5EBC9;
+  --grid:#E8E1D2;
+  --beat:#1A365D;
+}
+*{box-sizing:border-box}
+html{font-size:15px}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;
+  line-height:1.5;
+}
+.card{
+  max-width:46rem;
+  margin:1.5rem auto;
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-radius:8px;
+  padding:1.8rem 2rem;
+  box-shadow:0 1px 4px rgba(0,0,0,0.04);
+}
+.header{border-bottom:2px solid var(--accent);padding-bottom:0.6rem;margin-bottom:1.2rem}
+.eyebrow{
+  font-family:"Inter",system-ui,sans-serif;
+  text-transform:uppercase;
+  letter-spacing:0.18em;
+  font-size:0.7rem;
+  color:var(--accent);
+  font-weight:600;
+}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:1.55rem;margin:0.25rem 0 0}
+.numbers{display:grid;grid-template-columns:repeat(4,1fr);gap:0.7rem;margin:0.7rem 0 0.4rem}
+.numbers .n{background:var(--accent);color:#FFF;text-align:center;padding:0.55rem 0.4rem;border-radius:5px}
+.numbers .n strong{display:block;font-size:1.3rem;font-family:"Iowan Old Style",Georgia,serif}
+.numbers .n span{font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;opacity:0.85}
+.section-h{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.78rem;
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  color:var(--accent);
+  margin:1.3rem 0 0.5rem;
+  font-weight:600;
+  border-bottom:1px solid var(--grid);
+  padding-bottom:0.25rem;
+}
+.beat-box{
+  background:var(--highlight);
+  padding:0.7rem 0.9rem;
+  border-radius:5px;
+  margin:0.5rem 0;
+  font-size:0.95rem;
+  line-height:1.55;
+  border-left:3px solid var(--beat);
+}
+.beat-label{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.7rem;
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  color:var(--beat);
+  font-weight:600;
+  display:block;
+  margin-bottom:0.3rem;
+}
+.beat-pause{
+  text-align:center;
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.78rem;
+  color:var(--ink-soft);
+  font-style:italic;
+  padding:0.3rem 0;
+  letter-spacing:0.05em;
+}
+.hero-sentence{
+  background:#FFF;
+  border:2px solid var(--accent);
+  border-radius:5px;
+  padding:0.9rem 1.1rem;
+  margin:0.7rem 0;
+  text-align:center;
+  font-family:"Iowan Old Style",Georgia,serif;
+  font-size:1.05rem;
+  font-weight:500;
+}
+.hero-sentence .label{
+  display:block;
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.66rem;
+  text-transform:uppercase;
+  letter-spacing:0.09em;
+  color:var(--accent);
+  font-weight:600;
+  margin-bottom:0.4rem;
+}
+.donts{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin:0.6rem 0}
+.dont{
+  background:var(--paper);
+  border-left:3px solid var(--accent);
+  padding:0.4rem 0.65rem;
+  border-radius:3px;
+  font-size:0.85rem;
+}
+.dont strong{
+  display:block;
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.68rem;
+  text-transform:uppercase;
+  letter-spacing:0.05em;
+  color:var(--accent);
+  margin-bottom:0.1rem;
+}
+.preempt-table{width:100%;border-collapse:collapse;font-size:0.88rem;margin:0.5rem 0}
+.preempt-table th,.preempt-table td{padding:0.4rem 0.55rem;text-align:left;border-bottom:1px solid var(--grid)}
+.preempt-table th{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft)}
+.preempt-table tr td:first-child{color:var(--accent);font-weight:600;font-family:"Inter",system-ui,sans-serif;font-size:0.85rem}
+.foot{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.72rem;
+  color:var(--ink-soft);
+  margin-top:1rem;
+  border-top:1px dashed var(--grid);
+  padding-top:0.5rem;
+  text-align:right;
+}
+@media print{
+  body{background:#FFF}
+  .card{box-shadow:none;border:0;margin:0;max-width:none;padding:0.5in}
+  .numbers .n,.beat-box,.hero-sentence,.dont{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="card">
+
+<div class="header">
+<div class="eyebrow">Quick reference · VioNER defense kit</div>
+<h1>Slide 2 — Roadmap delivery</h1>
+</div>
+
+<div class="numbers">
+<div class="n"><strong>45 s</strong><span>target duration</span></div>
+<div class="n"><strong>3 beats</strong><span>arc · pause · thread</span></div>
+<div class="n"><strong>1 sentence</strong><span>does the strategic work</span></div>
+<div class="n"><strong>0 trail</strong><span>clean stop on "component"</span></div>
+</div>
+
+<div class="section-h">Beat 1 — the arc (20 s)</div>
+<div class="beat-box">
+<span class="beat-label">Say in one breath</span>
+"This is the roadmap. I move from <strong>why the problem matters</strong>, to <strong>why existing tools don't close it</strong>, to the <strong>four contributions</strong>, then the <strong>evidence</strong> — model metrics, the ablation, KB impact, and user testing — and finally the <strong>limits and deployment path</strong>."
+</div>
+
+<div class="beat-pause">— half-second pause — eye contact with one panellist —</div>
+
+<div class="section-h">Beat 3 — the integration thread (20 s)</div>
+<div class="beat-box">
+<span class="beat-label">Say slower than Beat 1</span>
+"One thread ties the whole talk together: <strong>each contribution closes one operational gap</strong>, and <strong>dropping any single piece breaks the chain</strong>. <strong>The contribution is the integration, not any one component.</strong>"
+</div>
+
+<div class="hero-sentence">
+<span class="label">The hero sentence — memorise verbatim</span>
+"The contribution is the integration, not any one component."
+</div>
+
+<div class="section-h">What this one sentence pre-empts</div>
+<table class="preempt-table">
+<tr><th>Attack pre-empted</th><th>How</th></tr>
+<tr><td>"Isn't this just engineering?"</td><td>Integration IS the contribution.</td></tr>
+<tr><td>"What's novel here?"</td><td>Novelty is the combination, not the pieces.</td></tr>
+<tr><td>"Could you have skipped component X?"</td><td>Dropping any piece breaks the chain.</td></tr>
+</table>
+
+<div class="section-h">Five forbidden moves</div>
+<div class="donts">
+<div class="dont"><strong>Don't read the list</strong>Panel can read. Name the shape.</div>
+<div class="dont"><strong>Don't repeat "I'll talk about"</strong>Use one verb for the whole arc.</div>
+<div class="dont"><strong>Don't trail off</strong>End on "component". Walk to slide 3.</div>
+<div class="dont"><strong>Don't apologise</strong>"It's a lot…" cuts your authority.</div>
+<div class="dont" style="grid-column:1 / -1"><strong>Don't go past 60 s</strong>At 60 s panel zones out. At 90 s they're forming questions.</div>
+</div>
+
+<div class="section-h">If interrupted mid-Beat-1</div>
+<p style="font-size:0.88rem;margin:0.4rem 0">Finish the current clause. Say: <em>"Happy to take that — and I'll come back to the rest of the roadmap after."</em> Answer briefly. Then return to deliver <strong>Beat 3</strong> — the integration thread is non-negotiable, regardless of what got interrupted.</p>
+
+<div class="section-h">Where this lives</div>
+<p style="font-size:0.86rem;color:var(--ink-soft);margin:0.3rem 0">
+<strong>Defense slide:</strong> Slide 2 of 22
+<br><strong>Defense kit:</strong> <code>VioNER_Defense_Slides_study_guide.md</code> slide 2 · <code>solution_architecture.md</code> (integration claim)
+<br><strong>Other roadmap-style slides this technique applies to:</strong> Slide 8 (VioNER in one slide) · Slide 22 (close — restating the five contributions)
+</p>
+
+<div class="foot">Reference card · keep open during slide-2 rehearsal</div>
+</div>
+
+</body>
+</html>

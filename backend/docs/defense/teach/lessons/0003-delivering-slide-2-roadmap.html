@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 3 — Delivering Slide 2: The Roadmap</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --accent-soft:#A14747;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --success-soft:#E6F0E6;
+  --warn:#8B5A2B;
+  --beat:#1A365D;
+  --beat-soft:#E8EEF5;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:42rem;margin:0 auto;padding:3.5rem 1.5rem 6rem}
+.eyebrow{
+  font-family:"Inter","SF Pro Text",system-ui,sans-serif;
+  text-transform:uppercase;
+  letter-spacing:0.18em;
+  font-size:0.72rem;
+  color:var(--accent);
+  font-weight:600;
+}
+h1{
+  font-family:"Iowan Old Style","Charter",Georgia,serif;
+  font-size:2.3rem;
+  font-weight:700;
+  line-height:1.18;
+  margin:0.4rem 0 0.6rem;
+  letter-spacing:-0.012em;
+}
+h2{
+  font-family:"Iowan Old Style","Charter",Georgia,serif;
+  font-size:1.45rem;
+  margin:3rem 0 0.6rem;
+  font-weight:700;
+  border-bottom:1px solid var(--rule);
+  padding-bottom:0.4rem;
+}
+h3{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:1rem;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.05em;
+  margin:1.6rem 0 0.4rem;
+  color:var(--accent);
+}
+p,li{font-size:1.05rem}
+.subtitle{
+  color:var(--ink-soft);
+  font-style:italic;
+  font-size:1.1rem;
+  margin:0 0 1.4rem;
+}
+.meta{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.78rem;
+  color:var(--ink-soft);
+  letter-spacing:0.02em;
+  border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);
+  padding:0.6rem 0;
+  margin-bottom:2.2rem;
+  display:flex;
+  flex-wrap:wrap;
+  gap:1.2rem;
+}
+.meta span strong{color:var(--ink)}
+.callout{
+  background:#FFF;
+  border:1px solid var(--rule);
+  padding:1rem 1.3rem;
+  margin:1.2rem 0;
+  border-radius:4px;
+}
+.callout.win{border-left:3px solid var(--success)}
+.callout.warn{border-left:3px solid var(--warn)}
+.callout.beat{border-left:3px solid var(--beat)}
+code{
+  font-family:"JetBrains Mono","SF Mono",Menlo,monospace;
+  font-size:0.92em;
+  background:#F0EBE0;
+  padding:0.06em 0.36em;
+  border-radius:3px;
+}
+/* Slide-2 visual mockup */
+.slide-mock{
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-radius:6px;
+  padding:1.6rem 1.8rem;
+  margin:1.4rem 0;
+  box-shadow:0 2px 6px rgba(0,0,0,0.05);
+}
+.slide-mock h4{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.7rem;
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  color:var(--accent);
+  margin:0 0 0.4rem;
+  font-weight:600;
+}
+.slide-mock .title{
+  font-family:"Iowan Old Style",Georgia,serif;
+  font-size:1.55rem;
+  font-weight:700;
+  margin:0 0 1rem;
+  color:var(--ink);
+}
+.slide-mock ol{
+  padding-left:1.4rem;
+  margin:0.5rem 0;
+}
+.slide-mock ol li{
+  font-size:0.96rem;
+  padding:0.18rem 0;
+  color:var(--ink);
+}
+.slide-mock ol li strong{color:var(--accent)}
+.slide-mock .footer{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.74rem;
+  color:var(--ink-soft);
+  margin-top:1rem;
+  border-top:1px solid var(--rule);
+  padding-top:0.5rem;
+  text-align:right;
+  font-style:italic;
+}
+/* Beat script */
+.beat-script{
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-radius:6px;
+  padding:1.4rem 1.6rem;
+  margin:1.4rem 0;
+}
+.beat{
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:0.9rem;
+  align-items:start;
+  padding:0.9rem 0;
+  border-bottom:1px dashed var(--rule);
+}
+.beat:last-child{border-bottom:0}
+.beat-num{
+  background:var(--beat);
+  color:#FFF;
+  width:2.1rem;
+  height:2.1rem;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:"Inter",system-ui,sans-serif;
+  font-weight:600;
+  font-size:0.85rem;
+}
+.beat-content .label{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.72rem;
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  color:var(--beat);
+  font-weight:600;
+  margin-bottom:0.25rem;
+  display:flex;
+  gap:0.7rem;
+  align-items:baseline;
+}
+.beat-content .label .secs{
+  color:var(--ink-soft);
+  font-weight:400;
+  font-style:italic;
+}
+.beat-content .text{
+  font-size:1.06rem;
+  line-height:1.55;
+  margin:0.2rem 0;
+}
+.beat-content .text em.key{
+  background:var(--highlight);
+  font-style:normal;
+  padding:0 0.18em;
+  border-radius:2px;
+  font-weight:600;
+}
+.beat-content .micro{
+  margin-top:0.4rem;
+  font-size:0.85rem;
+  color:var(--ink-soft);
+  font-style:italic;
+}
+.pause-row{
+  text-align:center;
+  margin:0.5rem 0;
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.85rem;
+  color:var(--ink-soft);
+  font-style:italic;
+}
+.pause-row::before,.pause-row::after{
+  content:"·";
+  margin:0 0.6rem;
+  color:var(--rule);
+}
+/* The one sentence */
+.hero-sentence{
+  background:var(--highlight);
+  border:2px solid var(--accent);
+  border-radius:6px;
+  padding:1.4rem 1.6rem;
+  margin:1.4rem 0;
+  font-family:"Iowan Old Style",Georgia,serif;
+  font-size:1.18rem;
+  line-height:1.55;
+  text-align:center;
+  font-weight:500;
+}
+.hero-sentence .label{
+  display:block;
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.7rem;
+  text-transform:uppercase;
+  letter-spacing:0.1em;
+  color:var(--accent);
+  font-weight:600;
+  margin-bottom:0.6rem;
+}
+/* What to avoid */
+.donts{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:0.5rem;
+  margin:0.7rem 0;
+}
+.dont{
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-left:3px solid var(--accent);
+  padding:0.55rem 0.9rem;
+  border-radius:4px;
+  font-size:0.95rem;
+}
+.dont strong{color:var(--accent);font-family:"Inter",system-ui,sans-serif;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.15rem}
+/* Timer */
+.timer-box{
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-radius:6px;
+  padding:1.3rem;
+  margin:1.3rem 0;
+  text-align:center;
+}
+.timer-display{
+  font-family:"JetBrains Mono","SF Mono",monospace;
+  font-size:2.6rem;
+  font-weight:700;
+  color:var(--accent);
+  margin:0.3rem 0;
+  font-feature-settings:"tnum";
+}
+.timer-buttons{display:flex;gap:0.6rem;justify-content:center;margin-top:0.7rem}
+.timer-buttons button{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.92rem;
+  font-weight:600;
+  padding:0.55rem 1.3rem;
+  border:1px solid var(--accent);
+  background:var(--accent);
+  color:#FFF;
+  border-radius:4px;
+  cursor:pointer;
+  transition:background 120ms;
+}
+.timer-buttons button:hover{background:var(--accent-soft)}
+.timer-buttons button.secondary{background:#FFF;color:var(--accent)}
+.timer-buttons button.secondary:hover{background:#FBFAF7}
+.timer-verdict{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.95rem;
+  margin-top:0.7rem;
+  min-height:1.4rem;
+  font-weight:600;
+}
+.timer-verdict.win{color:var(--success)}
+.timer-verdict.over{color:var(--warn)}
+/* Quiz */
+.quiz{
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-radius:6px;
+  padding:1.4rem;
+  margin:1.4rem 0;
+}
+.quiz h4{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.95rem;
+  margin:0 0 0.8rem;
+  color:var(--accent);
+}
+.quiz .qstem{font-size:1.02rem;margin-bottom:0.7rem}
+.choices{list-style:none;padding:0;margin:0}
+.choices li{
+  margin:0.45rem 0;
+  padding:0.55rem 0.8rem;
+  border:1px solid var(--rule);
+  border-radius:4px;
+  cursor:pointer;
+  background:#FBFAF7;
+  font-size:0.98rem;
+  transition:background 120ms,border-color 120ms;
+}
+.choices li:hover{background:#F0EBE0}
+.choices li.right{background:#E6F0E6;border-color:var(--success);color:var(--success);font-weight:600}
+.choices li.wrong{background:#F5DEDE;border-color:var(--accent);color:var(--accent)}
+.feedback{
+  margin-top:0.6rem;
+  font-size:0.93rem;
+  font-style:italic;
+  color:var(--ink-soft);
+  min-height:1.2rem;
+}
+.checklist{list-style:none;padding:0}
+.checklist li{
+  padding:0.5rem 0 0.5rem 1.8rem;
+  position:relative;
+  font-size:1rem;
+  border-bottom:1px dashed var(--rule);
+}
+.checklist li:before{
+  content:"☐";
+  position:absolute;
+  left:0;
+  top:0.45rem;
+  font-size:1.1rem;
+  color:var(--accent);
+}
+.footer-note{
+  margin-top:3rem;
+  padding:1.2rem 1.4rem;
+  background:#FFF;
+  border:1px dashed var(--rule);
+  border-radius:6px;
+  font-size:0.95rem;
+}
+.footer-note strong{color:var(--accent)}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft)}
+a:hover{color:var(--accent-soft)}
+@media print{
+  body{background:#FFF;font-size:11pt}
+  .wrap{max-width:none;padding:0 1in}
+  .quiz,.choices li,.timer-buttons button{cursor:auto}
+  .choices li{break-inside:avoid}
+  h2{break-after:avoid}
+  .hero-sentence,.slide-mock,.beat-num,.beat-content .text em.key{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .timer-buttons{display:none}
+  .meta{display:block}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">Lesson 03 · Slide 2 — Roadmap</div>
+<h1>Deliver the roadmap in 45 seconds</h1>
+<p class="subtitle">Slide 2 looks like a list. It isn't. It's where you frame the entire defence — and the integration thread you say here decides how every later slide gets received.</p>
+
+<div class="meta">
+  <span><strong>Mission link.</strong> Set the panel's frame in the first minute.</span>
+  <span><strong>Skill type.</strong> Presentation craft, not technical content.</span>
+  <span><strong>Time.</strong> 12 minutes.</span>
+</div>
+
+<p>Lessons <a href="0001-defending-focal-loss.html">01</a> and <a href="0002-defending-the-ablation.html">02</a> taught you to defend technical content. This lesson is different — it's about <em>stagecraft</em>. The roadmap slide is where you tell the panel <strong>what you're about to do</strong> and <strong>what frame to receive it in</strong>. Done well, every later slide lands more easily because you set up the context. Done badly, you sound like you're reading a table of contents.</p>
+
+<h2>1 · What's on the screen</h2>
+
+<p>This is what the panel sees. Notice it's a list — they can read it themselves. Your job is not to recite the list aloud. Your job is to tell them the <em>shape</em> and the <em>thread</em>.</p>
+
+<div class="slide-mock">
+<h4>Slide 2 of 22</h4>
+<div class="title">Roadmap</div>
+<ol>
+<li>Problem & operational stakes <em>(slides 3-5)</em></li>
+<li>Competitive landscape & the four gaps <em>(slides 6-7)</em></li>
+<li>The solution & methodology <em>(slides 8-9)</em></li>
+<li>The five contributions <em>(slides 10-15)</em></li>
+<li>Evidence <em>(slides 16-19)</em></li>
+<li>Limits, then close <em>(slides 20-22)</em></li>
+</ol>
+<div class="footer">VioNER — Defence at AAU CS Department</div>
+</div>
+
+<h2>2 · The 45-second script, in three beats</h2>
+
+<p>The script is two sentences. About 45 seconds at calm pace. Beat 1 names the arc. Beat 2 is silence. Beat 3 lands the through-line.</p>
+
+<div class="beat-script">
+
+<div class="beat">
+<div class="beat-num">1</div>
+<div class="beat-content">
+<div class="label">Beat 1 — the arc <span class="secs">~20 seconds</span></div>
+<div class="text">"This is the roadmap. I move from <em class="key">why the problem matters</em>, to <em class="key">why existing tools don't close it</em>, to the <em class="key">four contributions</em>, then the <em class="key">evidence</em> — model metrics, the ablation, KB impact, and user testing — and finally the <em class="key">limits and deployment path</em>."</div>
+<div class="micro">Notice: you're naming 6 sections in one breath, but in a single sentence with rhythm. The panel hears the shape — they don't need to hear "and then we'll cover X" six times.</div>
+</div>
+</div>
+
+<div class="pause-row">PAUSE — half a second — eye contact with one panellist</div>
+
+<div class="beat">
+<div class="beat-num">2</div>
+<div class="beat-content">
+<div class="label">Beat 2 — the strategic pause <span class="secs">~1 second</span></div>
+<div class="text">Don't speak. Make brief eye contact with one panel member. The pause says <em>"and now I'm about to tell you the most important thing about this talk."</em> A confident speaker takes pauses; a nervous one fills them.</div>
+<div class="micro">Most novice presenters skip this. The pause is what makes Beat 3 land.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">3</div>
+<div class="beat-content">
+<div class="label">Beat 3 — the integration thread <span class="secs">~20 seconds</span></div>
+<div class="text">"One thread ties the whole talk together: <em class="key">each contribution closes one operational gap</em>, and <em class="key">dropping any single piece breaks the chain</em>. <em class="key">The contribution is the integration</em>, not any one component."</div>
+<div class="micro">End on "component." Clean stop. Don't trail. The next sound the panel hears should be your foot stepping toward the next slide, not "um" or "so".</div>
+</div>
+
+</div>
+
+<h2>3 · The one sentence that does all the work</h2>
+
+<p>Beat 3 is the strategic move of the entire defence. Memorise this exact phrasing — it's worth more than any other sentence in the talk.</p>
+
+<div class="hero-sentence">
+<span class="label">The integration thread</span>
+"The contribution is the integration, not any one component."
+</div>
+
+<p>This twelve-word sentence neutralises three attacks before they happen:</p>
+
+<div class="callout warn">
+<strong>Pre-empted attack 1.</strong> <em>"Isn't this just engineering?"</em> Answered: the integration <em>is</em> the contribution.
+</div>
+<div class="callout warn">
+<strong>Pre-empted attack 2.</strong> <em>"What's novel here?"</em> Answered: the novelty is the combination, not any individual piece (each of which has precedent).
+</div>
+<div class="callout warn">
+<strong>Pre-empted attack 3.</strong> <em>"Could you have skipped component X?"</em> Answered: no — dropping any piece breaks the chain.
+</div>
+
+<p>By stating this frame in slide 2, every later slide that demonstrates an individual contribution becomes <em>evidence for the integration claim</em>, not a separate standalone claim that has to be defended on its own. Slide 2 is doing rhetorical work for slides 10, 11, 12, 13, 14, 18 — it's the lever that makes the whole talk easier.</p>
+
+<h2>4 · The forbidden moves</h2>
+
+<p>Five things to never do on slide 2. Each one is the tell of a nervous student.</p>
+
+<div class="donts">
+
+<div class="dont">
+<strong>Don't read the list aloud</strong>
+"First we'll cover problem and stakes, then we'll discuss the competitive landscape, then we'll go through the four gaps, then…" — the panel can read. Tell them the <em>shape</em>, not the items.
+</div>
+
+<div class="dont">
+<strong>Don't say "I'll talk about" six times</strong>
+Repeated "I'll talk about X" is what undergrads do. Use one verb for the whole arc, not six.
+</div>
+
+<div class="dont">
+<strong>Don't trail off after the through-line</strong>
+"...integration, not any one component, so yeah, let me get started." Wrong. End on <em>"component"</em> and walk to the next slide. The silence after the sentence is your friend.
+</div>
+
+<div class="dont">
+<strong>Don't apologise for the structure</strong>
+"It's a lot to cover, but I'll try to be quick." Cuts your authority. The arc is the arc; you don't apologise for it.
+</div>
+
+<div class="dont">
+<strong>Don't go past 60 seconds</strong>
+At 45 seconds the panel is paying attention. At 60 they're zoning out. At 90 they've already started thinking about their first question. Keep moving.
+</div>
+
+</div>
+
+<h2>5 · Timed practice — three reps</h2>
+
+<p>The whole script aloud, end-to-end, including the half-second pause between Beats 1 and 2. Target: 40 to 50 seconds. The timer below verifies.</p>
+
+<div class="timer-box">
+<div class="timer-display" id="timer">0.0 s</div>
+<div class="timer-buttons">
+<button id="startBtn">Start</button>
+<button id="stopBtn" class="secondary" disabled>Stop</button>
+<button id="resetBtn" class="secondary">Reset</button>
+</div>
+<div class="timer-verdict" id="verdict"></div>
+</div>
+
+<div class="callout">
+<strong>How to fail gracefully if the panel interrupts.</strong> If a panellist raises a question DURING beat 1, finish your current clause and yield: <em>"happy to take that — and I'll come back to the rest of the roadmap after."</em> Then answer their question briefly and return to Beat 3 — the through-line is the only part you must deliver, regardless of what was interrupted.
+</div>
+
+<h2>6 · Quiz</h2>
+
+<div class="quiz" id="quiz1">
+<h4>Q1. What is Beat 3 ("the integration is the contribution") actually doing strategically?</h4>
+<p class="qstem">Pick the best framing.</p>
+<ul class="choices" data-answer="c">
+<li data-key="a">Setting expectations on talk length.</li>
+<li data-key="b">Summarising the conclusion the panel will hear at the end.</li>
+<li data-key="c">Pre-empting the three most likely attacks: "isn't this just engineering?", "what's novel?", and "could you have skipped component X?".</li>
+<li data-key="d">Telling the panel what each contribution is.</li>
+</ul>
+<p class="feedback" id="fb1"></p>
+</div>
+
+<div class="quiz" id="quiz2">
+<h4>Q2. A panellist interrupts you halfway through Beat 1. What's the correct move?</h4>
+<p class="qstem">Pick the most professional response.</p>
+<ul class="choices" data-answer="b">
+<li data-key="a">Stop the roadmap entirely and answer their question, then move to slide 3.</li>
+<li data-key="b">Finish your current clause, yield politely, answer briefly, then return to deliver Beat 3 — the integration thread is non-negotiable.</li>
+<li data-key="c">Ask them to hold the question until the end of the talk.</li>
+<li data-key="d">Apologise for not being clearer and start the roadmap over.</li>
+</ul>
+<p class="feedback" id="fb2"></p>
+</div>
+
+<div class="quiz" id="quiz3">
+<h4>Q3. The slide displays a 6-item list. Which is the correct way to deliver it?</h4>
+<p class="qstem">Pick the strongest delivery instinct.</p>
+<ul class="choices" data-answer="d">
+<li data-key="a">Read each item aloud so the panel doesn't have to.</li>
+<li data-key="b">Say "I'll cover items 1 through 6" to set the scope.</li>
+<li data-key="c">Skim it quickly and say "I'll just dive in" to save time.</li>
+<li data-key="d">Name the arc as one continuous sentence, then deliver the through-line. The panel reads the list themselves.</li>
+</ul>
+<p class="feedback" id="fb3"></p>
+</div>
+
+<h2>7 · Fluency checklist</h2>
+
+<p>Tick each box mentally. Don't move on until all six are ticked.</p>
+
+<ul class="checklist">
+<li>I can recite Beat 1 in one breath, in 18-22 seconds, without looking at the slide.</li>
+<li>I can hold the half-second pause between Beat 1 and Beat 3 without filling it with "um".</li>
+<li>I can recite Beat 3 verbatim — including "the contribution is the integration, not any one component."</li>
+<li>I can finish on "component" with a clean stop and walk to slide 3 without trailing words.</li>
+<li>The total run is between 40 and 55 seconds in my last timed rep.</li>
+<li>I can explain to a friend in one sentence WHY Beat 3 is the most strategic sentence in the talk.</li>
+</ul>
+
+<div class="callout win">
+<strong>If all six are ticked,</strong> you have a roadmap delivery that primes the rest of the talk. From slide 3 onward, every contribution you describe becomes evidence FOR the integration claim — which is exactly the frame you want the panel operating in.
+</div>
+
+<h2>Where to go next</h2>
+
+<p>When you're ready, ask:</p>
+<ul>
+<li><em>"Teach me what to say on slide 1 — the title slide."</em> (First impressions, opening line, posture.)</li>
+<li><em>"Teach me what to say on slide 22 — the close."</em> (Restating the five contributions, the final ask, eye contact.)</li>
+<li><em>"Drill me cold on slide 2 — I'll recite from memory and you tell me where I drifted."</em></li>
+<li><em>"Teach me the panel-interrupt protocol in detail."</em> (How to handle questions mid-slide gracefully.)</li>
+</ul>
+
+<div class="footer-note">
+<strong>Authority for this lesson.</strong> The verbatim script comes from <code>VioNER_Defense_Slides_study_guide.md</code> slide 2 entry. The integration-thread strategic role is documented in <code>solution_architecture.md</code> ("the contribution is the integration evaluated end-to-end"). The forbidden-moves list draws on standard presentation-craft heuristics for academic defences — credit to Patrick Winston's <em>"How to Speak"</em> (MIT Lecture, 2018) for the "don't apologise" and "end on a clean stop" rules.
+</div>
+
+</div>
+
+<script>
+// Quiz wiring
+document.querySelectorAll('.quiz').forEach(function(q){
+  var list=q.querySelector('.choices');
+  var ans=list.getAttribute('data-answer');
+  var fb=q.querySelector('.feedback');
+  list.querySelectorAll('li').forEach(function(li){
+    li.addEventListener('click',function(){
+      list.querySelectorAll('li').forEach(function(x){x.classList.remove('right','wrong');});
+      if(li.getAttribute('data-key')===ans){
+        li.classList.add('right');
+        fb.textContent='Correct — this is the move.';
+      } else {
+        li.classList.add('wrong');
+        fb.textContent='Not the strongest answer — try again.';
+      }
+    });
+  });
+});
+
+// Timer
+(function(){
+  var display=document.getElementById('timer');
+  var startBtn=document.getElementById('startBtn');
+  var stopBtn=document.getElementById('stopBtn');
+  var resetBtn=document.getElementById('resetBtn');
+  var verdict=document.getElementById('verdict');
+  var startTime=null,timer=null,elapsed=0;
+  function tick(){
+    elapsed=(performance.now()-startTime)/1000;
+    display.textContent=elapsed.toFixed(1)+' s';
+  }
+  startBtn.addEventListener('click',function(){
+    startTime=performance.now();
+    timer=setInterval(tick,50);
+    startBtn.disabled=true;
+    stopBtn.disabled=false;
+    verdict.textContent='';
+    verdict.className='timer-verdict';
+  });
+  stopBtn.addEventListener('click',function(){
+    clearInterval(timer);
+    startBtn.disabled=false;
+    stopBtn.disabled=true;
+    var t=elapsed;
+    if(t<40){
+      verdict.textContent='Under 40 s — slow down. You're rushing the integration thread.';
+      verdict.className='timer-verdict over';
+    } else if(t<=55){
+      verdict.textContent='Between 40 and 55 s — on target. Ready to deliver on the day.';
+      verdict.className='timer-verdict win';
+    } else if(t<=70){
+      verdict.textContent='Between 55 and 70 s — tighten Beat 1. You're padding the arc.';
+      verdict.className='timer-verdict over';
+    } else {
+      verdict.textContent='Over 70 s — well over. Re-read the script and cut filler before the next rep.';
+      verdict.className='timer-verdict over';
+    }
+  });
+  resetBtn.addEventListener('click',function(){
+    clearInterval(timer);
+    startBtn.disabled=false;
+    stopBtn.disabled=true;
+    elapsed=0;
+    display.textContent='0.0 s';
+    verdict.textContent='';
+    verdict.className='timer-verdict';
+  });
+})();
+</script>
+</body>
+</html>

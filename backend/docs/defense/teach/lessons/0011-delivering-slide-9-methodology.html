@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 11 — Delivering Slide 9: Design Science + Three Iteration Loops</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --accent-soft:#A14747;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --success-soft:#E6F0E6;
+  --warn:#8B5A2B;
+  --beat:#1A365D;
+  --beat-soft:#E8EEF5;
+  --loop-corpus:#5B7D3D;
+  --loop-schema:#3D6B8B;
+  --loop-loss:#8B3D5B;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:42rem;margin:0 auto;padding:3.5rem 1.5rem 6rem}
+.eyebrow{font-family:"Inter","SF Pro Text",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.18em;font-size:0.72rem;color:var(--accent);font-weight:600}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:2.2rem;font-weight:700;line-height:1.18;margin:0.4rem 0 0.6rem;letter-spacing:-0.012em}
+h2{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:1.45rem;margin:3rem 0 0.6rem;font-weight:700;border-bottom:1px solid var(--rule);padding-bottom:0.4rem}
+h3{font-family:"Inter",system-ui,sans-serif;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin:1.6rem 0 0.4rem;color:var(--accent)}
+p,li{font-size:1.05rem}
+.subtitle{color:var(--ink-soft);font-style:italic;font-size:1.1rem;margin:0 0 1.4rem}
+.meta{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);letter-spacing:0.02em;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:0.6rem 0;margin-bottom:2.2rem;display:flex;flex-wrap:wrap;gap:1.2rem}
+.meta span strong{color:var(--ink)}
+.callout{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem;margin:1.2rem 0;border-radius:4px}
+.callout.win{border-left:3px solid var(--success)}
+.callout.warn{border-left:3px solid var(--warn)}
+.callout.beat{border-left:3px solid var(--beat)}
+code{font-family:"JetBrains Mono","SF Mono",Menlo,monospace;font-size:0.92em;background:#F0EBE0;padding:0.06em 0.36em;border-radius:3px}
+/* Slide visual */
+.slide-mock{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.5rem 1.7rem;margin:1.4rem 0;box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+.slide-mock .badge{font-family:"Inter",system-ui,sans-serif;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:0.3rem;font-weight:600}
+.slide-mock .title{font-family:"Iowan Old Style",Georgia,serif;font-size:1.5rem;font-weight:700;margin:0 0 1rem}
+/* Design science cycle */
+.cycle{background:var(--paper);border:1px solid var(--rule);border-radius:5px;padding:0.9rem;margin:0.7rem 0;text-align:center}
+.cycle .ring{display:inline-flex;align-items:center;gap:0.4rem;flex-wrap:wrap;justify-content:center;font-family:"Iowan Old Style",Georgia,serif;font-size:0.95rem}
+.cycle .step{background:#FFF;border:1px solid var(--rule);padding:0.3rem 0.7rem;border-radius:4px;font-weight:600;color:var(--beat)}
+.cycle .arrow{color:var(--accent);font-weight:700}
+/* Loop cards */
+.loops{display:grid;grid-template-columns:repeat(3,1fr);gap:0.7rem;margin:1rem 0}
+.loops .loop{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.85rem 0.7rem;text-align:left}
+.loops .loop h5{font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 0.3rem;font-weight:700}
+.loops .loop p{font-family:"Iowan Old Style",Georgia,serif;font-size:0.82rem;color:var(--ink-soft);margin:0;line-height:1.4}
+.loops .loop.corpus{border-left:3px solid var(--loop-corpus)}
+.loops .loop.corpus h5{color:var(--loop-corpus)}
+.loops .loop.schema{border-left:3px solid var(--loop-schema)}
+.loops .loop.schema h5{color:var(--loop-schema)}
+.loops .loop.loss{border-left:3px solid var(--loop-loss)}
+.loops .loop.loss h5{color:var(--loop-loss)}
+/* Beats */
+.beat-script{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin:1.4rem 0}
+.beat{display:grid;grid-template-columns:auto 1fr;gap:0.9rem;align-items:start;padding:0.9rem 0;border-bottom:1px dashed var(--rule)}
+.beat:last-child{border-bottom:0}
+.beat-num{background:var(--beat);color:#FFF;width:2.1rem;height:2.1rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.85rem}
+.beat-num.hero{background:var(--accent)}
+.beat-content .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--beat);font-weight:600;margin-bottom:0.25rem;display:flex;gap:0.7rem;align-items:baseline}
+.beat-content .label.hero{color:var(--accent)}
+.beat-content .label .secs{color:var(--ink-soft);font-weight:400;font-style:italic}
+.beat-content .text{font-size:1.04rem;line-height:1.55;margin:0.2rem 0}
+.beat-content .text em.loop{font-style:normal;font-weight:700}
+.beat-content .text em.corpus{color:var(--loop-corpus);background:rgba(91,125,61,0.10);padding:0 0.18em;border-radius:2px}
+.beat-content .text em.schema{color:var(--loop-schema);background:rgba(61,107,139,0.10);padding:0 0.18em;border-radius:2px}
+.beat-content .text em.loss{color:var(--loop-loss);background:rgba(139,61,91,0.10);padding:0 0.18em;border-radius:2px}
+.beat-content .text em.key{background:var(--success-soft);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:600;color:var(--success)}
+.beat-content .text em.num{background:var(--highlight);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:700;color:var(--accent)}
+.beat-content .micro{margin-top:0.4rem;font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Loop details table */
+.loop-detail{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.9rem 1.1rem;margin:0.8rem 0}
+.loop-detail h4{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.5rem;font-weight:700}
+.loop-detail.corpus h4{color:var(--loop-corpus)}
+.loop-detail.schema h4{color:var(--loop-schema)}
+.loop-detail.loss h4{color:var(--loop-loss)}
+.loop-detail .row{display:grid;grid-template-columns:7rem 1fr;gap:0.8rem;padding:0.35rem 0;border-bottom:1px dashed var(--rule);font-size:0.92rem}
+.loop-detail .row:last-child{border:0}
+.loop-detail .row strong{font-family:"Inter",system-ui,sans-serif;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:600;align-self:start;padding-top:0.1rem}
+/* Reserved numbers */
+.reserved{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.reserved h4{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.7rem;color:var(--accent);font-weight:700}
+.reserved-rows{display:grid;grid-template-columns:auto 1fr auto;gap:0.6rem 0.9rem;font-family:"Iowan Old Style",Georgia,serif;align-items:center}
+.reserved-rows .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:600}
+.reserved-rows .desc{font-size:0.93rem;color:var(--ink-soft);font-style:italic}
+.reserved-rows .num{font-weight:700;color:var(--accent);font-feature-settings:"tnum";font-size:1.02rem;text-align:right}
+.reserved-rows .row-sep{grid-column:1 / -1;border-top:1px dashed var(--rule);height:0;margin:0.1rem 0}
+/* Measurement-vs-preference */
+.mvp{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin:0.9rem 0}
+.mvp .col{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.8rem 1rem}
+.mvp .col h4{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.4rem;font-weight:700}
+.mvp .col.preference h4{color:var(--accent)}
+.mvp .col.preference{border-left:3px solid var(--accent)}
+.mvp .col.measurement h4{color:var(--success)}
+.mvp .col.measurement{border-left:3px solid var(--success)}
+.mvp .col p{font-size:0.88rem;margin:0.3rem 0;color:var(--ink-soft);line-height:1.45;font-style:italic}
+/* Hero line */
+.hero-line{background:var(--highlight);border:2px solid var(--accent);border-radius:6px;padding:1.2rem 1.4rem;margin:1.3rem 0;text-align:center;font-family:"Iowan Old Style",Georgia,serif;font-size:1.12rem;line-height:1.55;font-weight:500}
+.hero-line .label{display:block;font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:600;margin-bottom:0.4rem}
+/* Attack */
+.attack{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem 0.8rem;margin:1rem 0;border-radius:4px}
+.attack .q{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.95rem;color:var(--accent);margin-bottom:0.5rem}
+.attack .a{margin:0.4rem 0 0.6rem;font-size:1.03rem}
+.attack .micro{font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Timer */
+.timer-box{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.3rem;margin:1.3rem 0;text-align:center}
+.timer-display{font-family:"JetBrains Mono","SF Mono",monospace;font-size:2.6rem;font-weight:700;color:var(--accent);margin:0.3rem 0;font-feature-settings:"tnum"}
+.timer-buttons{display:flex;gap:0.6rem;justify-content:center;margin-top:0.7rem}
+.timer-buttons button{font-family:"Inter",system-ui,sans-serif;font-size:0.92rem;font-weight:600;padding:0.55rem 1.3rem;border:1px solid var(--accent);background:var(--accent);color:#FFF;border-radius:4px;cursor:pointer;transition:background 120ms}
+.timer-buttons button:hover{background:var(--accent-soft)}
+.timer-buttons button.secondary{background:#FFF;color:var(--accent)}
+.timer-buttons button.secondary:hover{background:#FBFAF7}
+.timer-verdict{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin-top:0.7rem;min-height:1.4rem;font-weight:600}
+.timer-verdict.win{color:var(--success)}
+.timer-verdict.over{color:var(--warn)}
+/* Quiz */
+.quiz{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem;margin:1.4rem 0}
+.quiz h4{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin:0 0 0.8rem;color:var(--accent)}
+.quiz .qstem{font-size:1.02rem;margin-bottom:0.7rem}
+.choices{list-style:none;padding:0;margin:0}
+.choices li{margin:0.45rem 0;padding:0.55rem 0.8rem;border:1px solid var(--rule);border-radius:4px;cursor:pointer;background:#FBFAF7;font-size:0.98rem;transition:background 120ms,border-color 120ms}
+.choices li:hover{background:#F5EFE2;border-color:var(--accent-soft)}
+.choices li.right{background:var(--success-soft);border-color:var(--success);color:var(--success)}
+.choices li.wrong{background:#F5E4E4;border-color:var(--accent);color:var(--accent)}
+.choices li.locked{pointer-events:none;opacity:0.85}
+.feedback{font-family:"Inter",system-ui,sans-serif;font-size:0.93rem;margin-top:0.7rem;color:var(--ink-soft);min-height:1.2rem;font-style:italic}
+/* Followup */
+.followup{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin-top:2.4rem;border-left:3px solid var(--beat)}
+.followup ul{margin:0.6rem 0 0 1.1rem}
+.followup li{margin:0.45rem 0;font-size:1rem}
+.bottom{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;color:var(--ink-soft);border-top:1px solid var(--rule);padding-top:1.2rem;margin-top:3rem;font-style:italic}
+/* Cite */
+.cite{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);margin-top:0.3rem}
+.cite a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent-soft)}
+.cite a:hover{border-bottom:1px solid var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">Lesson 11 · Slide 9</div>
+<h1>Methodology: Design science + three iteration loops</h1>
+<div class="subtitle">The methodological hinge. Where the talk pivots from "what's wrong with what exists" to "what VioNER does" — and where every contribution that follows gets its rigour pre-stamped.</div>
+
+<div class="meta">
+<span><strong>Slide:</strong> 9 of 22</span>
+<span><strong>Target time:</strong> 90 seconds</span>
+<span><strong>Hero line:</strong> "Measurement, not preference"</span>
+<span><strong>Reserved cards:</strong> κ = 0.78 · 212k → 50k · +11 F1</span>
+</div>
+
+<h2>1 · Where this slide sits in the arc</h2>
+
+<p>Slides 1-8 built up the <em>problem</em>: stakes, bottleneck, technical hardness, landscape, four gaps, the five-component preview. Slide 9 is the <strong>methodological hinge</strong> — it pre-stamps every contribution that follows (slides 10-14) with a research-method label. Without this slide, the panel could later ask <em>"how do we know any of these were principled choices?"</em>. With this slide, the answer is already on record: each was driven by an iteration loop closed by a measured signal.</p>
+
+<div class="callout beat">
+<strong>The function of slide 9.</strong> It buys research-level legitimacy for the five contributions that follow. By minute 12 of the talk you've said the words "design science" out loud and shown three measured iteration cycles. Everything after this slide inherits that rigour — the contributions are no longer assertions, they're outputs of a methodology.
+</div>
+
+<h3>What changes after slide 9</h3>
+<ul>
+<li><strong>The panel's framing shifts.</strong> Up to slide 8 they're listening for "is this a real problem?" From slide 10 onward they're listening for "is each contribution principled?" Slide 9 sets up the second posture.</li>
+<li><strong>The "is this just engineering?" attack gets pre-empted.</strong> By naming the methodology and demonstrating three iterations, slide 9 makes the attack land flat — the answer is already on the screen.</li>
+<li><strong>The reserved numbers (κ=0.78, 212k→50k, +11 F1) become inheritance for later slides.</strong> They appear here only in reserve; when slides 11, 12, 18 deploy them with full context, they feel pre-validated rather than freshly minted.</li>
+</ul>
+
+<h2>2 · What's on the slide</h2>
+
+<div class="slide-mock">
+<div class="badge">Slide 9</div>
+<div class="title">Methodology — design science + three iteration loops</div>
+
+<div class="cycle">
+<div class="ring">
+<span class="step">Build</span><span class="arrow">→</span>
+<span class="step">Evaluate</span><span class="arrow">→</span>
+<span class="step">Learn</span><span class="arrow">→</span>
+<span class="step">Refine</span><span class="arrow">↺</span>
+</div>
+</div>
+
+<div class="loops">
+<div class="loop corpus">
+<h5>Corpus loop</h5>
+<p>Raw event dump → curated diversity-balanced subset. Model learns varied phrasing, not over-represented common events.</p>
+</div>
+<div class="loop schema">
+<h5>Schema loop</h5>
+<p>Narrowed the entity set to only what an annotator can locate word-for-word in the source. Clean, auditable labels.</p>
+</div>
+<div class="loop loss">
+<h5>Loss loop</h5>
+<p>Reshaped training objective to concentrate on rare, operationally critical entities — victim, action, casualties.</p>
+</div>
+</div>
+</div>
+
+<p>Two visual elements: <strong>the design-science cycle</strong> (top — Build → Evaluate → Learn → Refine) and <strong>three loop cards</strong> (bottom — Corpus, Schema, Loss). The cards show <em>what each loop accomplished</em>, not the numerical evidence. The numbers stay in reserve.</p>
+
+<h2>3 · The 90-second script, in four beats</h2>
+
+<div class="beat-script">
+
+<div class="beat">
+<div class="beat-num">1</div>
+<div class="beat-content">
+<div class="label">Beat 1 — name the methodology <span class="secs">~10 seconds</span></div>
+<div class="text">"Methodology: <em class="key">design science</em> — <em class="key">build, evaluate, learn, refine.</em> I'll walk the three loops by what each one DID, matching the cards on screen."</div>
+<div class="micro">"Design science" should be said with confidence, not as a hedge. It's a recognised research paradigm (Hevner, Peffers) — the panel knows the term. The "build, evaluate, learn, refine" sequence is the cycle definition; deliver it as one phrase, not four pauses.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">2</div>
+<div class="beat-content">
+<div class="label">Beat 2 — the three loops, by accomplishment <span class="secs">~50 seconds</span></div>
+<div class="text"><em class="corpus">"Corpus loop:</em> refined the training data from a raw event dump into a curated, diversity-balanced subset, so the model learns from varied phrasing rather than a handful of over-represented common events.<br><br><em class="schema">Schema loop:</em> narrowed the entity set to only what an annotator can locate word-for-word in the source — clean, auditable labels.<br><br><em class="loss">Loss loop:</em> reshaped the training objective to concentrate on the rare, operationally critical entities — victim, action, casualties — rather than the easy majority."</div>
+<div class="micro">~17 seconds per loop. Each loop is delivered as <strong>what it accomplished</strong>, not as "what I changed" — operational framing carried over from slide 7. Do NOT cite numbers here. Numbers are reserved for if-asked. The framing is purely qualitative on the live slide.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num hero">3</div>
+<div class="beat-content">
+<div class="label hero">Beat 3 — the hero line <span class="secs">~20 seconds</span></div>
+<div class="text">"The point I want to land: <em class="key">each loop was a design decision validated by measurement, not preference.</em> That's what makes this <em class="key">genuine design science</em>."</div>
+<div class="micro">This is the most important sentence on slide 9. "Measurement, not preference" is the seven-word hinge that converts iteration into research methodology. Land it slowly, with weight on "measurement" and on "preference" (the contrast pair).</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">4</div>
+<div class="beat-content">
+<div class="label">Beat 4 — close on the holding pattern <span class="secs">~10 seconds</span></div>
+<div class="text"><em>(brief pause — invite the next slide or the next question)</em></div>
+<div class="micro">If you have time, take a beat before moving on. The hero line needs to land before you advance. Don't preview slide 10 verbally — the deck transition does that work.</div>
+</div>
+</div>
+
+</div>
+
+<h2>4 · "Measurement, not preference" — the seven-word hinge</h2>
+
+<p>This is the rhetorical move that makes design science <em>readable</em> as a methodology rather than a label. Without this line, the three loops sound like sequential decisions a developer might describe in a sprint retro. With this line, they become evidence that the candidate iterated on data, schema, and loss because <em>measured signals</em> told them to, not because of taste.</p>
+
+<div class="mvp">
+<div class="col preference">
+<h4>If the panel hears "preference"</h4>
+<p>"I chose to oversample rare classes because it felt right."</p>
+<p>"I narrowed the schema because 26 categories seemed unwieldy."</p>
+<p>"I switched to focal loss because it's used in detection."</p>
+<p style="font-weight:600;color:var(--accent);font-style:normal;margin-top:0.5rem;">→ Sounds like engineering judgement.</p>
+</div>
+<div class="col measurement">
+<h4>What the script lands instead</h4>
+<p>Corpus loop: a measured signal said the rare-class F1 was too low on the raw dump.</p>
+<p>Schema loop: a measured signal said EVENT_TYPE grounding was at 58%, below the auditability threshold.</p>
+<p>Loss loop: the §6.6 ablation measured a +11 F1 lift on VICTIM.</p>
+<p style="font-weight:600;color:var(--success);font-style:normal;margin-top:0.5rem;">→ Reads as design-science iteration.</p>
+</div>
+</div>
+
+<div class="callout warn">
+<strong>The trap.</strong> If you say "I felt that..." or "I thought..." anywhere on this slide, the methodological frame collapses. Replace every internal-mental-state verb with an external-signal verb: <em>"the rare-class F1 was low"</em>, <em>"the grounding score fell below the threshold"</em>, <em>"the ablation measured a lift"</em>. Signals are external. Preferences are internal.
+</div>
+
+<h2>5 · The three reserved numbers</h2>
+
+<p>The slide presents the loops qualitatively. But you should carry three specific numbers in your pocket — to deploy <em>only if a panellist presses on a loop</em>. Pre-loading them in the script would be over-claiming; withholding them and deploying them on demand is the design-science move.</p>
+
+<div class="reserved">
+<h4>Reserved evidence — bring out only if asked</h4>
+<div class="reserved-rows">
+<div class="label">Corpus loop</div>
+<div class="desc">Moved from a raw event dump to a curated diversity sample</div>
+<div class="num">~212k → 50k</div>
+<div class="row-sep"></div>
+<div class="label">Schema loop</div>
+<div class="desc">Annotator agreement on the grounded 8-entity schema</div>
+<div class="num">κ = 0.78</div>
+<div class="row-sep"></div>
+<div class="label">Loss loop</div>
+<div class="desc">VICTIM F1 lift over plain cross-entropy (§6.6 ablation)</div>
+<div class="num">+11 F1</div>
+</div>
+</div>
+
+<h3>The deployment rule</h3>
+<ul>
+<li><strong>Default delivery:</strong> qualitative. Each loop = what it accomplished, no numbers.</li>
+<li><strong>If a panellist asks "how do you know that worked?"</strong> Deploy the relevant reserved number. One number per question — don't fire all three at once.</li>
+<li><strong>If a panellist asks "what numbers back up the loop decisions?"</strong> Deploy all three in sequence: <em>"Kappa zero point seven eight on schema. Two hundred twelve thousand down to fifty thousand on corpus diversity. Plus eleven F1 on VICTIM from the loss ablation. Each loop closed on a measured signal."</em></li>
+<li><strong>Critical:</strong> these three numbers also appear on later slides (11, 12, 18) with full context. Deploying them here pre-empts the panel's later interest and signals you have data behind every loop.</li>
+</ul>
+
+<div class="callout">
+<strong>Why withhold the numbers on the slide itself?</strong> Three reasons. (1) The slide is about <em>methodology</em>, not <em>results</em> — putting numbers here would shift the panel's attention to "is +11 F1 a lot?" instead of "is this design science?". (2) The numbers get full context on dedicated later slides; previewing weakens them. (3) Withholding-then-deploying signals confidence — the candidate has more evidence than the slide shows.
+</div>
+
+<h2>6 · Three pre-loaded interrupts</h2>
+
+<div class="attack">
+<div class="q">"Is this just engineering? You built something and tested it."</div>
+<div class="a">"Engineering would mean making implementation choices to ship. Design science means iterating on a research artefact with a measured signal closing each loop. The three loops on screen each closed with a specific signal — schema grounding score, rare-class F1 on the raw corpus, the section 6.6 ablation. The iteration was empirically driven; that's what differentiates design science from engineering. The §6.6 ablation in particular is a controlled experiment embedded in the broader design-science programme."</div>
+<div class="micro">The key sentence: <em>"engineering makes implementation choices to ship; design science iterates on a research artefact with measured signals closing each loop."</em> That contrast is the entire defence.</div>
+</div>
+
+<div class="attack">
+<div class="q">"Why design science instead of a controlled experiment as your primary methodology?"</div>
+<div class="a">"Controlled experiments fit single-technique claims — you isolate one variable, vary it, measure the effect. VioNER's claim is about an integrated artefact — schema plus model plus KB plus platform — evaluated across multiple criteria (F1, KB enrichment, UAT). Design science is the established frame for that kind of multi-criterion integrated-artefact contribution. The §6.6 loss ablation is the embedded controlled experiment within the larger design-science programme; both methodologies coexist."</div>
+<div class="micro">Concede that controlled experiments are embedded — that's honest and pre-empts the "you're just choosing a softer label" follow-up. Hevner 2004 and Peffers 2007 are the canonical design-science references if cited.</div>
+</div>
+
+<div class="attack">
+<div class="q">"What if one of the loops had failed — would you have published the failure?"</div>
+<div class="a">"Each loop's exit criterion was empirical, not preference-based. If the schema loop hadn't produced higher agreement than the proposal's 26-entity schema, I would have kept iterating until it did, or documented why convergence wasn't possible. The grounding pilot measured EVENT_TYPE at 58% — that signal closed the loop on dropping EVENT_TYPE from the training signal. The exit criterion is the criterion; failure modes are visible in the iteration record."</div>
+<div class="micro">The point to land: <em>the exit criterion is the criterion.</em> Loops aren't validated by their outcome — they're validated by whether a measured signal closed them. This is a methodologically subtle but important defence.</div>
+</div>
+
+<h2>7 · The hero close</h2>
+
+<div class="hero-line">
+<span class="label">The hero line — memorise verbatim</span>
+"Each loop was a design decision validated by measurement, not preference. That's what makes this genuine design science."
+</div>
+
+<h3>Why this line is the hero</h3>
+<ul>
+<li><strong>"Measurement, not preference"</strong> is a binary contrast — easy to remember, easy to recall under pressure. Binary contrasts land harder than gradients.</li>
+<li><strong>"Each loop was..."</strong> includes every iteration without enumerating. The panel doesn't have to track three separate validations — they hear one categorical claim.</li>
+<li><strong>"Genuine design science"</strong> closes with the methodology name. The slide title and the hero line both anchor on it; the panel hears it twice.</li>
+<li><strong>Internally consistent with slides 1-8.</strong> Slide 4 framed analyst work as <em>operational, not perceptual</em>; slide 7 framed gaps <em>operationally, not technologically</em>; slide 9 frames iteration <em>empirically, not preferentially</em>. The pattern of "external signal over internal feeling" runs through the entire deck.</li>
+</ul>
+
+<h2>8 · Timed practice</h2>
+
+<p>Four beats, ~90 seconds. Target window: 80-105 seconds with proper pacing on the hero line.</p>
+
+<div class="timer-box">
+<div class="timer-display" id="timer">0.0 s</div>
+<div class="timer-buttons">
+<button id="startBtn">Start (begin "Methodology: design science")</button>
+<button id="stopBtn" class="secondary" disabled>Stop (after "genuine design science")</button>
+<button id="resetBtn" class="secondary">Reset</button>
+</div>
+<div class="timer-verdict" id="verdict"></div>
+</div>
+
+<div class="callout">
+<strong>The harder rep — the "preference" test.</strong> Deliver Beat 2 (the three loops) with your eyes closed. Notice if you instinctively reach for <em>"I felt"</em>, <em>"I thought"</em>, <em>"I decided to"</em>. Every one of those phrases breaks the methodology frame. Replace with external-signal verbs: <em>"the rare-class F1 fell"</em>, <em>"the grounding score dropped"</em>, <em>"the ablation measured"</em>. Run the rep until no preference verbs appear.
+</div>
+
+<h2>9 · Quiz</h2>
+
+<div class="quiz" id="quiz1">
+<h4>Q1. What is the function of slide 9 in the talk's overall arc?</h4>
+<p class="qstem">Pick the strongest description.</p>
+<ul class="choices" data-answer="b">
+<li data-key="a">To present the most novel technical contribution of the thesis.</li>
+<li data-key="b">To pre-stamp the contributions in slides 10-14 with a research-method label, so the panel listens to those slides asking "is each contribution principled?" rather than "is this a real problem?"</li>
+<li data-key="c">To establish that the candidate read the methodology literature.</li>
+<li data-key="d">To buy time before the technical content begins.</li>
+</ul>
+<p class="feedback" id="fb1"></p>
+</div>
+
+<div class="quiz" id="quiz2">
+<h4>Q2. A panellist asks: "Is this just engineering?"</h4>
+<p class="qstem">Pick the cleanest response.</p>
+<ul class="choices" data-answer="c">
+<li data-key="a">"No, design science is a recognised methodology — see Hevner 2004."</li>
+<li data-key="b">"Engineering would be implementation; this is research because it's a thesis."</li>
+<li data-key="c">"Engineering makes implementation choices to ship; design science iterates on a research artefact with a measured signal closing each loop. The three loops on screen each closed on a specific signal — that empirical closure is what differentiates the two."</li>
+<li data-key="d">"The §6.6 ablation is a controlled experiment, which is more rigorous than engineering."</li>
+</ul>
+<p class="feedback" id="fb2"></p>
+</div>
+
+<div class="quiz" id="quiz3">
+<h4>Q3. Why does the script <em>not</em> cite κ = 0.78, 212k → 50k, or +11 F1 on the live slide?</h4>
+<p class="qstem">Pick the strongest reason.</p>
+<ul class="choices" data-answer="a">
+<li data-key="a">The slide is about methodology, not results. Putting numbers here would shift the panel's attention to "is +11 F1 a lot?" instead of "is this design science?". Reserving them lets you deploy them on demand and signals you have evidence beyond what's shown.</li>
+<li data-key="b">The numbers aren't ready yet at this point in the talk.</li>
+<li data-key="c">The numbers are too dense for an audience that doesn't have ML background.</li>
+<li data-key="d">It would be improper to preview numbers that appear on later slides.</li>
+</ul>
+<p class="feedback" id="fb3"></p>
+</div>
+
+<div class="followup">
+<strong>Ask your teacher follow-up questions.</strong>
+<ul>
+<li>Want a 30-second compressed delivery for if you're running behind on time?</li>
+<li>Want to drill the "measurement, not preference" line under interruption?</li>
+<li>Want to rehearse deploying all three reserved numbers in sequence?</li>
+<li>Want a one-slide summary of Hevner's design-science guidelines for if a methodology purist presses on the framing?</li>
+</ul>
+<p class="cite">Reference: Hevner et al. (2004), <em>Design Science in Information Systems Research</em>, MIS Quarterly 28(1). Peffers et al. (2007), <em>A Design Science Research Methodology</em>, JMIS 24(3). Both establish the build-evaluate-iterate cycle this slide names.</p>
+</div>
+
+<div class="bottom">Lesson 11 of the slide drill. Next up — slide 10: contribution 1, the grounding-validated 8-entity schema.</div>
+
+</div>
+
+<script>
+// Timer
+(function(){
+  const display=document.getElementById('timer');
+  const startBtn=document.getElementById('startBtn');
+  const stopBtn=document.getElementById('stopBtn');
+  const resetBtn=document.getElementById('resetBtn');
+  const verdict=document.getElementById('verdict');
+  let raf=null, t0=0;
+  function tick(){const t=(performance.now()-t0)/1000;display.textContent=t.toFixed(1)+' s';raf=requestAnimationFrame(tick)}
+  startBtn.onclick=()=>{cancelAnimationFrame(raf);t0=performance.now();raf=requestAnimationFrame(tick);startBtn.disabled=true;stopBtn.disabled=false;verdict.textContent='';verdict.className='timer-verdict'};
+  stopBtn.onclick=()=>{cancelAnimationFrame(raf);const t=(performance.now()-t0)/1000;display.textContent=t.toFixed(1)+' s';startBtn.disabled=false;stopBtn.disabled=true;
+    if(t<70){verdict.textContent='Too fast — let the hero line breathe. Re-run with deliberate pacing on "measurement, not preference".';verdict.className='timer-verdict over'}
+    else if(t<=110){verdict.textContent='Inside the window. The methodological frame is established.';verdict.className='timer-verdict win'}
+    else{verdict.textContent='Over time — tighten Beat 2 (the three loops). Each loop should be ~17 seconds, qualitative only.';verdict.className='timer-verdict over'}};
+  resetBtn.onclick=()=>{cancelAnimationFrame(raf);display.textContent='0.0 s';startBtn.disabled=false;stopBtn.disabled=true;verdict.textContent='';verdict.className='timer-verdict'};
+})();
+// Quizzes
+document.querySelectorAll('.quiz').forEach(quiz=>{
+  const ul=quiz.querySelector('.choices');
+  const answer=ul.dataset.answer;
+  const fb=quiz.querySelector('.feedback');
+  const fbMap={
+    quiz1:{
+      b:'Yes. Slide 9 buys research-level legitimacy for the contribution slides. The panel\'s posture shifts from "is the problem real?" to "is each contribution principled?".',
+      a:'Not quite. Contributions come on slides 10-14; slide 9 is the methodological frame for them.',
+      c:'Citing references is a side effect. The function is shifting panel posture toward "principled" — that\'s what the design-science framing buys.',
+      d:'No — slide 9 does work. It pre-stamps the contributions.'
+    },
+    quiz2:{
+      c:'Yes. The contrast "engineering ships, design science iterates with measured signals" is the entire defence. Concrete reference to the three loops closing on specific signals seals it.',
+      a:'A reference works but it\'s a weak rebuttal alone. The panel needs the active contrast, not the citation.',
+      b:'Circular — "research because thesis" doesn\'t answer the methodological question.',
+      d:'Only partially. The ablation is the embedded controlled experiment, but the larger frame is still design science. Don\'t lead with the ablation.'
+    },
+    quiz3:{
+      a:'Yes. The slide is about methodology framing; numbers here would compete for attention. Reserving them lets you deploy on demand and signals you have evidence beyond what\'s shown.',
+      b:'No — the numbers exist and could be cited. The choice is rhetorical, not temporal.',
+      c:'Density isn\'t the issue — these are three clean numbers, easy to absorb.',
+      d:'Not impropriety — strategic withholding. Previewing weakens the deployment on slides 11, 12, 18.'
+    }
+  };
+  ul.querySelectorAll('li').forEach(li=>{
+    li.onclick=()=>{
+      if(li.classList.contains('locked'))return;
+      const key=li.dataset.key;
+      const correct=key===answer;
+      ul.querySelectorAll('li').forEach(x=>x.classList.add('locked'));
+      li.classList.add(correct?'right':'wrong');
+      if(!correct){ul.querySelector('li[data-key="'+answer+'"]').classList.add('right')}
+      fb.textContent=fbMap[quiz.id][key]||'';
+    };
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Slide 17 Quick Reference — Per-Entity F1 (The Reliability Map)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+@page{size:A4;margin:14mm}
+:root{
+  --ink:#1c1916;
+  --ink-soft:#4a4744;
+  --paper:#FFF;
+  --rule:#CFC8B8;
+  --accent:#7B1E1E;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --trust:#3F6B3F;
+  --spot:#3D6B8B;
+  --verify:#8B5A2B;
+  --correct:#7B1E1E;
+}
+*{box-sizing:border-box}
+html{font-size:10.5pt}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter",Georgia,serif;line-height:1.42}
+.wrap{max-width:185mm;margin:0 auto;padding:0}
+header{border-bottom:2px solid var(--accent);padding-bottom:6px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline;gap:1rem}
+header h1{font-family:"Iowan Old Style",Georgia,serif;font-size:16pt;font-weight:700;margin:0;letter-spacing:-0.01em}
+header .eye{font-family:"Inter","SF Pro Text",system-ui,sans-serif;font-size:8pt;color:var(--accent);text-transform:uppercase;letter-spacing:0.14em;font-weight:600}
+header .target{font-family:"Inter",sans-serif;font-size:8.5pt;color:var(--ink-soft)}
+.hero{background:var(--highlight);border:1.5px solid var(--accent);border-radius:4px;padding:7px 12px;margin:8px 0;text-align:center;font-size:9.5pt;font-weight:600;font-style:italic;line-height:1.45}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:7mm;margin-top:6px}
+h2{font-family:"Iowan Old Style",Georgia,serif;font-size:10.5pt;margin:8px 0 4px;border-bottom:1px solid var(--rule);padding-bottom:2px;color:var(--accent)}
+p,li{font-size:9.5pt;margin:2px 0}
+ul{margin:2px 0 2px 14px;padding:0}
+ul.tight li{margin:1px 0}
+em.k{background:#FFEFC0;font-style:normal;padding:0 2px;border-radius:2px;font-weight:600;color:var(--accent)}
+em.g{color:var(--success);font-style:normal;font-weight:600}
+/* Ranking table */
+.rank{width:100%;border-collapse:collapse;margin:4px 0;font-size:8.5pt}
+.rank th{font-family:"Inter",sans-serif;font-size:6.5pt;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);font-weight:700;text-align:left;padding:2px 5px;border-bottom:1.2px solid var(--rule)}
+.rank th.num,.rank td.num{text-align:right;font-feature-settings:"tnum"}
+.rank td{padding:2px 5px;border-bottom:1px dashed var(--rule)}
+.rank td.ent{font-family:"JetBrains Mono",monospace;font-size:7.8pt;font-weight:700}
+.rank td.num{font-family:"JetBrains Mono",monospace;font-size:7.8pt}
+.rank td.num b{color:var(--accent)}
+.rank td .op{font-family:"Inter",sans-serif;font-size:6pt;text-transform:uppercase;letter-spacing:0.03em;font-weight:700;padding:1px 4px;border-radius:2px;white-space:nowrap}
+.rank tr.t1 td .op{background:#E6F0E6;color:var(--trust)}
+.rank tr.t2 td .op{background:#E8EEF5;color:var(--spot)}
+.rank tr.t3 td .op{background:#F5EFE2;color:var(--verify)}
+.rank tr.t4 td .op{background:#F5E6E6;color:var(--correct)}
+.rank tr.avg td{border-top:1.2px solid var(--rule);font-weight:700;background:var(--highlight)}
+/* Beats */
+.beats{margin:3px 0}
+.b{display:grid;grid-template-columns:18px 1fr;gap:6px;padding:3px 0;border-bottom:1px dashed var(--rule);font-size:9pt}
+.b:last-child{border:0}
+.b .n{background:var(--accent);color:#FFF;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-family:"Inter",sans-serif;font-size:7pt;font-weight:700;margin-top:2px}
+.b .t{line-height:1.4}
+.b .t b{color:var(--accent)}
+.b .t .secs{font-family:"Inter",sans-serif;font-size:7pt;color:var(--ink-soft);font-style:italic;letter-spacing:0.04em}
+/* 2x2 */
+.grid2{display:grid;grid-template-columns:auto 1fr 1fr;gap:2px;margin:4px 0;font-size:7.8pt;text-align:center}
+.grid2 .h{font-family:"Inter",sans-serif;font-size:6.2pt;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);font-weight:700;padding:3px 4px;display:flex;align-items:center;justify-content:center}
+.grid2 .c{background:#FAF7F0;border:1px solid var(--rule);border-radius:2px;padding:4px 4px;line-height:1.3}
+.grid2 .c b{display:block;font-family:"JetBrains Mono",monospace;font-size:7.5pt;color:var(--accent)}
+.grid2 .c.good b{color:var(--success)}
+/* Attacks */
+.attack{background:#FAF7F0;border:1px solid var(--rule);border-radius:3px;padding:5px 7px;margin:3px 0;font-size:8.7pt}
+.attack .q{font-family:"Inter",sans-serif;font-size:7.5pt;color:var(--accent);font-weight:700;margin-bottom:2px}
+.attack .a{line-height:1.35}
+/* Reserved */
+.nums{display:grid;grid-template-columns:auto 1fr auto;gap:2px 6px;font-size:8.5pt;margin-top:3px}
+.nums .l{font-family:"Inter",sans-serif;text-transform:uppercase;font-size:6.5pt;letter-spacing:0.05em;color:var(--ink-soft);font-weight:700}
+.nums .d{font-style:italic;color:var(--ink-soft);font-size:8.5pt;line-height:1.3}
+.nums .n{color:var(--accent);font-weight:700;text-align:right;font-feature-settings:"tnum"}
+.nums .sep{grid-column:1 / -1;border-top:1px dashed var(--rule);height:0;margin:1px 0}
+footer{margin-top:8px;border-top:1px solid var(--rule);padding-top:4px;font-family:"Inter",sans-serif;font-size:6.5pt;color:var(--ink-soft);display:flex;justify-content:space-between}
+@media print{html{font-size:10pt}.hero{font-size:9pt}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+<div>
+<div class="eye">Slide 17 · Defense quick reference</div>
+<h1>Per-entity F1 — the reliability map</h1>
+</div>
+<div class="target">Target: 90 s · Window 80–105 s · Beats: 4</div>
+</header>
+
+<div class="hero">"Read it operationally. Dates and locations — trust them. Actors — spot-check for new groups. Casualties — verify the qualifier. Actions — add the passive-voice misses. Districts and victims — those need the most correction."</div>
+
+<div class="cols">
+<div>
+
+<h2>The table — memorise the F1 column</h2>
+<table class="rank">
+<tr><th>Entity</th><th class="num">Supp</th><th class="num">P</th><th class="num">R</th><th class="num">F1</th><th>Op</th></tr>
+<tr class="t1"><td class="ent">DATE</td><td class="num">31,938</td><td class="num">.961</td><td class="num">.952</td><td class="num"><b>0.956</b></td><td><span class="op">Trust</span></td></tr>
+<tr class="t1"><td class="ent">CITY</td><td class="num">44,361</td><td class="num">.941</td><td class="num">.928</td><td class="num"><b>0.934</b></td><td><span class="op">Trust</span></td></tr>
+<tr class="t2"><td class="ent">ACTOR</td><td class="num">47,612</td><td class="num">.929</td><td class="num">.917</td><td class="num"><b>0.923</b></td><td><span class="op">Spot-check</span></td></tr>
+<tr class="t2"><td class="ent">REGION</td><td class="num">24,331</td><td class="num">.902</td><td class="num">.881</td><td class="num"><b>0.891</b></td><td><span class="op">Occ. fix</span></td></tr>
+<tr class="t3"><td class="ent">CASUALTIES</td><td class="num">4,907</td><td class="num">.901</td><td class="num">.869</td><td class="num"><b>0.885</b></td><td><span class="op">Qualifier</span></td></tr>
+<tr class="t3"><td class="ent">ACTION</td><td class="num">9,963</td><td class="num">.881</td><td class="num">.852</td><td class="num"><b>0.866</b></td><td><span class="op">Passive</span></td></tr>
+<tr class="t4"><td class="ent">DISTRICT</td><td class="num">21,471</td><td class="num">.842</td><td class="num">.811</td><td class="num"><b>0.826</b></td><td><span class="op">Correct</span></td></tr>
+<tr class="t4"><td class="ent">VICTIM</td><td class="num">5,492</td><td class="num">.838</td><td class="num">.798</td><td class="num"><b>0.817</b></td><td><span class="op">Most corr.</span></td></tr>
+<tr class="avg"><td class="ent">Macro</td><td class="num">—</td><td class="num">.899</td><td class="num">.876</td><td class="num"><b>0.887</b></td><td></td></tr>
+<tr class="avg"><td class="ent">Micro</td><td class="num">190,075</td><td class="num">.918</td><td class="num">.901</td><td class="num"><b>0.909</b></td><td></td></tr>
+</table>
+<p style="font-size:8pt"><em class="k">Memory scaffold:</em> 2 trust (956/934) · 2 spot (923/891) · 2 verify (885/866) · 2 correct (826/817). Descending order = built-in error check. Averages tie back to slide 16.</p>
+
+<h2>The 90-second script · four beats</h2>
+<div class="beats">
+<div class="b"><div class="n">1</div><div class="t"><b>Frame (~5 s).</b> <em class="k">"Per-entity F1 — the reliability map."</em><br><span class="secs">Five words. Don't pad.</span></div></div>
+<div class="b"><div class="n">2</div><div class="t"><b>Recital (~25 s).</b> DATE .956 → CITY .934 → ACTOR .923 → REGION .891 → CASUALTIES .885 → ACTION .866 → DISTRICT .826 → VICTIM .817.<br><span class="secs">Steady cadence, pause per row. Drill eyes-closed × 5.</span></div></div>
+<div class="b"><div class="n">3</div><div class="t"><b>Operational reading (~35 s). HERO.</b> Trust dates+locations · spot-check actors for new groups · verify casualty qualifier · add passive-voice actions · correct districts+victims.<br><span class="secs">Five instructions, parallel structure. Slow down — these are instructions, not a list.</span></div></div>
+<div class="b"><div class="n">4</div><div class="t"><b>P&gt;R + pivot (~25 s).</b> <em class="k">Precision exceeds recall on every row</em> — uncertain ⇒ defaults to O ⇒ fewer false alarms — <em class="k">right trade for analyst review</em>. Pivot: <em class="g">"To prove the loss-function choice was the right one — here's the ablation."</em><br><span class="secs">Compress P&gt;R if long; pivot is never cuttable.</span></div></div>
+</div>
+
+<h2>Support × phrasing regularity — the 2×2</h2>
+<div class="grid2">
+<span class="h"></span><span class="h">Formulaic phrasing</span><span class="h">Variable / ambiguous</span>
+<span class="h">Common</span>
+<div class="c good"><b>DATE 0.956</b>strongest</div>
+<div class="c"><b>DISTRICT 0.826</b>name collision w/ CITY</div>
+<span class="h">Rare</span>
+<div class="c good"><b>CASUALTIES 0.885</b>"X killed" patterns</div>
+<div class="c"><b>VICTIM 0.817</b>scarcity + variability</div>
+</div>
+<p style="font-size:8pt">Support predicts F1 <em class="k">only with phrasing regularity held constant</em>. Naming CASUALTIES as the mirror case proves the causal model is real, not post-hoc.</p>
+
+</div>
+<div>
+
+<h2>Pre-loaded interrupts</h2>
+
+<div class="attack">
+<div class="q">Q · "Why is VICTIM weakest — isn't it what matters most?"</div>
+<div class="a">Two causes: <em class="k">5,492 spans vs 47,612 ACTOR</em> (9× less signal) + extreme phrasing variability ("civilians" → "the bus driver's family"). <em class="k">Judo turn:</em> because it matters most, the recipe targets it — next slide shows <em class="k">+11 F1</em> over plain CE. 0.817 IS the lifted number. Remainder = structural (lim. 2, FW 4).</div>
+</div>
+
+<div class="attack">
+<div class="q">Q · "P &gt; R everywhere — systematically missing entities?"</div>
+<div class="a"><em class="k">Calibrated to miss rather than guess.</em> Mechanism: uncertain ⇒ O. Direction: right for review — false alarm = deletion + eroded trust in every chip; miss = one addition. Knob: per-category thresholds tunable (§4.7). Designed trade, stated openly.</div>
+</div>
+
+<div class="attack">
+<div class="q">Q · "DISTRICT has 4× VICTIM's data, same F1 — contradiction?"</div>
+<div class="a">No — <em class="k">two failure modes</em>. VICTIM = scarcity + variability. DISTRICT = ambiguity with plenty of data: districts share names with cities/regions (<em class="k">Goma</em> = city + district + regional centre). Model defaults to CITY (more often right). More data can't fix ambiguous surface forms. Confusion matrix on slide 20.</div>
+</div>
+
+<div class="attack">
+<div class="q">Q · "Are these per-entity differences significant?"</div>
+<div class="a">Seed variance ±0.4 pp; rare rows wider — conceded. But the structure is robust: <em class="k">14-pt spread</em>, tier gaps 3–5 pts, rankings stable across 3 seeds. <em class="k">Not defended:</em> REGION .891 vs CASUALTIES .885 — within noise, no conclusion drawn from it. Tiers built on robust gaps only.</div>
+</div>
+
+<h2>Reserved — only if asked</h2>
+<div class="nums">
+<div class="l">5,492 / 47,612</div><div class="d">VICTIM vs ACTOR support — the 9× gap</div><div class="n">support</div>
+<div class="sep"></div>
+<div class="l">0.838 / 0.798</div><div class="d">VICTIM P/R — "found ~80 %, false alarms rare"</div><div class="n">P / R</div>
+<div class="sep"></div>
+<div class="l">0.708</div><div class="d">VICTIM under plain CE — endpoints only; table is slide 18's</div><div class="n">baseline</div>
+<div class="sep"></div>
+<div class="l">Goma / Beni</div><div class="d">Canonical CITY-DISTRICT ambiguity examples</div><div class="n">slide 20</div>
+<div class="sep"></div>
+<div class="l">§4.7</div><div class="d">Per-category threshold tuning — the P/R knob</div><div class="n">knob</div>
+<div class="sep"></div>
+<div class="l">Lim 2 / FW 4</div><div class="d">Real-news expansion · span-level CRF — VICTIM's remaining-gap paths</div><div class="n">§7.2/§7.4</div>
+</div>
+
+<h2>Delivery traps to avoid</h2>
+<ul class="tight">
+<li>Reciting the ablation progression here (0.708 → 0.776 → 0.792 → 0.817) ⇒ steals slide 18's punchline. Endpoints only, if forced.</li>
+<li>Reading the ranking without the operational tags ⇒ the slide becomes "more numbers after slide 16". The instructions ARE the slide.</li>
+<li>Glossing P&gt;R as coincidence ⇒ it's a designed trade; read the direction out loud like slide 16's micro/macro gap.</li>
+<li>Defending one-point differences (REGION vs CASUALTIES) ⇒ within seed noise. Name it as undefended — honesty deposit.</li>
+<li>Improvising new excuses (annotation quality, span length) ⇒ contradicts κ = 0.78 story; stick to the documented causes.</li>
+<li>Rushing Beat 3 ⇒ the five instructions are the hero and the panel's residue. The recital is for fluency; the instructions are for memory.</li>
+</ul>
+
+</div>
+</div>
+
+<footer>
+<span>VioNER defense — slide 17 quick reference</span>
+<span>8 rows · 4 tiers · trust → correct · P&gt;R by design · macro 0.887</span>
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 9 — Delivering Slide 7: The Four Operational Gaps</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --accent-soft:#A14747;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --success-soft:#E6F0E6;
+  --warn:#8B5A2B;
+  --beat:#1A365D;
+  --beat-soft:#E8EEF5;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:42rem;margin:0 auto;padding:3.5rem 1.5rem 6rem}
+.eyebrow{font-family:"Inter","SF Pro Text",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.18em;font-size:0.72rem;color:var(--accent);font-weight:600}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:2.2rem;font-weight:700;line-height:1.18;margin:0.4rem 0 0.6rem;letter-spacing:-0.012em}
+h2{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:1.45rem;margin:3rem 0 0.6rem;font-weight:700;border-bottom:1px solid var(--rule);padding-bottom:0.4rem}
+h3{font-family:"Inter",system-ui,sans-serif;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin:1.6rem 0 0.4rem;color:var(--accent)}
+p,li{font-size:1.05rem}
+.subtitle{color:var(--ink-soft);font-style:italic;font-size:1.1rem;margin:0 0 1.4rem}
+.meta{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);letter-spacing:0.02em;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:0.6rem 0;margin-bottom:2.2rem;display:flex;flex-wrap:wrap;gap:1.2rem}
+.meta span strong{color:var(--ink)}
+.callout{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem;margin:1.2rem 0;border-radius:4px}
+.callout.win{border-left:3px solid var(--success)}
+.callout.warn{border-left:3px solid var(--warn)}
+.callout.beat{border-left:3px solid var(--beat)}
+code{font-family:"JetBrains Mono","SF Mono",Menlo,monospace;font-size:0.92em;background:#F0EBE0;padding:0.06em 0.36em;border-radius:3px}
+/* Slide visual */
+.slide-mock{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.5rem 1.7rem;margin:1.4rem 0;box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+.slide-mock .badge{font-family:"Inter",system-ui,sans-serif;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:0.3rem;font-weight:600}
+.slide-mock .title{font-family:"Iowan Old Style",Georgia,serif;font-size:1.5rem;font-weight:700;margin:0 0 1rem}
+.slide-mock .subtitle-line{font-family:"Iowan Old Style",Georgia,serif;color:var(--accent);font-style:italic;font-size:0.95rem;margin-bottom:0.8rem;border-bottom:1px solid var(--rule);padding-bottom:0.5rem}
+.slide-mock .gaps{display:grid;grid-template-columns:1fr;gap:0.5rem}
+.slide-mock .gap-row{display:grid;grid-template-columns:auto 1fr;gap:0.7rem;align-items:start;background:var(--paper);border:1px solid var(--rule);border-radius:5px;padding:0.6rem 0.8rem}
+.slide-mock .gap-row .num{background:var(--accent);color:#FFF;width:1.8rem;height:1.8rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Inter",system-ui,sans-serif;font-weight:700;font-size:0.85rem;flex-shrink:0}
+.slide-mock .gap-row .body .topic{font-family:"Iowan Old Style",Georgia,serif;font-weight:700;font-size:0.98rem;color:var(--ink);margin-bottom:0.15rem}
+.slide-mock .gap-row .body .op{font-family:"Inter",system-ui,sans-serif;font-size:0.8rem;color:var(--ink-soft);line-height:1.4}
+/* Operational framing demo */
+.framing-demo{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin:0.9rem 0}
+.framing-demo .col{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.8rem 1rem}
+.framing-demo .col h4{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.5rem;font-weight:600}
+.framing-demo .col.bad h4{color:var(--accent)}
+.framing-demo .col.bad{border-left:3px solid var(--accent)}
+.framing-demo .col.good h4{color:var(--success)}
+.framing-demo .col.good{border-left:3px solid var(--success)}
+.framing-demo .col p{font-size:0.88rem;margin:0.3rem 0;color:var(--ink-soft);line-height:1.45;font-style:italic}
+/* Beats */
+.beat-script{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin:1.4rem 0}
+.beat{display:grid;grid-template-columns:auto 1fr;gap:0.9rem;align-items:start;padding:0.9rem 0;border-bottom:1px dashed var(--rule)}
+.beat:last-child{border-bottom:0}
+.beat-num{background:var(--beat);color:#FFF;width:2.1rem;height:2.1rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.85rem}
+.beat-num.hero{background:var(--accent)}
+.beat-content .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--beat);font-weight:600;margin-bottom:0.25rem;display:flex;gap:0.7rem;align-items:baseline}
+.beat-content .label.hero{color:var(--accent)}
+.beat-content .label .secs{color:var(--ink-soft);font-weight:400;font-style:italic}
+.beat-content .text{font-size:1.04rem;line-height:1.55;margin:0.2rem 0}
+.beat-content .text em.op{background:var(--beat-soft);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:600;color:var(--beat)}
+.beat-content .text em.cant{background:var(--highlight);font-style:normal;padding:0 0.2em;border-radius:2px;font-weight:700;color:var(--accent)}
+.beat-content .text em.key{background:var(--success-soft);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:600;color:var(--success)}
+.beat-content .text em.ex{font-style:italic;color:var(--ink-soft)}
+.beat-content .micro{margin-top:0.4rem;font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Independently necessary matrix */
+.indep-table{width:100%;border-collapse:collapse;font-size:0.93rem;margin:0.7rem 0;background:#FFF;border:1px solid var(--rule);border-radius:5px;overflow:hidden}
+.indep-table th,.indep-table td{padding:0.55rem 0.7rem;text-align:left;border-bottom:1px solid var(--rule);vertical-align:top}
+.indep-table tr:last-child td{border-bottom:0}
+.indep-table th{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);background:var(--paper)}
+.indep-table .met{color:var(--success);font-family:"Inter",system-ui,sans-serif;font-size:0.84rem;font-weight:600}
+.indep-table .miss{color:var(--accent);font-family:"Inter",system-ui,sans-serif;font-size:0.84rem;font-weight:600}
+.indep-table .result{font-style:italic;color:var(--ink);font-size:0.88rem}
+/* Forward map */
+.fwd-table{width:100%;border-collapse:collapse;font-size:0.93rem;margin:0.5rem 0}
+.fwd-table th,.fwd-table td{padding:0.45rem 0.6rem;text-align:left;border-bottom:1px solid var(--rule)}
+.fwd-table tr:last-child td{border-bottom:0}
+.fwd-table th{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);background:var(--paper)}
+.fwd-table .gap{font-family:"Inter",system-ui,sans-serif;font-weight:600;color:var(--accent);font-size:0.86rem}
+.fwd-table .arr{text-align:center;color:var(--beat);font-weight:700;font-family:"Inter",system-ui,sans-serif}
+.fwd-table .ctr{color:var(--beat);font-weight:500;font-size:0.86rem;font-family:"Inter",system-ui,sans-serif}
+.fwd-table .slide{color:var(--ink-soft);font-size:0.82rem;font-style:italic}
+/* Hero line */
+.hero-line{background:var(--highlight);border:2px solid var(--accent);border-radius:6px;padding:1.2rem 1.4rem;margin:1.3rem 0;text-align:center;font-family:"Iowan Old Style",Georgia,serif;font-size:1.1rem;line-height:1.55;font-weight:500}
+.hero-line .label{display:block;font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:600;margin-bottom:0.4rem}
+/* Attack */
+.attack{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem 0.8rem;margin:1rem 0;border-radius:4px}
+.attack .q{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.95rem;color:var(--accent);margin-bottom:0.5rem}
+.attack .a{margin:0.4rem 0 0.6rem;font-size:1.03rem}
+.attack .micro{font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Timer */
+.timer-box{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.3rem;margin:1.3rem 0;text-align:center}
+.timer-display{font-family:"JetBrains Mono","SF Mono",monospace;font-size:2.6rem;font-weight:700;color:var(--accent);margin:0.3rem 0;font-feature-settings:"tnum"}
+.timer-buttons{display:flex;gap:0.6rem;justify-content:center;margin-top:0.7rem}
+.timer-buttons button{font-family:"Inter",system-ui,sans-serif;font-size:0.92rem;font-weight:600;padding:0.55rem 1.3rem;border:1px solid var(--accent);background:var(--accent);color:#FFF;border-radius:4px;cursor:pointer;transition:background 120ms}
+.timer-buttons button:hover{background:var(--accent-soft)}
+.timer-buttons button.secondary{background:#FFF;color:var(--accent)}
+.timer-buttons button.secondary:hover{background:#FBFAF7}
+.timer-verdict{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin-top:0.7rem;min-height:1.4rem;font-weight:600}
+.timer-verdict.win{color:var(--success)}
+.timer-verdict.over{color:var(--warn)}
+/* Quiz */
+.quiz{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem;margin:1.4rem 0}
+.quiz h4{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin:0 0 0.8rem;color:var(--accent)}
+.quiz .qstem{font-size:1.02rem;margin-bottom:0.7rem}
+.choices{list-style:none;padding:0;margin:0}
+.choices li{margin:0.45rem 0;padding:0.55rem 0.8rem;border:1px solid var(--rule);border-radius:4px;cursor:pointer;background:#FBFAF7;font-size:0.98rem;transition:background 120ms,border-color 120ms}
+.choices li:hover{background:#F0EBE0}
+.choices li.right{background:#E6F0E6;border-color:var(--success);color:var(--success);font-weight:600}
+.choices li.wrong{background:#F5DEDE;border-color:var(--accent);color:var(--accent)}
+.feedback{margin-top:0.6rem;font-size:0.93rem;font-style:italic;color:var(--ink-soft);min-height:1.2rem}
+.checklist{list-style:none;padding:0}
+.checklist li{padding:0.5rem 0 0.5rem 1.8rem;position:relative;font-size:1rem;border-bottom:1px dashed var(--rule)}
+.checklist li:before{content:"☐";position:absolute;left:0;top:0.45rem;font-size:1.1rem;color:var(--accent)}
+.footer-note{margin-top:3rem;padding:1.2rem 1.4rem;background:#FFF;border:1px dashed var(--rule);border-radius:6px;font-size:0.95rem}
+.footer-note strong{color:var(--accent)}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft)}
+a:hover{color:var(--accent-soft)}
+@media print{
+  body{background:#FFF;font-size:11pt}
+  .wrap{max-width:none;padding:0 1in}
+  .quiz,.choices li,.timer-buttons button{cursor:auto}
+  .choices li{break-inside:avoid}
+  h2{break-after:avoid}
+  .slide-mock,.beat-num,.beat-content .text em,.hero-line,.framing-demo .col,.indep-table .met,.indep-table .miss,.fwd-table .gap,.fwd-table .arr{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .timer-buttons{display:none}
+  .meta{display:block}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">Lesson 09 · Slide 7 — The four operational gaps</div>
+<h1>State four operational gaps in 90 seconds — and defeat "why four and not three?"</h1>
+<p class="subtitle">Slide 7 is the heart of the problem statement. It's where the abstract "empty cell" from slide 6 becomes four concrete things the analyst can't do. Every contribution in slides 10-14 closes exactly one of these.</p>
+
+<div class="meta">
+<span><strong>Mission link.</strong> Commit to the four-part contribution shape.</span>
+<span><strong>Skill type.</strong> Operational framing + "independently necessary" defence.</span>
+<span><strong>Time.</strong> 15 minutes.</span>
+</div>
+
+<p><a href="0008-delivering-slide-6-landscape.html">Lesson 8</a> positioned VioNER in the empty cell of the competitive landscape. Slide 7 does the next move: <em>what does the empty cell actually mean operationally?</em>. The answer is four specific things the analyst can't do today. Each one will be closed by one contribution. If the panel accepts the four-gap structure, every contribution slide that follows feels inevitable rather than arbitrary.</p>
+
+<h2>1 · What's on the screen</h2>
+
+<div class="slide-mock">
+<div class="badge">Slide 7 of 22</div>
+<div class="title">The four operational gaps</div>
+<div class="subtitle-line">Stated in terms of what the analyst CAN'T get today</div>
+<div class="gaps">
+<div class="gap-row"><div class="num">1</div><div class="body"><div class="topic">Fast, structured, role-distinguished 5W1H output</div><div class="op">ACLED has it slowly; automated tools give flat or wrong-shape output.</div></div></div>
+<div class="gap-row"><div class="num">2</div><div class="body"><div class="topic">Rare-entity recovery</div><div class="op">Automated tools recover dates and locations but miss victims, casualties, action verbs.</div></div></div>
+<div class="gap-row"><div class="num">3</div><div class="body"><div class="topic">Trust + canonicalisation</div><div class="op">Output isn't sanity-checked against world knowledge or canonicalised across surface forms.</div></div></div>
+<div class="gap-row"><div class="num">4</div><div class="body"><div class="topic">Analyst-deployable system</div><div class="op">No system an analyst can actually deploy and run without ML expertise.</div></div></div>
+</div>
+</div>
+
+<div class="callout warn">
+<strong>The delivery risk on this slide.</strong> Slide 7 is structurally similar to slide 5 (four-item enumeration), so it's tempting to deliver it with the same cadence. Don't. Slide 5 listed <em>technical challenges</em>; slide 7 lists <em>operational deficits</em>. The grammar of each item is different: "What the analyst <strong>CAN'T</strong> get" not "Why the model <strong>can't</strong> do this." Hit the "CAN'T" with vocal weight — that's the signal you're speaking the analyst's language.
+</div>
+
+<h2>2 · The new craft skill — operational framing</h2>
+
+<p>Every gap on this slide is stated in user terms, not technical terms. That's deliberate. The panel has heard you talk about loss functions and BERT and class imbalance; on slide 7, you switch to the analyst's vocabulary. This signals: "I understand who this is for, not just how it works."</p>
+
+<div class="framing-demo">
+<div class="col bad">
+<h4>Technical framing (wrong)</h4>
+<p>"Plain CE doesn't handle class imbalance well."</p>
+<p>"Generic NER lacks domain KB integration."</p>
+<p>"There's no end-to-end deployable artefact in the literature."</p>
+</div>
+<div class="col good">
+<h4>Operational framing (right)</h4>
+<p>"Analysts don't see victims, action verbs, or casualties — the operationally critical entities."</p>
+<p>"Output isn't sanity-checked against world knowledge."</p>
+<p>"No system an analyst can deploy and run without ML expertise."</p>
+</div>
+</div>
+
+<h3>The rule of operational framing</h3>
+<p>If the sentence describes what the <em>technology</em> is missing → it's technical framing. If the sentence describes what the <em>user</em> can't do → it's operational framing. Slide 7 is all operational. Every later contribution slide will be partly technical; but slide 7 is the moment where you speak the analyst's language so the panel knows you can.</p>
+
+<h2>3 · The 90-second script, in six beats</h2>
+
+<div class="beat-script">
+
+<div class="beat">
+<div class="beat-num">0</div>
+<div class="beat-content">
+<div class="label">Opener <span class="secs">~10 seconds</span></div>
+<div class="text">"The four operational gaps — <em class="key">the heart of the contribution</em>. I state them operationally, in terms of what the analyst <em class="cant">CAN'T</em> get today."</div>
+<div class="micro">"CAN'T" is the orientation cue. The capital letters on the slide signal it; your vocal weight on "CAN'T" makes the panel hear it. Pause briefly after.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">1</div>
+<div class="beat-content">
+<div class="label">Gap 1 — fast structured 5W1H <span class="secs">~15 seconds</span></div>
+<div class="text">"<em class="op">Gap one:</em> fast, structured, role-distinguished 5W1H output. <em class="ex">ACLED has it slowly; automated tools give flat or wrong-shape output.</em>"</div>
+<div class="micro">Three adjectives — fast, structured, role-distinguished — say them as a unit. The "ACLED... automated tools..." contrast tells the panel where today's solutions fall short.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">2</div>
+<div class="beat-content">
+<div class="label">Gap 2 — rare-entity recovery <span class="secs">~15 seconds</span></div>
+<div class="text">"<em class="op">Gap two:</em> automated tools recover dates and locations but <em class="cant">miss victims, casualties, action verbs.</em>"</div>
+<div class="micro">"miss victims, casualties, action verbs" is the operational version of "rare-entity recovery". Land "miss" with weight — that's what makes it operational.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">3</div>
+<div class="beat-content">
+<div class="label">Gap 3 — trust + canonicalisation <span class="secs">~15 seconds</span></div>
+<div class="text">"<em class="op">Gap three:</em> output <em class="cant">isn't sanity-checked against world knowledge</em> or canonicalised across surface forms."</div>
+<div class="micro">Two sub-deficits: world-knowledge validation, and surface-form canonicalisation. The "or" joins them — say it like one combined deficit, not two separate items.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">4</div>
+<div class="beat-content">
+<div class="label">Gap 4 — analyst-deployable <span class="secs">~15 seconds</span></div>
+<div class="text">"<em class="op">Gap four:</em> <em class="cant">no system an analyst can actually deploy and run without ML expertise.</em>"</div>
+<div class="micro">"Without ML expertise" is the operational constraint. The analyst isn't a developer — they need something that just runs.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num hero">5</div>
+<div class="beat-content">
+<div class="label hero">The defence — "why four and not three?" <span class="secs">~20 seconds</span></div>
+<div class="text">"If asked <em class="ex">'why four and not three?'</em> — <em class="key">no existing system fills all four, and each is independently necessary for the analyst's job.</em> A <em class="ex">perfectly structured output that arrives too late</em> is useless; a <em class="ex">fast output that misses victims</em> is useless."</div>
+<div class="micro">This is the most important beat. The two concrete examples (slow-structured / fast-incomplete) are what make "independently necessary" feel argued, not asserted. Land both examples slowly. End on the second "useless" with a clean stop. Advance to slide 8.</div>
+</div>
+</div>
+
+</div>
+
+<h2>4 · The "independently necessary" matrix</h2>
+
+<p>The defence beat hinges on showing that any THREE gaps met = analyst still can't do their job. Memorise this table — it lets you defend "why four and not three" from any angle a panellist comes from.</p>
+
+<table class="indep-table">
+<thead>
+<tr><th>What's met</th><th>What's missing</th><th>What goes wrong</th></tr>
+</thead>
+<tbody>
+<tr><td class="met">Structured 5W1H + rare entities + validation</td><td class="miss">Not deployable</td><td class="result">Beautiful output the analyst can never run. Stays on a researcher's laptop.</td></tr>
+<tr><td class="met">Rare entities + validation + deployable</td><td class="miss">Not structured 5W1H</td><td class="result">Fast output in the wrong shape. Analyst has to restructure every record.</td></tr>
+<tr><td class="met">Structured + validation + deployable</td><td class="miss">No rare-entity recovery</td><td class="result">Beautiful empty cells where victim, casualties, action should be.</td></tr>
+<tr><td class="met">Structured + rare entities + deployable</td><td class="miss">No validation</td><td class="result">Plausible-looking but factually unchecked output. Geopolitically risky.</td></tr>
+</tbody>
+</table>
+
+<div class="callout beat">
+<strong>The argument in one line.</strong> Each row of the table is an existence proof that three gaps closed ≠ analyst-usable. Therefore all four are necessary; therefore the contribution is a four-part integration, not a single component.
+</div>
+
+<h2>5 · Gap-to-contribution map (forward references)</h2>
+
+<p>Each gap on this slide maps to one specific contribution the panel will see in slides 10-14. You don't reveal the contributions on slide 7 — but you should know the mapping so you can deliver each gap with awareness of what it sets up.</p>
+
+<table class="fwd-table">
+<thead>
+<tr><th>Gap (slide 7)</th><th></th><th>Contribution that closes it</th><th>Lands at</th></tr>
+</thead>
+<tbody>
+<tr><td class="gap">1. Fast structured 5W1H</td><td class="arr">→</td><td class="ctr">8-entity grounding-validated schema + BERT fine-tuning</td><td class="slide">Slides 10, 12, 15</td></tr>
+<tr><td class="gap">2. Rare-entity recovery</td><td class="arr">→</td><td class="ctr">Focal loss + inverse-frequency class weights</td><td class="slide">Slides 12, 18</td></tr>
+<tr><td class="gap">3. Trust + canonicalisation</td><td class="arr">→</td><td class="ctr">Curated KB with validation + enrichment</td><td class="slide">Slide 13, 19</td></tr>
+<tr><td class="gap">4. Analyst-deployable system</td><td class="arr">→</td><td class="ctr">Web platform (React + FastAPI + Postgres + Docker)</td><td class="slide">Slides 14, 19</td></tr>
+</tbody>
+</table>
+
+<div class="hero-line">
+<span class="label">The integration thread — restated</span>
+"Each contribution closes one gap. Dropping any one breaks the analyst's job. The integration is the contribution."
+</div>
+
+<p>This is the same integration thread you delivered on slide 2 (lesson 3). Slide 7 is where you make it concrete — four gaps, four contributions, one chain. The pattern from lesson 3 ("the contribution is the integration, not any one component") is now demonstrated, not asserted.</p>
+
+<h2>6 · Three pre-loaded interrupts</h2>
+
+<div class="attack">
+<div class="q">"Why four and not three? Couldn't gaps 1 and 4 collapse?"</div>
+<div class="a">"Gap one is about the <em>output shape</em> — fast, structured, role-distinguished. Gap four is about the <em>system shape</em> — an analyst can run it. ACLED has gap one met (the output shape is structured) but gap four unmet (no analyst can run it; it requires the ACLED coding team). Generic deployable NER systems have gap four met (anyone can run them) but gap one unmet (output is flat, no role distinction). The two gaps fail independently — they're not the same thing."</div>
+<div class="micro">Concrete examples on both sides. Don't define the gaps abstractly — show them with ACLED and generic NER as anchor points.</div>
+</div>
+
+<div class="attack">
+<div class="q">"Aren't gaps 2 and 3 both about quality?"</div>
+<div class="a">"Gap two is about <em>recall</em> — finding the rare entities at all. Gap three is about <em>validation</em> — checking that what's found is geographically and factually plausible. Recall without validation produces hallucinated victims; validation without recall validates nothing. They address different failure modes."</div>
+<div class="micro">"Different failure modes" is the disarming phrase. Recall failure and validation failure aren't the same kind of error.</div>
+</div>
+
+<div class="attack">
+<div class="q">"Is this just a checklist? Where does the real contribution sit?"</div>
+<div class="a">"The contribution is the integration. Each gap maps to one component — schema, model, KB, platform. Each component on its own has precedent in the literature. What's new is closing all four simultaneously, evaluated end-to-end. The integration is the contribution; the four-gap structure is how I justify why integration is necessary."</div>
+<div class="micro">This is the integration thread from slide 2, made operational. Use the exact phrase "the integration is the contribution" — it's the through-line.</div>
+</div>
+
+<h2>7 · Timed practice</h2>
+
+<p>Six beats, ~90 seconds. Range: 80-105 seconds with the defence beat (#5) taking proper time.</p>
+
+<div class="timer-box">
+<div class="timer-display" id="timer">0.0 s</div>
+<div class="timer-buttons">
+<button id="startBtn">Start (begin opener)</button>
+<button id="stopBtn" class="secondary" disabled>Stop (after "fast output that misses victims is useless")</button>
+<button id="resetBtn" class="secondary">Reset</button>
+</div>
+<div class="timer-verdict" id="verdict"></div>
+</div>
+
+<div class="callout">
+<strong>The harder rep.</strong> Cover the slide. Recite all four gap topics in order — fast structured 5W1H · rare-entity recovery · trust + canonicalisation · analyst-deployable. Then deliver the "perfectly structured / fast output" defence example. If you swap gap 2 and gap 3 order, or forget the two concrete examples in the defence, do another pass. The order matters because it tracks the analyst's workflow: structure first (what shape is the output?), then content (does it have the right things?), then trust (can I rely on it?), then access (can I run it?).
+</div>
+
+<h2>8 · Quiz</h2>
+
+<div class="quiz" id="quiz1">
+<h4>Q1. Which framing belongs on slide 7?</h4>
+<p class="qstem">Pick the operationally framed statement.</p>
+<ul class="choices" data-answer="b">
+<li data-key="a">"Plain cross-entropy fails to learn rare entity classes under severe imbalance."</li>
+<li data-key="b">"Automated tools recover dates and locations but miss victims, casualties, action verbs."</li>
+<li data-key="c">"BERT NER models lack domain-specific KB lookups."</li>
+<li data-key="d">"Current NER systems use generic schemas not optimised for African conflict events."</li>
+</ul>
+<p class="feedback" id="fb1"></p>
+</div>
+
+<div class="quiz" id="quiz2">
+<h4>Q2. A panellist asks: "Couldn't gaps 1 and 4 collapse into one?"</h4>
+<p class="qstem">Pick the strongest one-sentence rebuttal.</p>
+<ul class="choices" data-answer="c">
+<li data-key="a">"They're conceptually different — output shape vs system shape."</li>
+<li data-key="b">"The thesis defines them separately, so they should stay separate."</li>
+<li data-key="c">"ACLED has gap one met (structured output) but gap four unmet (no analyst can run it); generic deployable NER has gap four met but gap one unmet. They fail independently."</li>
+<li data-key="d">"Without gap four, the structured output would be useless."</li>
+</ul>
+<p class="feedback" id="fb2"></p>
+</div>
+
+<div class="quiz" id="quiz3">
+<h4>Q3. What is the strategic purpose of the defence beat ("If asked why four and not three...")?</h4>
+<p class="qstem">Pick the right reading.</p>
+<ul class="choices" data-answer="d">
+<li data-key="a">To acknowledge that the four-gap structure could be controversial.</li>
+<li data-key="b">To pad the script to hit the 90-second budget.</li>
+<li data-key="c">To remind the panel that there are exactly four contributions.</li>
+<li data-key="d">To pre-empt the most likely panel attack on the contribution structure. By stating the defence proactively, the candidate prevents a hostile interrupt that would otherwise derail the narrative.</li>
+</ul>
+<p class="feedback" id="fb3"></p>
+</div>
+
+<h2>9 · Fluency checklist</h2>
+
+<ul class="checklist">
+<li>I hit "CAN'T" with vocal weight on the opener — signals the slide is in the analyst's vocabulary.</li>
+<li>I deliver all four gaps in order (structured → rare entities → trust → deployable) without confusion.</li>
+<li>I say "miss victims, casualties, action verbs" in operational tone, not technical tone.</li>
+<li>I deliver the defence beat with both concrete examples — slow-structured AND fast-incomplete.</li>
+<li>I can answer "couldn't gaps 1 and 4 collapse?" by citing ACLED and generic NER as failure-mode anchors.</li>
+<li>I can answer "aren't gaps 2 and 3 both about quality?" by distinguishing recall from validation.</li>
+<li>My last timed rep was between 80 and 105 seconds.</li>
+</ul>
+
+<div class="callout win">
+<strong>If all seven are ticked,</strong> slide 7 commits the panel to the four-part contribution shape. Every later slide (10-14) is now a 1:1 response to a gap they've already accepted is real and operationally necessary. The "integration is the contribution" thread (lesson 3) is now demonstrated, not just asserted.
+</div>
+
+<h2>Where to go next</h2>
+
+<ul>
+<li><em>"Teach me slide 8 — VioNER in one slide."</em> (The five components introduced together; the 150ms vs 15-25min reveal.)</li>
+<li><em>"Teach me slide 22 — the close."</em></li>
+<li><em>"Drill me cold on slides 5-7 — three problem-side slides back to back."</em></li>
+<li><em>"Teach me how to respond when the panel pushes back hard on the four-gap structure."</em></li>
+</ul>
+
+<div class="footer-note">
+<strong>Authority for this lesson.</strong> Verbatim script from <code>VioNER_Defense_Slides_study_guide.md</code> slide 7. The gap-to-contribution map from <code>solution_architecture.md</code>. The "independently necessary" framing follows the standard argumentative structure for multi-component contribution claims in design-science research (Hevner et al. 2004, "Design Science in Information Systems Research"). The operational-framing technique draws on user-research conventions in UX literature, particularly Nielsen's "task-focused vs technology-focused" distinction.
+</div>
+
+</div>
+
+<script>
+document.querySelectorAll('.quiz').forEach(function(q){
+  var list=q.querySelector('.choices');
+  var ans=list.getAttribute('data-answer');
+  var fb=q.querySelector('.feedback');
+  list.querySelectorAll('li').forEach(function(li){
+    li.addEventListener('click',function(){
+      list.querySelectorAll('li').forEach(function(x){x.classList.remove('right','wrong');});
+      if(li.getAttribute('data-key')===ans){
+        li.classList.add('right');
+        fb.textContent='Correct — this is the move.';
+      } else {
+        li.classList.add('wrong');
+        fb.textContent='Not the strongest answer — try again.';
+      }
+    });
+  });
+});
+(function(){
+  var display=document.getElementById('timer');
+  var startBtn=document.getElementById('startBtn');
+  var stopBtn=document.getElementById('stopBtn');
+  var resetBtn=document.getElementById('resetBtn');
+  var verdict=document.getElementById('verdict');
+  var startTime=null,timer=null,elapsed=0;
+  function tick(){elapsed=(performance.now()-startTime)/1000;display.textContent=elapsed.toFixed(1)+' s'}
+  startBtn.addEventListener('click',function(){startTime=performance.now();timer=setInterval(tick,50);startBtn.disabled=true;stopBtn.disabled=false;verdict.textContent='';verdict.className='timer-verdict'});
+  stopBtn.addEventListener('click',function(){
+    clearInterval(timer);startBtn.disabled=false;stopBtn.disabled=true;
+    var t=elapsed;
+    if(t<70){verdict.textContent='Under 70 s — racing. The defence beat got compressed; slow it down so both examples land.';verdict.className='timer-verdict over'}
+    else if(t<=105){verdict.textContent='Between 70 and 105 s — on target. Four operational gaps + defence both have weight.';verdict.className='timer-verdict win'}
+    else if(t<=125){verdict.textContent='Between 105 and 125 s — slightly slow. Trim filler from gaps 1-4; keep the defence beat at full speed.';verdict.className='timer-verdict over'}
+    else{verdict.textContent='Over 125 s — significant padding. Re-read the verbatim and cut before next rep.';verdict.className='timer-verdict over'}
+  });
+  resetBtn.addEventListener('click',function(){clearInterval(timer);startBtn.disabled=false;stopBtn.disabled=true;elapsed=0;display.textContent='0.0 s';verdict.textContent='';verdict.className='timer-verdict'});
+})();
+</script>
+</body>
+</html>

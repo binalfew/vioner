@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 16 — Delivering Slide 14: The Platform</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --accent-soft:#A14747;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --success-soft:#E6F0E6;
+  --warn:#8B5A2B;
+  --beat:#1A365D;
+  --beat-soft:#E8EEF5;
+  --front:#3D6B8B;    /* React/TS — presentation */
+  --front-soft:#E8EEF5;
+  --svc:#7B5B1E;       /* FastAPI — service */
+  --svc-soft:#F5EFC9;
+  --core:#7B1E1E;      /* model + KB — inference core */
+  --core-soft:#F5E6E6;
+  --store:#3F6B3F;     /* PostgreSQL — persistence */
+  --store-soft:#E6F0E6;
+  --combine:#3F6B3F;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:42rem;margin:0 auto;padding:3.5rem 1.5rem 6rem}
+.eyebrow{font-family:"Inter","SF Pro Text",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.18em;font-size:0.72rem;color:var(--accent);font-weight:600}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:2.2rem;font-weight:700;line-height:1.18;margin:0.4rem 0 0.6rem;letter-spacing:-0.012em}
+h2{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:1.45rem;margin:3rem 0 0.6rem;font-weight:700;border-bottom:1px solid var(--rule);padding-bottom:0.4rem}
+h3{font-family:"Inter",system-ui,sans-serif;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin:1.6rem 0 0.4rem;color:var(--accent)}
+p,li{font-size:1.05rem}
+.subtitle{color:var(--ink-soft);font-style:italic;font-size:1.1rem;margin:0 0 1.4rem}
+.meta{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);letter-spacing:0.02em;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:0.6rem 0;margin-bottom:2.2rem;display:flex;flex-wrap:wrap;gap:1.2rem}
+.meta span strong{color:var(--ink)}
+.callout{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem;margin:1.2rem 0;border-radius:4px}
+.callout.win{border-left:3px solid var(--success)}
+.callout.warn{border-left:3px solid var(--warn)}
+.callout.beat{border-left:3px solid var(--beat)}
+code{font-family:"JetBrains Mono","SF Mono",Menlo,monospace;font-size:0.92em;background:#F0EBE0;padding:0.06em 0.36em;border-radius:3px}
+/* Slide mock */
+.slide-mock{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.5rem 1.7rem;margin:1.4rem 0;box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+.slide-mock .badge{font-family:"Inter",system-ui,sans-serif;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:0.3rem;font-weight:600}
+.slide-mock .title{font-family:"Iowan Old Style",Georgia,serif;font-size:1.45rem;font-weight:700;margin:0 0 0.6rem}
+/* Stack diagram */
+.stack{display:grid;gap:5px;margin:0.9rem 0}
+.layer{display:grid;grid-template-columns:7rem 1fr auto;gap:0.7rem;background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.7rem 0.9rem;align-items:center}
+.layer.front{border-left:3px solid var(--front);background:linear-gradient(180deg,#FFF 0%,#F8FAFD 100%)}
+.layer.svc{border-left:3px solid var(--svc);background:linear-gradient(180deg,#FFF 0%,#FDFBF1 100%)}
+.layer.core{border-left:3px solid var(--core);background:linear-gradient(180deg,#FFF 0%,#FDF8F8 100%)}
+.layer.store{border-left:3px solid var(--store);background:linear-gradient(180deg,#FFF 0%,#F8FDF8 100%)}
+.layer .tech{font-family:"JetBrains Mono","SF Mono",monospace;font-size:0.86rem;font-weight:700}
+.layer.front .tech{color:var(--front)}
+.layer.svc .tech{color:var(--svc)}
+.layer.core .tech{color:var(--core)}
+.layer.store .tech{color:var(--store)}
+.layer .role{font-family:"Iowan Old Style",Georgia,serif;font-size:0.93rem;color:var(--ink-soft);line-height:1.4}
+.layer .role strong{color:var(--ink)}
+.layer .badge{font-family:"Inter",sans-serif;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-soft);font-weight:700;background:var(--paper);border:1px solid var(--rule);padding:0.2em 0.55em;border-radius:3px}
+.orchestrate{display:flex;gap:0.6rem;align-items:center;background:#FAF7F0;border:1px dashed var(--rule);border-radius:5px;padding:0.55rem 0.9rem;margin:0.4rem 0;font-family:"JetBrains Mono",monospace;font-size:0.85rem;color:var(--ink-soft)}
+.orchestrate .tag{font-family:"Inter",sans-serif;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;background:var(--accent);color:#FFF;padding:0.15em 0.5em;border-radius:3px;font-weight:700}
+/* Engine vs car */
+.analogy{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin:1rem 0}
+.analogy .col{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.95rem 1.1rem}
+.analogy .col.engine{border-left:3px solid var(--warn);background:#FFFBF0}
+.analogy .col.car{border-left:3px solid var(--success);background:#F4FAF4}
+.analogy .col h4{font-family:"Inter",sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.35rem;font-weight:700}
+.analogy .col.engine h4{color:var(--warn)}
+.analogy .col.car h4{color:var(--success)}
+.analogy .col h5{font-family:"Iowan Old Style",Georgia,serif;font-size:1rem;margin:0 0 0.35rem;font-weight:700}
+.analogy .col p{font-size:0.9rem;margin:0.3rem 0;line-height:1.5;color:var(--ink-soft)}
+.analogy .col p strong{color:var(--ink)}
+.analogy .col ul{margin:0.35rem 0 0 1rem;padding:0}
+.analogy .col li{font-size:0.88rem;margin:0.15rem 0;color:var(--ink-soft)}
+/* Choice table — engineering pragmatism */
+.choices-table{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.85rem 1.05rem;margin:0.8rem 0}
+.choices-table h4{font-family:"Inter",sans-serif;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.45rem;color:var(--accent);font-weight:700}
+.choice-row{display:grid;grid-template-columns:7rem 1fr;gap:0.7rem;padding:0.4rem 0;border-bottom:1px dashed var(--rule);font-size:0.94rem;line-height:1.45;align-items:start}
+.choice-row:last-child{border:0}
+.choice-row .tech{font-family:"JetBrains Mono",monospace;font-size:0.84rem;font-weight:700;color:var(--accent)}
+.choice-row .why em{color:var(--accent);font-style:normal;font-weight:600}
+/* Swap test diagram */
+.swap{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.swap h4{font-family:"Inter",sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.5rem;color:var(--accent);font-weight:700;text-align:center}
+.swap-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:0.6rem;align-items:center}
+.swap-grid .side{background:#FAF7F0;border-radius:4px;padding:0.7rem 0.9rem;border:1px solid var(--rule)}
+.swap-grid .side.swap-ok{border-left:3px solid var(--success)}
+.swap-grid .side.swap-no{border-left:3px solid var(--accent)}
+.swap-grid .side h5{font-family:"Inter",sans-serif;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.3rem;font-weight:700}
+.swap-grid .side.swap-ok h5{color:var(--success)}
+.swap-grid .side.swap-no h5{color:var(--accent)}
+.swap-grid .side p{font-family:"Iowan Old Style",Georgia,serif;font-size:0.92rem;margin:0;line-height:1.45;color:var(--ink-soft)}
+.swap-grid .side p strong{color:var(--ink)}
+.swap-grid .vs{font-family:"Inter",sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-soft);font-weight:700;text-align:center}
+/* Empty cell */
+.emptycell{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.85rem 1.05rem;margin:0.9rem 0}
+.emptycell h4{font-family:"Inter",sans-serif;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.45rem;color:var(--accent);font-weight:700}
+.ec-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;font-family:"JetBrains Mono",monospace;font-size:0.78rem}
+.ec-grid .cell{padding:0.4rem 0.3rem;text-align:center;background:#FAF7F0;border:1px solid var(--rule);border-radius:3px;line-height:1.3}
+.ec-grid .cell.head{font-family:"Inter",sans-serif;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);font-weight:700;background:#FFF}
+.ec-grid .cell.no{color:var(--ink-soft)}
+.ec-grid .cell.yes{color:var(--success);font-weight:700}
+.ec-grid .cell.target{background:var(--highlight);color:var(--accent);font-weight:700;border:1.5px solid var(--accent)}
+/* Beats */
+.beat-script{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin:1.4rem 0}
+.beat{display:grid;grid-template-columns:auto 1fr;gap:0.9rem;align-items:start;padding:0.9rem 0;border-bottom:1px dashed var(--rule)}
+.beat:last-child{border-bottom:0}
+.beat-num{background:var(--beat);color:#FFF;width:2.1rem;height:2.1rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.85rem}
+.beat-num.hero{background:var(--accent)}
+.beat-content .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--beat);font-weight:600;margin-bottom:0.25rem;display:flex;gap:0.7rem;align-items:baseline}
+.beat-content .label.hero{color:var(--accent)}
+.beat-content .label .secs{color:var(--ink-soft);font-weight:400;font-style:italic}
+.beat-content .text{font-size:1.04rem;line-height:1.55;margin:0.2rem 0}
+.beat-content .text em.key{background:var(--success-soft);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:600;color:var(--success)}
+.beat-content .text em.num{background:var(--highlight);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:700;color:var(--accent)}
+.beat-content .text em.tech{font-family:"JetBrains Mono",monospace;font-style:normal;font-weight:700;color:var(--accent);font-size:0.96em}
+.beat-content .micro{margin-top:0.4rem;font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Pattern */
+.pattern{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.pattern h4{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.55rem;color:var(--accent);font-weight:700}
+.pattern-row{display:grid;grid-template-columns:auto 1fr;gap:0.6rem;align-items:start;padding:0.45rem 0;border-bottom:1px dashed var(--rule);font-size:0.95rem;line-height:1.5}
+.pattern-row:last-child{border:0}
+.pattern-row .step{background:var(--accent);color:#FFF;font-family:"Inter",sans-serif;font-size:0.68rem;font-weight:700;padding:0.15em 0.5em;border-radius:3px;white-space:nowrap}
+.pattern-row strong{color:var(--ink)}
+/* Reserved */
+.reserved{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.reserved h4{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.7rem;color:var(--accent);font-weight:700}
+.reserved-rows{display:grid;grid-template-columns:auto 1fr auto;gap:0.6rem 0.9rem;font-family:"Iowan Old Style",Georgia,serif;align-items:center}
+.reserved-rows .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:600}
+.reserved-rows .desc{font-size:0.93rem;color:var(--ink-soft);font-style:italic}
+.reserved-rows .num{font-weight:700;color:var(--accent);font-feature-settings:"tnum";font-size:1.02rem;text-align:right}
+.reserved-rows .row-sep{grid-column:1 / -1;border-top:1px dashed var(--rule);height:0;margin:0.1rem 0}
+/* Hero */
+.hero-line{background:var(--highlight);border:2px solid var(--accent);border-radius:6px;padding:1.2rem 1.4rem;margin:1.3rem 0;text-align:center;font-family:"Iowan Old Style",Georgia,serif;font-size:1.1rem;line-height:1.55;font-weight:500}
+.hero-line .label{display:block;font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:600;margin-bottom:0.4rem}
+/* Honest-middle binary chain */
+.binary-chain{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.binary-chain h4{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.55rem;color:var(--accent);font-weight:700}
+.binary-row{display:grid;grid-template-columns:5rem 1fr;gap:0.7rem;padding:0.35rem 0;border-bottom:1px dashed var(--rule);font-size:0.94rem;align-items:baseline}
+.binary-row:last-child{border:0}
+.binary-row .which{font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:700}
+.binary-row strong{color:var(--ink)}
+.binary-row em{color:var(--accent);font-style:normal;font-weight:600}
+/* Attack */
+.attack{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem 0.8rem;margin:1rem 0;border-radius:4px}
+.attack .q{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.95rem;color:var(--accent);margin-bottom:0.5rem}
+.attack .a{margin:0.4rem 0 0.6rem;font-size:1.03rem}
+.attack .micro{font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Timer */
+.timer-box{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.3rem;margin:1.3rem 0;text-align:center}
+.timer-display{font-family:"JetBrains Mono","SF Mono",monospace;font-size:2.6rem;font-weight:700;color:var(--accent);margin:0.3rem 0;font-feature-settings:"tnum"}
+.timer-buttons{display:flex;gap:0.6rem;justify-content:center;margin-top:0.7rem;flex-wrap:wrap}
+.timer-buttons button{font-family:"Inter",system-ui,sans-serif;font-size:0.92rem;font-weight:600;padding:0.55rem 1.3rem;border:1px solid var(--accent);background:var(--accent);color:#FFF;border-radius:4px;cursor:pointer;transition:background 120ms}
+.timer-buttons button:hover{background:var(--accent-soft)}
+.timer-buttons button.secondary{background:#FFF;color:var(--accent)}
+.timer-buttons button.secondary:hover{background:#FBFAF7}
+.timer-verdict{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin-top:0.7rem;min-height:1.4rem;font-weight:600}
+.timer-verdict.win{color:var(--success)}
+.timer-verdict.over{color:var(--warn)}
+/* Quiz */
+.quiz{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem;margin:1.4rem 0}
+.quiz h4{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin:0 0 0.8rem;color:var(--accent)}
+.quiz .qstem{font-size:1.02rem;margin-bottom:0.7rem}
+.choices{list-style:none;padding:0;margin:0}
+.choices li{margin:0.45rem 0;padding:0.55rem 0.8rem;border:1px solid var(--rule);border-radius:4px;cursor:pointer;background:#FBFAF7;font-size:0.98rem;transition:background 120ms,border-color 120ms}
+.choices li:hover{background:#F5EFE2;border-color:var(--accent-soft)}
+.choices li.right{background:var(--success-soft);border-color:var(--success);color:var(--success)}
+.choices li.wrong{background:#F5E4E4;border-color:var(--accent);color:var(--accent)}
+.choices li.locked{pointer-events:none;opacity:0.85}
+.feedback{font-family:"Inter",system-ui,sans-serif;font-size:0.93rem;margin-top:0.7rem;color:var(--ink-soft);min-height:1.2rem;font-style:italic}
+/* Followup */
+.followup{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin-top:2.4rem;border-left:3px solid var(--beat)}
+.followup ul{margin:0.6rem 0 0 1.1rem}
+.followup li{margin:0.45rem 0;font-size:1rem}
+.bottom{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;color:var(--ink-soft);border-top:1px solid var(--rule);padding-top:1.2rem;margin-top:3rem;font-style:italic}
+.cite{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);margin-top:0.3rem}
+.cite a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent-soft)}
+.cite a:hover{border-bottom:1px solid var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">Lesson 16 · Slide 14</div>
+<h1>The platform — the delivery vehicle</h1>
+<div class="subtitle">The systems contribution made visible. Four layers and one orchestration command. The slide has a structural attack to pre-empt — <em>"isn't this just engineering, not research?"</em> — and a structural defence to deliver: every individual technology choice is engineering pragmatism, but <em>the integration evaluated end-to-end</em> is the research contribution. Slide 6's empty cell in the related-work landscape is what this slide fills.</div>
+
+<div class="meta">
+<span><strong>Slide:</strong> 14 of 22</span>
+<span><strong>Target time:</strong> 75 seconds</span>
+<span><strong>Hero line:</strong> "Swapping React for Vue changes implementation, not contribution"</span>
+<span><strong>Reserved cards:</strong> 7 API groups · ~150 ms · n=5 UAT · §5.6 · §7.3 #5 · slide 6</span>
+</div>
+
+<h2>1 · Where this slide sits in the arc</h2>
+
+<p>Slides 10–13 built the four <em>research</em> contributions: schema, taxonomy + corpus, training recipe, KB. Slide 14 is the <em>fifth</em> contribution — the deployable platform. It is structurally the most exposed slide in the deck because every line on it looks like routine web engineering. <em>That is the point.</em> The slide's job is to convert the apparent weakness — "this all looks like a normal stack" — into the strength: nobody in the academic literature has built this stack for African violent-event extraction and evaluated it end-to-end with users.</p>
+
+<div class="callout beat">
+<strong>The function of slide 14.</strong> Two jobs. (1) Own the "isn't this just engineering?" attack <em>inside the slide itself</em> — say it before the panel can. Pre-empting an attack with your own framing of it is how you take the floor away from the dismissive reading. (2) Plant the <em>integration is the contribution</em> claim that slide 22 will close on. The five-contribution close depends on slide 14 having already established that an integrated and end-to-end-evaluated system is itself a research artefact in this domain.
+</div>
+
+<h2>2 · What's on the slide</h2>
+
+<div class="slide-mock">
+<div class="badge">Slide 14</div>
+<div class="title">The platform — four layers, one stack</div>
+
+<div class="stack">
+<div class="layer front">
+<span class="tech">React + TS</span>
+<span class="role"><strong>Front-end.</strong> Pages for inference, event browser, analytics, KB admin, training. What the analyst opens in a browser.</span>
+<span class="badge">Presentation</span>
+</div>
+<div class="layer svc">
+<span class="tech">FastAPI</span>
+<span class="role"><strong>Service layer.</strong> Seven REST API route groups. Loads the model once at startup, serves inference at ~150 ms.</span>
+<span class="badge">Interface</span>
+</div>
+<div class="layer core">
+<span class="tech">BERT + KB</span>
+<span class="role"><strong>In-process core.</strong> Model and KB share memory with the FastAPI worker. No network hop between extraction and validation.</span>
+<span class="badge">Inference</span>
+</div>
+<div class="layer store">
+<span class="tech">PostgreSQL 16</span>
+<span class="role"><strong>Event store.</strong> Persistent storage with full-text and JSONB indexing for fast analyst queries.</span>
+<span class="badge">Persistence</span>
+</div>
+</div>
+
+<div class="orchestrate">
+<span class="tag">Orchestration</span>
+<span><code>docker compose up</code> — one command stands the whole stack up.</span>
+</div>
+
+</div>
+
+<p>Three visual moves: the <strong>four-layer stack diagram</strong> (presentation → interface → inference → persistence, top to bottom), the <strong>orchestration line</strong> at the bottom (Docker Compose), and the <strong>implicit roleassignment</strong> — each layer has one job, and the layers are stacked in the order data flows. This visual itself is the integration claim: the slide is the architecture.</p>
+
+<h2>3 · The "engineering pragmatism vs research contribution" distinction</h2>
+
+<p>Slide 14's central craft skill is the <strong>engineering-as-contribution defence</strong>. It is a different defence shape from slides 12 and 13. There, you defended <em>technique combinations</em> (complementarity). Here, you defend a <em>systems artefact</em> by distinguishing what can be swapped without changing the contribution from what cannot.</p>
+
+<div class="swap">
+<h4>The swap test — what changes if you swap it?</h4>
+<div class="swap-grid">
+<div class="side swap-ok">
+<h5>Swap doesn't change contribution</h5>
+<p><strong>React → Vue.</strong> Different frontend framework, same UI surface.<br>
+<strong>FastAPI → Flask.</strong> Different Python web framework, same routes.<br>
+<strong>PostgreSQL → MySQL.</strong> Different RDBMS, same JSONB storage shape.<br>
+<strong>Docker Compose → Kubernetes.</strong> Different orchestration, same one-command stand-up.</p>
+</div>
+<div class="vs">— vs —</div>
+<div class="side swap-no">
+<h5>Swap WOULD change contribution</h5>
+<p><strong>Schema → 26 ungrounded labels.</strong> Loses the grounding-validated claim.<br>
+<strong>Loss → plain cross-entropy.</strong> Loses the imbalance result.<br>
+<strong>KB → ungrounded LLM.</strong> Loses validation and reproducibility.<br>
+<strong>UI → notebook.</strong> Loses end-to-end UAT evidence.</p>
+</div>
+</div>
+</div>
+
+<div class="callout">
+<strong>How to use the swap test under attack.</strong> If a panellist questions any individual choice — "why React?", "why FastAPI?", "why Docker Compose?" — answer with the swap test: <em>"swapping it would change implementation, not contribution."</em> Cite the alternative (Vue, Flask, Kubernetes), name the reason for the chosen one (ecosystem, async + PyTorch native, simpler at this scale), and pivot back to the integration claim. The swap test is what stops the panel from drawing you into a stack-religion debate about individual frameworks.
+</div>
+
+<h2>4 · The engineering pragmatism table</h2>
+
+<p>For each layer, there is one engineering reason that any working software engineer would accept. None of these are research claims — they are pragmatism. <em>Owning that pragmatism is what makes the integration claim survivable.</em></p>
+
+<div class="choices-table">
+<h4>Each choice — engineering reason, not research claim</h4>
+<div class="choice-row">
+<span class="tech">React + TS</span>
+<span class="why"><em>Largest community + strongest TypeScript ecosystem in 2026.</em> Lowest-risk choice for whoever inherits the system. <em>No research claim being made here.</em></span>
+</div>
+<div class="choice-row">
+<span class="tech">FastAPI</span>
+<span class="why"><em>Async-native + first-class PyTorch integration + auto-generated OpenAPI docs.</em> Loading a 110 M-param model into a single worker process is the right shape; Flask + WSGI would lose the async story.</span>
+</div>
+<div class="choice-row">
+<span class="tech">In-process model + KB</span>
+<span class="why"><em>No network hop between extraction and validation.</em> KB lookup is ~15 % of the 150 ms inference budget because it is in-memory; a remote KB service would push that toward ~50 ms by itself.</span>
+</div>
+<div class="choice-row">
+<span class="tech">PostgreSQL 16</span>
+<span class="why"><em>Full-text search + JSONB indexing</em> in one engine. The analytics page needs both — counting events by country (FTS-supported) and querying nested 5W1H fields (JSONB-supported).</span>
+</div>
+<div class="choice-row">
+<span class="tech">Docker Compose</span>
+<span class="why"><em>One command stands up the whole stack.</em> At 30 k articles/year, a service mesh would be overengineering. Compose hits the deployability target without the complexity tax.</span>
+</div>
+</div>
+
+<h2>5 · The car-vs-engine analogy</h2>
+
+<p>The single most useful image to carry into the room is the <strong>engine vs car</strong> framing. Most academic work hands the consumer an engine — a trained model with reported F1 numbers. This thesis hands the consumer a car — the engine, the chassis, the wheels, the dashboard, the key. UAT is the test drive.</p>
+
+<div class="analogy">
+<div class="col engine">
+<h4>Most academic work</h4>
+<h5>Hands you an engine</h5>
+<p>A trained model with F1 numbers and a paper. <strong>You cannot drive it</strong>: no UI, no persistence, no orchestration, no deployment guide.</p>
+<ul>
+<li>"The model achieves F1 = X"</li>
+<li>"Notebook in supplementary material"</li>
+<li>"Model weights on HuggingFace"</li>
+<li>"Reproduction may require modifications"</li>
+</ul>
+</div>
+<div class="col car">
+<h4>VioNER</h4>
+<h5>Hands you a car</h5>
+<p>The engine (model), chassis (architecture), wheels (API), dashboard (React UI), key (<code>docker compose up</code>). <strong>UAT is the test drive</strong>: n = 5 participants, six tasks, all completed.</p>
+<ul>
+<li>Inference page — paste article, see chips</li>
+<li>Event browser — filters, dates, countries</li>
+<li>Analytics dashboards — per-country, per-actor</li>
+<li>Training run from a UI form</li>
+<li>KB admin for new armed groups</li>
+</ul>
+</div>
+</div>
+
+<div class="callout">
+<strong>When to deploy the analogy.</strong> The analogy is best deployed if a panellist asks "what's different about your contribution vs other event-extraction work?" — it is the answer in one sentence. <em>"Most academic work hands you an engine. This thesis hands you a car."</em> If you have time, expand with the components → chassis, wheels, dashboard, key. If not, the headline sentence alone lands the point. The UAT-as-test-drive coda is what closes the analogy.
+</div>
+
+<h2>6 · The empty-cell defence — slide 6 callback</h2>
+
+<p>The hardest version of the "isn't this just engineering?" attack is <em>"sure you built it, but where is the academic novelty?"</em> The answer is the empty cell on the related-work landscape from slide 6. No published academic work in this domain has integrated <strong>schema + model + KB + UI</strong> and evaluated it end-to-end with users. VioNER fills that cell.</p>
+
+<div class="emptycell">
+<h4>The related-work landscape — slide 6 callback</h4>
+<div class="ec-grid">
+<div class="cell head">System</div>
+<div class="cell head">Schema</div>
+<div class="cell head">Model</div>
+<div class="cell head">KB</div>
+<div class="cell head">UI + UAT</div>
+
+<div class="cell">ACLED</div>
+<div class="cell yes">✓</div>
+<div class="cell no">hand</div>
+<div class="cell yes">partial</div>
+<div class="cell no">internal</div>
+
+<div class="cell">spaCy / NLTK</div>
+<div class="cell no">generic</div>
+<div class="cell yes">✓</div>
+<div class="cell no">—</div>
+<div class="cell no">—</div>
+
+<div class="cell">Generic LLM</div>
+<div class="cell no">prompt</div>
+<div class="cell yes">✓</div>
+<div class="cell no">—</div>
+<div class="cell no">—</div>
+
+<div class="cell target">VioNER</div>
+<div class="cell target">✓</div>
+<div class="cell target">✓</div>
+<div class="cell target">✓</div>
+<div class="cell target">✓</div>
+</div>
+</div>
+
+<p>This is a <em>sketch</em> of slide 6's landscape — the actual slide has more dimensions. What matters is that <strong>only the VioNER row is filled across all four dimensions</strong>. The empty cell is structural. It is what the engineering-as-contribution defence rests on. Without slide 6 already in the room, slide 14's integration claim is unproved; with it, the claim is auditable.</p>
+
+<h2>7 · The 75-second script, in four beats</h2>
+
+<div class="beat-script">
+
+<div class="beat">
+<div class="beat-num">1</div>
+<div class="beat-content">
+<div class="label">Beat 1 — name the platform and its shape <span class="secs">~10 seconds</span></div>
+<div class="text">"<em class="key">The platform — the delivery vehicle.</em> Four layers. <em class="tech">React and TypeScript</em> front-end. <em class="tech">FastAPI</em> service layer. <em class="key">In-process</em> component layer holding model and KB. <em class="tech">PostgreSQL 16</em> event store. <em class="tech">Docker Compose</em> orchestration — <em class="key">one command stands it up</em>."</div>
+<div class="micro">Pacing is critical. Read the four layers as a list, small pause between each one. The five technology names (React/TS, FastAPI, BERT, PostgreSQL, Docker Compose) are the slide's most identifiable terms — say them clearly enough that the panel hears each one register. The "one command" coda is the engineering credibility line.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">2</div>
+<div class="beat-content">
+<div class="label">Beat 2 — own the engineering framing <span class="secs">~20 seconds</span></div>
+<div class="text">"<em class="key">Four layers is the minimum for clean separation.</em> A monolithic FastAPI worker is faster and simpler than microservices at <em class="num">thirty thousand articles a year</em>. <em class="key">Defend the stack as engineering, not research claims.</em> <em class="tech">React</em> for ecosystem and TypeScript support. <em class="tech">FastAPI</em> for async plus native PyTorch integration plus auto OpenAPI docs. <em class="tech">PostgreSQL</em> for full-text plus JSONB indexing the analytics layer needs."</div>
+<div class="micro">This is the pre-emption beat. <em>You</em> use the phrase "engineering, not research claims." The panel cannot now attack you with a framing you have already named. The 30 k articles/year number is the load justification — say it slowly enough that the monolith decision lands as principled rather than convenient. Don't over-defend each choice — one engineering reason per layer is enough.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">3</div>
+<div class="beat-content">
+<div class="label">Beat 3 — the integration claim <span class="secs">~25 seconds</span></div>
+<div class="text">"<em class="key">The research contribution is the INTEGRATION evaluated end-to-end.</em> No published academic work in this domain has integrated <em class="key">schema, model, KB, and UI</em> — the empty cell on the related-work landscape from <em class="num">slide 6</em>. Section <em class="num">7.3</em> lists this as contribution number five. <em class="key">Swapping React for Vue would change implementation, not contribution.</em>"</div>
+<div class="micro">"Integration" is the load-bearing word on slide 14 — the equivalent of "complementarity" on slide 12 and "two guarantees" on slide 13. Say it crisply. The slide-6 callback converts "no academic work has done this" from assertion to audit reference — the panel can verify the empty cell. The swap-React-for-Vue line is the cleanest one-sentence statement of the engineering-vs-research distinction; deliver it as a single uninterrupted unit.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num hero">4</div>
+<div class="beat-content">
+<div class="label hero">Beat 4 — pivot to the worked example <span class="secs">~10 seconds</span></div>
+<div class="text">"<em class="key">Here's what happens end-to-end when an article goes through the system.</em>"</div>
+<div class="micro">The pivot line is the bridge into slide 15 (the inference pipeline worked example). It also performs a small rhetorical move — by saying "here's what happens", you are inviting the panel to watch the system run, which is exactly the posture that defends the systems contribution. Slide 15 will spend 90 seconds making the abstract platform concrete; slide 14's job is to set that up.</div>
+</div>
+</div>
+
+</div>
+
+<h2>8 · The engineering-as-contribution defence — the core skill</h2>
+
+<p>Slide 14's transferable craft is the <strong>own-the-attack pre-emption</strong>. Most contribution-defence patterns in the deck refuse a dismissive reading by stating a binary contrast ("decomposed, not narrower"). Slide 14's is different — it <em>agrees with the dismissive reading at the surface level</em> ("yes, these are engineering choices") and then names a different level at which the contribution lives ("the integration is the research").</p>
+
+<div class="pattern">
+<h4>The three-move engineering-as-contribution defence</h4>
+<div class="pattern-row"><span class="step">1</span><span><strong>Own the engineering framing.</strong> Say "defend the stack as engineering, not research claims" yourself. You take the dismissive frame away by stating it first.</span></div>
+<div class="pattern-row"><span class="step">2</span><span><strong>Name the contribution level.</strong> "The research contribution is the INTEGRATION evaluated end-to-end." This is the load-bearing move — it names a level at which the contribution exists that is <em>above</em> any individual technology choice.</span></div>
+<div class="pattern-row"><span class="step">3</span><span><strong>Point to the empty cell + the UAT evidence.</strong> Slide 6's related-work landscape is the gap; §7.3 contribution #5 is the explicit claim; §6.10 UAT (n=5, six tasks, all completed) is the evidence that the integration was actually evaluated end-to-end.</span></div>
+</div>
+
+<div class="callout warn">
+<strong>The trap.</strong> Do not get drawn into a stack-religion debate. If a panellist says "I would have used Django/Flask/Vue", do <em>not</em> defend React or FastAPI on their merits — concede the swap (<em>"Vue would work; the research contribution would be unchanged"</em>) and pivot back to integration. Defending individual technology choices on their merits cedes the framing: you are then arguing engineering with the panel, not research. The swap test keeps the framing in the right place.
+</div>
+
+<h2>9 · The sixth honest-middle binary</h2>
+
+<p>Slide 14 carries the deck's sixth contribution-defence binary, but it has a structural twist — it is the <em>only</em> slide whose binary has two halves operating at different levels.</p>
+
+<div class="binary-chain">
+<h4>The honest-middle binary chain across the deck</h4>
+<div class="binary-row"><span class="which">Slide 9</span><span><strong>Measurement, not preference.</strong> Methodology defended.</span></div>
+<div class="binary-row"><span class="which">Slide 10</span><span><strong>Decomposed, not narrower.</strong> 8-entity schema.</span></div>
+<div class="binary-row"><span class="which">Slide 11</span><span><strong>Synthesis, not relabelling.</strong> 4-level taxonomy + corpus.</span></div>
+<div class="binary-row"><span class="which">Slide 12</span><span><strong>Complementary, not redundant.</strong> Focal × class weights.</span></div>
+<div class="binary-row"><span class="which">Slide 13</span><span><strong>Active, not exhaustive · metadata, not veto · mapping, not fabrication.</strong> KB.</span></div>
+<div class="binary-row"><span class="which">Slide 14</span><span><strong>Engineering pragmatism at the part level · research integration at the system level.</strong> <em>The only two-level binary in the deck.</em></span></div>
+</div>
+
+<p>This two-level structure is what makes slide 14 the highest-risk and highest-reward contribution slide. The risk: if the panel only hears the first half, they hear "this is engineering" and move on. The reward: if the panel hears both halves, they hear "engineering at the parts, research at the integration" — and that is exactly what the deck's contribution claim requires them to accept.</p>
+
+<h2>10 · Reserved cards — deploy on demand</h2>
+
+<div class="reserved">
+<h4>Reserved evidence — bring out only if asked</h4>
+<div class="reserved-rows">
+<div class="label">Article load</div>
+<div class="desc">Annual volume the platform is sized for — the monolith justification</div>
+<div class="num">~30 000 / yr</div>
+<div class="row-sep"></div>
+<div class="label">API route groups</div>
+<div class="desc">REST groups: inference, training, events, analytics, KB, auth, system</div>
+<div class="num">7 groups</div>
+<div class="row-sep"></div>
+<div class="label">Inference latency</div>
+<div class="desc">End-to-end CPU latency per article — slide 15 deepens with breakdown</div>
+<div class="num">~150 ms</div>
+<div class="row-sep"></div>
+<div class="label">KB share of latency</div>
+<div class="desc">In-process KB makes lookup ~15 % of budget; remote would dominate</div>
+<div class="num">~15 %</div>
+<div class="row-sep"></div>
+<div class="label">UAT participants</div>
+<div class="desc">5 = 2 EW analysts + 1 academic researcher + 2 NLP developers (fairness)</div>
+<div class="num">n = 5</div>
+<div class="row-sep"></div>
+<div class="label">UAT tasks completed</div>
+<div class="desc">All six end-to-end tasks completed by all five participants</div>
+<div class="num">6 / 6 × 5 / 5</div>
+<div class="row-sep"></div>
+<div class="label">5W1H clarity Likert</div>
+<div class="desc">Highest item — defends the schema choice operationally</div>
+<div class="num">4.6 / 5</div>
+<div class="row-sep"></div>
+<div class="label">Training screen Likert</div>
+<div class="desc">Lowest item — drove future-work direction; honest concession</div>
+<div class="num">4.0 / 5</div>
+<div class="row-sep"></div>
+<div class="label">Thesis sections</div>
+<div class="desc">Architecture §5.6, §5.7 · contribution claim §7.3 · UAT §6.10</div>
+<div class="num">§5.6 / §7.3 / §6.10</div>
+</div>
+</div>
+
+<h3>The deployment rule</h3>
+<ul>
+<li><strong>Default delivery:</strong> the four layers, the Docker Compose line, the three engineering reasons (React/FastAPI/PostgreSQL), the integration claim, the slide-6 callback.</li>
+<li><strong>If asked "isn't this just engineering?"</strong> Deploy <em>"The engineering choices are pragmatism — React for ecosystem, FastAPI for async + PyTorch integration. The integration evaluated end-to-end is the research contribution. Slide 6 shows no published academic work has integrated schema + model + KB + UI in this domain. Section 7.3 is the contribution claim; §6.10 is the UAT evidence."</em></li>
+<li><strong>If asked "why monolith?"</strong> Deploy <em>"At 30 k articles a year, a single FastAPI worker holding the model in memory is faster and simpler than a service mesh. Microservices fit much higher load — not this scale."</em></li>
+<li><strong>If asked "why React/FastAPI/PostgreSQL specifically?"</strong> Use the swap test. Concede the swap, name the engineering reason for the chosen one, pivot to integration. Do <em>not</em> defend the framework on its individual merits.</li>
+<li><strong>Critical:</strong> the UAT details (n=5 breakdown, the six tasks, the Likert items) are deepened on slide 19 (KB operational impact and user testing). On slide 14 you only <em>name</em> UAT as the evidence; the operational story lives on slide 19.</li>
+</ul>
+
+<h2>11 · Four pre-loaded interrupts</h2>
+
+<div class="attack">
+<div class="q">"Isn't all of this just web engineering? Where's the research?"</div>
+<div class="a">"Defend the stack as engineering, not research claims — that's the right reading of the individual choices. React for ecosystem, FastAPI for async plus PyTorch integration, PostgreSQL for FTS plus JSONB. None of those are research claims. The research contribution is the <em>integration</em> evaluated end-to-end. No published academic work in this domain has integrated schema, model, KB, and UI — slide 6's related-work landscape shows that explicitly as an empty cell. Section 7.3 lists this as contribution number five. Section 6.10 is the UAT — five participants, six tasks, all completed. That's the evidence that the integration claim is more than assembly."</div>
+<div class="micro">Three moves: (1) <em>agree</em> with the engineering framing at the parts level — this is the move most defenders miss; (2) name the contribution level (integration); (3) cite the auditable evidence (slide 6 + §7.3 + §6.10). Owning the engineering framing first is what makes step 2 land — you're not denying engineering, you're naming where the research lives.</div>
+</div>
+
+<div class="attack">
+<div class="q">"Why monolith and not microservices?"</div>
+<div class="a">"At thirty thousand articles a year — the AU-CEWS / ACLED operational scale — a single FastAPI worker holding the 110-million-parameter BERT model in memory is both faster and simpler than a service mesh. The model loads once at startup; every inference is in-process. KB lookup stays at fifteen percent of the hundred-and-fifty-millisecond budget because the KB is in-memory; pulling it into a remote service would push that toward fifty milliseconds by itself. Microservices fit much higher load, where horizontal scaling justifies the network and ops overhead. Not at this scale."</div>
+<div class="micro">Anchor on 30 k articles/year as the operational load number — that is the scale-justification number. Then connect monolith → in-memory → 15 % latency budget. The latency point closes the architecture decision empirically. Don't argue microservices are <em>bad</em>; argue they are <em>oversized</em> for this load. That is the more defensible framing.</div>
+</div>
+
+<div class="attack">
+<div class="q">"Why React specifically? I would have built this in Vue / Svelte / vanilla."</div>
+<div class="a">"React for ecosystem and TypeScript support — it has the largest community and the strongest TypeScript story in 2026, which is the lowest-risk choice for whoever inherits the system. But the swap test matters here: swapping React for Vue would change implementation, not contribution. The research artefact is the integration evaluated end-to-end — schema + model + KB + UI plus UAT. The UI being React-based versus Vue-based does not change what the integration claim is or whether the UAT validates it. The engineering choice is pragmatism; the research is integration."</div>
+<div class="micro">The swap test is the whole answer. Do not defend React on its merits — name the engineering reason, deploy the swap test, pivot to integration. If you defend React you are now arguing frameworks with the panel; if you swap-test you are arguing methodology. The methodology framing is the one that wins.</div>
+</div>
+
+<div class="attack">
+<div class="q">"How do you know the platform is actually usable by analysts? F1 numbers don't tell us that."</div>
+<div class="a">"F1 numbers do not — UAT does. Section six-point-ten of the thesis documents the user-acceptance test. Five participants: two early-warning analysts who are the primary intended audience, one academic conflict researcher who is a secondary consumer, and two NLP developers unfamiliar with the conflict domain — that pairing is the fairness sanity check, would someone with technical literacy but no domain knowledge find the interface intuitive. All five participants completed all six end-to-end tasks: paste an article and get chips out; browse persisted events with filters; view per-country analytics; kick off a retraining run from the UI; add a new armed group to the KB; export an event record. The Likert scores are documented in Table 6.10. Slide 19 will deepen the operational impact."</div>
+<div class="micro">UAT is the integration claim's empirical receipt. Naming the five participants by role (analyst / academic / developer) shows the sampling was deliberate, not "whoever was available." Naming all six tasks demonstrates the platform's surface coverage. Reserve the Likert numbers and the operational-impact reading for slide 19 — on slide 14 you cite the table by name and stop.</div>
+</div>
+
+<h2>12 · The hero close</h2>
+
+<div class="hero-line">
+<span class="label">The hero line — memorise verbatim</span>
+"The research contribution is the integration evaluated end-to-end. Swapping React for Vue would change implementation, not contribution."
+</div>
+
+<h3>Why this line is the hero</h3>
+<ul>
+<li><strong>Two halves doing two jobs.</strong> The first sentence states the positive claim (integration is the contribution). The second sentence makes the engineering-vs-research distinction concrete with a specific swap. Together they answer the canonical attack inside one breath.</li>
+<li><strong>"Integration" is the load-bearing word.</strong> Same syntactic role as "complementarity" on slide 12 and "two roles, one resource" on slide 13. The candidate's contribution-defence vocabulary across slides 12–14 is now: <em>complementarity, two roles, integration</em>. These are the three structural claims that justify the system being more than the sum of its parts.</li>
+<li><strong>The specific swap is the auditable test.</strong> Naming React → Vue is a concrete example the panel can mentally run. Generic statements ("our contribution is the integration") sound like deflection; the specific swap demonstrates the candidate has thought through what the contribution actually depends on.</li>
+<li><strong>Consistent with the deck's posture.</strong> Slide 9: measurement, not preference. Slide 10: decomposed, not narrower. Slide 11: synthesis, not relabelling. Slide 12: complementary, not redundant. Slide 13: active, not exhaustive. Slide 14: <strong>engineering pragmatism, research integration</strong>. The dismissive reading is named (engineering) and refused (integration) in the same line.</li>
+</ul>
+
+<h2>13 · Timed practice</h2>
+
+<p>Four beats, ~75 seconds. Target window: 65–88 seconds. Beat 1's five technology names need pacing as a list. Beat 2 carries the pre-emption — do not rush "defend the stack as engineering, not research claims." Beat 3's hero line ("integration evaluated end-to-end") wants a tiny pause before the swap test.</p>
+
+<div class="timer-box">
+<div class="timer-display" id="timer">0.0 s</div>
+<div class="timer-buttons">
+<button id="startBtn">Start (begin "The platform — the delivery vehicle")</button>
+<button id="stopBtn" class="secondary" disabled>Stop (after "what happens end-to-end")</button>
+<button id="resetBtn" class="secondary">Reset</button>
+</div>
+<div class="timer-verdict" id="verdict"></div>
+</div>
+
+<div class="callout">
+<strong>The harder rep — the "don't defend the framework" test.</strong> Run Beat 2 (engineering framing) without defending React, FastAPI, or PostgreSQL on their individual merits. Use only: <em>"React for ecosystem and TypeScript support"</em>, <em>"FastAPI for async plus PyTorch integration plus OpenAPI"</em>, <em>"PostgreSQL for FTS plus JSONB"</em> — one phrase per layer, no expansion. Re-run until "actually React is better than Vue because…" or "FastAPI's performance compared to Flask…" never appear in your delivery. Defending individual frameworks on their merits is the trap. The swap test holds the framing.
+</div>
+
+<h2>14 · Quiz</h2>
+
+<div class="quiz" id="quiz1">
+<h4>Q1. The panel asks: "Isn't this just web engineering? Where is the research contribution?"</h4>
+<p class="qstem">Pick the strongest response.</p>
+<ul class="choices" data-answer="c">
+<li data-key="a">"Building this stack required substantial systems engineering — async PyTorch integration, JSONB schema design, and Docker orchestration are all non-trivial."</li>
+<li data-key="b">"The trained model is the research contribution; the platform is how we deliver it to users."</li>
+<li data-key="c">"Defend the stack as engineering, not research claims — that's right for the individual choices. The research contribution is the <em>integration</em> evaluated end-to-end. No published academic work has integrated schema + model + KB + UI in this domain — slide 6 shows the empty cell. §7.3 lists this as contribution #5; §6.10 is the UAT evidence (n=5, six tasks, all completed)."</li>
+<li data-key="d">"React, FastAPI, and PostgreSQL are research-grade choices that justify the academic novelty of the platform."</li>
+</ul>
+<p class="feedback" id="fb1"></p>
+</div>
+
+<div class="quiz" id="quiz2">
+<h4>Q2. What is the "swap test" doing in the slide-14 defence?</h4>
+<p class="qstem">Pick the cleanest explanation.</p>
+<ul class="choices" data-answer="b">
+<li data-key="a">It validates that the chosen frameworks are interchangeable, proving the implementation is generic.</li>
+<li data-key="b">It separates implementation-level choices (where swaps are admissible) from contribution-level claims (where swaps would invalidate the research). Saying "swapping React for Vue changes implementation, not contribution" names exactly what level the contribution lives at — above any individual technology choice.</li>
+<li data-key="c">It is a benchmarking exercise comparing React vs Vue and FastAPI vs Flask on standard metrics.</li>
+<li data-key="d">It signals to the panel that the candidate considered multiple alternatives before settling on the chosen stack.</li>
+</ul>
+<p class="feedback" id="fb2"></p>
+</div>
+
+<div class="quiz" id="quiz3">
+<h4>Q3. The panel asks: "Why monolith and not microservices?"</h4>
+<p class="qstem">Pick the strongest response.</p>
+<ul class="choices" data-answer="d">
+<li data-key="a">"Microservices are overengineered for academic projects — a monolith is faster to develop and easier to deploy."</li>
+<li data-key="b">"Microservices would require a service mesh, container orchestration, and inter-service auth — too much complexity for a thesis."</li>
+<li data-key="c">"A monolith is what the FastAPI documentation recommends for ML inference workloads."</li>
+<li data-key="d">"At ~30 000 articles per year, a single FastAPI worker holding the 110 M-parameter model in memory is faster and simpler than a service mesh. KB lookup stays at ~15 % of the 150 ms latency budget because the KB is in-memory; remoting it would push that toward 50 ms by itself. Microservices fit much higher load, not this scale."</li>
+</ul>
+<p class="feedback" id="fb3"></p>
+</div>
+
+<div class="quiz" id="quiz4">
+<h4>Q4. The panel asks: "Why React specifically? I would have used Vue."</h4>
+<p class="qstem">Pick the strongest response.</p>
+<ul class="choices" data-answer="a">
+<li data-key="a">"React for ecosystem and TypeScript support — lowest-risk for whoever inherits the system. But the swap test matters: swapping React for Vue would change implementation, not contribution. The research artefact is the integration evaluated end-to-end; the UI being React vs Vue doesn't change what the integration claim is or whether UAT validates it."</li>
+<li data-key="b">"React's virtual DOM and component-based architecture make it the most performant choice for analyst dashboards."</li>
+<li data-key="c">"Vue would have been a reasonable choice; React was preferred because the candidate had prior experience with it."</li>
+<li data-key="d">"React has stronger TypeScript bindings than Vue, which justifies the additional complexity of JSX and hooks."</li>
+</ul>
+<p class="feedback" id="fb4"></p>
+</div>
+
+<div class="followup">
+<strong>Ask your teacher follow-up questions.</strong>
+<ul>
+<li>Want a 50-second compressed delivery for if you're running behind?</li>
+<li>Want to drill the "isn't this just engineering?" attack under interruption — three reps without defending any individual framework on its merits?</li>
+<li>Want a mini-script for the engine-vs-car analogy that lands in under 20 seconds?</li>
+<li>Want to rehearse the slide-6 callback so the empty-cell reference lands without losing flow?</li>
+<li>Want a checklist of what to <em>not</em> claim about the platform (no novelty in individual frameworks, no novelty in any single layer, no architectural research claim) so over-claiming traps are pre-empted?</li>
+</ul>
+<p class="cite">References: <a href="../../VioNER_Defense_Slides_study_guide.md">VioNER_Defense_Slides_study_guide.md</a> Slide 14; <a href="../../problem_domain.md">problem_domain.md</a> Gap 4 (deployable platform) §§ engine-vs-car analogy and four-cell table; thesis §5.6 (system architecture), §5.7 (deployment), §6.10 (UAT n=5), §7.3 (five contributions).</p>
+</div>
+
+<div class="bottom">Lesson 16 of the slide drill. Next up — slide 15: the inference pipeline (worked example): the end-to-end 10-step walkthrough with a single article and the canonical "Al-Shabaab attacked a convoy near Mogadishu" worked example.</div>
+
+</div>
+
+<script>
+// Timer
+(function(){
+  const display=document.getElementById('timer');
+  const startBtn=document.getElementById('startBtn');
+  const stopBtn=document.getElementById('stopBtn');
+  const resetBtn=document.getElementById('resetBtn');
+  const verdict=document.getElementById('verdict');
+  let raf=null, t0=0;
+  function tick(){const t=(performance.now()-t0)/1000;display.textContent=t.toFixed(1)+' s';raf=requestAnimationFrame(tick)}
+  startBtn.onclick=()=>{cancelAnimationFrame(raf);t0=performance.now();raf=requestAnimationFrame(tick);startBtn.disabled=true;stopBtn.disabled=false;verdict.textContent='';verdict.className='timer-verdict'};
+  stopBtn.onclick=()=>{cancelAnimationFrame(raf);const t=(performance.now()-t0)/1000;display.textContent=t.toFixed(1)+' s';startBtn.disabled=false;stopBtn.disabled=true;
+    if(t<55){verdict.textContent='Too fast — the four-layer list (Beat 1) and the integration claim (Beat 3) both need pacing. The swap-React-for-Vue line wants a tiny pause before it lands.';verdict.className='timer-verdict over'}
+    else if(t<=88){verdict.textContent='Inside the window. The engineering-vs-research distinction landed.';verdict.className='timer-verdict win'}
+    else{verdict.textContent='Over time — tighten Beat 2 (engineering framing). One phrase per layer is enough — don\'t expand "React for ecosystem" into a framework comparison. The temptation to defend the framework on its merits is the trap.';verdict.className='timer-verdict over'}};
+  resetBtn.onclick=()=>{cancelAnimationFrame(raf);display.textContent='0.0 s';startBtn.disabled=false;stopBtn.disabled=true;verdict.textContent='';verdict.className='timer-verdict'};
+})();
+// Quizzes
+document.querySelectorAll('.quiz').forEach(quiz=>{
+  const ul=quiz.querySelector('.choices');
+  const answer=ul.dataset.answer;
+  const fb=quiz.querySelector('.feedback');
+  const fbMap={
+    quiz1:{
+      c:'Yes. Three moves: own the engineering framing (parts level); name the contribution level (integration); cite the audit evidence (slide 6 + §7.3 + §6.10). Owning the engineering framing first is what makes the integration claim land.',
+      a:'Defending engineering on its merits cedes the framing. The right move is to *agree* the parts are engineering and then name the contribution level above them.',
+      b:'Half-right but incomplete — the model is part of the contribution, but reducing the platform to "delivery" gives up the integration claim that slide 22 closes on.',
+      d:'No — claiming research grade for individual frameworks is over-claiming. React, FastAPI, PostgreSQL are pragmatism. The research is the *integration*.'
+    },
+    quiz2:{
+      b:'Yes. The swap test names two levels — implementation (where swaps are admissible) and contribution (where they aren\'t). It keeps the framing on integration instead of letting the panel pull you into a stack debate.',
+      a:'No — the swap test does not validate framework interchangeability for its own sake; it separates contribution-level claims from implementation-level choices.',
+      c:'No — there is no benchmarking comparison in the swap test. It is a methodological distinction, not an empirical comparison.',
+      d:'No — the swap test is not about candidate signalling; it is a structural defence move that names what the contribution actually depends on.'
+    },
+    quiz3:{
+      d:'Yes. Three moves: name the load (30 k articles/year), explain the in-memory consequence (KB at 15 % latency), bound the alternative (microservices fit much higher load). Empirical justification beats taste.',
+      a:'"Overengineered for academic projects" sounds defensive. The defence must be operational: at this load, monolith is the right shape.',
+      b:'Lists complexity costs but doesn\'t name *why* this load doesn\'t justify them. Half-right without the load argument.',
+      c:'"Documentation recommends it" is appeal to authority — weak defence. The decision must be defensible from the operational load number directly.'
+    },
+    quiz4:{
+      a:'Yes. Three moves: engineering reason (ecosystem + TypeScript); swap test (Vue would change implementation, not contribution); pivot to integration (the UAT-validated claim). Don\'t defend React on its merits.',
+      b:'Defending React on technical merits (virtual DOM, components) is exactly the trap. You\'re now arguing frameworks instead of integration.',
+      c:'"Prior experience" sounds personal, not principled. The engineering reason must be defensible independent of the candidate.',
+      d:'Comparative framework defence pulls you into a stack-religion debate. The swap test prevents this by conceding the swap up front.'
+    }
+  };
+  ul.querySelectorAll('li').forEach(li=>{
+    li.onclick=()=>{
+      if(li.classList.contains('locked'))return;
+      const key=li.dataset.key;
+      const correct=key===answer;
+      ul.querySelectorAll('li').forEach(x=>x.classList.add('locked'));
+      li.classList.add(correct?'right':'wrong');
+      if(!correct){ul.querySelector('li[data-key="'+answer+'"]').classList.add('right')}
+      fb.textContent=fbMap[quiz.id][key]||'';
+    };
+  });
+});
+</script>
+
+</body>
+</html>

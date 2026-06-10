@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Slide 4 — Bottleneck Delivery Card</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--ink:#1c1916;--ink-soft:#3d3935;--paper:#FBFAF7;--rule:#D9D2C5;--accent:#7B1E1E;--highlight:#F5EBC9;--grid:#E8E1D2;--beat:#1A365D;--beat-soft:#E8EEF5;--success:#3F6B3F}
+*{box-sizing:border-box}
+html{font-size:15px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.5}
+.card{max-width:46rem;margin:1.5rem auto;background:#FFF;border:1px solid var(--rule);border-radius:8px;padding:1.8rem 2rem;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.header{border-bottom:2px solid var(--accent);padding-bottom:0.6rem;margin-bottom:1.2rem}
+.eyebrow{font-family:"Inter",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.18em;font-size:0.7rem;color:var(--accent);font-weight:600}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:1.55rem;margin:0.25rem 0 0}
+.numbers{display:grid;grid-template-columns:repeat(4,1fr);gap:0.7rem;margin:0.7rem 0 0.4rem}
+.numbers .n{background:var(--accent);color:#FFF;text-align:center;padding:0.55rem 0.4rem;border-radius:5px}
+.numbers .n strong{display:block;font-size:1.2rem;font-family:"Iowan Old Style",Georgia,serif}
+.numbers .n span{font-family:"Inter",system-ui,sans-serif;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.04em;opacity:0.85}
+.section-h{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin:1.3rem 0 0.5rem;font-weight:600;border-bottom:1px solid var(--grid);padding-bottom:0.25rem}
+.beat-box{background:var(--highlight);padding:0.7rem 0.9rem;border-radius:5px;margin:0.5rem 0;font-size:0.92rem;line-height:1.55;border-left:3px solid var(--beat)}
+.beat-label{font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--beat);font-weight:600;display:block;margin-bottom:0.3rem}
+.beat-box strong{color:var(--accent)}
+.hero{background:#FFF;border:2px solid var(--accent);border-radius:5px;padding:0.85rem 1rem;margin:0.7rem 0;text-align:center;font-family:"Iowan Old Style",Georgia,serif;font-size:0.98rem;font-weight:500}
+.hero .label{display:block;font-family:"Inter",system-ui,sans-serif;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.09em;color:var(--accent);font-weight:600;margin-bottom:0.3rem}
+.chunks{background:var(--paper);border:1px solid var(--grid);border-radius:4px;padding:0.6rem 0.85rem;margin:0.5rem 0;font-size:0.86rem}
+.chunks .ch{padding:0.2rem 0;border-bottom:1px dashed var(--grid)}
+.chunks .ch:last-child{border-bottom:0}
+.chunks .ch strong{color:var(--accent);font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;margin-right:0.4rem}
+.math{background:var(--paper);border:1px solid var(--grid);border-radius:4px;padding:0.7rem 0.9rem;margin:0.5rem 0;font-family:"Iowan Old Style",Georgia,serif;font-size:0.94rem}
+.math .step{padding:0.15rem 0}
+.math .step strong{color:var(--accent);font-feature-settings:"tnum"}
+.attacks{margin:0.6rem 0}
+.atk{display:grid;grid-template-columns:auto 1fr;gap:0.7rem;align-items:start;padding:0.55rem 0;border-bottom:1px dashed var(--grid);font-size:0.88rem}
+.atk:last-child{border-bottom:0}
+.atk .num{background:var(--accent);color:#FFF;width:1.6rem;height:1.6rem;border-radius:50%;font-size:0.78rem;font-family:"Inter",system-ui,sans-serif;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0}
+.atk .q{font-weight:600;color:var(--ink)}
+.atk .a{color:var(--ink-soft)}
+.kw{background:var(--highlight);padding:0 0.18em;border-radius:2px}
+.foot{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;color:var(--ink-soft);margin-top:1rem;border-top:1px dashed var(--grid);padding-top:0.5rem;text-align:right}
+@media print{
+  body{background:#FFF}
+  .card{box-shadow:none;border:0;margin:0;max-width:none;padding:0.5in}
+  .numbers .n,.beat-box,.hero,.chunks,.math,.kw{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="card">
+
+<div class="header">
+<div class="eyebrow">Quick reference · VioNER defense kit</div>
+<h1>Slide 4 — The bottleneck, quantified</h1>
+</div>
+
+<div class="numbers">
+<div class="n"><strong>15-25 min</strong><span>per article</span></div>
+<div class="n"><strong>10k hr</strong><span>analyst-hours/yr</span></div>
+<div class="n"><strong>5.5 FTE</strong><span>article-to-row</span></div>
+<div class="n"><strong>3 freed</strong><span>even at 50% saving</span></div>
+</div>
+
+<div class="section-h">Beat 1 — per-article time + 7-step workflow (30 s)</div>
+<div class="beat-box">
+<span class="beat-label">Chunk the seven steps into four clusters</span>
+"The bottleneck, quantified. Each article takes a trained analyst <strong>fifteen to twenty-five minutes</strong> — <em>read, identify actors</em> · <em>cross-reference against an internal armed-group list, narrow location from country to city</em> · <em>extract casualties with qualifiers</em> · <em>classify the event type, and log</em>."
+</div>
+
+<div class="section-h">Beat 2 — the FTE arithmetic (20 s)</div>
+<div class="beat-box">
+<span class="beat-label">Three numbers in 20 s. Use "roughly".</span>
+"At <strong>thirty thousand events</strong> that's about <strong>ten thousand analyst-hours</strong> per year — roughly <strong>five and a half full-time analysts</strong> whose entire job is article-to-row conversion."
+</div>
+
+<div class="section-h">Beat 3 — strategic framing (40 s)</div>
+<div class="beat-box">
+<span class="beat-label">Emphasise READING vs REVIEWING. End on "theatres" cleanly.</span>
+"<strong>Key framing: VioNER does not replace analysts</strong> — it turns an article-<strong>READING</strong> task into an article-<strong>REVIEWING</strong> task. Reviewing is lower cognitive load than coding from blank, so per-article time drops. <strong>Even halving it frees three analysts</strong> to cover under-monitored theatres."
+</div>
+
+<div class="hero">
+<span class="label">The hero line — memorise verbatim</span>
+"VioNER does not replace analysts — it turns an article-READING task into an article-REVIEWING task."
+</div>
+
+<div class="section-h">7-step workflow — four chunks</div>
+<div class="chunks">
+<div class="ch"><strong>Chunk 1 (pair)</strong>read · identify actors</div>
+<div class="ch"><strong>Chunk 2 (pair)</strong>cross-reference armed-group list · narrow country → city</div>
+<div class="ch"><strong>Chunk 3 (single)</strong>extract casualties with qualifiers</div>
+<div class="ch"><strong>Chunk 4 (pair)</strong>classify event type · and log</div>
+</div>
+
+<div class="section-h">Arithmetic chain (don't show on stage)</div>
+<div class="math">
+<div class="step"><strong>30,000</strong> events × ~20 min</div>
+<div class="step">= ~<strong>600,000</strong> minutes = <strong>10,000 hours</strong></div>
+<div class="step">÷ ~1,800 hours per FTE-year</div>
+<div class="step">= ~<strong>5.5 FTE</strong></div>
+</div>
+
+<div class="section-h">Three pre-loaded attacks</div>
+<div class="attacks">
+
+<div class="atk">
+<div class="num">1</div>
+<div>
+<div class="q">Where do the 15-25 minutes come from?</div>
+<div class="a"><span class="kw">ACLED's published coder-throughput</span> + UAT interviews with 2 early-warning analysts. 10 min for routine, 45+ for complex multi-event.</div>
+</div>
+</div>
+
+<div class="atk">
+<div class="num">2</div>
+<div>
+<div class="q">Are you trying to replace human analysts?</div>
+<div class="a">No — output is a <span class="kw">triage layer</span>. Analysts review and edit before publication. §7.4 recommendation 1: treat output as triage, not final. Role <span class="kw">repositioned higher up the cognitive ladder</span>.</div>
+</div>
+</div>
+
+<div class="atk">
+<div class="num">3</div>
+<div>
+<div class="q">How does VioNER actually save time?</div>
+<div class="a">By turning <span class="kw">reading-from-blank</span> into <span class="kw">reviewing-pre-extracted-output</span>. Conservative estimate 40-60% reduction. Don't claim to have measured in production — §7.4 recommendation 1 is the controlled pilot.</div>
+</div>
+</div>
+
+</div>
+
+<div class="section-h">Arithmetic-delivery rules</div>
+<div class="chunks">
+<div class="ch"><strong>1.</strong> Don't show your work on stage. Intermediate steps stay in the script-writer's head.</div>
+<div class="ch"><strong>2.</strong> Round, don't precision. "10k hours" not "10,240 hours".</div>
+<div class="ch"><strong>3.</strong> Use "roughly" before FTE — concedes approximation, immunises against precision attacks.</div>
+<div class="ch"><strong>4.</strong> Three numbers in 20 sec = ~6 sec each.</div>
+</div>
+
+<div class="section-h">Where this lives</div>
+<p style="font-size:0.85rem;color:var(--ink-soft);margin:0.3rem 0">
+<strong>Defense slide:</strong> Slide 4 of 22 (bottleneck quantified)
+<br><strong>Defense kit:</strong> <code>VioNER_Defense_Slides_study_guide.md</code> slide 4 · <code>problem_domain.md</code> (workflow + ACLED throughput) · thesis §7.4 (pilot recommendation)
+<br><strong>Continues into:</strong> Slide 5 (why automating this is hard)
+</p>
+
+<div class="foot">Reference card · keep open during slide-4 rehearsal</div>
+</div>
+
+</body>
+</html>

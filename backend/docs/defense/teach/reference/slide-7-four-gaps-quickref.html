@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Slide 7 — Four Operational Gaps Delivery Card</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--ink:#1c1916;--ink-soft:#3d3935;--paper:#FBFAF7;--rule:#D9D2C5;--accent:#7B1E1E;--highlight:#F5EBC9;--grid:#E8E1D2;--beat:#1A365D;--beat-soft:#E8EEF5;--success:#3F6B3F}
+*{box-sizing:border-box}
+html{font-size:15px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.5}
+.card{max-width:46rem;margin:1.5rem auto;background:#FFF;border:1px solid var(--rule);border-radius:8px;padding:1.8rem 2rem;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.header{border-bottom:2px solid var(--accent);padding-bottom:0.6rem;margin-bottom:1.2rem}
+.eyebrow{font-family:"Inter",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.18em;font-size:0.7rem;color:var(--accent);font-weight:600}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:1.55rem;margin:0.25rem 0 0}
+.section-h{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin:1.3rem 0 0.5rem;font-weight:600;border-bottom:1px solid var(--grid);padding-bottom:0.25rem}
+.opener{background:#FFF;border:2px solid var(--accent);border-radius:5px;padding:0.7rem 0.9rem;text-align:center;font-size:0.9rem;margin:0.5rem 0;font-style:italic}
+.opener strong{color:var(--accent);font-style:normal}
+.gaps{display:grid;grid-template-columns:1fr;gap:0.4rem;margin:0.5rem 0}
+.g{background:var(--highlight);border-left:3px solid var(--beat);padding:0.55rem 0.85rem;border-radius:4px;font-size:0.88rem;line-height:1.55}
+.g strong{color:var(--accent)}
+.g .ord{font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--beat);font-weight:600;display:block;margin-bottom:0.2rem}
+.g.hero{border-left-color:var(--accent);background:#FFE8E8}
+.indep{width:100%;border-collapse:collapse;font-size:0.83rem;margin:0.4rem 0;background:#FFF;border:1px solid var(--grid);border-radius:4px;overflow:hidden}
+.indep th,.indep td{padding:0.4rem 0.55rem;text-align:left;border-bottom:1px solid var(--grid);vertical-align:top}
+.indep tr:last-child td{border-bottom:0}
+.indep th{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);background:var(--paper)}
+.indep .met{color:var(--success);font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;font-weight:600}
+.indep .miss{color:var(--accent);font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;font-weight:600}
+.indep .r{font-style:italic;color:var(--ink);font-size:0.82rem}
+.fwd{width:100%;border-collapse:collapse;font-size:0.84rem;margin:0.4rem 0}
+.fwd th,.fwd td{padding:0.35rem 0.55rem;text-align:left;border-bottom:1px solid var(--grid)}
+.fwd tr:last-child td{border-bottom:0}
+.fwd th{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);background:var(--paper)}
+.fwd .ch{font-family:"Inter",system-ui,sans-serif;font-weight:600;color:var(--accent);font-size:0.82rem}
+.fwd .a{text-align:center;color:var(--beat);font-weight:700}
+.fwd .c{color:var(--beat);font-weight:500;font-size:0.82rem;font-family:"Inter",system-ui,sans-serif}
+.fwd .sl{color:var(--ink-soft);font-size:0.78rem;font-style:italic}
+.framing{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin:0.5rem 0}
+.framing .c{background:var(--paper);border:1px solid var(--grid);border-radius:4px;padding:0.5rem 0.7rem;font-size:0.8rem}
+.framing .c.b{border-left:3px solid var(--accent)}
+.framing .c.g{border-left:3px solid var(--success)}
+.framing .c strong{font-family:"Inter",system-ui,sans-serif;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.2rem}
+.framing .c.b strong{color:var(--accent)}
+.framing .c.g strong{color:var(--success)}
+.attacks{margin:0.5rem 0}
+.atk{display:grid;grid-template-columns:auto 1fr;gap:0.6rem;padding:0.5rem 0;border-bottom:1px dashed var(--grid);font-size:0.85rem}
+.atk:last-child{border-bottom:0}
+.atk .n{background:var(--accent);color:#FFF;width:1.5rem;height:1.5rem;border-radius:50%;font-size:0.72rem;font-family:"Inter",system-ui,sans-serif;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0}
+.atk .q{font-weight:600;color:var(--ink);font-size:0.84rem}
+.atk .a{color:var(--ink-soft)}
+.kw{background:var(--highlight);padding:0 0.18em;border-radius:2px}
+.foot{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;color:var(--ink-soft);margin-top:1rem;border-top:1px dashed var(--grid);padding-top:0.5rem;text-align:right}
+@media print{
+  body{background:#FFF}
+  .card{box-shadow:none;border:0;margin:0;max-width:none;padding:0.5in}
+  .opener,.g,.indep .met,.indep .miss,.framing .c,.fwd .ch,.fwd .a{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="card">
+
+<div class="header">
+<div class="eyebrow">Quick reference · VioNER defense kit</div>
+<h1>Slide 7 — Four operational gaps (90 s)</h1>
+</div>
+
+<div class="opener">
+<strong>Opener:</strong> "The four operational gaps — the heart of the contribution. I state them operationally, in terms of what the analyst <strong>CAN'T</strong> get today." <em>(pause)</em>
+</div>
+
+<div class="section-h">Four gaps — verbatim</div>
+<div class="gaps">
+
+<div class="g"><span class="ord">Gap 1 · structured 5W1H · 15 s</span>
+"<strong>Gap one:</strong> fast, structured, role-distinguished 5W1H output. ACLED has it slowly; automated tools give flat or wrong-shape output."
+</div>
+
+<div class="g"><span class="ord">Gap 2 · rare-entity recovery · 15 s · LAND "MISS"</span>
+"<strong>Gap two:</strong> automated tools recover dates and locations but <strong>miss victims, casualties, action verbs</strong>."
+</div>
+
+<div class="g"><span class="ord">Gap 3 · trust + canonicalisation · 15 s</span>
+"<strong>Gap three:</strong> output <strong>isn't sanity-checked against world knowledge</strong> or canonicalised across surface forms."
+</div>
+
+<div class="g"><span class="ord">Gap 4 · deployable · 15 s</span>
+"<strong>Gap four:</strong> <strong>no system an analyst can actually deploy and run without ML expertise.</strong>"
+</div>
+
+<div class="g hero"><span class="ord">Defence · why 4 not 3 · 20 s · SLOW THE TWO EXAMPLES</span>
+"If asked <em>'why four and not three?'</em> — <strong>no existing system fills all four, and each is independently necessary for the analyst's job.</strong> <em>A perfectly structured output that arrives too late</em> is useless; <em>a fast output that misses victims</em> is useless."
+</div>
+
+</div>
+
+<div class="section-h">Operational framing — the new craft skill</div>
+<div class="framing">
+<div class="c b"><strong>Technical (wrong here)</strong>"Plain CE fails under imbalance."</div>
+<div class="c g"><strong>Operational (right here)</strong>"Analysts don't see victims, casualties, action verbs."</div>
+</div>
+<p style="font-size:0.84rem;color:var(--ink-soft);margin:0.3rem 0;font-style:italic">Rule: if the sentence describes what the technology is missing → technical. If it describes what the user can't do → operational. Slide 7 is all operational.</p>
+
+<div class="section-h">Independently-necessary matrix</div>
+<table class="indep">
+<thead><tr><th>3 met</th><th>1 missing</th><th>Failure mode</th></tr></thead>
+<tbody>
+<tr><td class="met">1+2+3</td><td class="miss">Gap 4</td><td class="r">Beautiful output stuck on researcher's laptop.</td></tr>
+<tr><td class="met">2+3+4</td><td class="miss">Gap 1</td><td class="r">Fast output, wrong shape. Analyst restructures.</td></tr>
+<tr><td class="met">1+3+4</td><td class="miss">Gap 2</td><td class="r">Empty cells where victim/casualties/action should be.</td></tr>
+<tr><td class="met">1+2+4</td><td class="miss">Gap 3</td><td class="r">Plausible but factually unchecked. Geopolitically risky.</td></tr>
+</tbody>
+</table>
+
+<div class="section-h">Gap → contribution map</div>
+<table class="fwd">
+<thead><tr><th>Gap</th><th></th><th>Contribution</th><th>Slide</th></tr></thead>
+<tbody>
+<tr><td class="ch">1. Structured 5W1H</td><td class="a">→</td><td class="c">8-entity schema + BERT</td><td class="sl">10, 12, 15</td></tr>
+<tr><td class="ch">2. Rare-entity recovery</td><td class="a">→</td><td class="c">Focal loss + class weights</td><td class="sl">12, 18</td></tr>
+<tr><td class="ch">3. Trust + canonicalisation</td><td class="a">→</td><td class="c">Curated KB</td><td class="sl">13, 19</td></tr>
+<tr><td class="ch">4. Analyst-deployable</td><td class="a">→</td><td class="c">Web platform (FastAPI+React+Postgres+Docker)</td><td class="sl">14, 19</td></tr>
+</tbody>
+</table>
+
+<div class="section-h">Pre-loaded interrupts</div>
+<div class="attacks">
+
+<div class="atk">
+<div class="n">1</div>
+<div>
+<div class="q">Couldn't gaps 1 and 4 collapse?</div>
+<div class="a">Gap 1 = output shape; gap 4 = system shape. <span class="kw">ACLED has 1 but not 4</span> (structured but no analyst can run it). <span class="kw">Generic deployable NER has 4 but not 1</span> (anyone can run it but output is flat). Fail independently.</div>
+</div>
+</div>
+
+<div class="atk">
+<div class="n">2</div>
+<div>
+<div class="q">Aren't gaps 2 and 3 both about quality?</div>
+<div class="a">Gap 2 = <span class="kw">recall</span> (find them at all). Gap 3 = <span class="kw">validation</span> (check what's found). Recall without validation → hallucinations. Validation without recall validates nothing.</div>
+</div>
+</div>
+
+<div class="atk">
+<div class="n">3</div>
+<div>
+<div class="q">Is this just a checklist? Where's the real contribution?</div>
+<div class="a"><span class="kw">The integration is the contribution.</span> Each gap → one component. Each component has precedent individually. What's new: closing all four simultaneously, evaluated end-to-end.</div>
+</div>
+</div>
+
+</div>
+
+<div class="section-h">Connects back to slide 2</div>
+<p style="font-size:0.84rem;line-height:1.55;margin:0.3rem 0">The "integration is the contribution" thread from slide 2 (lesson 3) is now demonstrated by slide 7's four-gap structure. Four gaps × four contributions = one chain. Dropping any link breaks the analyst's job.</p>
+
+<div class="section-h">Where this lives</div>
+<p style="font-size:0.85rem;color:var(--ink-soft);margin:0.3rem 0">
+<strong>Defense slide:</strong> Slide 7 of 22 (four operational gaps)
+<br><strong>Defense kit:</strong> <code>VioNER_Defense_Slides_study_guide.md</code> slide 7 · <code>problem_domain.md</code> · <code>solution_architecture.md</code> (gap-to-contribution map)
+<br><strong>Continues into:</strong> Slide 8 (VioNER in one slide — the five components)
+</p>
+
+<div class="foot">Reference card · keep open during slide-7 rehearsal</div>
+</div>
+
+</body>
+</html>

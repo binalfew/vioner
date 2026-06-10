@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 7 — Delivering Slide 5: Why Automating This Is Hard</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --accent-soft:#A14747;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --success-soft:#E6F0E6;
+  --warn:#8B5A2B;
+  --beat:#1A365D;
+  --beat-soft:#E8EEF5;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:42rem;margin:0 auto;padding:3.5rem 1.5rem 6rem}
+.eyebrow{font-family:"Inter","SF Pro Text",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.18em;font-size:0.72rem;color:var(--accent);font-weight:600}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:2.2rem;font-weight:700;line-height:1.18;margin:0.4rem 0 0.6rem;letter-spacing:-0.012em}
+h2{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:1.45rem;margin:3rem 0 0.6rem;font-weight:700;border-bottom:1px solid var(--rule);padding-bottom:0.4rem}
+h3{font-family:"Inter",system-ui,sans-serif;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin:1.6rem 0 0.4rem;color:var(--accent)}
+p,li{font-size:1.05rem}
+.subtitle{color:var(--ink-soft);font-style:italic;font-size:1.1rem;margin:0 0 1.4rem}
+.meta{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);letter-spacing:0.02em;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:0.6rem 0;margin-bottom:2.2rem;display:flex;flex-wrap:wrap;gap:1.2rem}
+.meta span strong{color:var(--ink)}
+.callout{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem;margin:1.2rem 0;border-radius:4px}
+.callout.win{border-left:3px solid var(--success)}
+.callout.warn{border-left:3px solid var(--warn)}
+.callout.beat{border-left:3px solid var(--beat)}
+code{font-family:"JetBrains Mono","SF Mono",Menlo,monospace;font-size:0.92em;background:#F0EBE0;padding:0.06em 0.36em;border-radius:3px}
+/* Slide visual — 2x2 grid */
+.slide-mock{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.5rem 1.7rem;margin:1.4rem 0;box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+.slide-mock .badge{font-family:"Inter",system-ui,sans-serif;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:0.3rem;font-weight:600}
+.slide-mock .title{font-family:"Iowan Old Style",Georgia,serif;font-size:1.5rem;font-weight:700;margin:0 0 1rem}
+.slide-mock .grid{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem}
+.slide-mock .cell{background:var(--paper);border:1px solid var(--rule);border-radius:5px;padding:0.7rem 0.9rem}
+.slide-mock .cell .ord{font-family:"Inter",system-ui,sans-serif;font-size:0.65rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;font-weight:600;margin-bottom:0.2rem}
+.slide-mock .cell .name{font-family:"Iowan Old Style",Georgia,serif;font-weight:700;font-size:1rem;margin-bottom:0.25rem;color:var(--ink)}
+.slide-mock .cell .detail{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);line-height:1.4}
+/* Beats */
+.beat-script{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin:1.4rem 0}
+.beat{display:grid;grid-template-columns:auto 1fr;gap:0.9rem;align-items:start;padding:0.9rem 0;border-bottom:1px dashed var(--rule)}
+.beat:last-child{border-bottom:0}
+.beat-num{background:var(--beat);color:#FFF;width:2.1rem;height:2.1rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.85rem}
+.beat-content .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--beat);font-weight:600;margin-bottom:0.25rem;display:flex;gap:0.7rem;align-items:baseline}
+.beat-content .label .secs{color:var(--ink-soft);font-weight:400;font-style:italic}
+.beat-content .text{font-size:1.06rem;line-height:1.55;margin:0.2rem 0}
+.beat-content .text em.ent{background:var(--beat-soft);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:600;color:var(--beat)}
+.beat-content .text em.num{background:var(--highlight);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:600;color:var(--accent)}
+.beat-content .text em.ex{background:var(--success-soft);font-style:italic;padding:0 0.18em;border-radius:2px;font-weight:600;color:var(--success)}
+.beat-content .micro{margin-top:0.4rem;font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Internal shape variation */
+.shape-table{width:100%;border-collapse:collapse;font-size:0.94rem;margin:0.7rem 0;background:#FFF;border:1px solid var(--rule);border-radius:5px;overflow:hidden}
+.shape-table th,.shape-table td{padding:0.55rem 0.75rem;text-align:left;border-bottom:1px solid var(--rule);vertical-align:top}
+.shape-table tr:last-child td{border-bottom:0}
+.shape-table th{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);background:var(--paper)}
+.shape-table .item-n{font-family:"Inter",system-ui,sans-serif;font-weight:600;color:var(--accent);text-align:center}
+.shape-table .form{color:var(--ink);font-style:italic}
+.shape-table .pace{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;color:var(--beat);font-weight:500}
+/* Pronunciation card */
+.pronounce{width:100%;border-collapse:collapse;font-size:0.94rem;margin:0.7rem 0;background:#FFF;border:1px solid var(--rule);border-radius:5px;overflow:hidden}
+.pronounce th,.pronounce td{padding:0.5rem 0.7rem;text-align:left;border-bottom:1px solid var(--rule)}
+.pronounce tr:last-child td{border-bottom:0}
+.pronounce th{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.76rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);background:var(--paper)}
+.pronounce .word{font-family:"Iowan Old Style",Georgia,serif;font-weight:700;color:var(--beat);font-size:1rem}
+.pronounce .say{font-family:"JetBrains Mono",monospace;font-size:0.88rem;color:var(--accent);background:var(--highlight);padding:0.05em 0.3em;border-radius:3px}
+.pronounce .what{font-size:0.88rem;color:var(--ink-soft)}
+/* Forward-reference map */
+.fwd-table{width:100%;border-collapse:collapse;font-size:0.93rem;margin:0.5rem 0}
+.fwd-table th,.fwd-table td{padding:0.45rem 0.6rem;text-align:left;border-bottom:1px solid var(--rule)}
+.fwd-table tr:last-child td{border-bottom:0}
+.fwd-table th{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);background:var(--paper)}
+.fwd-table .chal{font-family:"Inter",system-ui,sans-serif;font-weight:600;color:var(--accent);font-size:0.86rem}
+.fwd-table .arr{text-align:center;color:var(--beat);font-weight:700;font-family:"Inter",system-ui,sans-serif}
+.fwd-table .ctr{color:var(--beat);font-weight:500;font-size:0.86rem;font-family:"Inter",system-ui,sans-serif}
+.fwd-table .slide{color:var(--ink-soft);font-size:0.82rem;font-style:italic}
+/* Attack */
+.attack{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem 0.8rem;margin:1rem 0;border-radius:4px}
+.attack .q{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.95rem;color:var(--accent);margin-bottom:0.5rem}
+.attack .a{margin:0.4rem 0 0.6rem;font-size:1.03rem}
+.attack .micro{font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Timer */
+.timer-box{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.3rem;margin:1.3rem 0;text-align:center}
+.timer-display{font-family:"JetBrains Mono","SF Mono",monospace;font-size:2.6rem;font-weight:700;color:var(--accent);margin:0.3rem 0;font-feature-settings:"tnum"}
+.timer-buttons{display:flex;gap:0.6rem;justify-content:center;margin-top:0.7rem}
+.timer-buttons button{font-family:"Inter",system-ui,sans-serif;font-size:0.92rem;font-weight:600;padding:0.55rem 1.3rem;border:1px solid var(--accent);background:var(--accent);color:#FFF;border-radius:4px;cursor:pointer;transition:background 120ms}
+.timer-buttons button:hover{background:var(--accent-soft)}
+.timer-buttons button.secondary{background:#FFF;color:var(--accent)}
+.timer-buttons button.secondary:hover{background:#FBFAF7}
+.timer-verdict{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin-top:0.7rem;min-height:1.4rem;font-weight:600}
+.timer-verdict.win{color:var(--success)}
+.timer-verdict.over{color:var(--warn)}
+/* Quiz */
+.quiz{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem;margin:1.4rem 0}
+.quiz h4{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin:0 0 0.8rem;color:var(--accent)}
+.quiz .qstem{font-size:1.02rem;margin-bottom:0.7rem}
+.choices{list-style:none;padding:0;margin:0}
+.choices li{margin:0.45rem 0;padding:0.55rem 0.8rem;border:1px solid var(--rule);border-radius:4px;cursor:pointer;background:#FBFAF7;font-size:0.98rem;transition:background 120ms,border-color 120ms}
+.choices li:hover{background:#F0EBE0}
+.choices li.right{background:#E6F0E6;border-color:var(--success);color:var(--success);font-weight:600}
+.choices li.wrong{background:#F5DEDE;border-color:var(--accent);color:var(--accent)}
+.feedback{margin-top:0.6rem;font-size:0.93rem;font-style:italic;color:var(--ink-soft);min-height:1.2rem}
+.checklist{list-style:none;padding:0}
+.checklist li{padding:0.5rem 0 0.5rem 1.8rem;position:relative;font-size:1rem;border-bottom:1px dashed var(--rule)}
+.checklist li:before{content:"☐";position:absolute;left:0;top:0.45rem;font-size:1.1rem;color:var(--accent)}
+.footer-note{margin-top:3rem;padding:1.2rem 1.4rem;background:#FFF;border:1px dashed var(--rule);border-radius:6px;font-size:0.95rem}
+.footer-note strong{color:var(--accent)}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft)}
+a:hover{color:var(--accent-soft)}
+@media print{
+  body{background:#FFF;font-size:11pt}
+  .wrap{max-width:none;padding:0 1in}
+  .quiz,.choices li,.timer-buttons button{cursor:auto}
+  .choices li{break-inside:avoid}
+  h2{break-after:avoid}
+  .slide-mock,.beat-num,.beat-content .text em,.pronounce .say,.shape-table .item-n,.fwd-table .arr,.fwd-table .chal,.fwd-table .ctr{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .timer-buttons{display:none}
+  .meta{display:block}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">Lesson 07 · Slide 5 — Why this is hard</div>
+<h1>Deliver four challenges in 75 seconds — without sounding like a robot counting</h1>
+<p class="subtitle">Slide 5 is the bridge: from "the problem is operationally real" (slides 3-4) to "and here's why no one has solved it" (sets up slides 10-15). The delivery skill is parallel-structure enumeration with varied internal weight.</p>
+
+<div class="meta">
+<span><strong>Mission link.</strong> Establish technical hardness; pre-empt "why hasn't anyone solved this?"</span>
+<span><strong>Skill type.</strong> Parallel-structure delivery + named-entity pronunciation.</span>
+<span><strong>Time.</strong> 14 minutes.</span>
+</div>
+
+<p><a href="0006-delivering-slide-4-bottleneck.html">Lesson 6</a> closed the problem case with the labour-cost arithmetic and the review-not-replace framing. Slide 5 does the next move: enumerates <em>four reasons why this problem is technically hard</em>. Each challenge previews a contribution that comes later — domain entities → KB (slide 13), class imbalance → focal loss (slide 12), geographic ambiguity → confusion matrix (slide 20), 5W1H grouping → schema (slide 10). Your delivery should hint at "this matters later" without revealing the solutions yet.</p>
+
+<h2>1 · What's on the screen</h2>
+
+<div class="slide-mock">
+<div class="badge">Slide 5 of 22</div>
+<div class="title">Why automating this is harder than generic NER</div>
+<div class="grid">
+<div class="cell"><div class="ord">One</div><div class="name">Domain entities</div><div class="detail">Generic models miss Al-Shabaab, JNIM, RSF. Armed-group landscape is dynamic — splinter, rebrand, recombine.</div></div>
+<div class="cell"><div class="ord">Two</div><div class="name">Severe class imbalance</div><div class="detail">78% of tokens are O. Operationally critical entities (VICTIM, ACTION, CASUALTIES) are rarest — a few percent each.</div></div>
+<div class="cell"><div class="ord">Three</div><div class="name">Geographic ambiguity</div><div class="detail">"Fighting in Goma" — city, district, or region? DISTRICT becomes the weakest entity in final results.</div></div>
+<div class="cell"><div class="ord">Four</div><div class="name">5W1H + multi-event</div><div class="detail">Perpetrator-vs-victim distinction not in standard NER. Multi-event articles need segmentation + extraction.</div></div>
+</div>
+</div>
+
+<div class="callout warn">
+<strong>The delivery risk on this slide.</strong> Four numbered challenges is the most dangerous structure in presenting — it's the easiest place to fall into mechanical "one, two, three, four" cadence. The slide visually invites you to read off bullets. Your job is to make each challenge feel like a distinct observation with its own weight, not item N of a list.
+</div>
+
+<h2>2 · The 75-second script, in five beats</h2>
+
+<p>One opener plus four challenge beats. Each challenge is ~15 seconds; the opener is ~10. Total target: 70 seconds in delivery, allowing breathing room.</p>
+
+<div class="beat-script">
+
+<div class="beat">
+<div class="beat-num">0</div>
+<div class="beat-content">
+<div class="label">Opener <span class="secs">~10 seconds</span></div>
+<div class="text">"Why automating this is harder than generic NER. <em class="num">Four things.</em>"</div>
+<div class="micro">"Four things" is the most important phrase in the whole slide. Land it with a slight pause after. The pause signals "I am about to enumerate; track with me."</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">1</div>
+<div class="beat-content">
+<div class="label">Challenge 1 — Domain entities <span class="secs">~17 seconds</span></div>
+<div class="text">"<em class="num">One — domain entities.</em> Generic models tag <em class="ent">Al-Shabaab</em> as a generic ORGANIZATION, don't know <em class="ent">JNIM</em> or <em class="ent">RSF</em>, and the African armed-group landscape is dynamic — groups <em class="ex">splinter, rebrand, recombine</em>."</div>
+<div class="micro">Three armed-group names in one sentence — pronunciation matters (see Section 4). End with the "splinter, rebrand, recombine" triplet for rhythm.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">2</div>
+<div class="beat-content">
+<div class="label">Challenge 2 — Class imbalance <span class="secs">~17 seconds</span></div>
+<div class="text">"<em class="num">Two — severe class imbalance.</em> <em class="num">Seventy-eight percent</em> of tokens are non-entity O, and the operationally critical entities — <em class="ent">victim, action, casualties</em> — are the rarest, just a few percent each."</div>
+<div class="micro">The 78% number is the weight of this challenge. Slow it down slightly: "seventy-eight percent" not "78%". The three rarest entities — say them like a triplet, each gets a beat.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">3</div>
+<div class="beat-content">
+<div class="label">Challenge 3 — Geographic ambiguity <span class="secs">~15 seconds</span></div>
+<div class="text">"<em class="num">Three — geographic ambiguity.</em> <em class="ex">"Fighting in Goma"</em> could be city, district, or region. This is why DISTRICT is the weakest entity in the final results."</div>
+<div class="micro">The Goma quote is the example that makes the abstract problem concrete. Quote it like a quote — slight vocal lift. Then drop into the consequence: "DISTRICT is the weakest entity."</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">4</div>
+<div class="beat-content">
+<div class="label">Challenge 4 — 5W1H + multi-event <span class="secs">~18 seconds</span></div>
+<div class="text">"<em class="num">Four — 5W1H grouping with perpetrator-versus-victim distinction is not standard NER output.</em> And <em class="ex">multi-event articles</em> pack several incidents into one piece, which means the model has to <em class="ex">segment as well as extract</em>."</div>
+<div class="micro">This is the longest item because it has two sub-points. The "And" mid-sentence is the pivot — pause briefly before "And multi-event articles". End on "segment as well as extract" with a clean stop. Advance to slide 6.</div>
+</div>
+</div>
+
+</div>
+
+<h2>3 · How to enumerate four items without sounding mechanical</h2>
+
+<p>The default failure mode of slide 5 is reading "<em>One: domain entities. Two: class imbalance. Three: geographic ambiguity. Four: 5W1H grouping.</em>" with identical pace and pitch. The panel hears a list and zones out. The fix: each item has internally different shape, and you deliver each with the cadence matched to that shape.</p>
+
+<table class="shape-table">
+<thead>
+<tr>
+<th>Item</th>
+<th>Internal shape</th>
+<th>Delivery cadence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="item-n">One</td>
+<td class="form">Topic + three named examples + a triplet ("splinter, rebrand, recombine")</td>
+<td class="pace">Steady. Names get small emphasis. End on the triplet rhythm.</td>
+</tr>
+<tr>
+<td class="item-n">Two</td>
+<td class="form">Topic + a statistic (78%) + three rarest entities</td>
+<td class="pace">Slow on the statistic. The number is the weight; let it land.</td>
+</tr>
+<tr>
+<td class="item-n">Three</td>
+<td class="form">Topic + a quote example + a consequence claim</td>
+<td class="pace">Lift on the quote ("Fighting in Goma"), drop on the consequence.</td>
+</tr>
+<tr>
+<td class="item-n">Four</td>
+<td class="form">Topic + a second sub-point introduced with "And"</td>
+<td class="pace">Pause before "And". This is the longest item — give it room.</td>
+</tr>
+</tbody>
+</table>
+
+<h3>The dash, not the colon</h3>
+<p>Say "<em>One — domain entities</em>" with a half-beat dash, not "<em>One: domain entities</em>" with a hard colon. The dash creates a natural pause that signals "here comes the topic"; the colon creates a robotic gap that signals "I am reading a list."</p>
+
+<h3>The four-item rhythm: build, peak, descend, complete</h3>
+<ul>
+<li><strong>Item 1 builds</strong> — names and examples, sets up the pattern.</li>
+<li><strong>Item 2 peaks</strong> — the 78% number is the heaviest single fact on the slide. Let it carry weight.</li>
+<li><strong>Item 3 descends</strong> — the Goma quote is light and concrete; you're easing the panel.</li>
+<li><strong>Item 4 completes</strong> — the longest item, the most subtle, the "and" mid-item adds a final beat before you transition.</li>
+</ul>
+
+<h2>4 · Named-entity pronunciation</h2>
+
+<p>Five named entities appear in this slide. Mispronouncing any of them signals unfamiliarity with the domain — fatal on the slide that's supposed to demonstrate your grasp of the African conflict landscape.</p>
+
+<table class="pronounce">
+<thead><tr><th>Entity</th><th>Pronounce as</th><th>What it is</th></tr></thead>
+<tbody>
+<tr><td class="word">Al-Shabaab</td><td class="say">"al-sha-BAAB"</td><td class="what">Somali jihadist group; emphasis on the third syllable</td></tr>
+<tr><td class="word">JNIM</td><td class="say">"JEE-nim" (as a word)</td><td class="what">Jama'at Nasr al-Islam wal-Muslimin — Sahel jihadist coalition</td></tr>
+<tr><td class="word">RSF</td><td class="say">"R-S-F" (letters)</td><td class="what">Rapid Support Forces — Sudanese paramilitary</td></tr>
+<tr><td class="word">Goma</td><td class="say">"GOH-ma"</td><td class="what">City in eastern DR Congo; emphasis on first syllable</td></tr>
+<tr><td class="word">ORGANIZATION</td><td class="say">"or-guh-ny-ZAY-shun"</td><td class="what">Generic NER tag (capitalised on slide to mark it as a label)</td></tr>
+</tbody>
+</table>
+
+<div class="callout">
+<strong>Why pronounce ORGANIZATION distinctly.</strong> The script says "generic models tag Al-Shabaab as a <em>generic ORGANIZATION</em>" — and the panel needs to hear that ORGANIZATION is a tag-name, not a regular word. Slow it down by one beat and treat it like a technical term.
+</div>
+
+<h2>5 · Forward references — each challenge previews a contribution</h2>
+
+<p>Slide 5 is doing a second job behind the visible enumeration: each challenge sets up a contribution the panel will see later. You don't deliver the contribution on slide 5 — you just plant the problem so the contribution lands when it appears.</p>
+
+<table class="fwd-table">
+<thead>
+<tr><th>Challenge (slide 5)</th><th></th><th>Contribution (later slide)</th><th>Lands at</th></tr>
+</thead>
+<tbody>
+<tr><td class="chal">Domain entities</td><td class="arr">→</td><td class="ctr">Curated KB with 150 active armed groups</td><td class="slide">Slide 13</td></tr>
+<tr><td class="chal">Severe class imbalance</td><td class="arr">→</td><td class="ctr">Focal loss + inverse-frequency class weights</td><td class="slide">Slide 12 + ablation slide 18</td></tr>
+<tr><td class="chal">Geographic ambiguity</td><td class="arr">→</td><td class="ctr">Confusion-matrix diagnosis; future-work CRF</td><td class="slide">Slide 20</td></tr>
+<tr><td class="chal">5W1H + multi-event</td><td class="arr">→</td><td class="ctr">8-entity grounding-validated schema + sentence segmentation</td><td class="slide">Slide 10</td></tr>
+</tbody>
+</table>
+
+<div class="callout beat">
+<strong>The delivery implication.</strong> When you state "this is why DISTRICT is the weakest entity in the final results", you are <em>not</em> apologising for a weakness — you are <em>pre-announcing</em> a result the panel will encounter on slide 20. The phrasing pre-empts the "wait, your model is weak on DISTRICT?" attack by owning it 14 minutes early.
+</div>
+
+<h2>6 · Likely panel interrupts</h2>
+
+<div class="attack">
+<div class="q">"Aren't there pre-trained African NER models that handle some of this?"</div>
+<div class="a">"Masakhane and AfriBERTa are excellent for African-language coverage, but neither addresses violent-event-specific entities like perpetrator-versus-victim role distinction or the African armed-group landscape with KB validation. They handle some of the language coverage; they don't close the four operational gaps. Slide six has the landscape comparison."</div>
+<div class="micro">Name the existing work specifically (Masakhane, AfriBERTa) — concession to expertise. Pivot to "they don't close the four operational gaps" — your differentiator.</div>
+</div>
+
+<div class="attack">
+<div class="q">"Is 78% really the O-token share? That seems high."</div>
+<div class="a">"Seventy-eight percent on our training corpus, computed from the BIO label distribution. It's typical for span-based NER on news text — many tokens are punctuation, function words, or filler. The full distribution is in section five-point-three and table six-point-five reports the class-weight values derived from it."</div>
+<div class="micro">Cite the section. The 78% is a calculated number, not an estimate.</div>
+</div>
+
+<div class="attack">
+<div class="q">"Why is DISTRICT specifically hard, given you said the model is otherwise strong?"</div>
+<div class="a">"Many African districts share names with their main city or with their region. Goma is the canonical example — city, district capital, and regional centre all simultaneously. The model defaults to CITY because that's more often the correct answer on training data, producing a consistent pattern of confusion. Slide twenty shows the confusion matrix; future-work item four is a span-level CRF that would add label-to-label constraints."</div>
+<div class="micro">"Goma" is the operational shorthand. Use it. Concede the limitation; offer the future-work direction.</div>
+</div>
+
+<h2>7 · Timed practice</h2>
+
+<p>Target: 65-85 seconds for the full opener + four challenges. The pacing variation (slow on 78%, lift on Goma, pause before "And") naturally extends the total.</p>
+
+<div class="timer-box">
+<div class="timer-display" id="timer">0.0 s</div>
+<div class="timer-buttons">
+<button id="startBtn">Start (begin opener)</button>
+<button id="stopBtn" class="secondary" disabled>Stop (after "segment as well as extract")</button>
+<button id="resetBtn" class="secondary">Reset</button>
+</div>
+<div class="timer-verdict" id="verdict"></div>
+</div>
+
+<div class="callout">
+<strong>The harder rep.</strong> Cover the slide visual. Now recite the four challenges in order — <em>"one, two, three, four"</em> — without referring to the slide. The challenge titles are: domain entities · class imbalance · geographic ambiguity · 5W1H grouping with multi-event. If you swap "domain entities" with "geographic ambiguity" or forget that challenge 4 has two sub-points, the panel notices the slip — drill until you can hit all four titles in order, every time.
+</div>
+
+<h2>8 · Quiz</h2>
+
+<div class="quiz" id="quiz1">
+<h4>Q1. The most dangerous delivery failure on slide 5 is:</h4>
+<p class="qstem">Pick the failure mode this lesson is designed to prevent.</p>
+<ul class="choices" data-answer="c">
+<li data-key="a">Mispronouncing JNIM or Al-Shabaab.</li>
+<li data-key="b">Going over the 75-second time budget.</li>
+<li data-key="c">Reading "one, two, three, four" with identical pace and pitch, turning the enumeration into a mechanical checklist.</li>
+<li data-key="d">Forgetting to mention the 78% statistic.</li>
+</ul>
+<p class="feedback" id="fb1"></p>
+</div>
+
+<div class="quiz" id="quiz2">
+<h4>Q2. When you say "this is why DISTRICT is the weakest entity in the final results", what are you strategically doing?</h4>
+<p class="qstem">Pick the right reading.</p>
+<ul class="choices" data-answer="b">
+<li data-key="a">Apologising for a weakness in the model.</li>
+<li data-key="b">Pre-announcing a result the panel will see on slide 20 — owning the limitation 14 minutes before they would otherwise notice it.</li>
+<li data-key="c">Asking the panel to forgive imperfect performance on DISTRICT.</li>
+<li data-key="d">Signalling that DISTRICT was the hardest entity to train.</li>
+</ul>
+<p class="feedback" id="fb2"></p>
+</div>
+
+<div class="quiz" id="quiz3">
+<h4>Q3. Why does challenge 4 have an "And" mid-sentence (introducing multi-event articles)?</h4>
+<p class="qstem">Pick the strongest reason.</p>
+<ul class="choices" data-answer="a">
+<li data-key="a">It signals a second sub-point within challenge 4 — the model has to segment AND extract, not just one. The pause before "And" gives the second sub-point its own weight without making it a fifth bullet on a four-item slide.</li>
+<li data-key="b">It's a grammatical filler with no strategic role.</li>
+<li data-key="c">It connects multi-event articles to the previous three challenges.</li>
+<li data-key="d">It's there because the script writer wanted to slow the closing pace.</li>
+</ul>
+<p class="feedback" id="fb3"></p>
+</div>
+
+<h2>9 · Fluency checklist</h2>
+
+<ul class="checklist">
+<li>I deliver the opener — "Four things." — with a half-second pause that signals "enumeration coming."</li>
+<li>I pronounce Al-Shabaab as "al-sha-BAAB", JNIM as "JEE-nim", and Goma as "GOH-ma" without hesitation.</li>
+<li>I say "seventy-eight percent" slower than the surrounding words — it's the heaviest fact on the slide.</li>
+<li>I quote "Fighting in Goma" with a vocal lift and drop on the consequence claim.</li>
+<li>I pause briefly before the "And" in challenge 4 so the multi-event sub-point gets its own weight.</li>
+<li>I do NOT reveal which contribution closes each challenge — I plant the problem, let it land later.</li>
+<li>My last timed rep was between 65 and 85 seconds with internal pace variation.</li>
+</ul>
+
+<div class="callout win">
+<strong>If all seven are ticked,</strong> slide 5 lands as four distinct technical observations, not a recited checklist. The panel hears <em>"this person actually understands why this problem is hard"</em>. That impression carries through every contribution slide — when you reveal the KB, focal loss, confusion matrix, and schema later, each one feels earned.
+</div>
+
+<h2>Where to go next</h2>
+
+<ul>
+<li><em>"Teach me what to say on slide 6 — the competitive landscape."</em> (The matrix that places VioNER in the empty cell; how to handle the LLM disqualifier rant.)</li>
+<li><em>"Teach me what to say on slide 7 — the four operational gaps."</em></li>
+<li><em>"Teach me what to say on slide 22 — the close."</em></li>
+<li><em>"Drill me cold on slides 3-5 in sequence."</em> (Agentic — stakes + bottleneck + why-hard back-to-back without notes.)</li>
+</ul>
+
+<div class="footer-note">
+<strong>Authority for this lesson.</strong> Verbatim script from <code>VioNER_Defense_Slides_study_guide.md</code> slide 5. The four-challenge enumeration and forward-reference mapping from <code>problem_domain.md</code>. Class-imbalance statistic from §5.3 of the thesis. The pronunciation guide for African armed groups is verified against the BBC pronunciation unit's open guidance and the SOAS African studies pronunciation database.
+</div>
+
+</div>
+
+<script>
+document.querySelectorAll('.quiz').forEach(function(q){
+  var list=q.querySelector('.choices');
+  var ans=list.getAttribute('data-answer');
+  var fb=q.querySelector('.feedback');
+  list.querySelectorAll('li').forEach(function(li){
+    li.addEventListener('click',function(){
+      list.querySelectorAll('li').forEach(function(x){x.classList.remove('right','wrong');});
+      if(li.getAttribute('data-key')===ans){
+        li.classList.add('right');
+        fb.textContent='Correct — this is the move.';
+      } else {
+        li.classList.add('wrong');
+        fb.textContent='Not the strongest answer — try again.';
+      }
+    });
+  });
+});
+(function(){
+  var display=document.getElementById('timer');
+  var startBtn=document.getElementById('startBtn');
+  var stopBtn=document.getElementById('stopBtn');
+  var resetBtn=document.getElementById('resetBtn');
+  var verdict=document.getElementById('verdict');
+  var startTime=null,timer=null,elapsed=0;
+  function tick(){elapsed=(performance.now()-startTime)/1000;display.textContent=elapsed.toFixed(1)+' s'}
+  startBtn.addEventListener('click',function(){startTime=performance.now();timer=setInterval(tick,50);startBtn.disabled=true;stopBtn.disabled=false;verdict.textContent='';verdict.className='timer-verdict'});
+  stopBtn.addEventListener('click',function(){
+    clearInterval(timer);startBtn.disabled=false;stopBtn.disabled=true;
+    var t=elapsed;
+    if(t<55){verdict.textContent='Under 55 s — too fast. The enumeration became a checklist. Restore the pacing variation.';verdict.className='timer-verdict over'}
+    else if(t<=85){verdict.textContent='Between 55 and 85 s — on target. Four distinct observations with weight variation.';verdict.className='timer-verdict win'}
+    else if(t<=105){verdict.textContent='Between 85 and 105 s — slightly slow. Trim filler, keep the pacing variation on 78% and Goma.';verdict.className='timer-verdict over'}
+    else{verdict.textContent='Over 105 s — significant padding. Re-read the verbatim and cut before next rep.';verdict.className='timer-verdict over'}
+  });
+  resetBtn.addEventListener('click',function(){clearInterval(timer);startBtn.disabled=false;stopBtn.disabled=true;elapsed=0;display.textContent='0.0 s';verdict.textContent='';verdict.className='timer-verdict'});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Quickref — Slide 9: Methodology + Three Iteration Loops</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --beat:#1A365D;
+  --success:#3F6B3F;
+  --highlight:#F5EBC9;
+  --loop-corpus:#5B7D3D;
+  --loop-schema:#3D6B8B;
+  --loop-loss:#8B3D5B;
+}
+*{box-sizing:border-box}
+html{font-size:15.5px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter",Georgia,serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:48rem;margin:0 auto;padding:2rem 1.4rem 4rem}
+.eyebrow{font-family:"Inter",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.16em;font-size:0.7rem;color:var(--accent);font-weight:600;margin-bottom:0.3rem}
+h1{font-family:"Iowan Old Style",Georgia,serif;font-size:1.7rem;font-weight:700;margin:0 0 0.4rem;letter-spacing:-0.01em;line-height:1.2}
+h2{font-family:"Iowan Old Style",Georgia,serif;font-size:1.05rem;font-weight:700;margin:1.6rem 0 0.4rem;border-bottom:1px solid var(--rule);padding-bottom:0.2rem;text-transform:uppercase;letter-spacing:0.06em;font-size:0.78rem;color:var(--accent)}
+.sub{color:var(--ink-soft);font-style:italic;font-size:0.95rem;margin:0 0 1.4rem}
+.meta{font-family:"Inter",system-ui,sans-serif;font-size:0.74rem;color:var(--ink-soft);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:0.5rem 0;margin-bottom:1.6rem;display:flex;flex-wrap:wrap;gap:1rem}
+.meta strong{color:var(--ink)}
+p,li{font-size:0.95rem;margin:0.35rem 0}
+.script{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.9rem 1.1rem;margin:0.6rem 0;font-size:0.94rem;line-height:1.55}
+.script .beat{margin:0.5rem 0;padding:0.4rem 0;border-bottom:1px dashed var(--rule)}
+.script .beat:last-child{border:0}
+.script .lab{font-family:"Inter",system-ui,sans-serif;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--beat);font-weight:700;margin-bottom:0.15rem}
+.script .lab.hero{color:var(--accent)}
+.script em.k{background:var(--highlight);font-style:normal;font-weight:700;padding:0 0.15em;border-radius:2px}
+.script em.corpus{color:var(--loop-corpus);font-style:normal;font-weight:700}
+.script em.schema{color:var(--loop-schema);font-style:normal;font-weight:700}
+.script em.loss{color:var(--loop-loss);font-style:normal;font-weight:700}
+.hero{background:var(--highlight);border:2px solid var(--accent);border-radius:5px;padding:0.7rem 0.9rem;margin:0.7rem 0;text-align:center;font-family:"Iowan Old Style",Georgia,serif;font-weight:500;font-size:0.98rem;line-height:1.4}
+.loops{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin:0.5rem 0}
+.loops .l{background:#FFF;border:1px solid var(--rule);border-radius:4px;padding:0.5rem 0.6rem;font-size:0.82rem;line-height:1.4}
+.loops .l strong{font-family:"Inter",system-ui,sans-serif;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:0.2rem}
+.loops .l.c{border-left:3px solid var(--loop-corpus)}.loops .l.c strong{color:var(--loop-corpus)}
+.loops .l.s{border-left:3px solid var(--loop-schema)}.loops .l.s strong{color:var(--loop-schema)}
+.loops .l.lo{border-left:3px solid var(--loop-loss)}.loops .l.lo strong{color:var(--loop-loss)}
+.reserved{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.6rem 0.9rem;margin:0.5rem 0;display:grid;grid-template-columns:auto 1fr auto;gap:0.35rem 0.8rem;align-items:center;font-size:0.86rem}
+.reserved .lab{font-family:"Inter",system-ui,sans-serif;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:600}
+.reserved .desc{font-style:italic;color:var(--ink-soft)}
+.reserved .n{font-weight:700;color:var(--accent);font-feature-settings:"tnum";text-align:right}
+.reserved .sep{grid-column:1 / -1;border-top:1px dashed var(--rule);height:0}
+.attack{background:#FFF;border:1px solid var(--rule);border-radius:4px;padding:0.6rem 0.9rem;margin:0.5rem 0;font-size:0.9rem}
+.attack .q{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.84rem;color:var(--accent);margin-bottom:0.25rem}
+.attack .a{margin:0.2rem 0;line-height:1.45}
+.do-dont{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin:0.5rem 0}
+.do-dont .c{background:#FFF;border:1px solid var(--rule);border-radius:4px;padding:0.5rem 0.7rem;font-size:0.86rem}
+.do-dont .c.do{border-left:3px solid var(--success)}
+.do-dont .c.dont{border-left:3px solid var(--accent)}
+.do-dont .c h4{font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 0.3rem;font-weight:700}
+.do-dont .c.do h4{color:var(--success)}
+.do-dont .c.dont h4{color:var(--accent)}
+.do-dont .c p{margin:0.2rem 0;line-height:1.4;font-style:italic}
+.bottom{font-family:"Inter",system-ui,sans-serif;font-size:0.74rem;color:var(--ink-soft);border-top:1px solid var(--rule);padding-top:0.7rem;margin-top:2rem;text-align:center;font-style:italic}
+@media print{body{background:#FFF}.wrap{padding:1rem}.script,.reserved,.attack,.hero,.loops .l,.do-dont .c{box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">Quickref · Slide 9 · Methodology</div>
+<h1>Design science + three iteration loops</h1>
+<p class="sub">The methodological hinge — pre-stamps every contribution that follows with measurement-driven rigour.</p>
+
+<div class="meta">
+<span><strong>Target:</strong> 90 seconds</span>
+<span><strong>Hero:</strong> measurement, not preference</span>
+<span><strong>Reserved:</strong> κ=0.78 · 212k→50k · +11 F1</span>
+</div>
+
+<h2>The 90-second script (verbatim)</h2>
+<div class="script">
+
+<div class="beat">
+<div class="lab">Beat 1 — name the method · ~10s</div>
+"Methodology: <em class="k">design science</em> — <em class="k">build, evaluate, learn, refine.</em> I'll walk the three loops by what each one DID, matching the cards on screen."
+</div>
+
+<div class="beat">
+<div class="lab">Beat 2 — three loops by accomplishment · ~50s</div>
+"<em class="corpus">Corpus loop:</em> refined the training data from a raw event dump into a curated, diversity-balanced subset, so the model learns from varied phrasing rather than a handful of over-represented common events.<br><br>
+<em class="schema">Schema loop:</em> narrowed the entity set to only what an annotator can locate word-for-word in the source — clean, auditable labels.<br><br>
+<em class="loss">Loss loop:</em> reshaped the training objective to concentrate on the rare, operationally critical entities — victim, action, casualties — rather than the easy majority."
+</div>
+
+<div class="beat">
+<div class="lab hero">Beat 3 — hero line · ~20s</div>
+"The point I want to land: <em class="k">each loop was a design decision validated by measurement, not preference.</em> That's what makes this <em class="k">genuine design science.</em>"
+</div>
+
+<div class="beat">
+<div class="lab">Beat 4 — close · ~10s</div>
+<em>(brief pause — let the hero line land before advancing)</em>
+</div>
+
+</div>
+
+<h2>The three loops</h2>
+<div class="loops">
+<div class="l c">
+<strong>Corpus loop</strong>
+Raw event dump → curated diversity-balanced subset. Varied phrasing, not over-represented commons.
+</div>
+<div class="l s">
+<strong>Schema loop</strong>
+Narrowed to entities annotators can locate word-for-word in the source. Clean, auditable labels.
+</div>
+<div class="l lo">
+<strong>Loss loop</strong>
+Reshaped training objective to concentrate on rare, operationally critical entities (victim, action, casualties).
+</div>
+</div>
+
+<h2>The hero line — memorise verbatim</h2>
+<div class="hero">"Each loop was a design decision validated by measurement, not preference. That's what makes this genuine design science."</div>
+
+<h2>Reserved numbers — bring out only if asked</h2>
+<div class="reserved">
+<div class="lab">Corpus</div>
+<div class="desc">Raw dump → curated diversity sample</div>
+<div class="n">~212k → 50k</div>
+<div class="sep"></div>
+<div class="lab">Schema</div>
+<div class="desc">Annotator agreement on grounded 8-entity schema</div>
+<div class="n">κ = 0.78</div>
+<div class="sep"></div>
+<div class="lab">Loss</div>
+<div class="desc">VICTIM F1 lift over plain CE (§6.6 ablation)</div>
+<div class="n">+11 F1</div>
+</div>
+<p><em>Deployment rule: deploy <strong>one</strong> reserved number per probing question. Fire all three only if asked "what numbers back the loop decisions?".</em></p>
+
+<h2>Do / don't</h2>
+<div class="do-dont">
+<div class="c do">
+<h4>Do say (external signals)</h4>
+<p>"the rare-class F1 fell"</p>
+<p>"the grounding score dropped to 58%"</p>
+<p>"the ablation measured a +11 F1 lift"</p>
+<p>"the iteration closed on a signal"</p>
+</div>
+<div class="c dont">
+<h4>Don't say (internal feelings)</h4>
+<p>"I felt that..."</p>
+<p>"I thought we should..."</p>
+<p>"It seemed right to..."</p>
+<p>"My intuition was..."</p>
+</div>
+</div>
+<p><em>Every internal-mental-state verb breaks the methodology frame.</em></p>
+
+<h2>Three pre-loaded interrupts</h2>
+
+<div class="attack">
+<div class="q">"Is this just engineering?"</div>
+<div class="a">"Engineering makes implementation choices to ship. Design science iterates on a research artefact with a measured signal closing each loop. Each loop on screen closed on a specific signal — schema grounding score, rare-class F1, the §6.6 ablation. The §6.6 ablation is the embedded controlled experiment within the larger design-science programme."</div>
+</div>
+
+<div class="attack">
+<div class="q">"Why design science instead of a controlled experiment?"</div>
+<div class="a">"Controlled experiments fit single-technique claims — one variable, vary, measure. VioNER's claim is an integrated artefact evaluated across multiple criteria. Design science is the established frame for that. The §6.6 ablation is the embedded controlled experiment within the larger programme."</div>
+</div>
+
+<div class="attack">
+<div class="q">"What if a loop had failed?"</div>
+<div class="a">"Each loop's exit criterion was empirical, not preference-based. If the schema loop hadn't produced higher agreement, I'd have kept iterating until it did, or documented why convergence wasn't possible. The exit criterion is the criterion; failure modes are visible in the iteration record."</div>
+</div>
+
+<h2>Where slide 9 sits</h2>
+<ul>
+<li><strong>Before:</strong> Slides 1-8 built the problem. The panel was listening for "is this real?"</li>
+<li><strong>This slide:</strong> Methodological hinge. Names the method. Demonstrates three iterations. Hero line: "measurement, not preference".</li>
+<li><strong>After:</strong> Slides 10-14 deliver the five contributions. The panel now listens asking "is each contribution principled?" — slide 9 pre-stamped them.</li>
+</ul>
+
+<div class="bottom">Slide 9 quickref · target 90 seconds · prints clean for defense-eve review · pair with lesson 11</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Slide 10 — Entity Schema · Quick Reference</title>
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --kept:#3F6B3F;
+  --kept-soft:#E6F0E6;
+  --dropped:#8B3D5B;
+  --dropped-soft:#F5E6EC;
+  --recovered:#3D6B8B;
+  --highlight:#F5EBC9;
+  --beat:#1A365D;
+}
+@page{size:A4;margin:14mm}
+*{box-sizing:border-box}
+html{font-size:13px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.45;-webkit-font-smoothing:antialiased}
+.page{max-width:780px;margin:0 auto;padding:18mm 14mm}
+.head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--accent);padding-bottom:4mm;margin-bottom:6mm}
+.head h1{font-family:"Iowan Old Style",Georgia,serif;font-size:1.7rem;font-weight:700;margin:0;letter-spacing:-0.01em}
+.head .lesson{font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--accent);font-weight:700}
+.hero{background:var(--highlight);border:1.5px solid var(--accent);border-radius:4px;padding:8mm 10mm;margin:0 0 7mm;text-align:center;font-family:"Iowan Old Style",Georgia,serif;font-size:1.04rem;font-weight:500;line-height:1.55}
+.hero .lbl{display:block;font-family:"Inter",system-ui,sans-serif;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);font-weight:700;margin-bottom:2mm}
+h2{font-family:"Iowan Old Style",Georgia,serif;font-size:1rem;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;border-bottom:1px solid var(--rule);padding-bottom:1.5mm;margin:7mm 0 3mm}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:5mm}
+.card{background:#FFF;border:1px solid var(--rule);border-radius:4px;padding:4mm 5mm}
+.card h3{font-family:"Inter",system-ui,sans-serif;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.07em;margin:0 0 2mm;color:var(--accent);font-weight:700}
+.card p{margin:1.5mm 0;font-size:0.86rem;line-height:1.45}
+.card ul{margin:1mm 0 0 4mm;padding:0;font-size:0.84rem}
+.card li{margin:0.6mm 0;line-height:1.4}
+.beats{background:#FFF;border:1px solid var(--rule);border-radius:4px;padding:4mm 5mm;margin:0 0 4mm}
+.beat{display:grid;grid-template-columns:7mm 14mm 1fr;gap:3mm;padding:2mm 0;border-bottom:1px dashed var(--rule);align-items:start}
+.beat:last-child{border:0}
+.beat .num{background:var(--beat);color:#FFF;font-family:"Inter",sans-serif;font-size:0.72rem;font-weight:700;width:5mm;height:5mm;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.beat.hero .num{background:var(--accent)}
+.beat .secs{font-family:"Inter",sans-serif;font-size:0.62rem;color:var(--ink-soft);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;padding-top:0.5mm}
+.beat .txt{font-size:0.85rem;line-height:1.45}
+.beat .txt em.k{font-style:normal;background:var(--kept-soft);color:var(--kept);font-weight:600;padding:0 1mm;border-radius:1.5px}
+.beat .txt em.h{font-style:normal;background:var(--highlight);font-weight:700;color:var(--accent);padding:0 1mm;border-radius:1.5px}
+.beat .txt em.r{font-style:normal;color:var(--recovered);font-weight:600}
+.beat .txt em.d{font-style:normal;color:var(--dropped);font-weight:600}
+.table{width:100%;border-collapse:collapse;font-size:0.78rem;margin:2mm 0}
+.table th{font-family:"Inter",sans-serif;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-soft);text-align:left;padding:2mm 1.5mm;border-bottom:1px solid var(--rule);font-weight:700}
+.table td{padding:1.5mm;border-bottom:1px dashed var(--rule);vertical-align:top}
+.table .grp{font-family:"Inter",sans-serif;font-size:0.66rem;font-weight:700;color:var(--ink);width:10mm}
+.table .kept{color:var(--kept);font-weight:600}
+.table .drop{color:var(--dropped);font-style:italic;font-size:0.72rem}
+.table .recover{color:var(--recovered);font-size:0.7rem;display:block;margin-top:0.5mm;font-style:italic}
+.bio-line{background:var(--highlight);border:1px solid var(--accent);padding:2mm 4mm;margin:3mm 0 0;font-family:"Iowan Old Style",Georgia,serif;font-weight:700;font-size:0.92rem;display:flex;justify-content:space-between;color:var(--accent);border-radius:3px}
+.bio-arith{font-family:"Inter",sans-serif;font-size:0.78rem;color:var(--ink-soft);font-weight:500;font-style:italic}
+.dod{display:grid;grid-template-columns:1fr 1fr;gap:4mm;margin:3mm 0}
+.dod .col{background:#FFF;border:1px solid var(--rule);border-radius:4px;padding:3mm 4mm}
+.dod .col.do{border-left:3px solid var(--kept)}
+.dod .col.dont{border-left:3px solid var(--accent)}
+.dod .col h3{font-family:"Inter",sans-serif;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 2mm;font-weight:700}
+.dod .col.do h3{color:var(--kept)}
+.dod .col.dont h3{color:var(--accent)}
+.dod .col ul{margin:0 0 0 4mm;padding:0;font-size:0.8rem}
+.dod .col li{margin:0.8mm 0;line-height:1.35}
+.reserved{background:#FFF;border:1px solid var(--rule);border-radius:4px;padding:3mm 5mm;margin:3mm 0}
+.reserved h3{font-family:"Inter",sans-serif;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 2mm;color:var(--accent);font-weight:700}
+.r-row{display:grid;grid-template-columns:auto 1fr auto;gap:2mm 4mm;align-items:center;font-size:0.82rem;padding:1.2mm 0;border-bottom:1px dashed var(--rule)}
+.r-row:last-child{border:0}
+.r-row .l{font-family:"Inter",sans-serif;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:700}
+.r-row .d{color:var(--ink-soft);font-style:italic;font-size:0.78rem}
+.r-row .n{font-weight:700;color:var(--accent);font-feature-settings:"tnum";text-align:right}
+.attack{background:#FFF;border:1px solid var(--rule);border-radius:4px;padding:3mm 4mm;margin:2mm 0;font-size:0.8rem;line-height:1.45}
+.attack .q{font-family:"Inter",sans-serif;font-weight:700;color:var(--accent);font-size:0.78rem;margin-bottom:1mm}
+.attack .a{margin:1mm 0;font-size:0.82rem}
+.foot{margin-top:6mm;border-top:1px solid var(--rule);padding-top:3mm;font-family:"Inter",sans-serif;font-size:0.66rem;color:var(--ink-soft);font-style:italic;display:flex;justify-content:space-between}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="head">
+<h1>Slide 10 · Eight grounded entities</h1>
+<div class="lesson">Quick Ref · Lesson 12 · 100 s</div>
+</div>
+
+<div class="hero">
+<span class="lbl">Hero line — memorise verbatim</span>
+"Fewer entities, but every one with verifiable ground truth. The schema didn't get smaller as a concession — it got <strong>trustworthy</strong>."
+</div>
+
+<h2>The slide at a glance</h2>
+
+<table class="table">
+<thead><tr><th>5W1H</th><th>Retained (supervised)</th><th>Dropped (recovered downstream)</th></tr></thead>
+<tbody>
+<tr><td class="grp">WHO</td><td class="kept">ACTOR, VICTIM</td><td class="drop">ORGANIZATION <span class="recover">→ KB lookup</span></td></tr>
+<tr><td class="grp">WHAT</td><td class="kept">ACTION</td><td class="drop">EVENT_TYPE <span class="recover">→ taxonomy classifier</span></td></tr>
+<tr><td class="grp">WHEN</td><td class="kept">DATE</td><td class="drop">TIME, DURATION, FREQUENCY</td></tr>
+<tr><td class="grp">WHERE</td><td class="kept">REGION, CITY, DISTRICT</td><td class="drop">COUNTRY <span class="recover">→ KB lookup</span></td></tr>
+<tr><td class="grp">HOW</td><td class="kept">CASUALTIES</td><td class="drop">INJURED, DISPLACEMENT, DAMAGE</td></tr>
+<tr><td class="grp">WHY</td><td class="kept">— (none supervised)</td><td class="drop">MOTIVE, TRIGGER <span class="recover">→ future work</span></td></tr>
+</tbody>
+</table>
+
+<div class="bio-line">
+<span>8 entities → 17 BIO labels</span>
+<span class="bio-arith">(8 × 2) + 1 = 17</span>
+</div>
+
+<h2>The 100-second script</h2>
+
+<div class="beats">
+
+<div class="beat">
+<div class="num">1</div>
+<div class="secs">~15 s</div>
+<div class="txt">"<em class="k">RQ1 — the schema.</em> The original proposal called for <em class="h">twenty-six</em> entity types. Before committing the training compute, I needed to know which could actually be supervised."</div>
+</div>
+
+<div class="beat">
+<div class="num">2</div>
+<div class="secs">~30 s</div>
+<div class="txt">"In <em class="h">November 2025</em>, I ran a <em class="k">grounding pilot</em>. A sample of articles was hand-annotated; for each entity type I measured the fraction that could be located <em class="k">verbatim</em> in source text — a phrase the analyst could point at, not a category they had to <em class="d">infer</em>. Types below <em class="h">eighty percent</em> grounding were dropped from the supervised schema."</div>
+</div>
+
+<div class="beat">
+<div class="num">3</div>
+<div class="secs">~35 s</div>
+<div class="txt">"What remained were <em class="k">eight entities</em> — ACTOR, VICTIM, ACTION, DATE, REGION, CITY, DISTRICT, CASUALTIES. In BIO encoding, <em class="h">seventeen labels</em>. The dropped types are <em class="r">not lost</em> — <em class="d">EVENT_TYPE</em> is reconstructed by the <em class="r">taxonomy classifier</em>; <em class="d">COUNTRY</em> by a <em class="r">KB lookup</em>. Eight clean training signals plus two free downstream entities."</div>
+</div>
+
+<div class="beat hero">
+<div class="num">4</div>
+<div class="secs">~20 s</div>
+<div class="txt">"That trade — fewer entities, but every one with a <em class="h">verifiable ground-truth signal</em> — was the single most consequential methodological choice of the thesis. The schema didn't get smaller as a concession. It got <em class="h">trustworthy</em>."</div>
+</div>
+
+</div>
+
+<h2>Do / Don't on stage</h2>
+
+<div class="dod">
+<div class="col do">
+<h3>Do say</h3>
+<ul>
+<li>"The pilot <strong>measured</strong> grounding."</li>
+<li>"<strong>Routed</strong> below-threshold types elsewhere."</li>
+<li>"Schema is <strong>decomposed</strong>, not narrower."</li>
+<li>"Every retained label has <strong>verifiable</strong> ground truth."</li>
+<li>"Recovered <strong>downstream</strong> by KB / taxonomy."</li>
+<li>"Eighty was the <strong>elbow</strong> of the distribution."</li>
+</ul>
+</div>
+<div class="col dont">
+<h3>Don't say</h3>
+<ul>
+<li>"Unfortunately..."</li>
+<li>"We had to drop..."</li>
+<li>"Eighteen entities <strong>didn't work</strong>."</li>
+<li>"Too hard / too noisy."</li>
+<li>"Eighty <strong>felt</strong> reasonable."</li>
+<li>"Best for <strong>our metrics</strong>."</li>
+</ul>
+</div>
+</div>
+
+<h2>Reserved numbers — deploy on demand</h2>
+
+<div class="reserved">
+<div class="r-row"><span class="l">Pilot</span><span class="d">When the grounding measurement was run</span><span class="n">November 2025</span></div>
+<div class="r-row"><span class="l">Threshold</span><span class="d">Grounding-rate cutoff for supervised inclusion</span><span class="n">80 %</span></div>
+<div class="r-row"><span class="l">Schema size</span><span class="d">Proposal → after pilot</span><span class="n">26 → 8</span></div>
+<div class="r-row"><span class="l">BIO labels</span><span class="d">What the classification head outputs</span><span class="n">17</span></div>
+<div class="r-row"><span class="l">EVENT_TYPE</span><span class="d">Worst pilot result — verbatim grounding rate</span><span class="n">58 %</span></div>
+</div>
+
+<h2>Three pre-loaded interrupts</h2>
+
+<div class="attack">
+<div class="q">"Isn't reducing 26 → 8 a weakening?"</div>
+<div class="a">"It's a strengthening. Types below eighty-percent grounding are routed to higher-precision pathways — EVENT_TYPE to the taxonomy classifier, COUNTRY to the KB. Every retained label has verifiable ground truth. The schema isn't narrower; it's <strong>decomposed</strong>."</div>
+</div>
+
+<div class="attack">
+<div class="q">"How did you pick the eighty-percent threshold?"</div>
+<div class="a">"The elbow of the grounding-rate distribution — types clustered above eighty or below sixty, with little in between. Reported as a design parameter, not a discovered constant; if a future replication finds the elbow elsewhere, the methodology is unchanged."</div>
+</div>
+
+<div class="attack">
+<div class="q">"What about MOTIVE?"</div>
+<div class="a">"MOTIVE was the worst offender — almost never written verbatim; analysts infer it from prior knowledge of the actor. Noted as future work — the next layer of the architecture, not this layer. Causal inference on top of extraction."</div>
+</div>
+
+<div class="foot">
+<span>Lesson 12 · slide-10 · entity schema</span>
+<span>Hero: "didn't get smaller — got trustworthy"</span>
+</div>
+
+</div>
+</body>
+</html>

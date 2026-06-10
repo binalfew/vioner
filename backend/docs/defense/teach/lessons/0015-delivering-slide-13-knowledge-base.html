@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 15 — Delivering Slide 13: The Curated Knowledge Base</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --accent-soft:#A14747;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --success-soft:#E6F0E6;
+  --warn:#8B5A2B;
+  --beat:#1A365D;
+  --beat-soft:#E8EEF5;
+  --validate:#3D6B8B;   /* validation — correctness axis */
+  --validate-soft:#E8EEF5;
+  --enrich:#7B1E1E;     /* enrichment — canonicalisation axis */
+  --enrich-soft:#F5E6E6;
+  --combine:#3F6B3F;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:42rem;margin:0 auto;padding:3.5rem 1.5rem 6rem}
+.eyebrow{font-family:"Inter","SF Pro Text",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.18em;font-size:0.72rem;color:var(--accent);font-weight:600}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:2.2rem;font-weight:700;line-height:1.18;margin:0.4rem 0 0.6rem;letter-spacing:-0.012em}
+h2{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:1.45rem;margin:3rem 0 0.6rem;font-weight:700;border-bottom:1px solid var(--rule);padding-bottom:0.4rem}
+h3{font-family:"Inter",system-ui,sans-serif;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin:1.6rem 0 0.4rem;color:var(--accent)}
+p,li{font-size:1.05rem}
+.subtitle{color:var(--ink-soft);font-style:italic;font-size:1.1rem;margin:0 0 1.4rem}
+.meta{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);letter-spacing:0.02em;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:0.6rem 0;margin-bottom:2.2rem;display:flex;flex-wrap:wrap;gap:1.2rem}
+.meta span strong{color:var(--ink)}
+.callout{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem;margin:1.2rem 0;border-radius:4px}
+.callout.win{border-left:3px solid var(--success)}
+.callout.warn{border-left:3px solid var(--warn)}
+.callout.beat{border-left:3px solid var(--beat)}
+code{font-family:"JetBrains Mono","SF Mono",Menlo,monospace;font-size:0.92em;background:#F0EBE0;padding:0.06em 0.36em;border-radius:3px}
+/* Slide mock */
+.slide-mock{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.5rem 1.7rem;margin:1.4rem 0;box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+.slide-mock .badge{font-family:"Inter",system-ui,sans-serif;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:0.3rem;font-weight:600}
+.slide-mock .title{font-family:"Iowan Old Style",Georgia,serif;font-size:1.45rem;font-weight:700;margin:0 0 0.6rem}
+/* Composition strip */
+.composition{display:grid;grid-template-columns:repeat(4,1fr);gap:0.55rem;margin:0.9rem 0}
+.comp-cell{background:#FAF7F0;border:1px solid var(--rule);border-radius:5px;padding:0.7rem 0.5rem;text-align:center}
+.comp-cell .n{font-family:"Iowan Old Style",Georgia,serif;font-size:1.6rem;font-weight:800;color:var(--accent);line-height:1;font-feature-settings:"tnum"}
+.comp-cell .l{font-family:"Inter",system-ui,sans-serif;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:600;margin-top:0.35rem;line-height:1.3}
+/* Two-card layout: validate vs enrich */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin:1rem 0}
+.card{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.95rem 1.1rem}
+.card.validate{border-left:3px solid var(--validate);background:linear-gradient(180deg,#FFF 0%,#F8FAFD 100%)}
+.card.enrich{border-left:3px solid var(--enrich);background:linear-gradient(180deg,#FFF 0%,#FDF8F8 100%)}
+.card h4{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.3rem;font-weight:700}
+.card.validate h4{color:var(--validate)}
+.card.enrich h4{color:var(--enrich)}
+.card h5{font-family:"Iowan Old Style",Georgia,serif;font-size:1.02rem;margin:0 0 0.4rem;font-weight:700}
+.card .role{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;background:var(--paper);padding:0.25rem 0.5rem;border-radius:3px;display:inline-block;margin-bottom:0.4rem;font-weight:600}
+.card.validate .role{color:var(--validate);border:1px solid var(--validate)}
+.card.enrich .role{color:var(--enrich);border:1px solid var(--enrich)}
+.card p{font-size:0.92rem;margin:0.35rem 0;color:var(--ink-soft);line-height:1.5}
+.card p strong{color:var(--ink)}
+.card .arith{font-family:"JetBrains Mono","SF Mono",monospace;font-size:0.85rem;background:#FAF7F0;padding:0.4rem 0.7rem;border-radius:3px;margin:0.4rem 0;color:var(--ink);font-weight:600}
+/* Worked example — Al-Shabaab */
+.worked{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.9rem 1.1rem;margin:0.9rem 0}
+.worked h4{font-family:"Inter",system-ui,sans-serif;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.5rem;color:var(--accent);font-weight:700}
+.worked-row{display:grid;grid-template-columns:auto 1fr;gap:0.7rem;padding:0.3rem 0;border-bottom:1px dashed var(--rule);align-items:start;font-size:0.92rem}
+.worked-row:last-child{border:0}
+.worked-row .tag{font-family:"Inter",system-ui,sans-serif;font-size:0.66rem;font-weight:700;padding:0.18em 0.55em;border-radius:3px;white-space:nowrap;text-transform:uppercase;letter-spacing:0.05em}
+.worked-row .tag.surface{background:var(--paper);border:1px solid var(--rule);color:var(--ink-soft)}
+.worked-row .tag.canon{background:var(--success-soft);color:var(--success)}
+.worked-row .tag.flag{background:var(--enrich-soft);color:var(--enrich)}
+.worked-row code{font-family:"JetBrains Mono",monospace;font-size:0.86rem}
+/* Two-axes diagram */
+.complement{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.complement h4{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.5rem;color:var(--accent);font-weight:700;text-align:center}
+.complement-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:0.6rem;align-items:center}
+.complement-grid .side{background:#FAF7F0;border-radius:4px;padding:0.7rem 0.9rem;text-align:center;border:1px solid var(--rule)}
+.complement-grid .side.validate{border-left:3px solid var(--validate)}
+.complement-grid .side.enrich{border-left:3px solid var(--enrich)}
+.complement-grid .side h5{font-family:"Inter",sans-serif;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.3rem;font-weight:700}
+.complement-grid .side.validate h5{color:var(--validate)}
+.complement-grid .side.enrich h5{color:var(--enrich)}
+.complement-grid .side p{font-family:"Iowan Old Style",Georgia,serif;font-size:0.9rem;margin:0;line-height:1.4;color:var(--ink-soft);font-style:italic}
+.complement-grid .side p strong{color:var(--ink);font-style:normal}
+.complement-grid .x{font-family:"Iowan Old Style",Georgia,serif;font-size:1.8rem;color:var(--combine);font-weight:700}
+.complement .result{text-align:center;margin-top:0.7rem;font-family:"Iowan Old Style",Georgia,serif;font-size:1.02rem;font-weight:600;color:var(--combine);background:var(--success-soft);border-radius:4px;padding:0.55rem 0.9rem}
+/* Guarantees strip */
+.guarantees{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin:1rem 0}
+.guarantee{background:#FFF;border:1px solid var(--rule);border-left:3px solid var(--success);border-radius:5px;padding:0.85rem 1.05rem}
+.guarantee h5{font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.35rem;color:var(--success);font-weight:700}
+.guarantee p{font-family:"Iowan Old Style",Georgia,serif;font-size:0.96rem;margin:0;line-height:1.45;color:var(--ink)}
+.guarantee p strong{color:var(--accent)}
+/* Beats */
+.beat-script{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin:1.4rem 0}
+.beat{display:grid;grid-template-columns:auto 1fr;gap:0.9rem;align-items:start;padding:0.9rem 0;border-bottom:1px dashed var(--rule)}
+.beat:last-child{border-bottom:0}
+.beat-num{background:var(--beat);color:#FFF;width:2.1rem;height:2.1rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.85rem}
+.beat-num.hero{background:var(--accent)}
+.beat-content .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--beat);font-weight:600;margin-bottom:0.25rem;display:flex;gap:0.7rem;align-items:baseline}
+.beat-content .label.hero{color:var(--accent)}
+.beat-content .label .secs{color:var(--ink-soft);font-weight:400;font-style:italic}
+.beat-content .text{font-size:1.04rem;line-height:1.55;margin:0.2rem 0}
+.beat-content .text em.key{background:var(--success-soft);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:600;color:var(--success)}
+.beat-content .text em.num{background:var(--highlight);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:700;color:var(--accent)}
+.beat-content .text em.validate{color:var(--validate);font-style:normal;font-weight:700}
+.beat-content .text em.enrich{color:var(--enrich);font-style:normal;font-weight:700}
+.beat-content .micro{margin-top:0.4rem;font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Pattern */
+.pattern{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.pattern h4{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.55rem;color:var(--accent);font-weight:700}
+.pattern-row{display:grid;grid-template-columns:auto 1fr;gap:0.6rem;align-items:start;padding:0.45rem 0;border-bottom:1px dashed var(--rule);font-size:0.95rem;line-height:1.5}
+.pattern-row:last-child{border:0}
+.pattern-row .step{background:var(--accent);color:#FFF;font-family:"Inter",sans-serif;font-size:0.68rem;font-weight:700;padding:0.15em 0.5em;border-radius:3px;white-space:nowrap}
+.pattern-row strong{color:var(--ink)}
+/* Reserved */
+.reserved{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.reserved h4{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.7rem;color:var(--accent);font-weight:700}
+.reserved-rows{display:grid;grid-template-columns:auto 1fr auto;gap:0.6rem 0.9rem;font-family:"Iowan Old Style",Georgia,serif;align-items:center}
+.reserved-rows .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:600}
+.reserved-rows .desc{font-size:0.93rem;color:var(--ink-soft);font-style:italic}
+.reserved-rows .num{font-weight:700;color:var(--accent);font-feature-settings:"tnum";font-size:1.02rem;text-align:right}
+.reserved-rows .row-sep{grid-column:1 / -1;border-top:1px dashed var(--rule);height:0;margin:0.1rem 0}
+/* Hero */
+.hero-line{background:var(--highlight);border:2px solid var(--accent);border-radius:6px;padding:1.2rem 1.4rem;margin:1.3rem 0;text-align:center;font-family:"Iowan Old Style",Georgia,serif;font-size:1.1rem;line-height:1.55;font-weight:500}
+.hero-line .label{display:block;font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:600;margin-bottom:0.4rem}
+/* Honest-middle binary chain */
+.binary-chain{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.binary-chain h4{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.55rem;color:var(--accent);font-weight:700}
+.binary-row{display:grid;grid-template-columns:5rem 1fr;gap:0.7rem;padding:0.35rem 0;border-bottom:1px dashed var(--rule);font-size:0.94rem;align-items:baseline}
+.binary-row:last-child{border:0}
+.binary-row .which{font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:700}
+.binary-row strong{color:var(--ink)}
+.binary-row em{color:var(--accent);font-style:normal;font-weight:600}
+/* Attack */
+.attack{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem 0.8rem;margin:1rem 0;border-radius:4px}
+.attack .q{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.95rem;color:var(--accent);margin-bottom:0.5rem}
+.attack .a{margin:0.4rem 0 0.6rem;font-size:1.03rem}
+.attack .micro{font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Timer */
+.timer-box{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.3rem;margin:1.3rem 0;text-align:center}
+.timer-display{font-family:"JetBrains Mono","SF Mono",monospace;font-size:2.6rem;font-weight:700;color:var(--accent);margin:0.3rem 0;font-feature-settings:"tnum"}
+.timer-buttons{display:flex;gap:0.6rem;justify-content:center;margin-top:0.7rem;flex-wrap:wrap}
+.timer-buttons button{font-family:"Inter",system-ui,sans-serif;font-size:0.92rem;font-weight:600;padding:0.55rem 1.3rem;border:1px solid var(--accent);background:var(--accent);color:#FFF;border-radius:4px;cursor:pointer;transition:background 120ms}
+.timer-buttons button:hover{background:var(--accent-soft)}
+.timer-buttons button.secondary{background:#FFF;color:var(--accent)}
+.timer-buttons button.secondary:hover{background:#FBFAF7}
+.timer-verdict{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin-top:0.7rem;min-height:1.4rem;font-weight:600}
+.timer-verdict.win{color:var(--success)}
+.timer-verdict.over{color:var(--warn)}
+/* Quiz */
+.quiz{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem;margin:1.4rem 0}
+.quiz h4{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin:0 0 0.8rem;color:var(--accent)}
+.quiz .qstem{font-size:1.02rem;margin-bottom:0.7rem}
+.choices{list-style:none;padding:0;margin:0}
+.choices li{margin:0.45rem 0;padding:0.55rem 0.8rem;border:1px solid var(--rule);border-radius:4px;cursor:pointer;background:#FBFAF7;font-size:0.98rem;transition:background 120ms,border-color 120ms}
+.choices li:hover{background:#F5EFE2;border-color:var(--accent-soft)}
+.choices li.right{background:var(--success-soft);border-color:var(--success);color:var(--success)}
+.choices li.wrong{background:#F5E4E4;border-color:var(--accent);color:var(--accent)}
+.choices li.locked{pointer-events:none;opacity:0.85}
+.feedback{font-family:"Inter",system-ui,sans-serif;font-size:0.93rem;margin-top:0.7rem;color:var(--ink-soft);min-height:1.2rem;font-style:italic}
+/* Followup */
+.followup{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin-top:2.4rem;border-left:3px solid var(--beat)}
+.followup ul{margin:0.6rem 0 0 1.1rem}
+.followup li{margin:0.45rem 0;font-size:1rem}
+.bottom{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;color:var(--ink-soft);border-top:1px solid var(--rule);padding-top:1.2rem;margin-top:3rem;font-style:italic}
+.cite{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);margin-top:0.3rem}
+.cite a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent-soft)}
+.cite a:hover{border-bottom:1px solid var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">Lesson 15 · Slide 13</div>
+<h1>The curated knowledge base</h1>
+<div class="subtitle">The KB contribution made visible. A small, deliberate lookup layer that sits on top of the trained model — one resource doing two jobs that the model alone cannot. Validate the world facts the model never saw; canonicalise the surface forms the model cannot resolve. The slide's job is to defend the <em>scope</em> (why only 150?) and the <em>roles</em> (why both validate and enrich?) in 75 seconds.</div>
+
+<div class="meta">
+<span><strong>Slide:</strong> 13 of 22</span>
+<span><strong>Target time:</strong> 75 seconds</span>
+<span><strong>Hero line:</strong> "Validation never blocks extraction; enrichment never invents data"</span>
+<span><strong>Reserved cards:</strong> 150 · 200 · 54 · 38 · 4.2 aliases · 2.4 % flag · 64.3 % enrich · slide 19</span>
+</div>
+
+<h2>1 · Where this slide sits in the arc</h2>
+
+<p>Slides 10–12 built the data and modelling story — the schema, the taxonomy, the corpus, the training recipe. Slide 13 introduces the <em>external knowledge</em> the model itself cannot acquire from text. BERT learned patterns in a corpus; it did not learn that <em>Al-Shabaab operates in the Horn of Africa, not Eastern DRC</em>, and it did not learn that <em>"Al Shabaab"</em>, <em>"al-shabaab"</em>, and <em>"Al-Shabaab militants"</em> all refer to the same canonical entry. The KB injects exactly those two missing pieces — world knowledge for plausibility, alias tables for canonicalisation.</p>
+
+<div class="callout beat">
+<strong>The function of slide 13.</strong> Two jobs. (1) Make the KB <em>visible as a contribution</em> — not a footnote, not an afterthought. The KB has its own composition numbers, its own operational rates, and a defensible scope decision. (2) Set up the <em>operational impact</em> that slide 19 will deepen. Slide 13 introduces the rates (2.4 %, 64.3 %); slide 19 connects them to user testing and analyst behaviour. The numbers must land here so they pay off there.
+</div>
+
+<h2>2 · What's on the slide</h2>
+
+<div class="slide-mock">
+<div class="badge">Slide 13</div>
+<div class="title">The curated knowledge base</div>
+
+<div class="composition">
+<div class="comp-cell"><div class="n">150</div><div class="l">armed groups<br>+ aliases</div></div>
+<div class="comp-cell"><div class="n">200</div><div class="l">conflict cities<br>+ region map</div></div>
+<div class="comp-cell"><div class="n">54</div><div class="l">African<br>countries</div></div>
+<div class="comp-cell"><div class="n">38</div><div class="l">weapon<br>categories</div></div>
+</div>
+
+<div class="cards">
+<div class="card validate">
+<h4>Role 1</h4>
+<h5>Validation — geographic plausibility</h5>
+<div class="role">Axis: CORRECTNESS</div>
+<p><strong>Flag implausible actor–location pairs.</strong> Cross-reference the extracted ACTOR's country-of-operation with the extracted LOCATION's country. Mismatch ⇒ flag for analyst re-read.</p>
+<div class="arith">~2.4 % of records get flagged</div>
+<p>Flag is metadata. <em>Never blocks the record.</em></p>
+</div>
+<div class="card enrich">
+<h4>Role 2</h4>
+<h5>Enrichment — actor canonicalisation</h5>
+<div class="role">Axis: CANONICALISATION</div>
+<p><strong>Map surface variant → canonical entry.</strong> "Al Shabaab" / "al-shabaab" / "Al-Shabaab fighters" → one canonical KB id; analytics aggregate correctly.</p>
+<div class="arith">~64.3 % of ACTOR mentions enrich</div>
+<p>The other 35.7 % carry raw text. <em>Never invents data.</em></p>
+</div>
+</div>
+
+</div>
+
+<p>Three visual elements: the <strong>composition strip</strong> (150 / 200 / 54 / 38), the <strong>two role cards</strong> (validate × enrich), and the <strong>two operational rates</strong> (2.4 % / 64.3 %). Optional fourth element: a single concrete example like "Al-Shabaab in Goma → flagged" — this is the strongest verbal payoff if the panel is in plain-English mode.</p>
+
+<h2>3 · The "one resource, two roles" mental model</h2>
+
+<p>The KB is the second complementarity claim in the deck. Slide 12's was focal × class weights — two rebalancers attacking different parts of the imbalance problem. Slide 13's is validate × enrich — two roles for one curated resource, attacking different parts of the <em>knowledge gap</em> the model has.</p>
+
+<div class="complement">
+<h4>The two-axes picture for the KB</h4>
+<div class="complement-grid">
+<div class="side validate"><h5>Validation</h5><p><strong>Correctness axis</strong><br>Is this <em>plausible</em>?</p></div>
+<div class="x">×</div>
+<div class="side enrich"><h5>Enrichment</h5><p><strong>Canonicalisation axis</strong><br>Is this the <em>same as</em> X?</p></div>
+</div>
+<div class="result">One curated resource, two distinct knowledge gaps closed</div>
+</div>
+
+<div class="callout">
+<strong>Why each role is needed.</strong> Validation answers "is this geographically plausible?" — a <em>truth-conditional</em> question. The model cannot answer this from text alone; it needs a world fact (Al-Shabaab country-of-operation). Enrichment answers "is this surface variant the same entity as another?" — an <em>identity-conditional</em> question. The model produces correct strings but cannot collapse them to a single id without an alias table. Validation alone leaves analytics broken (duplicate actor counts). Enrichment alone leaves implausible extractions silent (false-positive events propagate into reports). The two roles attack <em>different aspects</em> of the knowledge gap; neither does the other's job.
+</div>
+
+<h2>4 · One worked example — Al-Shabaab</h2>
+
+<p>If the panel asks for a concrete walk-through, this is the single example to carry. It is the canonical KB worked example because it exercises both roles in one sentence pair.</p>
+
+<div class="worked">
+<h4>Sentence A — successful enrichment</h4>
+<div class="worked-row">
+<span class="tag surface">Surface form</span>
+<span><em>"Al-Shabaab militants attacked a village in southern Somalia."</em></span>
+</div>
+<div class="worked-row">
+<span class="tag canon">Enrich</span>
+<span>ACTOR <code>"Al-Shabaab militants"</code> → KB canonical <code>al_shabaab</code> (alias match, confidence high). Country-of-operation: <code>SO</code>. LOCATION <code>"southern Somalia"</code> → <code>SO</code>. Validation check: <em>match</em> → no flag. Record persists with canonical actor id.</span>
+</div>
+</div>
+
+<div class="worked">
+<h4>Sentence B — validation flag</h4>
+<div class="worked-row">
+<span class="tag surface">Surface form</span>
+<span><em>"Al-Shabaab fighters were active near Goma in eastern DRC."</em></span>
+</div>
+<div class="worked-row">
+<span class="tag canon">Enrich</span>
+<span>ACTOR <code>"Al-Shabaab fighters"</code> → KB canonical <code>al_shabaab</code>. Country-of-operation: <code>SO</code>. LOCATION <code>"Goma"</code> → <code>CD</code> (DRC).</span>
+</div>
+<div class="worked-row">
+<span class="tag flag">Validate</span>
+<span>Country mismatch <code>SO ≠ CD</code> ⇒ <em>geographic plausibility flag</em> attached. Record still persists. UI shows the flag as a coloured chip prompting analyst re-read. Extraction is <em>not</em> dropped.</span>
+</div>
+</div>
+
+<div class="callout">
+<strong>What this example does for the slide.</strong> One pair of sentences makes <em>both</em> roles concrete in three breaths. Sentence A shows enrichment (surface → canonical). Sentence B shows validation (canonical actor × extracted location ⇒ flag). The same canonical entry <code>al_shabaab</code> participates in both — that is what "one curated resource, two roles" looks like operationally. Carry this in your pocket; deploy if a panellist asks "can you give me a concrete case?"
+</div>
+
+<h2>5 · The 75-second script, in four beats</h2>
+
+<div class="beat-script">
+
+<div class="beat">
+<div class="beat-num">1</div>
+<div class="beat-content">
+<div class="label">Beat 1 — name the resource and its composition <span class="secs">~15 seconds</span></div>
+<div class="text">"The curated knowledge base. About <em class="num">a hundred and fifty</em> active armed groups with aliases, country, and group type. <em class="num">Two hundred</em> conflict cities mapped to country and region. All <em class="num">fifty-four</em> countries. <em class="num">Thirty-eight</em> weapon categories. <em class="key">Loaded once in-memory at server startup</em>, consulted on every inference."</div>
+<div class="micro">Pacing matters. The four composition numbers (150 / 200 / 54 / 38) want to be read as a list, not a paragraph — small pause between each one. "Loaded once in-memory at startup" is the engineering credibility line — it signals "I know how to deploy this, not just describe it" without burning time on architecture.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">2</div>
+<div class="beat-content">
+<div class="label">Beat 2 — the two roles <span class="secs">~25 seconds</span></div>
+<div class="text">"<em class="key">Two roles from one curated resource.</em> <em class="validate">Validation</em> flags geographically implausible actor–location pairs — <em>Al-Shabaab in Goma</em> — at a <em class="num">two-point-four percent</em> rate. <em class="enrich">Enrichment</em> canonicalises actor surface forms so analytics aggregate correctly — <em class="num">sixty-four-point-three percent</em> of ACTOR mentions get enriched."</div>
+<div class="micro">"Two roles from one curated resource" is the load-bearing phrase — it pre-empts "why both?" by framing both as deriving from the same investment. The <em>Al-Shabaab in Goma</em> example is the highest-bandwidth payoff on the slide: one phrase makes "geographically implausible" concrete. Do not over-explain — the panel will get the parallel "Somalia-based group flagged in DRC" in the silence after the phrase.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">3</div>
+<div class="beat-content">
+<div class="label">Beat 3 — defend the scope of 150 <span class="secs">~20 seconds</span></div>
+<div class="text">"Defend the small size. <em class="num">A hundred and fifty</em> covers the <em class="key">ACTIVE</em> landscape, not historical exhaustiveness. Including inactive groups would produce false-positive enrichments. Mean alias count per group is <em class="num">four-point-two</em>, which is what matters for canonicalisation."</div>
+<div class="micro">This is the pre-emptive scope defence. The panel <em>will</em> ask "why so few?" — the slide already answers it. The two moves: (1) reframe "small" as "active, not historical" (the dismissive reading is named and refused); (2) deploy the 4.2 aliases number to redirect attention to <em>depth per group</em>, which is the metric that actually drives canonicalisation quality. Do not say "we couldn't curate more" — that gives the floor away.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num hero">4</div>
+<div class="beat-content">
+<div class="label hero">Beat 4 — the two guarantees <span class="secs">~10 seconds</span></div>
+<div class="text">"<em class="key">Validation never blocks extraction; enrichment never invents data.</em>"</div>
+<div class="micro">The hero line. Deliver it slowly. It is a pair of negative guarantees — naming what the KB will <em>not</em> do — and that is what wins trust with a CS panel. Validation as <em>metadata, not veto</em>. Enrichment as <em>mapping, not fabrication</em>. After this beat, pivot to slide 14: "All of this is delivered through the platform."</div>
+</div>
+</div>
+
+</div>
+
+<h2>6 · The two-guarantees defence — the core skill</h2>
+
+<p>The hero line is structurally important. It is not a description of what the KB does — it is a description of what the KB <em>refuses to do</em>. Two negative guarantees, side by side. This is the slide's central craft skill: <strong>defending an external knowledge component with constraints, not capabilities</strong>.</p>
+
+<div class="guarantees">
+<div class="guarantee">
+<h5>Guarantee 1 — Validation never blocks</h5>
+<p>The flag is <strong>metadata, not a veto</strong>. The record persists; the UI displays the flag. The analyst decides what to do. The KB does not gatekeep the extraction pipeline.</p>
+</div>
+<div class="guarantee">
+<h5>Guarantee 2 — Enrichment never invents</h5>
+<p>If the surface form does not match any KB entry, the record carries the <strong>raw text</strong>. No fabrication. The KB augments; it never substitutes for what the model actually extracted.</p>
+</div>
+</div>
+
+<div class="callout">
+<strong>Why this defence works.</strong> The standing CS-panel anxiety about a curated KB is that it will <em>distort</em> the pipeline — block extractions the curator didn't anticipate, or hallucinate canonical entries that don't match the source. The two guarantees explicitly refuse both failure modes. By stating the constraints up front, the slide turns "what if the KB is wrong?" into a manageable question: a wrong validation flag is visible metadata an analyst can override; a missing enrichment leaves raw text the analyst can read. <em>Neither failure mode silently corrupts the output.</em>
+</div>
+
+<h2>7 · The complementarity defence — second use</h2>
+
+<p>Slide 12 introduced the complementarity claim for focal × class weights — two rebalancers, two distinct axes (across classes × across difficulty). Slide 13 deploys the <em>same shape</em> for validate × enrich. The three-move defence is identical; the axes are different.</p>
+
+<div class="pattern">
+<h4>The three-move complementarity defence — applied to the KB</h4>
+<div class="pattern-row"><span class="step">1</span><span><strong>Name the two roles.</strong> "Validation and enrichment." Use the role names; the panel infers two functions.</span></div>
+<div class="pattern-row"><span class="step">2</span><span><strong>Name the two distinct axes.</strong> <em>Correctness</em> vs <em>canonicalisation</em>. Validation answers "is this plausible?" — correctness. Enrichment answers "is this the same as X?" — canonicalisation. This is the load-bearing move.</span></div>
+<div class="pattern-row"><span class="step">3</span><span><strong>Point to the operational evidence.</strong> "Slide 19 / §6.7 shows the operational impact on user testing." Slide 13 plants the rates (2.4 %, 64.3 %); slide 19 converts them to <em>analyst behaviour</em> evidence.</span></div>
+</div>
+
+<div class="callout warn">
+<strong>The trap.</strong> If asked "why both?", do <em>not</em> say "validation catches errors, enrichment improves quality" — both halves of that answer sound like the same thing ("makes output better") and read as one role split in two. Say "different aspects of the knowledge gap — correctness for validation, canonicalisation for enrichment." Distinct axes is the whole defence.
+</div>
+
+<h2>8 · The fifth honest-middle binary</h2>
+
+<p>"Validation never blocks; enrichment never invents" is one binary. But the slide-13 scope defence — "active, not exhaustive" — is the <em>fifth</em> entry in the deck's contribution-defence series. Every contribution slide names the dismissive reading and refuses it with a precise positive claim.</p>
+
+<div class="binary-chain">
+<h4>The honest-middle binary chain across the deck</h4>
+<div class="binary-row"><span class="which">Slide 9</span><span><strong>Measurement, not preference.</strong> Design-science methodology defended.</span></div>
+<div class="binary-row"><span class="which">Slide 10</span><span><strong>Decomposed, not narrower.</strong> 8-entity schema as grounding-validated reduction.</span></div>
+<div class="binary-row"><span class="which">Slide 11</span><span><strong>Synthesis, not relabelling.</strong> 4-level taxonomy with African extensions.</span></div>
+<div class="binary-row"><span class="which">Slide 12</span><span><strong>Complementary, not redundant.</strong> Focal × class weights, two axes.</span></div>
+<div class="binary-row"><span class="which">Slide 13</span><span><strong>Active, not exhaustive.</strong> 150 covers the active landscape; depth via 4.2 aliases per group.</span></div>
+</div>
+
+<p>The same shape rehearsed five times across five slides is a deliberate posture — the panel learns to expect that every contribution comes with a self-imposed binary, and that the candidate is the one who already named the dismissive reading. By slide 13, the panel is anticipating the next binary on slide 14. This is delivery rhythm working in your favour.</p>
+
+<h2>9 · Reserved cards — deploy on demand</h2>
+
+<div class="reserved">
+<h4>Reserved evidence — bring out only if asked</h4>
+<div class="reserved-rows">
+<div class="label">Armed groups</div>
+<div class="desc">Active African armed groups in the curated KB (with aliases + country)</div>
+<div class="num">~150</div>
+<div class="row-sep"></div>
+<div class="label">Cities</div>
+<div class="desc">Conflict cities mapped to country and region</div>
+<div class="num">~200</div>
+<div class="row-sep"></div>
+<div class="label">Countries</div>
+<div class="desc">Full African coverage — all 54 countries</div>
+<div class="num">54</div>
+<div class="row-sep"></div>
+<div class="label">Weapon categories</div>
+<div class="desc">Weapon-type controlled vocabulary</div>
+<div class="num">38</div>
+<div class="row-sep"></div>
+<div class="label">Mean aliases / group</div>
+<div class="desc">Depth-per-group — the metric that actually drives canonicalisation</div>
+<div class="num">4.2</div>
+<div class="row-sep"></div>
+<div class="label">Validation flag rate</div>
+<div class="desc">Fraction of records the KB flags as implausible — reserved for slide 19 deepening</div>
+<div class="num">~2.4 %</div>
+<div class="row-sep"></div>
+<div class="label">Enrichment match rate</div>
+<div class="desc">Fraction of ACTOR mentions successfully canonicalised — reserved for slide 19 deepening</div>
+<div class="num">~64.3 %</div>
+<div class="row-sep"></div>
+<div class="label">Raw-form retention</div>
+<div class="desc">The "what about the other 35.7 %?" answer — no fabrication, raw text persists</div>
+<div class="num">35.7 %</div>
+<div class="row-sep"></div>
+<div class="label">KB lookup latency share</div>
+<div class="desc">Fraction of ~150 ms inference budget spent on KB lookup</div>
+<div class="num">~15 %</div>
+</div>
+</div>
+
+<h3>The deployment rule</h3>
+<ul>
+<li><strong>Default delivery:</strong> the four composition numbers; the two role names with their two rates; the 4.2 aliases for scope defence; the hero line.</li>
+<li><strong>If asked "why only 150?"</strong> Deploy <em>"ACLED's full actor list has thousands, many inactive or splinter-faction. Active landscape, not historical exhaustiveness. Mean alias count is four-point-two — what actually drives canonicalisation quality. Recommendation 2 in §7.4 covers ongoing curation."</em></li>
+<li><strong>If asked "what about the 35.7 % not enriched?"</strong> Deploy <em>"They carry the raw surface form. No fabrication — the record still persists, only the canonical fields are empty. New armed groups not yet in the KB are exactly this case."</em></li>
+<li><strong>If asked "why doesn't validation block?"</strong> Deploy <em>"The flag is metadata, not a veto. The record is persisted with the flag visible in the UI, prompting analyst re-read. Blocking on plausibility would lose records describing genuinely unusual events."</em></li>
+<li><strong>Critical:</strong> the operational deepening — what the 2.4 % and 64.3 % rates <em>mean for the analyst</em> — is reserved for slide 19. Don't deploy "analysts trust the records more" claims here; that is slide 19's punchline.</li>
+</ul>
+
+<h2>10 · Four pre-loaded interrupts</h2>
+
+<div class="attack">
+<div class="q">"Only 150 armed groups? ACLED has thousands of actor entries. Isn't that a serious coverage gap?"</div>
+<div class="a">"ACLED's full actor list includes splinter factions, dissolved groups, and inactive historical entries — many with no recent operations. The 150 in the KB covers the <em>active</em> landscape across the continent. Including inactive groups would actively produce false-positive enrichments — surface forms collapsing to canonical entries that no longer correspond to acting organisations. Mean alias count per group is four-point-two, which is what matters for canonicalisation quality. Recommendation two in section 7.4 specifies a part-time domain expert keeps the KB current as the operational landscape changes."</div>
+<div class="micro">Four moves: (1) name the right reading of ACLED's list (mixed live + historical); (2) reframe "small" as "active"; (3) name the depth metric (4.2 aliases) that the panel didn't think to ask about; (4) cite the future-work recommendation. Never say "we ran out of time" — that gives the floor away. The scope defence is principled, not apologetic.</div>
+</div>
+
+<div class="attack">
+<div class="q">"Why both validation and enrichment? Isn't this just a lookup table doing one job?"</div>
+<div class="a">"No — they answer different questions about the extracted record. Validation answers <em>is this geographically plausible</em> — a correctness question about the world. The KB provides a country-of-operation fact the model cannot acquire from text. Enrichment answers <em>is this surface variant the same entity as another mention</em> — a canonicalisation question about identity. The KB provides an alias table the model cannot acquire from text. One resource, two distinct knowledge gaps closed. The operational evidence is on slide 19 — the 2.4 % flag rate matters to analysts because they re-read; the 64.3 % enrichment rate matters because aggregate analytics stop double-counting."</div>
+<div class="micro">Two-axes framing for the KB. Never say "validation catches errors and enrichment improves quality" — that reads as two phrasings of "makes output better." Name the question each role answers — <em>plausibility</em> vs <em>identity</em> — that is the load-bearing distinction.</div>
+</div>
+
+<div class="attack">
+<div class="q">"What happens if the model extracts an actor not in your KB — a brand-new armed group?"</div>
+<div class="a">"The record still persists with the raw surface form. The canonical actor id field is empty; everything else — the location, the casualties, the timestamp — remains. No fabrication. New armed groups not yet in the KB are exactly this case, and they are the largest part of the thirty-five-point-seven percent of ACTOR mentions that don't enrich. The analyst sees the raw text and can flag the new group for KB curation. The enrichment is opt-in by match; absence of a match is silent, not fabricated."</div>
+<div class="micro">The critical move: keep "no fabrication" front and centre. The CS-panel concern is that the KB might silently invent canonical ids for unmatched mentions — explicitly refusing that closes the failure mode. Naming the 35.7 % unmatched fraction shows that the unmatched case is the design's <em>known and accepted</em> behaviour, not an oversight.</div>
+</div>
+
+<div class="attack">
+<div class="q">"How do you keep the KB current? Armed-group landscapes change quickly."</div>
+<div class="a">"Recommendation two in section seven-point-four addresses exactly this — a part-time domain expert maintaining the KB on a quarterly cadence. The architecture supports this: the KB is loaded from JSON at server startup, so adding aliases or new groups is a configuration change, not a code change. The thesis claim is not that the KB is permanently complete — the claim is that the curated <em>active</em> landscape is the right starting state, and that ongoing curation is part of the operational model. The platform makes the curation cycle cheap."</div>
+<div class="micro">Three moves: (1) cite the recommendation by section number, signalling this was foreseen; (2) name the architectural property (config-driven KB) that makes curation cheap; (3) reframe the question — the KB is not claimed to be complete-forever, it is claimed to be the right <em>operational shape</em>. Don't get drawn into "how often exactly?" — quarterly is the default; the architecture supports faster if needed.</div>
+</div>
+
+<h2>11 · The hero close</h2>
+
+<div class="hero-line">
+<span class="label">The hero line — memorise verbatim</span>
+"Validation never blocks extraction; enrichment never invents data."
+</div>
+
+<h3>Why this line is the hero</h3>
+<ul>
+<li><strong>Two negative guarantees in one breath.</strong> Negative guarantees are stronger than positive promises for a curated component — they tell the panel what the failure modes <em>cannot</em> be. "Never blocks" closes the gatekeeping failure mode; "never invents" closes the fabrication failure mode.</li>
+<li><strong>Parallel structure.</strong> Same shape — "X never Y" — twice. Parallel structure is what makes pairs memorable. The panel hears it once and can repeat it.</li>
+<li><strong>Refuses the implicit attack.</strong> The implicit CS-panel attack is "you've put a hand-curated component into the pipeline; what could go wrong?" The hero line names both candidate things-that-could-go-wrong and rules them out by design. The attack is neutralised before it is asked.</li>
+<li><strong>Consistent with the deck's posture.</strong> Slide 9: measurement, not preference. Slide 10: decomposed, not narrower. Slide 11: synthesis, not relabelling. Slide 12: complementary, not redundant. Slide 13: <strong>metadata, not veto; mapping, not fabrication.</strong> Every contribution slide carries its own honest-middle binary; slide 13 carries two in one line.</li>
+</ul>
+
+<h2>12 · Timed practice</h2>
+
+<p>Four beats, ~75 seconds. Target window: 65–88 seconds. Beat 1's composition numbers (150 / 200 / 54 / 38) want a small pause between each. Beat 2's two operational rates (2.4 %, 64.3 %) are the slide's anchor numbers — say them slowly. Beat 3's scope defence is where most candidates rush; deliberately slow there.</p>
+
+<div class="timer-box">
+<div class="timer-display" id="timer">0.0 s</div>
+<div class="timer-buttons">
+<button id="startBtn">Start (begin "The curated knowledge base")</button>
+<button id="stopBtn" class="secondary" disabled>Stop (after "never invents data")</button>
+<button id="resetBtn" class="secondary">Reset</button>
+</div>
+<div class="timer-verdict" id="verdict"></div>
+</div>
+
+<div class="callout">
+<strong>The harder rep — the "no defensive language" test.</strong> Run Beat 3 (the scope defence) without ever saying "we couldn't", "we didn't have time to", or "in future work we'd". Replace with: "active, not historical", "four-point-two aliases per group", "recommendation two in seven-point-four". Re-run the rep until apologetic language is gone from your scope defence.
+</div>
+
+<h2>13 · Quiz</h2>
+
+<div class="quiz" id="quiz1">
+<h4>Q1. The panel asks: "Why only 150 armed groups when ACLED has thousands?"</h4>
+<p class="qstem">Pick the strongest response.</p>
+<ul class="choices" data-answer="c">
+<li data-key="a">"150 was the largest set we could curate manually within the thesis timeframe."</li>
+<li data-key="b">"ACLED's actor list is too noisy to use directly; we filtered to a smaller working set."</li>
+<li data-key="c">"ACLED's full list includes splinter, dissolved, and inactive historical entries. 150 covers the active landscape across the continent. Including inactive groups would produce false-positive enrichments. Mean alias count per group is 4.2, which is what matters for canonicalisation. Recommendation 2 in §7.4 specifies ongoing curation by a part-time domain expert."</li>
+<li data-key="d">"150 is enough for the most important armed groups — extending it is future work."</li>
+</ul>
+<p class="feedback" id="fb1"></p>
+</div>
+
+<div class="quiz" id="quiz2">
+<h4>Q2. What does the "Validation never blocks extraction" guarantee mean operationally?</h4>
+<p class="qstem">Pick the correct meaning.</p>
+<ul class="choices" data-answer="b">
+<li data-key="a">The KB never raises validation flags — every extraction is persisted unmarked.</li>
+<li data-key="b">When validation flags a record (~2.4 %), the flag is attached as metadata but the record is still persisted; the UI displays the flag and the analyst decides whether to act on it. The KB does not gatekeep the extraction pipeline.</li>
+<li data-key="c">Validation runs after extraction is committed, so it cannot block — it only audits the database retroactively.</li>
+<li data-key="d">Records that fail validation are routed to a separate quarantine table for manual review.</li>
+</ul>
+<p class="feedback" id="fb2"></p>
+</div>
+
+<div class="quiz" id="quiz3">
+<h4>Q3. The panel asks: "Why both validation and enrichment from the same KB?"</h4>
+<p class="qstem">Pick the strongest response.</p>
+<ul class="choices" data-answer="d">
+<li data-key="a">"Validation catches errors and enrichment improves quality — both make the output better."</li>
+<li data-key="b">"Using one curated resource for two jobs is more efficient than maintaining two separate lookup tables."</li>
+<li data-key="c">"Validation is for the analyst; enrichment is for the analytics dashboard. Different consumers, same data."</li>
+<li data-key="d">"They answer different questions about the extracted record. Validation answers <em>is this geographically plausible</em> — a correctness question. Enrichment answers <em>is this surface variant the same entity as X</em> — a canonicalisation question. The KB closes two distinct knowledge gaps the model alone cannot. Operational impact is on slide 19."</li>
+</ul>
+<p class="feedback" id="fb3"></p>
+</div>
+
+<div class="quiz" id="quiz4">
+<h4>Q4. What happens to ACTOR mentions in the ~35.7 % that don't match a KB entry?</h4>
+<p class="qstem">Pick the correct behaviour.</p>
+<ul class="choices" data-answer="c">
+<li data-key="a">The record is dropped — without a canonical actor id, downstream analytics cannot aggregate it.</li>
+<li data-key="b">The KB invents a placeholder canonical id from the surface form; the analyst can rename it later.</li>
+<li data-key="c">The record persists with the raw surface form in the actor field; the canonical id field is empty. No fabrication — new armed groups not yet curated land exactly here. The analyst sees the raw text and can flag the group for KB curation.</li>
+<li data-key="d">The mention is routed to a fuzzy-matching fallback that picks the nearest canonical entry by string similarity.</li>
+</ul>
+<p class="feedback" id="fb4"></p>
+</div>
+
+<div class="followup">
+<strong>Ask your teacher follow-up questions.</strong>
+<ul>
+<li>Want a 50-second compressed delivery for if you're running behind?</li>
+<li>Want to drill the "ACLED has thousands" attack under interruption — three reps without using "we couldn't" or "in future work"?</li>
+<li>Want a second worked example beyond Al-Shabaab — say RSF in Sudan or M23 in Eastern DRC — to carry as a backup?</li>
+<li>Want to rehearse the bridge into slide 14 ("all of this is delivered through the platform")?</li>
+<li>Want to map exactly which slide-13 numbers reappear on slide 19 and how the operational story deepens there?</li>
+</ul>
+<p class="cite">References: <a href="../../concepts_explained.md">concepts_explained.md</a> §4.6 (KB validation and enrichment); <a href="../../VioNER_Defense_Slides_study_guide.md">VioNER_Defense_Slides_study_guide.md</a> Slide 13; thesis §5.6 (KB construction), §6.7 (KB operational impact), §7.4 Recommendation 2 (ongoing curation).</p>
+</div>
+
+<div class="bottom">Lesson 15 of the slide drill. Next up — slide 14: the platform (FastAPI + PostgreSQL + React, the deployable substrate that turns the model + KB into a usable tool).</div>
+
+</div>
+
+<script>
+// Timer
+(function(){
+  const display=document.getElementById('timer');
+  const startBtn=document.getElementById('startBtn');
+  const stopBtn=document.getElementById('stopBtn');
+  const resetBtn=document.getElementById('resetBtn');
+  const verdict=document.getElementById('verdict');
+  let raf=null, t0=0;
+  function tick(){const t=(performance.now()-t0)/1000;display.textContent=t.toFixed(1)+' s';raf=requestAnimationFrame(tick)}
+  startBtn.onclick=()=>{cancelAnimationFrame(raf);t0=performance.now();raf=requestAnimationFrame(tick);startBtn.disabled=true;stopBtn.disabled=false;verdict.textContent='';verdict.className='timer-verdict'};
+  stopBtn.onclick=()=>{cancelAnimationFrame(raf);const t=(performance.now()-t0)/1000;display.textContent=t.toFixed(1)+' s';startBtn.disabled=false;stopBtn.disabled=true;
+    if(t<55){verdict.textContent='Too fast — the composition numbers (150/200/54/38) need pacing as a list, and the Al-Shabaab-in-Goma example needs a beat after it. Slow down on Beats 1 and 2.';verdict.className='timer-verdict over'}
+    else if(t<=88){verdict.textContent='Inside the window. The two-roles claim and the scope defence both landed.';verdict.className='timer-verdict win'}
+    else{verdict.textContent='Over time — tighten Beat 3 (scope defence). Use just two moves: "active, not historical" + "4.2 aliases per group" — drop the future-work citation here; reserve it for the attack response.';verdict.className='timer-verdict over'}};
+  resetBtn.onclick=()=>{cancelAnimationFrame(raf);display.textContent='0.0 s';startBtn.disabled=false;stopBtn.disabled=true;verdict.textContent='';verdict.className='timer-verdict'};
+})();
+// Quizzes
+document.querySelectorAll('.quiz').forEach(quiz=>{
+  const ul=quiz.querySelector('.choices');
+  const answer=ul.dataset.answer;
+  const fb=quiz.querySelector('.feedback');
+  const fbMap={
+    quiz1:{
+      c:'Yes. Four moves: name the right reading of ACLED (live + historical mix); reframe "small" as "active"; deploy 4.2 aliases as the depth metric; cite Recommendation 2 as the ongoing-curation answer. Principled, not apologetic.',
+      a:'Apologetic — "we could only manage 150" gives the floor away. The scope defence has to be principled (active vs historical), not a constraint admission.',
+      b:'"Too noisy" sounds dismissive of ACLED. The right move is naming what 150 *covers* (the active landscape), not what was filtered out.',
+      d:'"Future work" is a deflection, not a defence. The 150 must be defended on its own merits — active landscape + depth via 4.2 aliases.'
+    },
+    quiz2:{
+      b:'Yes. Flag is metadata, not veto. The record persists, the UI shows the flag, the analyst decides. The KB does not gatekeep.',
+      a:'No — the 2.4 % flag rate is exactly the rate at which validation does flag. "Never raises flags" contradicts the slide.',
+      c:'No — validation runs in-line during the inference pipeline (step 4.6 of the lifecycle), not post-hoc. The non-blocking property is by design, not by timing.',
+      d:'No — there is no quarantine table. Flagged records persist in the main store with the flag attached as metadata.'
+    },
+    quiz3:{
+      d:'Yes. Two distinct knowledge gaps: plausibility (correctness axis) vs identity (canonicalisation axis). Naming the *question* each role answers is the load-bearing move.',
+      a:'"Both make output better" reads as two phrasings of the same role. The defence must name the two distinct *questions* the roles answer.',
+      b:'"More efficient" is a maintenance argument, not a contribution argument. The slide is defending the two roles as independently necessary, not as a maintenance choice.',
+      c:'Half-right on consumer separation, but it doesn\'t name the *questions* the two roles answer. Without "plausibility vs identity", the defence is too vague to survive scrutiny.'
+    },
+    quiz4:{
+      c:'Yes. Raw surface form persists; canonical id field is empty; no fabrication. New armed groups land exactly here. The analyst sees the raw text and can flag for KB curation.',
+      a:'Wrong direction — dropping records would lose information the model correctly extracted. The architectural commitment is that enrichment augments, never gatekeeps.',
+      b:'Fabrication is exactly what the second guarantee ("enrichment never invents data") explicitly rules out. Placeholder canonical ids would corrupt downstream analytics.',
+      d:'Fuzzy matching is not in the production pipeline — it would introduce silent canonicalisation errors. The KB uses exact alias match; misses leave the raw form intact.'
+    }
+  };
+  ul.querySelectorAll('li').forEach(li=>{
+    li.onclick=()=>{
+      if(li.classList.contains('locked'))return;
+      const key=li.dataset.key;
+      const correct=key===answer;
+      ul.querySelectorAll('li').forEach(x=>x.classList.add('locked'));
+      li.classList.add(correct?'right':'wrong');
+      if(!correct){ul.querySelector('li[data-key="'+answer+'"]').classList.add('right')}
+      fb.textContent=fbMap[quiz.id][key]||'';
+    };
+  });
+});
+</script>
+
+</body>
+</html>

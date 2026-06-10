@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 8 — Delivering Slide 6: The Competitive Landscape</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --accent-soft:#A14747;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --success-soft:#E6F0E6;
+  --warn:#8B5A2B;
+  --beat:#1A365D;
+  --beat-soft:#E8EEF5;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:42rem;margin:0 auto;padding:3.5rem 1.5rem 6rem}
+.eyebrow{font-family:"Inter","SF Pro Text",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.18em;font-size:0.72rem;color:var(--accent);font-weight:600}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:2.2rem;font-weight:700;line-height:1.18;margin:0.4rem 0 0.6rem;letter-spacing:-0.012em}
+h2{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:1.45rem;margin:3rem 0 0.6rem;font-weight:700;border-bottom:1px solid var(--rule);padding-bottom:0.4rem}
+h3{font-family:"Inter",system-ui,sans-serif;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin:1.6rem 0 0.4rem;color:var(--accent)}
+p,li{font-size:1.05rem}
+.subtitle{color:var(--ink-soft);font-style:italic;font-size:1.1rem;margin:0 0 1.4rem}
+.meta{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);letter-spacing:0.02em;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:0.6rem 0;margin-bottom:2.2rem;display:flex;flex-wrap:wrap;gap:1.2rem}
+.meta span strong{color:var(--ink)}
+.callout{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem;margin:1.2rem 0;border-radius:4px}
+.callout.win{border-left:3px solid var(--success)}
+.callout.warn{border-left:3px solid var(--warn)}
+.callout.beat{border-left:3px solid var(--beat)}
+code{font-family:"JetBrains Mono","SF Mono",Menlo,monospace;font-size:0.92em;background:#F0EBE0;padding:0.06em 0.36em;border-radius:3px}
+/* Slide visual — matrix */
+.slide-mock{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.5rem 1.7rem;margin:1.4rem 0;box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+.slide-mock .badge{font-family:"Inter",system-ui,sans-serif;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:0.3rem;font-weight:600}
+.slide-mock .title{font-family:"Iowan Old Style",Georgia,serif;font-size:1.45rem;font-weight:700;margin:0 0 1rem}
+.matrix{display:grid;grid-template-columns:auto 1fr 1fr;gap:0;border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.matrix .h{background:var(--paper);padding:0.45rem 0.7rem;font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:600;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+.matrix .h:last-child{border-right:0}
+.matrix .rh{background:var(--paper);padding:0.6rem 0.7rem;font-family:"Inter",system-ui,sans-serif;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:600;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);display:flex;align-items:center}
+.matrix .cell{padding:0.7rem 0.85rem;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);font-size:0.9rem;min-height:5rem}
+.matrix .cell:last-child{border-right:0}
+.matrix .cell.empty{background:var(--highlight);border:2px solid var(--accent);position:relative}
+.matrix .cell.empty strong{display:block;font-family:"Iowan Old Style",Georgia,serif;color:var(--accent);font-size:1.05rem;font-weight:700;margin-bottom:0.2rem}
+.matrix .cell.empty .marker{position:absolute;top:0.3rem;right:0.5rem;font-family:"Inter",system-ui,sans-serif;font-size:0.65rem;color:var(--accent);text-transform:uppercase;letter-spacing:0.08em;font-weight:600}
+.matrix .sys-list{font-family:"Iowan Old Style",Georgia,serif;font-size:0.95rem;color:var(--ink);font-weight:600}
+.matrix .sys-note{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);margin-top:0.2rem}
+.matrix .row-last{border-bottom:0}
+/* Beats */
+.beat-script{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin:1.4rem 0}
+.beat{display:grid;grid-template-columns:auto 1fr;gap:0.9rem;align-items:start;padding:0.9rem 0;border-bottom:1px dashed var(--rule)}
+.beat:last-child{border-bottom:0}
+.beat-num{background:var(--beat);color:#FFF;width:2.1rem;height:2.1rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.85rem}
+.beat-num.hero{background:var(--accent)}
+.beat-content .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--beat);font-weight:600;margin-bottom:0.25rem;display:flex;gap:0.7rem;align-items:baseline}
+.beat-content .label.hero{color:var(--accent)}
+.beat-content .label .secs{color:var(--ink-soft);font-weight:400;font-style:italic}
+.beat-content .text{font-size:1.04rem;line-height:1.55;margin:0.2rem 0}
+.beat-content .text em.sys{background:var(--beat-soft);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:600;color:var(--beat)}
+.beat-content .text em.dq{background:#F5DEDE;font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:600;color:var(--accent)}
+.beat-content .text em.key{background:var(--success-soft);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:600;color:var(--success)}
+.beat-content .text em.hl{background:var(--highlight);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:600;color:var(--accent)}
+.beat-content .micro{margin-top:0.4rem;font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Acknowledge-position pattern */
+.pattern{width:100%;border-collapse:collapse;font-size:0.93rem;margin:0.7rem 0;background:#FFF;border:1px solid var(--rule);border-radius:5px;overflow:hidden}
+.pattern th,.pattern td{padding:0.5rem 0.7rem;text-align:left;border-bottom:1px solid var(--rule);vertical-align:top}
+.pattern tr:last-child td{border-bottom:0}
+.pattern th{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);background:var(--paper)}
+.pattern .sys{font-family:"Inter",system-ui,sans-serif;font-weight:700;color:var(--beat);font-size:0.86rem}
+.pattern .ack{color:var(--success);font-style:italic;font-size:0.88rem}
+.pattern .pos{color:var(--accent);font-size:0.88rem}
+/* LLM disqualifier */
+.dq-list{background:#FFF;border:1px solid var(--rule);border-left:3px solid var(--accent);border-radius:5px;padding:1rem 1.2rem;margin:0.7rem 0}
+.dq-list ol{margin:0;padding-left:1.3rem}
+.dq-list ol li{padding:0.25rem 0;font-size:1rem}
+.dq-list ol li strong{font-family:"Inter",system-ui,sans-serif;text-transform:uppercase;font-size:0.78rem;letter-spacing:0.05em;color:var(--accent);margin-right:0.4rem}
+.dq-list .why{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;color:var(--ink-soft);font-style:italic;margin-top:0.5rem;border-top:1px dashed var(--rule);padding-top:0.4rem}
+/* Hero line */
+.hero-line{background:var(--highlight);border:2px solid var(--accent);border-radius:6px;padding:1.2rem 1.4rem;margin:1.3rem 0;text-align:center;font-family:"Iowan Old Style",Georgia,serif;font-size:1.13rem;line-height:1.55;font-weight:500}
+.hero-line .label{display:block;font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:600;margin-bottom:0.4rem}
+/* Four-adjective map */
+.adj-table{width:100%;border-collapse:collapse;font-size:0.93rem;margin:0.5rem 0;background:#FFF;border:1px solid var(--rule);border-radius:5px;overflow:hidden}
+.adj-table th,.adj-table td{padding:0.5rem 0.7rem;text-align:left;border-bottom:1px solid var(--rule)}
+.adj-table tr:last-child td{border-bottom:0}
+.adj-table th{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);background:var(--paper)}
+.adj-table .adj{font-family:"Inter",system-ui,sans-serif;font-weight:700;color:var(--accent);font-size:0.9rem;text-transform:uppercase;letter-spacing:0.04em}
+.adj-table .closes{color:var(--ink);font-size:0.88rem}
+/* Pronounce */
+.pronounce{width:100%;border-collapse:collapse;font-size:0.92rem;margin:0.7rem 0;background:#FFF;border:1px solid var(--rule);border-radius:5px;overflow:hidden}
+.pronounce th,.pronounce td{padding:0.45rem 0.65rem;text-align:left;border-bottom:1px solid var(--rule)}
+.pronounce tr:last-child td{border-bottom:0}
+.pronounce th{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);background:var(--paper)}
+.pronounce .word{font-family:"Iowan Old Style",Georgia,serif;font-weight:700;color:var(--beat);font-size:0.95rem}
+.pronounce .say{font-family:"JetBrains Mono",monospace;font-size:0.84rem;color:var(--accent);background:var(--highlight);padding:0.05em 0.3em;border-radius:3px}
+/* Attack */
+.attack{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem 0.8rem;margin:1rem 0;border-radius:4px}
+.attack .q{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.95rem;color:var(--accent);margin-bottom:0.5rem}
+.attack .a{margin:0.4rem 0 0.6rem;font-size:1.03rem}
+.attack .micro{font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Timer */
+.timer-box{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.3rem;margin:1.3rem 0;text-align:center}
+.timer-display{font-family:"JetBrains Mono","SF Mono",monospace;font-size:2.6rem;font-weight:700;color:var(--accent);margin:0.3rem 0;font-feature-settings:"tnum"}
+.timer-buttons{display:flex;gap:0.6rem;justify-content:center;margin-top:0.7rem}
+.timer-buttons button{font-family:"Inter",system-ui,sans-serif;font-size:0.92rem;font-weight:600;padding:0.55rem 1.3rem;border:1px solid var(--accent);background:var(--accent);color:#FFF;border-radius:4px;cursor:pointer;transition:background 120ms}
+.timer-buttons button:hover{background:var(--accent-soft)}
+.timer-buttons button.secondary{background:#FFF;color:var(--accent)}
+.timer-buttons button.secondary:hover{background:#FBFAF7}
+.timer-verdict{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin-top:0.7rem;min-height:1.4rem;font-weight:600}
+.timer-verdict.win{color:var(--success)}
+.timer-verdict.over{color:var(--warn)}
+/* Quiz */
+.quiz{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem;margin:1.4rem 0}
+.quiz h4{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin:0 0 0.8rem;color:var(--accent)}
+.quiz .qstem{font-size:1.02rem;margin-bottom:0.7rem}
+.choices{list-style:none;padding:0;margin:0}
+.choices li{margin:0.45rem 0;padding:0.55rem 0.8rem;border:1px solid var(--rule);border-radius:4px;cursor:pointer;background:#FBFAF7;font-size:0.98rem;transition:background 120ms,border-color 120ms}
+.choices li:hover{background:#F0EBE0}
+.choices li.right{background:#E6F0E6;border-color:var(--success);color:var(--success);font-weight:600}
+.choices li.wrong{background:#F5DEDE;border-color:var(--accent);color:var(--accent)}
+.feedback{margin-top:0.6rem;font-size:0.93rem;font-style:italic;color:var(--ink-soft);min-height:1.2rem}
+.checklist{list-style:none;padding:0}
+.checklist li{padding:0.5rem 0 0.5rem 1.8rem;position:relative;font-size:1rem;border-bottom:1px dashed var(--rule)}
+.checklist li:before{content:"☐";position:absolute;left:0;top:0.45rem;font-size:1.1rem;color:var(--accent)}
+.footer-note{margin-top:3rem;padding:1.2rem 1.4rem;background:#FFF;border:1px dashed var(--rule);border-radius:6px;font-size:0.95rem}
+.footer-note strong{color:var(--accent)}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft)}
+a:hover{color:var(--accent-soft)}
+@media print{
+  body{background:#FFF;font-size:11pt}
+  .wrap{max-width:none;padding:0 1in}
+  .quiz,.choices li,.timer-buttons button{cursor:auto}
+  .choices li{break-inside:avoid}
+  h2{break-after:avoid}
+  .hero-line,.slide-mock,.matrix .cell.empty,.beat-num,.beat-content .text em,.pronounce .say,.dq-list,.adj-table .adj{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .timer-buttons{display:none}
+  .meta{display:block}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">Lesson 08 · Slide 6 — Competitive landscape</div>
+<h1>Defeat "why not just use GPT-4?" in 90 seconds</h1>
+<p class="subtitle">Slide 6 is the most-anticipated slide of the talk — every panel asks the LLM question. This lesson teaches you the four-disqualifier answer AND the acknowledge-then-position pattern that lets you state competitors don't fit without sounding dismissive of legitimate prior work.</p>
+
+<div class="meta">
+<span><strong>Mission link.</strong> Land "VioNER occupies the empty cell" + pre-empt the LLM attack.</span>
+<span><strong>Skill type.</strong> Competitive positioning without dismissal.</span>
+<span><strong>Time.</strong> 16 minutes.</span>
+</div>
+
+<p><a href="0007-delivering-slide-5-why-hard.html">Lesson 7</a> taught you to deliver four technical challenges in parallel. Slide 6 does the next move: positions VioNER against six categories of prior work, naming systems specifically (ACLED, UCDP, ICEWS, GDELT, Masakhane, AfriBERTa, LLMs), and lands the "empty cell" claim that justifies the contribution. The delivery risk is high — every defence panel includes someone who has worked with one of those systems. A dismissive tone toward Masakhane or GDELT turns a benign panellist hostile within seconds.</p>
+
+<h2>1 · What's on the screen</h2>
+
+<div class="slide-mock">
+<div class="badge">Slide 6 of 22</div>
+<div class="title">The competitive landscape</div>
+<div class="matrix">
+<div class="h"></div>
+<div class="h">Hand-coded</div>
+<div class="h">Automated</div>
+<div class="rh">Generic</div>
+<div class="cell"><span class="sys-list">—</span><div class="sys-note">(no entry)</div></div>
+<div class="cell"><span class="sys-list">ICEWS · GDELT</span><div class="sys-note">CAMEO schema, closed/noisy</div></div>
+<div class="rh">African-tuned</div>
+<div class="cell row-last"><span class="sys-list">ACLED · UCDP</span><div class="sys-note">gold standard, slow</div></div>
+<div class="cell empty row-last"><span class="marker">VioNER</span><strong>The empty cell</strong>African · automated · open · operational</div>
+</div>
+</div>
+
+<div class="callout warn">
+<strong>The delivery risk.</strong> Two failure modes. <em>First</em> — sounding dismissive of ACLED/Masakhane (turns sympathetic panellists hostile). <em>Second</em> — sounding evangelical about LLM disqualifiers (sounds like you're picking a fight). The script's craft is to be factual and operational, never tribal.
+</div>
+
+<h2>2 · The 90-second script, in six beats</h2>
+
+<div class="beat-script">
+
+<div class="beat">
+<div class="beat-num">1</div>
+<div class="beat-content">
+<div class="label">Beat 1 — opener <span class="secs">~5 seconds</span></div>
+<div class="text">"The competitive landscape as a matrix."</div>
+<div class="micro">Pause briefly after "matrix" — signals "this is structured."</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">2</div>
+<div class="beat-content">
+<div class="label">Beat 2 — ACLED + UCDP (acknowledge gold standard) <span class="secs">~15 seconds</span></div>
+<div class="text">"<em class="sys">ACLED</em> and <em class="sys">UCDP</em> are the gold standard but hand-coded — they are <em class="key">the TARGET of this work, not competitors</em>. I train on ACLED open data."</div>
+<div class="micro">"TARGET, not competitors" is the move that disarms any ACLED-sympathetic panellist. Land it clearly.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">3</div>
+<div class="beat-content">
+<div class="label">Beat 3 — ICEWS + GDELT (automated but wrong shape) <span class="secs">~15 seconds</span></div>
+<div class="text">"<em class="sys">ICEWS</em> and <em class="sys">GDELT</em> are automated, but they use generic <em class="hl">CAMEO schemas</em>, not Africa-tuned 5W1H, and they're closed or noisy."</div>
+<div class="micro">"Closed or noisy" concedes both their weaknesses without naming either as worse. CAMEO is the technical keyword — say it cleanly.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">4</div>
+<div class="beat-content">
+<div class="label">Beat 4 — Generic NER + African NLP (incomplete coverage) <span class="secs">~15 seconds</span></div>
+<div class="text">"Generic NER doesn't know African armed groups. Prior African NLP — <em class="sys">Masakhane</em>, <em class="sys">AfriBERTa</em> — <em class="key">stops at the model boundary, no operational packaging</em>."</div>
+<div class="micro">"Stops at the model boundary" — the kindest way to say "these are research projects, not deployable systems." Use it verbatim.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">5</div>
+<div class="beat-content">
+<div class="label">Beat 5 — LLM disqualifier (the big one) <span class="secs">~25 seconds</span></div>
+<div class="text">"<em class="dq">LLMs are disqualified on four operational grounds:</em> closed weights, per-call cost, no auditability, and data sovereignty — sending conflict metadata to a US commercial API is a <em class="key">non-starter for many AU member states</em>."</div>
+<div class="micro">The four-item disqualifier. Slow your pace through the list — each ground gets a beat. "Non-starter for many AU member states" is the geopolitical close that no panellist will challenge.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num hero">6</div>
+<div class="beat-content">
+<div class="label hero">Beat 6 — the empty cell (hero line) <span class="secs">~15 seconds</span></div>
+<div class="text">"<em class="hl">VioNER occupies the empty cell:</em> <em class="key">African, automated, open, and operational.</em>"</div>
+<div class="micro">Four adjectives. End on "operational" with a clean stop. Pause one beat. Advance to slide 7. This is the strategic punchline — give it weight.</div>
+</div>
+</div>
+
+</div>
+
+<h2>3 · The "acknowledge then position" pattern</h2>
+
+<p>This is the central craft skill of slide 6. Every competitor mention follows the same two-clause structure: <em>acknowledge what they do well</em>, then <em>position the gap they leave</em>. Never just dismiss.</p>
+
+<table class="pattern">
+<thead>
+<tr><th>System</th><th>Acknowledge (what they do well)</th><th>Position (what gap they leave)</th></tr>
+</thead>
+<tbody>
+<tr><td class="sys">ACLED, UCDP</td><td class="ack">gold standard</td><td class="pos">hand-coded — they are the TARGET, not competitors</td></tr>
+<tr><td class="sys">ICEWS, GDELT</td><td class="ack">automated</td><td class="pos">generic CAMEO schema, closed or noisy</td></tr>
+<tr><td class="sys">Generic NER</td><td class="ack">(implicit — known general competence)</td><td class="pos">doesn't know African armed groups</td></tr>
+<tr><td class="sys">Masakhane, AfriBERTa</td><td class="ack">African NLP coverage</td><td class="pos">stops at the model boundary, no operational packaging</td></tr>
+<tr><td class="sys">LLMs (GPT-4, Claude)</td><td class="ack">(implicit — general capability assumed)</td><td class="pos">disqualified on four operational grounds</td></tr>
+</tbody>
+</table>
+
+<div class="callout">
+<strong>The pattern in one rule.</strong> Never make a comparative claim without acknowledging what the other system does well first. "Closed or noisy" follows "automated"; "no operational packaging" follows "African NLP"; "TARGET, not competitor" follows "gold standard". The acknowledge clause inoculates against any panellist who has worked with that system.
+</div>
+
+<h2>4 · The four LLM disqualifiers — the answer to "why not GPT-4?"</h2>
+
+<p>Almost every defence asks this question. The script answers it in the slide itself, but you should also have it ready as a stand-alone answer for the Q&A.</p>
+
+<div class="dq-list">
+<ol>
+<li><strong>Closed weights</strong> — the vendor can update silently and break our reproducibility.</li>
+<li><strong>Per-call cost</strong> — scales with volume; 30,000 articles/year × per-call fee is a recurring budget line.</li>
+<li><strong>No auditability</strong> — we can't trace the inference path. For a system feeding AU early-warning decisions, this is a non-negotiable.</li>
+<li><strong>Data sovereignty</strong> — sending conflict metadata to a US commercial API is a non-starter for many AU member states.</li>
+</ol>
+<div class="why">These are <em>operational</em> grounds, not technical. You're not saying LLMs are bad — you're saying they don't fit the operational requirements of this use case. That framing keeps even pro-LLM panellists on side.</div>
+</div>
+
+<h3>The "operational, not technical" framing</h3>
+<p>Critically: the script does <em>not</em> say "LLMs don't perform well on this task" or "LLMs are inferior". It says "LLMs are <em>disqualified</em> on four <em>operational</em> grounds". The candidate is making an institutional fit argument, not a quality argument. This is essential — many panellists use LLMs daily for other tasks and would react badly to a quality dismissal.</p>
+
+<h2>5 · The four-adjective closing — each closes a specific gap</h2>
+
+<p>The hero line is "VioNER occupies the empty cell: African, automated, open, and operational." Each adjective is doing specific work — closing a specific gap left by the systems above.</p>
+
+<table class="adj-table">
+<thead>
+<tr><th>Adjective</th><th>Closes the gap left by</th></tr>
+</thead>
+<tbody>
+<tr><td class="adj">African</td><td class="closes">Generic NER (doesn't know African armed groups)</td></tr>
+<tr><td class="adj">Automated</td><td class="closes">ACLED / UCDP (hand-coded, slow)</td></tr>
+<tr><td class="adj">Open</td><td class="closes">LLMs (closed weights, data sovereignty)</td></tr>
+<tr><td class="adj">Operational</td><td class="closes">Masakhane / AfriBERTa (research only, no packaging)</td></tr>
+</tbody>
+</table>
+
+<div class="callout beat">
+<strong>The delivery implication.</strong> When you say "African, automated, open, and operational", each adjective is referencing a gap you just established. If a panellist tracked all four beats above, the closing feels inevitable — VioNER is what's left after every other quadrant is taken. The four-adjective rhythm should sound like four checkmarks, not four adjectives in a row.
+</div>
+
+<h2>6 · Named-systems pronunciation</h2>
+
+<table class="pronounce">
+<thead><tr><th>System</th><th>Pronounce as</th><th>What it is</th></tr></thead>
+<tbody>
+<tr><td class="word">ACLED</td><td class="say">"ACK-led"</td><td>Armed Conflict Location & Event Data</td></tr>
+<tr><td class="word">UCDP</td><td class="say">"U-C-D-P" (letters)</td><td>Uppsala Conflict Data Program</td></tr>
+<tr><td class="word">ICEWS</td><td class="say">"EYE-cues"</td><td>Integrated Crisis Early Warning System (Lockheed/DARPA)</td></tr>
+<tr><td class="word">GDELT</td><td class="say">"GEE-delt" (hard G)</td><td>Global Database of Events, Language, Tone</td></tr>
+<tr><td class="word">CAMEO</td><td class="say">"cam-EE-oh"</td><td>Conflict and Mediation Event Observations (event schema)</td></tr>
+<tr><td class="word">Masakhane</td><td class="say">"ma-sa-KAH-nay"</td><td>African NLP collective; Zulu word for "let's build together"</td></tr>
+<tr><td class="word">AfriBERTa</td><td class="say">"AFRI-BER-ta"</td><td>African language BERT variant</td></tr>
+</tbody>
+</table>
+
+<div class="callout">
+<strong>The hardest one.</strong> Masakhane — saying it correctly signals you've read the African NLP literature, not just looked up the name. Drill "ma-sa-KAH-nay" — emphasis on the third syllable.
+</div>
+
+<h2>7 · Three pre-loaded interrupts</h2>
+
+<div class="attack">
+<div class="q">"Why not just use GPT-4 or Claude directly?"</div>
+<div class="a">"Four operational disqualifiers. <em>Closed weights</em> — the vendor can update silently and break reproducibility. <em>Per-call cost</em> — scales with volume; thirty thousand articles a year becomes a recurring budget line. <em>No auditability</em> — we can't trace the inference path, which is non-negotiable for a system feeding AU early-warning decisions. <em>Data sovereignty</em> — sending conflict metadata to a US commercial API is a non-starter for many AU member states. LLMs remain a credible future baseline to compare against, but not a substitute for an auditable on-prem system."</div>
+<div class="micro">The closing concession — "credible future baseline to compare against" — keeps you respectful of LLMs while holding the position. Use it.</div>
+</div>
+
+<div class="attack">
+<div class="q">"Doesn't Masakhane already solve African NER?"</div>
+<div class="a">"Masakhane is excellent for African-language coverage — translation, language ID, basic NER on African languages. But it stops at the model boundary. VioNER goes further: violent-event-specific entities like the perpetrator-versus-victim distinction, KB validation against world facts, taxonomy classification, and a deployable web platform. We use the same family of pretrained models; we add the operational layer."</div>
+<div class="micro">"Stops at the model boundary" is the key phrase. Concede generously on what Masakhane does well; the gap is operational, not technical.</div>
+</div>
+
+<div class="attack">
+<div class="q">"How does VioNER compare against ICEWS or GDELT in coverage?"</div>
+<div class="a">"Direct comparison isn't possible — ICEWS uses CAMEO event codes, VioNER uses 5W1H structured records. Different output schemas, so head-to-head F1 isn't meaningful. Backup B9 compares against generic BERT NER models on the entity-tag overlap. The right framing isn't "VioNER beats ICEWS" — it's "VioNER produces a different shape of output that the analyst actually needs."</div>
+<div class="micro">Refuse the head-to-head framing politely. The "different shape of output" reframe is the move.</div>
+</div>
+
+<h2>8 · Timed practice</h2>
+
+<p>Six beats, ~90 seconds target. Range: 80-100 seconds with internal pacing.</p>
+
+<div class="timer-box">
+<div class="timer-display" id="timer">0.0 s</div>
+<div class="timer-buttons">
+<button id="startBtn">Start (begin "competitive landscape")</button>
+<button id="stopBtn" class="secondary" disabled>Stop (after "operational")</button>
+<button id="resetBtn" class="secondary">Reset</button>
+</div>
+<div class="timer-verdict" id="verdict"></div>
+</div>
+
+<div class="callout">
+<strong>The harder rep.</strong> Cover the slide. Recite the six beats in order from memory: opener · ACLED/UCDP · ICEWS/GDELT · Generic+Masakhane · LLM-four · empty-cell-four-adjectives. If you swap ICEWS/GDELT with ACLED/UCDP order, or forget that ACLED+UCDP get the "TARGET not competitor" framing, you need another pass. The order matters — gold-standard first, then automated-but-wrong-shape, then research-only, then disqualified, then VioNER.
+</div>
+
+<h2>9 · Quiz</h2>
+
+<div class="quiz" id="quiz1">
+<h4>Q1. A panellist asks: "Why not just use GPT-4?"</h4>
+<p class="qstem">Pick the strongest first-sentence opening to your answer.</p>
+<ul class="choices" data-answer="b">
+<li data-key="a">"LLMs aren't actually that good at NER on African content."</li>
+<li data-key="b">"Four operational disqualifiers — closed weights, per-call cost, no auditability, and data sovereignty."</li>
+<li data-key="c">"GPT-4 is expensive, and we don't have the budget to use it."</li>
+<li data-key="d">"LLMs can't be fine-tuned to our specific schema."</li>
+</ul>
+<p class="feedback" id="fb1"></p>
+</div>
+
+<div class="quiz" id="quiz2">
+<h4>Q2. Why does the script say "ACLED is the TARGET of this work, not a competitor"?</h4>
+<p class="qstem">Pick the strategic function.</p>
+<ul class="choices" data-answer="c">
+<li data-key="a">Because ACLED is too well-respected to criticise.</li>
+<li data-key="b">Because the candidate trained on ACLED data.</li>
+<li data-key="c">It disarms any ACLED-sympathetic panellist by repositioning ACLED as the institution the work serves, not the system it competes with. Even if your work surpasses ACLED's throughput, you frame yourself as supporting their mission.</li>
+<li data-key="d">Because ACLED is hand-coded and therefore not a fair comparison.</li>
+</ul>
+<p class="feedback" id="fb2"></p>
+</div>
+
+<div class="quiz" id="quiz3">
+<h4>Q3. The four-adjective closing — "African, automated, open, and operational" — is doing what?</h4>
+<p class="qstem">Pick the correct reading.</p>
+<ul class="choices" data-answer="d">
+<li data-key="a">Listing VioNER's general qualities for marketing purposes.</li>
+<li data-key="b">Stating the four contributions of the thesis.</li>
+<li data-key="c">Describing the four-axis evaluation criteria for NER systems.</li>
+<li data-key="d">Each adjective references a specific gap left by the systems just discussed: African→Generic NER, Automated→ACLED, Open→LLMs, Operational→Masakhane. Four checkmarks against four gaps.</li>
+</ul>
+<p class="feedback" id="fb3"></p>
+</div>
+
+<h2>10 · Fluency checklist</h2>
+
+<ul class="checklist">
+<li>I pronounce ACLED as "ACK-led", GDELT as "GEE-delt" (hard G), Masakhane as "ma-sa-KAH-nay".</li>
+<li>I say "TARGET, not competitor" for ACLED with clear emphasis on "TARGET".</li>
+<li>I deliver the four LLM disqualifiers in order — closed weights · per-call cost · no auditability · data sovereignty — without scrambling.</li>
+<li>I land "non-starter for many AU member states" as the geopolitical close, not as a flat statement.</li>
+<li>I deliver the four-adjective closing — "African, automated, open, and operational" — like four checkmarks, not a recital.</li>
+<li>I never dismiss a system without first acknowledging what it does well (Masakhane → "African NLP coverage", ACLED → "gold standard").</li>
+<li>I have the "LLMs are a credible future baseline" concession ready in case the panel pushes back on the disqualifier list.</li>
+<li>My last timed rep was between 80 and 100 seconds with internal pacing.</li>
+</ul>
+
+<div class="callout win">
+<strong>If all eight are ticked,</strong> slide 6 is armoured. You have neutralised the "why not GPT-4?" attack before it leaves the panellist's mouth, and you have positioned VioNER without making enemies of any prior-work community. The integration thread (lesson 3) and the empty-cell claim (this lesson) together set up every contribution slide that follows.
+</div>
+
+<h2>Where to go next</h2>
+
+<ul>
+<li><em>"Teach me slide 7 — the four operational gaps."</em> (The matrix has revealed an empty cell; this slide enumerates what the empty cell means operationally.)</li>
+<li><em>"Teach me slide 22 — the close."</em></li>
+<li><em>"Drill me cold on the LLM disqualifier — fire it as a hostile question and I'll respond verbally."</em></li>
+<li><em>"Teach me how to handle a panellist who insists LLMs would have been better."</em> (Extended scenario for high-pressure pushback.)</li>
+</ul>
+
+<div class="footer-note">
+<strong>Authority for this lesson.</strong> Verbatim script from <code>VioNER_Defense_Slides_study_guide.md</code> slide 6. Competitive-landscape matrix from <code>problem_domain.md</code>. The four LLM disqualifiers map directly to thesis §2.7 and §7.4 (the future-work LLM-baseline comparison). The acknowledge-then-position pattern follows Patrick Winston's "How to Speak" lecture (MIT, 2018) on respectful comparative claims in academic talks.
+</div>
+
+</div>
+
+<script>
+document.querySelectorAll('.quiz').forEach(function(q){
+  var list=q.querySelector('.choices');
+  var ans=list.getAttribute('data-answer');
+  var fb=q.querySelector('.feedback');
+  list.querySelectorAll('li').forEach(function(li){
+    li.addEventListener('click',function(){
+      list.querySelectorAll('li').forEach(function(x){x.classList.remove('right','wrong');});
+      if(li.getAttribute('data-key')===ans){
+        li.classList.add('right');
+        fb.textContent='Correct — this is the move.';
+      } else {
+        li.classList.add('wrong');
+        fb.textContent='Not the strongest answer — try again.';
+      }
+    });
+  });
+});
+(function(){
+  var display=document.getElementById('timer');
+  var startBtn=document.getElementById('startBtn');
+  var stopBtn=document.getElementById('stopBtn');
+  var resetBtn=document.getElementById('resetBtn');
+  var verdict=document.getElementById('verdict');
+  var startTime=null,timer=null,elapsed=0;
+  function tick(){elapsed=(performance.now()-startTime)/1000;display.textContent=elapsed.toFixed(1)+' s'}
+  startBtn.addEventListener('click',function(){startTime=performance.now();timer=setInterval(tick,50);startBtn.disabled=true;stopBtn.disabled=false;verdict.textContent='';verdict.className='timer-verdict'});
+  stopBtn.addEventListener('click',function(){
+    clearInterval(timer);startBtn.disabled=false;stopBtn.disabled=true;
+    var t=elapsed;
+    if(t<70){verdict.textContent='Under 70 s — racing. The four LLM grounds got blurred. Slow each one to its own clause.';verdict.className='timer-verdict over'}
+    else if(t<=100){verdict.textContent='Between 70 and 100 s — on target. Acknowledge + position rhythm intact.';verdict.className='timer-verdict win'}
+    else if(t<=120){verdict.textContent='Between 100 and 120 s — slightly slow. Trim filler in beats 2-4, keep the LLM disqualifier slow.';verdict.className='timer-verdict over'}
+    else{verdict.textContent='Over 120 s — significant padding. Re-read the verbatim and cut before next rep.';verdict.className='timer-verdict over'}
+  });
+  resetBtn.addEventListener('click',function(){clearInterval(timer);startBtn.disabled=false;stopBtn.disabled=true;elapsed=0;display.textContent='0.0 s';verdict.textContent='';verdict.className='timer-verdict'});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Slide 5 — Why-Hard Delivery Card</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--ink:#1c1916;--ink-soft:#3d3935;--paper:#FBFAF7;--rule:#D9D2C5;--accent:#7B1E1E;--highlight:#F5EBC9;--grid:#E8E1D2;--beat:#1A365D;--beat-soft:#E8EEF5;--success:#3F6B3F}
+*{box-sizing:border-box}
+html{font-size:15px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.5}
+.card{max-width:46rem;margin:1.5rem auto;background:#FFF;border:1px solid var(--rule);border-radius:8px;padding:1.8rem 2rem;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.header{border-bottom:2px solid var(--accent);padding-bottom:0.6rem;margin-bottom:1.2rem}
+.eyebrow{font-family:"Inter",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.18em;font-size:0.7rem;color:var(--accent);font-weight:600}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:1.55rem;margin:0.25rem 0 0}
+.section-h{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin:1.3rem 0 0.5rem;font-weight:600;border-bottom:1px solid var(--grid);padding-bottom:0.25rem}
+.beats{display:grid;grid-template-columns:1fr;gap:0.5rem;margin:0.5rem 0}
+.b{background:var(--highlight);border-left:3px solid var(--beat);padding:0.55rem 0.85rem;border-radius:4px;font-size:0.9rem;line-height:1.55}
+.b strong{color:var(--accent)}
+.b .ord{font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--beat);font-weight:600;display:block;margin-bottom:0.2rem}
+.opener{background:#FFF;border:2px solid var(--accent);border-radius:5px;padding:0.7rem 0.9rem;text-align:center;font-size:0.96rem;margin:0.5rem 0}
+.opener strong{color:var(--accent);font-size:1rem}
+.pronounce{width:100%;border-collapse:collapse;font-size:0.86rem;margin:0.5rem 0;background:#FFF;border:1px solid var(--grid);border-radius:5px;overflow:hidden}
+.pronounce th,.pronounce td{padding:0.35rem 0.55rem;text-align:left;border-bottom:1px solid var(--grid)}
+.pronounce tr:last-child td{border-bottom:0}
+.pronounce th{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);background:var(--paper)}
+.pronounce .w{font-family:"Iowan Old Style",Georgia,serif;font-weight:700;color:var(--beat)}
+.pronounce .s{font-family:"JetBrains Mono",monospace;font-size:0.78rem;color:var(--accent);background:var(--highlight);padding:0.05em 0.3em;border-radius:3px}
+.fwd{width:100%;border-collapse:collapse;font-size:0.85rem;margin:0.5rem 0}
+.fwd th,.fwd td{padding:0.35rem 0.5rem;text-align:left;border-bottom:1px solid var(--grid)}
+.fwd tr:last-child td{border-bottom:0}
+.fwd th{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft)}
+.fwd .ch{font-family:"Inter",system-ui,sans-serif;font-weight:600;color:var(--accent);font-size:0.82rem}
+.fwd .a{text-align:center;color:var(--beat);font-weight:700}
+.fwd .c{color:var(--beat);font-weight:500;font-size:0.82rem}
+.fwd .sl{color:var(--ink-soft);font-size:0.78rem;font-style:italic}
+.shape{background:var(--paper);border:1px solid var(--grid);border-radius:5px;padding:0.55rem 0.8rem;margin:0.4rem 0;font-size:0.85rem}
+.shape strong{font-family:"Inter",system-ui,sans-serif;color:var(--accent);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;margin-right:0.4rem}
+.foot{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;color:var(--ink-soft);margin-top:1rem;border-top:1px dashed var(--grid);padding-top:0.5rem;text-align:right}
+@media print{
+  body{background:#FFF}
+  .card{box-shadow:none;border:0;margin:0;max-width:none;padding:0.5in}
+  .b,.opener,.pronounce .s,.fwd .ch,.fwd .a,.shape{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="card">
+
+<div class="header">
+<div class="eyebrow">Quick reference · VioNER defense kit</div>
+<h1>Slide 5 — Why this is hard (4 challenges)</h1>
+</div>
+
+<div class="opener">
+<strong>Opener:</strong> "Why automating this is harder than generic NER. <strong>Four things.</strong>" <em>(half-second pause)</em>
+</div>
+
+<div class="section-h">Four challenges — verbatim</div>
+<div class="beats">
+
+<div class="b"><span class="ord">One · domain entities · 17 s</span>
+"<strong>One — domain entities.</strong> Generic models tag <strong>Al-Shabaab</strong> as a generic ORGANIZATION, don't know <strong>JNIM</strong> or <strong>RSF</strong>, and the African armed-group landscape is dynamic — groups splinter, rebrand, recombine."
+</div>
+
+<div class="b"><span class="ord">Two · class imbalance · 17 s · SLOW THE 78%</span>
+"<strong>Two — severe class imbalance.</strong> <strong>Seventy-eight percent</strong> of tokens are non-entity O, and the operationally critical entities — victim, action, casualties — are the rarest, just a few percent each."
+</div>
+
+<div class="b"><span class="ord">Three · geographic ambiguity · 15 s · LIFT ON GOMA</span>
+"<strong>Three — geographic ambiguity.</strong> <em>'Fighting in Goma'</em> could be city, district, or region. This is why DISTRICT is the weakest entity in the final results."
+</div>
+
+<div class="b"><span class="ord">Four · 5W1H + multi-event · 18 s · PAUSE BEFORE "AND"</span>
+"<strong>Four — 5W1H grouping with perpetrator-versus-victim distinction is not standard NER output.</strong> <em>(pause)</em> And multi-event articles pack several incidents into one piece, which means the model has to segment as well as extract."
+</div>
+
+</div>
+
+<div class="section-h">Pronunciation</div>
+<table class="pronounce">
+<thead><tr><th>Word</th><th>Say as</th></tr></thead>
+<tbody>
+<tr><td class="w">Al-Shabaab</td><td class="s">"al-sha-BAAB" (3rd syllable)</td></tr>
+<tr><td class="w">JNIM</td><td class="s">"JEE-nim" (as word)</td></tr>
+<tr><td class="w">RSF</td><td class="s">"R-S-F" (letters)</td></tr>
+<tr><td class="w">Goma</td><td class="s">"GOH-ma" (1st syllable)</td></tr>
+<tr><td class="w">ORGANIZATION</td><td class="s">slow — it's a tag-name, not a regular word</td></tr>
+</tbody>
+</table>
+
+<div class="section-h">Internal shape per item (vary your cadence)</div>
+<div class="shape"><strong>One</strong>Topic + 3 named examples + a triplet ("splinter, rebrand, recombine"). Steady; names get small emphasis.</div>
+<div class="shape"><strong>Two</strong>Topic + statistic (78%) + 3 rarest entities. SLOW on the statistic — it's the heaviest fact.</div>
+<div class="shape"><strong>Three</strong>Topic + quote example + consequence. LIFT on the quote, drop on consequence.</div>
+<div class="shape"><strong>Four</strong>Topic + second sub-point with "And". PAUSE before "And"; this is the longest item.</div>
+
+<div class="section-h">Forward references — what each challenge sets up</div>
+<table class="fwd">
+<thead><tr><th>Challenge</th><th></th><th>Contribution</th><th>Slide</th></tr></thead>
+<tbody>
+<tr><td class="ch">Domain entities</td><td class="a">→</td><td class="c">Curated KB (150 active groups)</td><td class="sl">Slide 13</td></tr>
+<tr><td class="ch">Class imbalance</td><td class="a">→</td><td class="c">Focal loss + class weights</td><td class="sl">12, 18</td></tr>
+<tr><td class="ch">Geographic ambiguity</td><td class="a">→</td><td class="c">Confusion matrix; CRF future-work</td><td class="sl">Slide 20</td></tr>
+<tr><td class="ch">5W1H + multi-event</td><td class="a">→</td><td class="c">8-entity schema + segmentation</td><td class="sl">Slide 10</td></tr>
+</tbody>
+</table>
+
+<div class="section-h">Pre-loaded interrupts</div>
+<div class="shape"><strong>Pre-trained African NER?</strong>Masakhane + AfriBERTa cover language; don't close the four gaps. Slide 6 has the landscape.</div>
+<div class="shape"><strong>Is 78% really right?</strong>Yes — typical for span-based NER on news. Punctuation, function words, filler. §5.3, Table 6.5.</div>
+<div class="shape"><strong>Why is DISTRICT hard?</strong>Goma is city, district, regional centre simultaneously. Model defaults to CITY (more often correct). Slide 20 confusion matrix; future-work CRF.</div>
+
+<div class="section-h">Where this lives</div>
+<p style="font-size:0.85rem;color:var(--ink-soft);margin:0.3rem 0">
+<strong>Defense slide:</strong> Slide 5 of 22 (why this is hard)
+<br><strong>Defense kit:</strong> <code>VioNER_Defense_Slides_study_guide.md</code> slide 5 · <code>problem_domain.md</code>
+<br><strong>Continues into:</strong> Slide 6 (competitive landscape) · Slide 7 (four operational gaps)
+</p>
+
+<div class="foot">Reference card · keep open during slide-5 rehearsal</div>
+</div>
+
+</body>
+</html>

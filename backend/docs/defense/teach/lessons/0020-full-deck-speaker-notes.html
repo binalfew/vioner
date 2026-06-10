@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 20 — Full-Deck Speaker Notes (Recite Word for Word)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+@page{size:A4;margin:16mm}
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --beat:#1A365D;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:44rem;margin:0 auto;padding:3.5rem 1.5rem 6rem}
+.eyebrow{font-family:"Inter","SF Pro Text",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.18em;font-size:0.72rem;color:var(--accent);font-weight:600}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:2.1rem;font-weight:700;line-height:1.18;margin:0.4rem 0 0.6rem;letter-spacing:-0.012em}
+.subtitle{color:var(--ink-soft);font-style:italic;font-size:1.05rem;margin:0 0 1.2rem}
+.meta{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:0.6rem 0;margin-bottom:2rem;display:flex;flex-wrap:wrap;gap:1.2rem}
+.meta span strong{color:var(--ink)}
+.howto{background:#FFF;border:1px solid var(--rule);border-left:3px solid var(--beat);border-radius:4px;padding:0.9rem 1.2rem;margin:0 0 2.2rem;font-size:0.95rem;color:var(--ink-soft)}
+.howto strong{color:var(--ink)}
+/* Slide block */
+.slide{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.5rem 1.8rem 1.3rem;margin:1.6rem 0;break-inside:avoid}
+.slide-head{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;border-bottom:1px solid var(--rule);padding-bottom:0.55rem;margin-bottom:1rem}
+.slide-head .t{font-family:"Iowan Old Style",Georgia,serif;font-size:1.18rem;font-weight:700}
+.slide-head .t .n{color:var(--accent);font-feature-settings:"tnum"}
+.slide-head .secs{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;color:var(--ink-soft);white-space:nowrap;background:var(--paper);border:1px solid var(--rule);padding:0.2em 0.6em;border-radius:3px;font-weight:600}
+.script p{font-size:1.08rem;margin:0.85rem 0;line-height:1.75}
+.script p:first-child{margin-top:0}
+.script .pause{display:inline-block;color:var(--ink-soft);font-family:"Inter",sans-serif;font-size:0.7rem;letter-spacing:0.06em;text-transform:uppercase;background:var(--paper);border:1px dashed var(--rule);border-radius:3px;padding:0 0.45em;margin:0 0.2em;vertical-align:middle}
+.pivot{margin-top:1rem;padding-top:0.7rem;border-top:1px dashed var(--rule);font-style:italic;color:var(--ink-soft);font-size:1.02rem}
+.pivot::before{content:"→ ";color:var(--accent);font-style:normal;font-weight:700}
+/* Section dividers */
+.section-divider{font-family:"Inter",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.14em;font-size:0.74rem;color:var(--accent);font-weight:700;margin:2.6rem 0 0.2rem;display:flex;align-items:center;gap:0.8rem}
+.section-divider::after{content:"";flex:1;border-top:1px solid var(--rule)}
+.bottom{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;color:var(--ink-soft);border-top:1px solid var(--rule);padding-top:1.2rem;margin-top:3rem;font-style:italic}
+@media print{
+  body{background:#FFF}
+  .slide{box-shadow:none;page-break-inside:avoid}
+  html{font-size:11pt}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">Lesson 20 · The whole deck</div>
+<h1>Full-deck speaker notes — recite word for word</h1>
+<div class="subtitle">All 22 slides as one continuous script. Each block is exactly what you say — nothing else. The arrow line at the end of each slide is the pivot sentence that carries you into the next slide; say it as you advance. Total run time ≈ 28 minutes, which leaves breathing room inside the 30-minute window.</div>
+
+<div class="meta">
+<span><strong>Slides:</strong> 22</span>
+<span><strong>Total run time:</strong> ~28 min</span>
+<span><strong>Source:</strong> VioNER_Defense_Slides_study_guide.md (canonical deck)</span>
+</div>
+
+<div class="howto"><strong>How to rehearse with this document:</strong> read it aloud start to finish, advancing an imaginary slide at every arrow line. Numbers are written the way you should say them. Where you see <span class="pause">pause</span>, take one breath — those are the moments that need air. Everything you might be asked lives in the per-slide lessons (0001–0019); this document is only the talk itself.</div>
+
+<div class="section-divider">Opening · slides 1–2</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 1</span> — Title</span><span class="secs">45 s</span></div>
+<div class="script">
+<p>Good morning, distinguished examiners. I'm Binalfew Kassa. The thesis I'm presenting today is VioNER — Violent-event Named Entity Recognition. It's an end-to-end, deployable system that converts English-language news about violent events in Africa into structured, queryable 5W1H records.</p>
+<p>In the next thirty minutes I'll cover the problem, the four-part contribution, the evidence, and the limits I own honestly. The headline result I want to plant early: micro F1 of zero point nine zero nine on held-out data, with rare-entity recovery that actually saves analyst time.</p>
+<p>The frame for the whole talk: a real operational bottleneck, methodologically open in the literature, closed by an integrated artefact I built and evaluated end-to-end.</p>
+</div>
+<div class="pivot">Here is the roadmap for the next thirty minutes.</div>
+</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 2</span> — Roadmap</span><span class="secs">45 s</span></div>
+<div class="script">
+<p>This is the roadmap. I move from why the problem matters, to why existing tools don't close it, to the four contributions, then the evidence — model metrics, the ablation, KB impact, and user testing — and finally the limits and deployment path.</p>
+<p>One thread ties the whole talk together: each contribution closes one operational gap, and dropping any single piece breaks the chain. The contribution is the integration, not any one component.</p>
+</div>
+<div class="pivot">Let's begin with why this problem matters operationally.</div>
+</div>
+
+<div class="section-divider">The problem · slides 3–7</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 3</span> — The operational stakes</span><span class="secs">75 s</span></div>
+<div class="script">
+<p>The operational stakes. About thirty thousand African violent events are reported and coded each year. Twenty-plus active armed conflicts in any given year. All fifty-four countries tracked, roughly thirty with mass-casualty events in 2024.</p>
+<p>This is the operational backbone for the AU Peace and Security Council, the AU early-warning system, ECOWAS, IGAD, UN OCHA, and UNHCR. The point I want to land: this is not an academic curiosity — reduced extraction cost benefits every one of those consumers.</p>
+</div>
+<div class="pivot">Let me quantify what "bottleneck" actually means.</div>
+</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 4</span> — The bottleneck, quantified</span><span class="secs">90 s</span></div>
+<div class="script">
+<p>The bottleneck, quantified. Each article takes a trained analyst fifteen to twenty-five minutes — read, identify actors, cross-reference against an internal armed-group list, narrow location from country to city, extract casualties with qualifiers, classify the event type, and log.</p>
+<p>At thirty thousand events that's about ten thousand analyst-hours per year — roughly five and a half full-time analysts whose entire job is article-to-row conversion.</p>
+<p>The key framing: VioNER does not replace analysts — it turns an article-reading task into an article-reviewing task. Reviewing is lower cognitive load than coding from blank, so per-article time drops. Even halving it frees three analysts to cover under-monitored theatres.</p>
+</div>
+<div class="pivot">That's the operational problem. The technical problem — why this is harder than generic NER — is the next slide.</div>
+</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 5</span> — Why automating this is hard</span><span class="secs">75 s</span></div>
+<div class="script">
+<p>Why automating this is harder than generic NER. Four things.</p>
+<p>One — domain entities. Generic models tag Al-Shabaab as a generic organization, don't know JNIM or RSF, and the African armed-group landscape is dynamic — groups splinter, rebrand, recombine.</p>
+<p>Two — severe class imbalance. Seventy-eight percent of tokens are non-entity O, and the operationally critical entities — victim, action, casualties — are the rarest, just a few percent each.</p>
+<p>Three — geographic ambiguity. "Fighting in Goma" could be city, district, or region. This is why DISTRICT is the weakest entity in the final results.</p>
+<p>Four — 5W1H grouping with perpetrator-versus-victim distinction is not standard NER output. And multi-event articles pack several incidents into one piece, which means the model has to segment as well as extract.</p>
+</div>
+<div class="pivot">Given those challenges, where do existing systems land?</div>
+</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 6</span> — The competitive landscape</span><span class="secs">90 s</span></div>
+<div class="script">
+<p>The competitive landscape as a matrix.</p>
+<p>ACLED and UCDP are the gold standard but hand-coded — they are the target of this work, not competitors. I train on ACLED open data.</p>
+<p>ICEWS and GDELT are automated, but they use generic CAMEO schemas, not Africa-tuned 5W1H, and they're closed or noisy.</p>
+<p>Generic NER doesn't know African armed groups. Prior African NLP — Masakhane, AfriBERTa — stops at the model boundary, no operational packaging.</p>
+<p>LLMs are disqualified on four operational grounds: closed weights, per-call cost, no auditability, and data sovereignty — sending conflict metadata to a US commercial API is a non-starter for many AU member states.</p>
+<p>VioNER occupies the empty cell: African, automated, open, and operational.</p>
+</div>
+<div class="pivot">Each shortfall in that landscape maps to one of four operational gaps.</div>
+</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 7</span> — The four operational gaps</span><span class="secs">90 s</span></div>
+<div class="script">
+<p>The four operational gaps — the heart of the contribution. I state them operationally, in terms of what the analyst can't get today.</p>
+<p>Gap one: fast, structured, role-distinguished 5W1H output. ACLED has it slowly; automated tools give flat or wrong-shape output.</p>
+<p>Gap two: automated tools recover dates and locations but miss victims, casualties, action verbs.</p>
+<p>Gap three: output isn't sanity-checked against world knowledge or canonicalised across surface forms.</p>
+<p>Gap four: no system an analyst can actually deploy and run without ML expertise.</p>
+<p>Why four and not three? Because no existing system fills all four, and each is independently necessary for the analyst's job. A perfectly structured output that arrives too late is useless; a fast output that misses victims is useless.</p>
+</div>
+<div class="pivot">With the gaps framed, here's VioNER's response in one slide.</div>
+</div>
+
+<div class="section-divider">The system · slides 8–15</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 8</span> — VioNER in one slide</span><span class="secs">75 s</span></div>
+<div class="script">
+<p>VioNER in one slide. Five components.</p>
+<p>One — the eight-entity grounding-validated schema. Two — a fine-tuned BERT NER model. Three — a curated knowledge base. Four — a four-level event taxonomy. Five — a deployable web platform.</p>
+<p>End-to-end latency is about a hundred and fifty milliseconds per article on a single CPU core, versus fifteen to twenty-five minutes of manual coding.</p>
+<p>The point I want you to hold: the model is one component. The schema, the KB, the taxonomy, and the platform are what turn a checkpoint on a laptop into a capability an analyst can actually drive.</p>
+</div>
+<div class="pivot">Before the contributions in detail, one slide on methodology — design science and the three iteration loops that produced these components.</div>
+</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 9</span> — Design science + three iteration loops</span><span class="secs">90 s</span></div>
+<div class="script">
+<p>Methodology: design science — build, evaluate, learn, refine. I'll walk the three loops by what each one did, matching the cards on screen.</p>
+<p>The corpus loop refined the training data from a raw event dump into a curated, diversity-balanced subset, so the model learns from varied phrasing rather than a handful of over-represented common events.</p>
+<p>The schema loop narrowed the entity set to only what an annotator can locate word-for-word in the source — clean, auditable labels.</p>
+<p>The loss loop reshaped the training objective to concentrate on the rare, operationally critical entities — victim, action, casualties — rather than the easy majority.</p>
+<p>The point I want to land: each loop was a design decision validated by measurement, not preference. That's what makes this genuine design science.</p>
+</div>
+<div class="pivot">Now the contributions in detail. Starting with the schema.</div>
+</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 10</span> — The grounding-validated 8-entity schema</span><span class="secs">75 s</span></div>
+<div class="script">
+<p>Contribution one — the grounding-validated eight-entity schema, and how it maps to the analyst's 5W1H record.</p>
+<p>The principle, on the left card: every entity in the schema is one the model can point to word-for-word in the article, so the analyst can audit each extracted span against the source. Nothing inferred or invented.</p>
+<p>Then the eight types and what they represent. WHO splits into ACTOR and VICTIM — perpetrator versus those harmed, the role distinction generic NER lacks. WHAT is ACTION. WHEN is DATE. WHERE splits into REGION, CITY, DISTRICT. HOW is CASUALTIES — counts with their qualifiers preserved.</p>
+<p>That role-distinguished 5W1H mapping is the contribution — it's the shape of output an analyst can use directly.</p>
+</div>
+<div class="pivot">On top of the schema sits the taxonomy and the training data.</div>
+</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 11</span> — The 4-level taxonomy and the corpus</span><span class="secs">75 s</span></div>
+<div class="script">
+<p>The four-level taxonomy and the corpus.</p>
+<p>The taxonomy: four Level-1 families — Political, Criminal, Communal, and State Violence Against Civilians — with about sixteen Level-2 subcategories and roughly ninety-five Level-3 leaves. It synthesises ACLED, UCDP, and PMVE at Level 1 for cross-database aggregation, and adds African-specific extensions like pastoralist-farmer clashes and communal cattle raiding that no existing framework carves out at this depth.</p>
+<p>The corpus: fifty thousand examples — thirty-five thousand stratified ACLED examples plus fifteen thousand template-augmented examples targeting the rare classes. Stratified sampling oversamples rare entity types; augmentation lifts rare-class minimums to a level the model can learn from.</p>
+</div>
+<div class="pivot">With the schema and corpus in place, the training recipe is where the modelling contribution lives.</div>
+</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 12</span> — The training recipe (focal × weights)</span><span class="secs">90 s</span></div>
+<div class="script">
+<p>The training recipe — focal loss times class weights. Two ingredients.</p>
+<p>Inverse-frequency class weights rebalance across classes. Rare classes get a large weight, capped at ten to avoid gradient blow-up. A VICTIM token ends up about a hundred and thirty times more loss-impactful than an O token.</p>
+<p>Focal loss, with gamma equal to two, rebalances across difficulty. The one-minus-p-squared factor suppresses tokens the model already gets right, so the optimiser concentrates on the hard ones — which is where the rare entities live.</p>
+<p>The key claim is complementarity: the two attack different parts of the imbalance problem, so the combination beats either alone.</p>
+</div>
+<div class="pivot">On top of the trained model sits the KB layer.</div>
+</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 13</span> — The curated knowledge base</span><span class="secs">75 s</span></div>
+<div class="script">
+<p>The curated knowledge base.</p>
+<p>About a hundred and fifty active armed groups with aliases, country, and group type. Two hundred conflict cities mapped to country and region. All fifty-four countries. Thirty-eight weapon categories. Loaded once in-memory at server startup, consulted on every inference.</p>
+<p>Two roles from one curated resource. Validation flags geographically implausible actor-location pairs — Al-Shabaab in Goma — at a two-point-four percent rate. Enrichment canonicalises actor surface forms so analytics aggregate correctly — sixty-four-point-three percent of actor mentions get enriched.</p>
+<p>On the size: a hundred and fifty covers the active landscape, not historical exhaustiveness. Including inactive groups would produce false-positive enrichments. Mean alias count per group is four-point-two, which is what matters for canonicalisation.</p>
+<p>Validation never blocks extraction; enrichment never invents data.</p>
+</div>
+<div class="pivot">All of this is delivered through the platform.</div>
+</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 14</span> — The platform</span><span class="secs">75 s</span></div>
+<div class="script">
+<p>The platform — the delivery vehicle.</p>
+<p>React and TypeScript front-end. FastAPI service layer. In-process component layer holding model and KB. PostgreSQL sixteen event store. Docker Compose orchestration — one command stands it up.</p>
+<p>Four layers is the minimum for clean separation. A monolithic FastAPI worker is faster and simpler than microservices at thirty thousand articles a year.</p>
+<p>I defend the stack as engineering, not research claims. React for ecosystem and TypeScript support. FastAPI for async plus native PyTorch integration plus auto OpenAPI docs. PostgreSQL for full-text plus JSONB indexing the analytics layer needs.</p>
+<p>The research contribution is the integration evaluated end-to-end. Swapping React for Vue would change implementation, not contribution.</p>
+</div>
+<div class="pivot">Here's what happens end-to-end when an article goes through the system.</div>
+</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 15</span> — The inference pipeline (worked example)</span><span class="secs">90 s</span></div>
+<div class="script">
+<p>The end-to-end inference pipeline, with the worked example.</p>
+<p>Article in. Tokenise. BERT forward pass. BIO decode to spans. Confidence filter. 5W1H grouping. KB validate-and-enrich. Taxonomy classify. Persist. Render chips.</p>
+<p>The forward pass is about seventy-five percent of the hundred and fifty milliseconds. KB lookup is fifteen percent. Everything else is ten percent, because the KB is in-memory.</p>
+<p>The worked example. "Al-Shabaab attacked a convoy near Mogadishu on Tuesday, killing twelve soldiers." Becomes: perpetrator, Al-Shabaab. Victim, twelve soldiers. Action, attacked. Date, Tuesday — normalised to a calendar date relative to publication. Location, Mogadishu — resolved to Somalia. Casualties, twelve, with the "at least" qualifier preserved.</p>
+</div>
+<div class="pivot">With the system explained, we move to the evidence.</div>
+</div>
+
+<div class="section-divider">The evidence · slides 16–20</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 16</span> — Headline results</span><span class="secs">75 s</span></div>
+<div class="script">
+<p>Headline results. All on a held-out ten-thousand-example validation set covering one hundred and ninety thousand gold spans.</p>
+<p>Micro F1 zero-point-nine-zero-nine. Macro F1 zero-point-eight-eight-seven. Token accuracy ninety-six-point-seven percent. Best checkpoint at epoch two with validation loss zero-point-zero-zero-seven-four.</p>
+<p>I lead with F1, not accuracy, because seventy-eight percent of tokens are O — a degenerate predict-O-everywhere model already scores seventy-eight percent accuracy and learns nothing.</p>
+<p>Micro exceeds macro by about two points because the high-support entities — DATE, CITY, ACTOR — also have the highest F1.</p>
+<p>All numbers are strict span-level — exact boundaries and type — reported for honesty.</p>
+</div>
+<div class="pivot">The per-entity breakdown is where the operational story lives.</div>
+</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 17</span> — Per-entity F1</span><span class="secs">90 s</span></div>
+<div class="script">
+<p>Per-entity F1 — the reliability map.</p>
+<p>DATE strongest at zero-point-nine-five-six. Then CITY zero-point-nine-three-four. ACTOR zero-point-nine-two-three. REGION zero-point-eight-nine-one. CASUALTIES zero-point-eight-eight-five. ACTION zero-point-eight-six-six. DISTRICT zero-point-eight-two-six. VICTIM zero-point-eight-one-seven.</p>
+<p>Read it operationally. Dates and locations are essentially solved — trust them. Actors are mostly solved — spot-check for new groups. Casualties are mostly solved — verify the qualifier. Actions need occasional addition for passive voice. Districts and victims need the most correction.</p>
+<p>Precision exceeds recall on every row — standard NER. When uncertain the model defaults to O, trading a missed entity for fewer false alarms. That's the right trade for analyst review.</p>
+</div>
+<div class="pivot">To prove the loss-function choice was the right one, here's the ablation.</div>
+</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 18</span> — The ablation</span><span class="secs">90 s</span></div>
+<div class="script">
+<p>The ablation — the single most important table in the thesis.</p>
+<p>Four loss configurations. Identical conditions. Only the loss changes.</p>
+<p>VICTIM. Plain cross-entropy, zero-point-seven-zero-eight. Weighted CE, zero-point-seven-seven-six. Focal alone, zero-point-seven-nine-two. Focal-plus-weights, zero-point-eight-one-seven. <span class="pause">pause</span> Plus ten-point-nine.</p>
+<p>ACTION, plus seven-point-two.</p>
+<p>Two headline claims. One — complementarity. Each ingredient alone is insufficient; the combination beats both. Two — every entity is at least as good as baseline. No common-class regression.</p>
+<p>On significance — three seeds, run-to-run variance about plus or minus zero-point-four F1, so the eleven-point gain exceeds variance by twenty-five times. Paired bootstrap at article level gives p below zero-point-zero-one.</p>
+<p>This table is the empirical answer to the modelling research question. Without it, the loss choice would be assertion, not evidence.</p>
+</div>
+<div class="pivot">Beyond the model — the KB's operational impact, and what real users said.</div>
+</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 19</span> — KB operational impact and user testing</span><span class="secs">90 s</span></div>
+<div class="script">
+<p>KB operational impact and user testing.</p>
+<p>The KB. Sixty-four-point-three percent of actor mentions get enriched with a canonical identifier. Two-point-four percent of events get a geo-implausibility flag — a small, targeted priority queue, not noise.</p>
+<p>The unenriched thirty-six percent are new groups, generic phrasings like "armed men", or below-threshold matches. The threshold is conservative — collapsing distinct groups under one canonical entry would be worse than leaving them unenriched.</p>
+<p>Speed. About a hundred and fifty milliseconds versus fifteen to twenty-five minutes — a three to five times reduction once you add realistic review time.</p>
+<p>User testing. Five participants. Two early-warning analysts, one academic, two NLP developers as a fairness check. All completed all six tasks. Every item cleared four-point-zero. The two highest, at four-point-six, were 5W1H clarity and KB enrichment — exactly the differentiating contributions.</p>
+<p>On n equals five — qualitative, not inferential. Nielsen's rule is five users find about eighty-five percent of usability issues.</p>
+</div>
+<div class="pivot">Where does the model still fall short? Error analysis.</div>
+</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 20</span> — Error analysis</span><span class="secs">60 s</span></div>
+<div class="script">
+<p>Error analysis — structured diagnosis, not just "it fails sometimes".</p>
+<p>From three hundred error-containing events. Boundary mismatch, thirty-eight percent. Location-type confusion, twenty-four percent. Missed entities, nineteen percent. Spurious entities, twelve percent. Confidence drops, seven percent.</p>
+<p>Boundary plus location together are sixty-two percent — both addressable by a span-level CRF on top of BERT, which is the high-priority future-work fix.</p>
+<p>The location confusion is the Goma problem. When gold is DISTRICT, the model predicts CITY seven percent of the time and REGION nine percent. It defaults to CITY because it's more often right.</p>
+<p>In terms of analyst cost: boundary mismatch is least costly — right type, clipped span. Missed entities are most costly per error — add from scratch. Spurious entities are tunable via confidence thresholds.</p>
+</div>
+<div class="pivot">With evidence covered, I want to own the limits honestly.</div>
+</div>
+
+<div class="section-divider">The close · slides 21–22</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 21</span> — Limitations</span><span class="secs">60 s</span></div>
+<div class="script">
+<p>Limitations — I want to own them.</p>
+<p>English-only. A large share of African reporting is in French, Arabic, Portuguese. Multilingual extension via XLM-RoBERTa or AfroLM is the highest-priority future work, and the methodology transfers directly.</p>
+<p>About thirty percent of the corpus is template-augmented, so the metrics are in-distribution, not out-of-distribution. Real-news expansion is future work item three.</p>
+<p>The taxonomy classifier is rule-based, not learned. A learned hierarchical classifier needs Level-3 labelled data that would be a thesis in itself.</p>
+<p>The KB needs ongoing curation as groups rebrand. The recommendation is a part-time domain expert, about a day a week.</p>
+<p>None of these undercut the in-scope contribution.</p>
+</div>
+<div class="pivot">To close — the five contributions, restated.</div>
+</div>
+
+<div class="slide">
+<div class="slide-head"><span class="t"><span class="n">Slide 22</span> — The five contributions (close)</span><span class="secs">75 s</span></div>
+<div class="script">
+<p>The five contributions, restated as the close.</p>
+<p>One — the eight-entity grounding-validated schema. Kappa zero-point-seven-eight.</p>
+<p>Two — the four-level taxonomy synthesising ACLED, UCDP, and PMVE, with African-specific extensions.</p>
+<p>Three — the focal-loss-plus-class-weights recipe. Plus eleven F1 on VICTIM, with no entity hurt.</p>
+<p>Four — the curated KB doing validation and enrichment. Two-point-four percent flag and sixty-four-point-three percent enrichment.</p>
+<p>Five — the deployable platform. UAT-validated, with non-ML users completing all six tasks.</p>
+<p>The thesis-level claim: the integration of these five — schema plus model plus KB plus taxonomy plus platform, evaluated end-to-end — is the contribution. Because no single piece alone closes the operational loop.</p>
+<p><span class="pause">pause</span> Thank you. I welcome your questions.</p>
+</div>
+<div class="pivot">After "thank you" — stop. Make eye contact with each panel member. Let the silence sit until the first question comes.</div>
+</div>
+
+<div class="bottom">Lesson 20 — the full-deck recital script. Rehearse it as one continuous read first, then slide by slide against the timer drills in lessons 0003–0019. The per-slide lessons hold everything this document deliberately leaves out: reserved numbers, pre-loaded interrupts, and the craft behind each line.</div>
+
+</div>
+</body>
+</html>

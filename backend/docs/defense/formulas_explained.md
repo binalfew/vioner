@@ -434,7 +434,39 @@ Notice how a wrong-answer token (last row) contributes ~300× more loss than a c
 
 Cross-entropy is the default classification loss. It works fine when classes are balanced. **But on VioNER's data 78 % of tokens are class O.** Almost all of those O tokens are *easy* for the model — it gets them right with high confidence. Each easy correct O contributes a tiny loss (≈ 0.01), but there are so many of them that they collectively dominate the total. The gradient signal for the rare entities — VICTIM, ACTION, CASUALTIES — gets drowned out.
 
-The thesis reports the cross-entropy baseline because the contribution claim is that **focal loss + class weights beats cross-entropy by 11 F1 on VICTIM**. The baseline number — VICTIM F1 = 0.708 under plain cross-entropy — is what makes the +11 F1 gain quantifiable.
+### Why plain CE is still reported (the baseline argument)
+
+This trips a lot of people up: *"if plain cross-entropy isn't the production loss, why does the thesis bother to report its numbers?"*
+
+The answer: because the contribution claim of this thesis is a **comparison** — *"focal loss + class weights lifts VICTIM F1 by 11 points over plain cross-entropy."* A comparison needs two numbers, and the 0.708 is one of them.
+
+**The drug-trial analogy.** Imagine a new drug cures 65% of patients. Is that good? It depends entirely on what the placebo cures. If placebo cures 60%, the drug barely works (+5%). If placebo cures 5%, the drug is revolutionary (+60%). The 65% number *alone* is uninterpretable; you need the placebo baseline.
+
+> **Plain cross-entropy is the placebo. Focal-loss-plus-weights is the drug. The +11 F1 on VICTIM is the measured drug effect above placebo.**
+
+**Mapped to VioNER's numbers:**
+
+| Configuration | VICTIM F1 | Reading |
+|:--|--:|:--|
+| Plain cross-entropy *(the placebo)* | 0.708 | What a generic NER would achieve on the same data, with the same model, same training settings |
+| Focal loss + class weights *(the drug — VioNER's production loss)* | **0.817** | What VioNER's deliberate loss-function choice achieves |
+| **Lift (= what the loss choice bought)** | **+0.109 = +11 F1 points** | The empirical evidence for the loss-function contribution |
+
+> **About the "+0.109 = +11 F1 points" notation.** F1 is reported as a decimal between 0 and 1, but the NER literature conventionally talks about it in **"points"** where 1 point = 0.01 of F1 = 1 percentage point. Conversion: multiply the absolute difference by 100. Here $0.817 - 0.708 = 0.109$, and $0.109 \times 100 = 10.9 \approx 11$ F1 points. Same convention as polling ("leads by 5 points" = 5 percentage points). This is the **absolute** gain, not relative — relative would be $0.109 / 0.708 = 15.4\%$, a different number. The NER convention is to report absolute F1 differences because they're directly comparable across configurations.
+
+Without the 0.708 baseline you'd just have 0.817 — and *0.817 alone* is uninterpretable. Is it good? Normal? Poor? You can't tell without something to compare against. The baseline makes the +11 quantifiable, and the +11 is what the thesis claims as its loss-function contribution.
+
+**Three consequences of this logic:**
+
+1. **The §6.6 ablation table reports four configurations** — plain CE, weighted CE, focal alone, focal+weights — precisely to establish what each ingredient buys independently and what the combination buys jointly. That's not redundancy; it's how a comparison claim is empirically defended.
+
+2. **The baseline must be plain cross-entropy specifically.** Because that's the loss generic NER models use by default. Comparing focal+weights against a different exotic loss wouldn't prove an operationally meaningful contribution — it would just compare two exotic choices.
+
+3. **"+11 F1" is the quotable headline, not "0.817".** Because everyone understands what plain CE is, and everyone understands +11 F1 on a single entity is a substantial improvement. *"VICTIM F1 = 0.817"* alone communicates nothing about the contribution; *"+11 F1 over plain CE"* communicates the whole story.
+
+**Defense-day delivery script.** If a panellist asks *"why do you show 0.708 if you don't actually use plain CE?"*:
+
+> *"Because without the baseline, the contribution claim can't be quantified. A VICTIM F1 of 0.817 is just a number — it doesn't tell you whether the focal-loss-plus-weights recipe accomplished anything compared to what a generic NER model would have achieved. By reporting 0.708 under plain cross-entropy on the same data with the same model, I can say the loss-function choice specifically bought us 11 F1 points on VICTIM. That's the empirical evidence for the loss contribution in section 6.6, and that ablation is what makes the loss choice defensible rather than just asserted."*
 
 ### Likely panel questions
 
@@ -750,220 +782,455 @@ This is just the integrated form. Equations (1), (3), and (4) are the ingredient
 
 ---
 
-# Part B · The metric family (evaluation-time math)
+# Part B · The metric family — how we judge the trained model
 
-Now we leave training behind. The model's weights are frozen. We need to **answer one question**: *how good is the trained model at extracting entities from text it has never seen?* That's evaluation, and the next four formulas are how every results table in the thesis was computed.
+Training is over. The model's weights are frozen. We need to answer the question the whole defense rests on: **how good is this thing?**
 
-## Why we hold data out
+This part walks you through every metric the thesis reports — TP, FP, FN, precision, recall, F1, macro F1, micro F1, token accuracy — using **one concrete running example** that you can track all the way through. By the end you should be able to look at any results table in the thesis and read it without confusion.
 
-During training (Part A), the model adjusts its weights to fit the training examples. The danger is that the model could **memorise** the training data without learning anything generalisable — like a student who memorises practice-exam answers without understanding the material. Such a student would ace the practice exam and bomb the real one.
+---
 
-To detect this and to estimate real-world performance honestly, we **set aside** a portion of the data — the **validation split** — that the model **never sees during training**. After training is complete, we run the model on the validation split and measure performance there. The metrics on the validation split are a fair estimate of what would happen on truly new, unseen data.
+## Why we need metrics at all
 
-This thesis uses an **80 / 20 split**:
+After training, the model produces predictions on new articles. We need to **score those predictions** so we can answer questions like *"is this model better than the previous one?"* or *"how often is the model correct?"*.
 
-- **80 %** of the 50,000 examples → training (the model sees these and adjusts weights)
-- **20 %** = **10,000 examples** → validation (the model never trains on these)
+A useful score has to be:
 
-Every F1 number on slides 27, 28, 29 — including the headline 0.909 micro F1 — was computed on that held-out 10,000-example validation split.
+- **Honest** — based on data the model hasn't memorised
+- **Specific** — not just "good" or "bad" but a number you can compare across configurations
+- **Operationally meaningful** — high score should correspond to a model that actually saves analyst time
 
-> **The split is at the article level, not the sentence level.** No article appears in both halves. The thesis goes one step further: articles are hashed and deduplicated *before* the split, so even copy-pasted duplicates can't sneak across. This is what "held-out integrity" on slide 24 means.
+Without such a score, the thesis would just be assertion (*"the model works well"*) rather than evidence (*"on data the model never saw during training, it correctly extracted entities at a rate we can quantify"*). Part B is how we turn the model's predictions into that defensible number. Each of the five steps below introduces one piece of that scoring machinery, and by the end you'll know exactly what every results table in the thesis is showing.
 
-## What are TP, FP, FN? — A spam-filter analogy
+---
 
-To compute any NER metric, we first bucketise every prediction into one of four boxes. Think of an email spam filter:
+## The honesty requirement — why we hold data out
 
-| Bucket | What happened in spam filtering | What it means for NER |
+A trained model has seen every training example many times. It may have memorised some examples without actually learning the underlying pattern. If we measured the model's performance on the *same data it trained on*, we'd get a flatteringly high score that wouldn't predict how the model behaves on truly new articles.
+
+**The student analogy.** Imagine a student who studied with a copy of the answer key. On the practice problems they've already memorised the answers to, they ace the test. On *new* problems they haven't seen, they fail. The practice-test score is meaningless because it measures memorisation, not understanding.
+
+**The fix: hold 20% of the data out.** Don't show it to the model during training. After training is over, use that held-out 20% — and only it — to measure performance.
+
+| Split | Size | What the model does with it |
+|:--|--:|:--|
+| Training set | 40,000 examples (80%) | Sees during training; weights adjust to fit these |
+| **Validation set** | **10,000 examples (20%)** | **Never seen during training; used only for honest evaluation** |
+
+Every quality number you'll see in Part B from here on — TP, FP, FN, precision, recall, F1, macro F1, micro F1 — is computed on that **10,000-example held-out validation split**. **Whenever you see a result number anywhere in the thesis, assume it's on held-out data unless explicitly stated otherwise.**
+
+The split has three extra integrity controls (§6.13 of thesis): article-level (not sentence-level), hash-based dedup before the split, and augmentation template pools partitioned. Together these prevent any leakage of training information into the validation split.
+
+> **The vocabulary is coming.** Don't worry that the list above (TP, FP, F1, macro, micro) is unfamiliar — every one of those terms is built up step by step in Steps 1 through 5 below. The point of this section is just: *whatever we end up measuring, we measure it on held-out data*.
+
+---
+
+## The running example — 100 VICTIM gold spans, 90 predictions
+
+To make the rest of this part concrete, let's fix one scenario and carry the same numbers through every formula. **Memorise these four numbers — they're the only ones you need to follow the rest of Part B.**
+
+**Setup.** The validation set contains **100 actual VICTIM spans** (according to the gold annotations). We run the trained model on the validation set, and it produces **90 predicted VICTIM spans**.
+
+Suppose of those 90 predictions:
+
+- **82 are correct** — they match a real gold VICTIM (same span, same type)
+- **8 are wrong** — false alarms; the model said VICTIM but the gold says no
+- **18 actual victims went missing** — the gold has 100, the model only found 82 of them, so 18 are missed
+
+Three natural questions arise from those numbers:
+
+1. *Of the model's 90 predictions, how many were correct?*
+2. *Of the 100 actual victims, how many did the model find?*
+3. *Is this model good or bad overall?*
+
+The next sections answer each. We'll see the numbers **82, 8, 18, 100, 90** appear over and over.
+
+---
+
+## Step 1 — Bucketise predictions: TP, FP, FN
+
+For every span (predicted or gold), we ask: did the model and the gold agree? That gives three buckets:
+
+- **True Positive (TP)** — model predicted VICTIM AND gold says VICTIM ✓
+- **False Positive (FP)** — model predicted VICTIM AND gold says no ✗ (false alarm)
+- **False Negative (FN)** — gold has a VICTIM AND model missed it ✗ (gap)
+
+**A medical-test analogy.** Think of a flu test:
+
+| Bucket | Flu test reading | VioNER reading |
 |:--|:--|:--|
-| **True Positive (TP)** | Filter said "spam" → email was spam ✓ | Model predicted an entity → gold says yes, same type and same boundaries ✓ |
-| **False Positive (FP)** | Filter said "spam" → email was real ✗ | Model predicted an entity → gold says no (or different type/boundaries) ✗ |
-| **False Negative (FN)** | Filter said "not spam" → email was spam ✗ | Model missed an entity that was actually there ✗ |
-| **True Negative (TN)** | Filter said "not spam" → email was real ✓ | Model correctly said "no entity here" ✓ |
+| TP | Test positive + patient has flu | Model said VICTIM + gold says VICTIM |
+| FP | Test positive + patient is healthy | Model said VICTIM + gold says no |
+| FN | Test negative + patient has flu | Model said O + gold says VICTIM |
+| TN | Test negative + patient is healthy | Model said O + gold says O |
 
-For NER we **don't report TN** because there are too many of them — every O token is technically a TN, and counting them would dilute the metric. The three numbers that drive every NER report are:
+For NER we **ignore TN** — every correctly-labelled O token is a TN, and reporting *"the model correctly identified that this comma is not an entity"* a million times tells us nothing useful.
 
-- **TP**: useful entities found
-- **FP**: false alarms (extra work for the analyst)
-- **FN**: missed entities (gap in coverage)
+**Filling in our running example's buckets:**
 
-### Why both FP and FN matter
+| Bucket | Count for VICTIM | What it means |
+|:--|--:|:--|
+| **TP** | **82** | The model's 82 useful predictions — correctly extracted victims the analyst won't have to add |
+| **FP** | **8** | The model's 8 false alarms — wrong predictions the analyst will have to delete |
+| **FN** | **18** | 18 actual victims the model didn't find — work the analyst still has to do by hand |
 
-A model that achieves **high precision** but **low recall** is the equivalent of a spam filter that only flags emails it is 100 % sure about. Almost nothing flagged is wrong (low FP), but tons of actual spam slips through (high FN). For VioNER that would mean: every extracted record is correct, but most of the violent events in the article queue never get extracted. The analyst still has to do everything by hand.
+Sanity checks:
+- TP + FP = 82 + 8 = 90 ✓ (the model's total predictions)
+- TP + FN = 82 + 18 = 100 ✓ (the gold's total actual victims)
 
-A model that achieves **high recall** but **low precision** is the equivalent of a spam filter that flags everything that looks even vaguely suspicious. Almost no real spam slips through (low FN), but the user has to wade through tons of false alarms (high FP). For VioNER that would mean: nothing is missed, but every entity list has so much noise that the analyst spends as much time filtering false alarms as they would have on the original article.
-
-Both modes are failure modes. The thesis reports **F1**, which is high only when both precision and recall are high simultaneously.
-
----
-
-## 7. Precision, Recall, F1 — span-level
-
-### The formulas
-
-For each entity type, count over the validation set:
-
-- **TP** (true positives): predicted spans that exactly match a gold span (same type AND same boundaries)
-- **FP** (false positives): predicted spans that don't match any gold span
-- **FN** (false negatives): gold spans that no prediction matches
-
-Then:
-
-$$\text{Precision} \;=\; \frac{\text{TP}}{\text{TP} + \text{FP}}$$
-
-$$\text{Recall} \;=\; \frac{\text{TP}}{\text{TP} + \text{FN}}$$
-
-$$\text{F1} \;=\; 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}$$
-
-### Plain English
-
-> *"Precision: of the entities the model predicted, what fraction were right? Recall: of the entities that really existed, what fraction did the model find? F1 is the harmonic mean — a single number that rewards being good at both."*
-
-### Symbol breakdown
-
-| Symbol | Meaning |
-|:-:|:--|
-| TP | Number of predicted spans that exactly match gold (correct, useful predictions). |
-| FP | Predicted spans with no matching gold (wrong predictions — noise the analyst would have to filter). |
-| FN | Gold spans with no matching prediction (missed extractions — work the analyst still has to do manually). |
-| F1 | Harmonic mean of P and R — closer to whichever is lower. |
-
-### Worked numeric example — VICTIM from the thesis
-
-From Table 6.7 (slide 28): VICTIM precision = 0.838, recall = 0.798, gold support (total gold VICTIM spans) = 5,492.
-
-Reverse-engineer the counts:
-
-- True positives: TP = 5,492 × recall = 5,492 × 0.798 = **4,383** VICTIM spans correctly recovered
-- False negatives: FN = 5,492 − 4,383 = **1,109** VICTIM spans missed
-- From precision: TP / (TP + FP) = 0.838, so FP = TP × (1 − 0.838) / 0.838 = 4,383 × 0.1934 = **848**
-
-So the model recovered 4,383 of 5,492 gold VICTIMs (recall 0.798), produced 848 false alarms (so precision 0.838).
-
-F1 check:
-
-$$\text{F1} = \frac{2 \cdot 0.838 \cdot 0.798}{0.838 + 0.798} = \frac{1.337}{1.636} = \mathbf{0.817}$$
-
-Matches the thesis table. ✓
-
-### Why harmonic mean?
-
-The harmonic mean is **closer to the smaller of the two values** than the arithmetic mean. If precision = 1.0 and recall = 0.1:
-
-- Arithmetic mean: (1.0 + 0.1) / 2 = 0.55 — flattering.
-- Harmonic mean (F1): 2 × 1.0 × 0.1 / 1.1 = 0.182 — honest.
-
-F1 punishes a model that wins on one metric by sacrificing the other. That is exactly what we want for NER: high precision with terrible recall is useless (we missed everything), and high recall with terrible precision is useless (we drowned the analyst in false alarms).
-
-### Where in the thesis / slides
-
-- Thesis §2.5 — definitions
-- Thesis §6.4–6.7 — every results table
-- Defense slide 27 — the headline F1
-- Defense slide 28 — per-entity precision/recall/F1
-- Defense slide 29 — ablation in F1 terms
-
-### Why it was required
-
-F1 is the universal NER reporting metric. CoNLL-2003 set the convention; every NER paper since reports F1 in the same form. Reporting precision and recall separately exposes the trade-off (some entities are precision-bound, some recall-bound).
-
-### Likely panel questions
-
-- **"Why not just accuracy?"** — *"With 78 % O tokens, a degenerate predict-O-everywhere model would score 78 % token accuracy. F1 on entity spans is the right metric because it ignores correct O predictions entirely."*
-- **"Strict or relaxed span matching?"** — *"Strict — both type and exact boundaries must match. CoNLL-2003 convention. A relaxed-match score (50 % overlap) would be 1.5-2 points higher."*
+**These three numbers — 82, 8, 18 — are the entire basis for the rest of Part B.** Everything else is just two ways of dividing them.
 
 ---
 
-## 8. Macro F1 vs Micro F1
+## Step 2 — Two natural questions: precision and recall
 
-### The formulas
+From TP, FP, FN we now ask two operationally meaningful questions about the same model.
 
-After computing per-entity F1 ($\text{F1}_c$ for class $c$):
+### Question 1: When the model said VICTIM, was it right?
 
-$$\text{Macro F1} \;=\; \frac{1}{K} \sum_{c=1}^{K} \text{F1}_c$$
+That's **precision**:
 
-(average of per-class F1; each class weighted equally — $K$ here is the number of entity types, **not** the number of BIO labels)
+$$\text{Precision} \;=\; \frac{\text{TP}}{\text{TP} + \text{FP}} \;=\; \frac{\text{useful predictions}}{\text{all predictions}}$$
 
-$$\text{Micro F1} \;=\; \text{F1}\Bigl(\sum_c \text{TP}_c, \, \sum_c \text{FP}_c, \, \sum_c \text{FN}_c\Bigr)$$
+For our running example:
 
-(F1 recomputed from pooled counts; high-support classes dominate)
+$$\text{Precision} \;=\; \frac{82}{82 + 8} \;=\; \frac{82}{90} \;=\; \mathbf{0.911}$$
 
-### Plain English
+**Read it:** *"When the model said VICTIM, it was correct 91.1% of the time."*
 
-> *"Macro F1 averages the per-entity F1 scores, treating every entity type as equally important. Micro F1 pools the raw counts across all entity types and computes one F1 from those — so populous classes like DATE and CITY drive the number more than VICTIM does."*
+The **denominator** is *all 90 things the model predicted*. The **numerator** is *the 82 that turned out right*. So precision measures the model's *trustworthiness* — what fraction of its claims hold up.
 
-### When to use which
+### Question 2: Of the actual victims, how many did the model find?
 
-- **Macro F1** — the right number when you want to know whether the model is balanced across entity types. A bad rare-entity F1 brings macro down sharply.
-- **Micro F1** — the right number when you want to estimate overall extraction throughput. Dominated by the high-support entities. Treats every gold span as equally important.
+That's **recall**:
 
-### Worked numeric example using thesis numbers
+$$\text{Recall} \;=\; \frac{\text{TP}}{\text{TP} + \text{FN}} \;=\; \frac{\text{found}}{\text{actually there}}$$
 
-From Table 6.7:
+For our running example:
+
+$$\text{Recall} \;=\; \frac{82}{82 + 18} \;=\; \frac{82}{100} \;=\; \mathbf{0.820}$$
+
+**Read it:** *"Of the 100 actual victims, the model found 82%."*
+
+The **denominator** is *all 100 actual gold victims*. The **numerator** is *the 82 the model recovered*. So recall measures the model's *thoroughness* — what fraction of the truth it caught.
+
+### The key trick: same numerator, different denominators
+
+This is what makes precision and recall feel slippery — they share TP in the numerator but use **different denominators**:
+
+| Metric | Numerator | Denominator | Reads as |
+|:--|:--|:--|:--|
+| Precision | TP = 82 | TP + FP = **90 (everything predicted)** | *"Of what I said, what fraction was right?"* |
+| Recall | TP = 82 | TP + FN = **100 (everything actual)** | *"Of what was there, what fraction did I find?"* |
+
+A diagram might help. Imagine two overlapping circles:
+
+```
+    Predicted (90)          Actual gold (100)
+       ┌─────────────────────────┐
+       │  ┌─────────────────┐   │
+       │  │  TP = 82        │   │  ← the overlap: correctly found
+       │  │  (both said yes)│   │
+       │  └─────────────────┘   │
+       │                        │
+       │  Outside gold = FP = 8 │   ← model said yes, gold said no
+       │                        │
+       └──────────┬─────────────┘
+                  │
+       Outside model = FN = 18      ← gold said yes, model said no
+```
+
+- **Precision** asks: *"Of the 90 in my circle, what fraction lands in the gold circle?"* → 82 / 90
+- **Recall** asks: *"Of the 100 in the gold circle, what fraction lands in my circle?"* → 82 / 100
+
+### Why both matter (the analyst's perspective)
+
+Imagine a model with **perfect precision (1.0)** but **terrible recall (0.1)**. It only flags 10 entities, all correct, missing the other 90. Useless to the analyst — they still have to read every article for the 90 missed.
+
+Imagine the reverse: **perfect recall (1.0)** but **terrible precision (0.1)**. It flags 1,000 candidates, only 100 correct. Useless too — the analyst spends as much time deleting the 900 false alarms as they would have on the original article.
+
+A useful model needs *both*. That's what F1 measures.
+
+---
+
+## Step 3 — One number to summarise both: F1
+
+We have two numbers (precision 0.911, recall 0.820). To compare configurations we want **one** number summarising the model's quality on VICTIM.
+
+### Why not just average them?
+
+Tempting: take the arithmetic mean.
+
+$$\frac{0.911 + 0.820}{2} = 0.866$$
+
+The problem: arithmetic mean lets a lopsided high precision paper over a low recall. Take precision = 1.0 and recall = 0.1:
+
+$$\frac{1.0 + 0.1}{2} = 0.55$$
+
+That sounds *okay*. But the model is actually useless (90% of victims missed). Arithmetic mean *flatters* lopsided performance.
+
+### The harsh judge: the harmonic mean
+
+The **harmonic mean** of precision and recall is called **F1**:
+
+$$\text{F1} \;=\; \frac{2 \cdot \text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}$$
+
+For our running example:
+
+$$\text{F1} \;=\; \frac{2 \times 0.911 \times 0.820}{0.911 + 0.820} \;=\; \frac{1.494}{1.731} \;=\; \mathbf{0.864}$$
+
+For the lopsided case (P = 1.0, R = 0.1):
+
+$$\text{F1} \;=\; \frac{2 \times 1.0 \times 0.1}{1.0 + 0.1} \;=\; \frac{0.2}{1.1} \;=\; \mathbf{0.182}$$
+
+Compare with the arithmetic mean (0.55). The harmonic mean is **honest** — it refuses to be flattered by one-sided performance.
+
+### Why the harmonic mean has that property
+
+A key fact about the harmonic mean: **it's always closer to the smaller of the two values** than the arithmetic mean is. So if one of precision or recall is bad, F1 drops sharply toward it. You can't game F1 by maximising one side.
+
+That's why F1 is the universal NER metric: it rewards models that are *both* trustworthy *and* thorough. A model that's good at only one of those is useless to the analyst.
+
+### How to read an F1 number quickly
+
+- **F1 ≥ 0.90** — strong; both precision and recall are high
+- **F1 0.80-0.90** — good; some imbalance but usable
+- **F1 0.70-0.80** — moderate; visible gaps, may need review
+- **F1 < 0.70** — weak; recall or precision (or both) is poor
+
+VioNER's per-entity F1s span 0.817-0.956. **Even the weakest entity (VICTIM at 0.817) is in the "good" tier** — that's the strength of the result.
+
+---
+
+## Step 4 — Aggregating across entity types: macro F1 and micro F1
+
+So far we computed F1 for **one entity type** (VICTIM). VioNER has 8. How do we combine 8 F1 numbers into "the overall F1 of the model"?
+
+Two methods, both meaningful, each answers a different question.
+
+### Macro F1 — every entity counts equally
+
+Just average the 8 per-entity F1s:
+
+$$\text{Macro F1} \;=\; \frac{\text{F1}_{\text{DATE}} + \text{F1}_{\text{CITY}} + \cdots + \text{F1}_{\text{VICTIM}}}{8}$$
+
+Using the thesis's per-entity F1s (Table 6.7):
+
+$$\text{Macro F1} \;=\; \frac{0.956 + 0.934 + 0.923 + 0.891 + 0.885 + 0.866 + 0.826 + 0.817}{8} \;=\; \frac{7.098}{8} \;=\; \mathbf{0.887}$$
+
+That matches the thesis. ✓
+
+**The teacher analogy.** Imagine a student took 8 subjects with very different numbers of questions per subject (Math had 100 questions, Art had 10). **Macro grading** says: *"Each subject is equally important. The student's overall mark is the simple average across subjects, regardless of how many questions each subject had."*
+
+**When macro is right:** when you want to know whether the model is *balanced* across entity types. A weak rare entity (VICTIM at 0.817) drags macro down sharply, which tells you something is being neglected. Macro is the right number when *every entity type matters operationally*.
+
+### Micro F1 — every gold span counts equally
+
+Before showing the formula, let me explain the notation and the "pool" idea — they're what makes this section look harder than it is.
+
+#### Two pieces of notation you'll need first
+
+**The $\sum$ symbol (read as "sigma" or "the sum of").** This is a math shorthand for *"sum the following quantity across all the things being indexed."* For example, $\sum_c \text{TP}_c$ literally reads as *"sum the TP counts across all classes c"* — which for VioNER means *"add up the TP counts across all 8 entity types."*
+
+**The subscript $c$.** Here $c$ is just a label that ranges over the 8 entity types — ACTOR, VICTIM, ACTION, DATE, REGION, CITY, DISTRICT, CASUALTIES. So $\text{TP}_c$ means *"the TP count for entity c."* For example, $\text{TP}_{\text{VICTIM}} = 82$ in our earlier running example.
+
+So $\sum_c \text{TP}_c$ is just notation for *"the total TPs pooled across all 8 entity types."*
+
+#### What "pooling" means concretely
+
+Imagine taking the 8 separate (TP, FP, FN) triples — one triple per entity — and dumping all 24 numbers into one big bucket. Then add them up by type to get three big totals: pooled TP, pooled FP, pooled FN.
+
+Using thesis's per-entity numbers (reverse-engineered from Table 6.7's precision, recall, and support columns), here is the actual pool for VioNER:
+
+| Entity | Support (= TP + FN) | TP | FP | FN |
+|:--|--:|--:|--:|--:|
+| DATE | 31,938 | 30,405 | 1,234 | 1,533 |
+| CITY | 44,361 | 41,167 | 2,581 | 3,194 |
+| ACTOR | 47,612 | 43,660 | 3,335 | 3,952 |
+| REGION | 24,331 | 21,436 | 2,330 | 2,895 |
+| CASUALTIES | 4,907 | 4,264 | 469 | 643 |
+| ACTION | 9,963 | 8,489 | 1,147 | 1,474 |
+| DISTRICT | 21,471 | 17,413 | 3,269 | 4,058 |
+| VICTIM | 5,492 | 4,383 | 847 | 1,109 |
+| **POOL TOTAL** ($\sum_c$) | **190,075** | **171,217** | **15,212** | **18,858** |
+
+The pool totals at the bottom are exactly the $\sum_c \text{TP}_c$, $\sum_c \text{FP}_c$, $\sum_c \text{FN}_c$ values that appear in the formula.
+
+#### Computing micro F1 the easy way
+
+Once you have the pool totals, you can just treat them as if they were a single entity's TP, FP, FN — and apply the same precision / recall / F1 formulas from Step 3:
+
+**Pool precision** (just like single-entity precision, but using pool totals):
+$$\text{Pool Precision} \;=\; \frac{\text{Pool TP}}{\text{Pool TP} + \text{Pool FP}} \;=\; \frac{171{,}217}{171{,}217 + 15{,}212} \;=\; \frac{171{,}217}{186{,}429} \;=\; \mathbf{0.918}$$
+
+**Pool recall** (same idea):
+$$\text{Pool Recall} \;=\; \frac{\text{Pool TP}}{\text{Pool TP} + \text{Pool FN}} \;=\; \frac{171{,}217}{171{,}217 + 18{,}858} \;=\; \frac{171{,}217}{190{,}075} \;=\; \mathbf{0.901}$$
+
+**Micro F1** = harmonic mean of pool precision and pool recall:
+$$\text{Micro F1} \;=\; \frac{2 \times 0.918 \times 0.901}{0.918 + 0.901} \;=\; \frac{1.654}{1.819} \;=\; \mathbf{0.909}$$
+
+That matches the thesis. ✓
+
+#### The compact formula — same answer, fewer steps
+
+If you skip computing pool precision and pool recall separately and substitute them straight into the F1 definition, all the divisions collapse and you get:
+
+$$\text{Micro F1} \;=\; \frac{2 \times \sum_c \text{TP}_c}{2 \times \sum_c \text{TP}_c + \sum_c \text{FP}_c + \sum_c \text{FN}_c}$$
+
+Substituting our pool totals:
+
+$$\text{Micro F1} \;=\; \frac{2 \times 171{,}217}{2 \times 171{,}217 + 15{,}212 + 18{,}858} \;=\; \frac{342{,}434}{376{,}504} \;=\; \mathbf{0.909}$$
+
+Same answer. The compact form just packages the two steps into one expression — useful for writing on a slide, but the two-step version (pool → precision and recall → F1) is what you should picture mentally.
+
+#### The teacher analogy, continued
+
+**Micro grading says:** *"Pool all the questions across all subjects, ignoring which subject they came from. The student's overall mark is the percentage of all questions they got right."*
+
+If a student took Math (100 questions, 95 right) and Art (10 questions, 6 right), micro grading would compute:
+
+- Pool right: $95 + 6 = 101$
+- Pool total: $100 + 10 = 110$
+- Micro score: $101 / 110 = 91.8\%$
+
+Math dominates because it contributed 100 of the 110 pooled questions. Compare that with **macro grading** (the average of subject percentages): $(95/100 + 6/10) / 2 = (0.95 + 0.60) / 2 = 77.5\%$. The two grades disagree because Art's weakness affects them differently.
+
+#### Why VioNER's micro (0.909) > macro (0.887)
+
+Because **VioNER's high-support entities also have the highest F1**. Look back at the support column:
+
+- DATE has 31,938 spans and F1 = 0.956 → contributes 30,405 of the 171,217 pooled TPs (~18%)
+- VICTIM has 5,492 spans and F1 = 0.817 → contributes just 4,383 of the pooled TPs (~2.6%)
+
+The pool is dominated by the strong-performing high-support entities, pulling micro up. Macro gives every entity equal weight, so VICTIM's weakness drags macro down. The 2-point gap between micro (0.909) and macro (0.887) is the visible signature of *"the model is strongest on the most common entities."*
+
+If instead the model had been weak on DATE and strong on VICTIM, micro would be *lower* than macro. The relationship reveals the model's performance profile across entity types.
+
+**When micro is right:** when you want **overall extraction throughput** — what fraction of typical spans the model gets right across a normal mix of articles. High-support entities (DATE, CITY, ACTOR) drive the number.
+
+**When macro is right:** when you want **balance** — whether the model is operationally usable for *every* entity type, including the rare ones.
+
+The thesis reports both because both are defensible and they answer different operational questions.
+
+### Why micro is higher than macro in VioNER (0.909 vs 0.887)
+
+Because **VioNER's high-support entities also have the highest F1**:
 
 | Entity | Support | F1 |
 |:--|--:|--:|
-| DATE | 31,938 | 0.956 |
-| CITY | 44,361 | 0.934 |
-| ACTOR | 47,612 | 0.923 |
-| REGION | 24,331 | 0.891 |
-| CASUALTIES | 4,907 | 0.885 |
-| ACTION | 9,963 | 0.866 |
-| DISTRICT | 21,471 | 0.826 |
-| VICTIM | 5,492 | 0.817 |
+| DATE | 31,938 | **0.956** ← high support, high F1 |
+| CITY | 44,361 | **0.934** ← high support, high F1 |
+| ACTOR | 47,612 | **0.923** ← high support, high F1 |
+| ... | ... | ... |
+| VICTIM | 5,492 | 0.817 ← low support, lower F1 |
 
-**Macro F1:**
+Micro is pulled up by the high-support strong entities (DATE, CITY, ACTOR), because they contribute more spans to the pool. Macro gives every entity equal weight, so the weak VICTIM (0.817) drags it down. **If the model had been bad at high-support entities and good at rare ones, micro would be *lower* than macro instead.**
 
-$$(0.956 + 0.934 + 0.923 + 0.891 + 0.885 + 0.866 + 0.826 + 0.817) / 8 = 7.098 / 8 = \mathbf{0.887}$$
+The relationship between macro and micro reveals the model's profile.
 
-Matches the thesis. ✓
+### Why the thesis reports both
 
-**Micro F1:** computed from pooled TP/FP/FN across all 8 entities. The thesis reports 0.909 — about 2 points higher than macro because the high-support entities (DATE, CITY, ACTOR) have higher F1 and dominate the pool.
+- **Macro 0.887** says *"the model is balanced — even the rare entities are usable"*
+- **Micro 0.909** says *"on a typical batch of articles, ~91% of spans are correctly extracted"*
 
-### Where in the thesis / slides
+Both answer different defensible questions; reporting both is standard NER practice.
 
-- Thesis §2.5 — definitions
-- Defense slide 27 — both reported in the caption
-- Defense slide 28 — macro reported as the bottom row
+### A quick mnemonic
 
-### Why it was required
-
-Reporting one of these in isolation is misleading. Macro alone hides the fact that the model performs well overall; micro alone hides the fact that VICTIM is weaker. Reporting both is standard NER practice and the thesis's defence depends on both: macro shows balance, micro shows operational throughput.
-
-### Likely panel questions
-
-- **"Which is more important?"** — *"Depends on the use case. For analyst triage on rare events, macro matters more — we need every entity type to be usable. For estimating annual throughput across all events, micro matters more."*
-- **"Why is micro higher than macro here?"** — *"Because the highest-support entities (DATE, CITY, ACTOR) also have the highest F1. Micro is weighted by support, so it inherits their numbers more strongly than the rare-entity numbers."*
+- **MAc**ro → **MA**ny equal entities → average per-entity F1
+- **MI**cro → **MIxed** pool of spans → compute one F1 from totals
 
 ---
 
-## 9. Token accuracy
+## Step 5 — Token accuracy: the trap
 
-### The formula
+The simplest NER metric: what fraction of tokens did the model get right?
 
-$$\text{Token accuracy} \;=\; \frac{\text{number of correctly classified tokens}}{\text{total tokens (excluding special tokens)}}$$
+$$\text{Token accuracy} \;=\; \frac{\text{correctly classified tokens}}{\text{total tokens (excluding padding)}}$$
 
-### Plain English
+VioNER scores **96.7%**. This sounds excellent and most people (including many panellists) assume this is the headline. **It isn't, and the thesis is explicit about why.**
 
-> *"The fraction of token positions where the model's predicted label matches the gold label."*
+### The 78% trap
 
-### Worked numeric example
+Recall that **78% of tokens are class O** (non-entity — punctuation, prepositions, function words). A degenerate model that just predicted O for every single token — without learning anything — would score:
 
-Imagine a 100-token validation set where the model gets 95 tokens right (78 O tokens correctly tagged as O, plus 17 entity tokens correctly tagged with their entity).
+$$\text{Token accuracy} \;=\; \frac{\text{tokens labelled O that were correctly predicted O}}{\text{total tokens}} \;=\; \frac{78}{100} \;=\; \mathbf{78\%}$$
 
-$$\text{Token acc} = 95/100 = \mathbf{0.95}$$
+**A "predict O everywhere" baseline scores 78% accuracy without learning anything at all.**
 
-### Where in the thesis / slides
+So when VioNER scores 96.7%, the meaningful improvement is only $96.7 - 78 = 18.7$ percentage points above the trivial baseline. The 96.7% number is *inflated by the O class*.
 
-- Thesis §2.5 — defined, with a warning
-- Defense slide 27 — reported as 96.7 % in the caption
+### Why F1 fixes the trap
 
-### Why it was required (and why it should not be the headline)
+F1 is computed on **entity spans only** — correctly-tagged O tokens count for nothing. A "predict O everywhere" baseline would score:
 
-The thesis reports token accuracy for completeness — it is the simplest available metric and easy for non-specialists to interpret. **But §2.5 explicitly warns against using it as the headline metric.** With 78 % O tokens, a "predict O everywhere" model already achieves 78 % accuracy without learning anything useful. The 96.7 % accuracy reported in this thesis sounds good, but the meaningful gain over the naïve baseline is only 96.7 − 78 = **18.7 percentage points** of useful learning. F1 — which ignores correct O predictions — is the metric that captures actual entity-extraction quality.
+- Precision: 0 / 0 (undefined — no predictions)
+- Recall: 0 / 100,000 = 0
+- F1: 0
 
-### Likely panel questions
+So a degenerate model that hits 78% token accuracy gets **F1 = 0**. F1 is the metric that distinguishes "actually extracting entities" from "trivially correct on the dominant class".
 
-- **"96.7 % accuracy sounds great — why isn't that your headline?"** — *"Because 78 % of tokens are O, so the trivial 'predict O everywhere' baseline already gives 78 %. The headline metric is span-level F1, which ignores correct O predictions and measures actual entity recovery."*
+### When token accuracy is OK to report
+
+- As a **sanity check** that the model is doing something above the trivial baseline
+- As a **simple metric** for non-specialist audiences
+
+But never as the headline number for a contribution claim.
+
+### Defense-day answer
+
+If a panellist says *"96.7% accuracy sounds great — why isn't that your headline?"* deliver:
+
+> *"Because 78% of tokens are O, so a 'predict O everywhere' baseline already scores 78% without learning anything. The headline metric is span-level F1, which ignores correct O predictions and measures actual entity recovery. Token accuracy is reported in section 2.5 with an explicit warning."*
+
+---
+
+## Putting it all together — what every results table actually shows
+
+After Part B, you should be able to read any results table in the thesis without confusion. Here's the decoder:
+
+| What you see | What it actually shows |
+|:--|:--|
+| Support column (e.g., VICTIM = 5,492) | Total gold spans of that entity type in the validation set — the denominator for recall |
+| Precision column (e.g., 0.911) | TP / (TP + FP) — when the model said this entity, how often was it right? |
+| Recall column (e.g., 0.820) | TP / (TP + FN) — of the actual entities, how many did the model find? |
+| F1 column (e.g., 0.864) | Harmonic mean of precision and recall — single quality number per entity |
+| Macro F1 (= 0.887) | Average of 8 per-entity F1s — answers *"is the model balanced?"* |
+| Micro F1 (= 0.909) | F1 from pooled TP/FP/FN — answers *"what's overall throughput?"* |
+| Token accuracy (= 96.7%) | Fraction of tokens correctly labelled — inflated by O dominance, not a headline |
+| Ablation table (Table 6.8) | The same per-entity F1s recomputed under different loss functions. **The differences show what each loss-function choice bought.** |
+| "+11 F1 on VICTIM" | (Focal-plus-weights VICTIM F1 = 0.817) − (Plain-CE VICTIM F1 = 0.708) = 0.109; multiply by 100 = 10.9 ≈ 11 F1 points |
+
+If you can read each row of this table without hesitation, you've internalised Part B.
+
+---
+
+## Where Part B's metrics appear in the thesis and slides
+
+| Concept | Thesis | Defense slide |
+|:--|:--|:--|
+| Held-out validation set | §5.3, §6.13 | Slide 24 |
+| TP/FP/FN | §2.5 | Underlies every results slide |
+| Precision, Recall, F1 | §2.5, §6.4–6.7 | Slides 27, 28, 29 |
+| Macro F1 | §2.5, §6.4 | Slide 27 caption, slide 28 |
+| Micro F1 | §2.5, §6.4 | Slide 27 caption |
+| Token accuracy | §2.5 (with warning) | Slide 27 caption |
+
+---
+
+## Likely panel questions on Part B's metrics
+
+**"Why F1 and not just accuracy?"** → *"Because 78% of tokens are O. A 'predict O everywhere' baseline already scores 78% accuracy without learning anything. F1 on entity spans ignores correct O predictions and measures actual entity recovery."*
+
+**"Strict or relaxed span matching?"** → *"Strict — both type AND exact boundaries must match. CoNLL-2003 convention. A relaxed 50% overlap score would be 1.5-2 F1 points higher; we report strict for honesty."*
+
+**"Why is micro higher than macro?"** → *"Because the high-support entities (DATE, CITY, ACTOR) also have the highest F1. Micro is weighted by support, so it inherits their numbers more strongly than the rare-entity numbers."*
+
+**"Which matters more — macro or micro?"** → *"Depends on the consumer's question. Macro answers 'is the model balanced across entity types?' — important for analyst triage on rare events. Micro answers 'what's the overall extraction throughput?' — important for estimating annual coverage."*
+
+**"What's the support column for?"** → *"It's the total number of gold spans of that entity type in the validation set. It serves as the denominator for recall and as a sanity check on whether each entity has enough data for its F1 to be reliable."*
+
+**"Why do you say precision is the model's trustworthiness?"** → *"Because precision tells you, of everything the model predicted, what fraction was correct. High precision means the analyst can trust the model's positive predictions without verification. Low precision means most predictions need to be deleted, which costs review time."*
 
 ---
 

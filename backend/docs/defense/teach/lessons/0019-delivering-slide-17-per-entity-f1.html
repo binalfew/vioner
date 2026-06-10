@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 19 — Delivering Slide 17: Per-Entity F1 (The Reliability Map)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --accent-soft:#A14747;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --success-soft:#E6F0E6;
+  --warn:#8B5A2B;
+  --warn-soft:#F5EFE2;
+  --beat:#1A365D;
+  --beat-soft:#E8EEF5;
+  --trust:#3F6B3F;     /* trust tier */
+  --spot:#3D6B8B;      /* spot-check tier */
+  --verify:#8B5A2B;    /* verify tier */
+  --correct:#7B1E1E;   /* correct tier */
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:42rem;margin:0 auto;padding:3.5rem 1.5rem 6rem}
+.eyebrow{font-family:"Inter","SF Pro Text",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.18em;font-size:0.72rem;color:var(--accent);font-weight:600}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:2.2rem;font-weight:700;line-height:1.18;margin:0.4rem 0 0.6rem;letter-spacing:-0.012em}
+h2{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:1.45rem;margin:3rem 0 0.6rem;font-weight:700;border-bottom:1px solid var(--rule);padding-bottom:0.4rem}
+h3{font-family:"Inter",system-ui,sans-serif;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin:1.6rem 0 0.4rem;color:var(--accent)}
+p,li{font-size:1.05rem}
+.subtitle{color:var(--ink-soft);font-style:italic;font-size:1.1rem;margin:0 0 1.4rem}
+.meta{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);letter-spacing:0.02em;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:0.6rem 0;margin-bottom:2.2rem;display:flex;flex-wrap:wrap;gap:1.2rem}
+.meta span strong{color:var(--ink)}
+.callout{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem;margin:1.2rem 0;border-radius:4px}
+.callout.win{border-left:3px solid var(--success)}
+.callout.warn{border-left:3px solid var(--warn)}
+.callout.beat{border-left:3px solid var(--beat)}
+code{font-family:"JetBrains Mono","SF Mono",Menlo,monospace;font-size:0.92em;background:#F0EBE0;padding:0.06em 0.36em;border-radius:3px}
+/* Slide mock */
+.slide-mock{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.5rem 1.7rem;margin:1.4rem 0;box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+.slide-mock .badge{font-family:"Inter",system-ui,sans-serif;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:0.3rem;font-weight:600}
+.slide-mock .title{font-family:"Iowan Old Style",Georgia,serif;font-size:1.45rem;font-weight:700;margin:0 0 0.6rem}
+/* F1 bar list */
+.barlist{display:grid;gap:4px;margin:0.9rem 0}
+.barrow{display:grid;grid-template-columns:7rem 1fr 3.6rem auto;gap:0.6rem;align-items:center}
+.barrow .ent{font-family:"JetBrains Mono",monospace;font-size:0.82rem;font-weight:700;text-align:right;color:var(--ink)}
+.barrow .track{height:20px;background:#F0EBE0;border-radius:3px;overflow:hidden;position:relative}
+.barrow .fill{height:100%;border-radius:3px}
+.barrow.trust .fill{background:var(--trust)}
+.barrow.spot .fill{background:var(--spot)}
+.barrow.verify .fill{background:var(--verify)}
+.barrow.correct .fill{background:var(--correct)}
+.barrow .f1{font-family:"JetBrains Mono",monospace;font-size:0.85rem;font-weight:700;font-feature-settings:"tnum";text-align:right}
+.barrow.trust .f1{color:var(--trust)}
+.barrow.spot .f1{color:var(--spot)}
+.barrow.verify .f1{color:var(--verify)}
+.barrow.correct .f1{color:var(--correct)}
+.barrow .op{font-family:"Inter",sans-serif;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.04em;font-weight:700;padding:0.18em 0.5em;border-radius:3px;white-space:nowrap}
+.barrow.trust .op{background:var(--success-soft);color:var(--trust)}
+.barrow.spot .op{background:var(--beat-soft);color:var(--spot)}
+.barrow.verify .op{background:var(--warn-soft);color:var(--verify)}
+.barrow.correct .op{background:#F5E6E6;color:var(--correct)}
+.bar-avg{display:grid;grid-template-columns:7rem 1fr;gap:0.6rem;margin-top:0.4rem;padding-top:0.45rem;border-top:1.5px solid var(--rule);font-family:"JetBrains Mono",monospace;font-size:0.82rem;color:var(--ink-soft)}
+.bar-avg b{color:var(--accent)}
+/* Full table */
+.f1table{width:100%;border-collapse:collapse;margin:0.8rem 0;font-size:0.92rem}
+.f1table th{font-family:"Inter",sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:700;text-align:left;padding:0.4rem 0.6rem;border-bottom:1.5px solid var(--rule)}
+.f1table th.num,.f1table td.num{text-align:right;font-feature-settings:"tnum"}
+.f1table td{padding:0.35rem 0.6rem;border-bottom:1px dashed var(--rule);font-family:"Iowan Old Style",Georgia,serif}
+.f1table td.ent{font-weight:600}
+.f1table td.num{font-family:"JetBrains Mono",monospace;font-size:0.85rem}
+.f1table td.num b{color:var(--accent)}
+.f1table tr.avg td{border-top:1.5px solid var(--rule);font-weight:700;background:var(--highlight)}
+/* Tier cards */
+.tiers{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin:1rem 0}
+.tier{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.9rem 1.05rem}
+.tier.trust{border-left:3px solid var(--trust)}
+.tier.spot{border-left:3px solid var(--spot)}
+.tier.verify{border-left:3px solid var(--verify)}
+.tier.correct{border-left:3px solid var(--correct)}
+.tier h4{font-family:"Inter",sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.3rem;font-weight:700}
+.tier.trust h4{color:var(--trust)}
+.tier.spot h4{color:var(--spot)}
+.tier.verify h4{color:var(--verify)}
+.tier.correct h4{color:var(--correct)}
+.tier .ents{font-family:"JetBrains Mono",monospace;font-size:0.8rem;font-weight:700;margin-bottom:0.3rem;color:var(--ink)}
+.tier p{font-size:0.9rem;margin:0.25rem 0;color:var(--ink-soft);line-height:1.5}
+.tier p em{color:var(--ink)}
+/* Row readings */
+.rowread{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.1rem 1.3rem;margin:1.2rem 0}
+.rowread h4{font-family:"Inter",sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.55rem;color:var(--accent);font-weight:700}
+.rr{display:grid;grid-template-columns:7.2rem 1fr;gap:0.7rem;padding:0.45rem 0;border-bottom:1px dashed var(--rule);font-size:0.94rem;line-height:1.5;align-items:start}
+.rr:last-child{border:0}
+.rr .e{font-family:"JetBrains Mono",monospace;font-size:0.8rem;font-weight:700;color:var(--accent)}
+.rr .why em{color:var(--ink);font-style:italic}
+.rr .why .aq{display:block;font-size:0.85rem;color:var(--ink-soft);font-style:italic;margin-top:0.2rem}
+/* Beats */
+.beat-script{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin:1.4rem 0}
+.beat{display:grid;grid-template-columns:auto 1fr;gap:0.9rem;align-items:start;padding:0.9rem 0;border-bottom:1px dashed var(--rule)}
+.beat:last-child{border-bottom:0}
+.beat-num{background:var(--beat);color:#FFF;width:2.1rem;height:2.1rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.85rem}
+.beat-num.hero{background:var(--accent)}
+.beat-content .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--beat);font-weight:600;margin-bottom:0.25rem;display:flex;gap:0.7rem;align-items:baseline}
+.beat-content .label.hero{color:var(--accent)}
+.beat-content .label .secs{color:var(--ink-soft);font-weight:400;font-style:italic}
+.beat-content .text{font-size:1.04rem;line-height:1.55;margin:0.2rem 0}
+.beat-content .text em.key{background:var(--success-soft);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:600;color:var(--success)}
+.beat-content .text em.num{background:var(--highlight);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:700;color:var(--accent)}
+.beat-content .micro{margin-top:0.4rem;font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Pattern */
+.pattern{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.pattern h4{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.55rem;color:var(--accent);font-weight:700}
+.pattern-row{display:grid;grid-template-columns:auto 1fr;gap:0.6rem;align-items:start;padding:0.45rem 0;border-bottom:1px dashed var(--rule);font-size:0.95rem;line-height:1.5}
+.pattern-row:last-child{border:0}
+.pattern-row .step{background:var(--accent);color:#FFF;font-family:"Inter",sans-serif;font-size:0.68rem;font-weight:700;padding:0.15em 0.5em;border-radius:3px;white-space:nowrap}
+.pattern-row strong{color:var(--ink)}
+/* Reserved */
+.reserved{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.reserved h4{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.7rem;color:var(--accent);font-weight:700}
+.reserved-rows{display:grid;grid-template-columns:auto 1fr auto;gap:0.6rem 0.9rem;font-family:"Iowan Old Style",Georgia,serif;align-items:center}
+.reserved-rows .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:600}
+.reserved-rows .desc{font-size:0.93rem;color:var(--ink-soft);font-style:italic}
+.reserved-rows .num{font-weight:700;color:var(--accent);font-feature-settings:"tnum";font-size:1.02rem;text-align:right}
+.reserved-rows .row-sep{grid-column:1 / -1;border-top:1px dashed var(--rule);height:0;margin:0.1rem 0}
+/* Hero line */
+.hero-line{background:var(--highlight);border:2px solid var(--accent);border-radius:6px;padding:1.2rem 1.4rem;margin:1.3rem 0;text-align:center;font-family:"Iowan Old Style",Georgia,serif;font-size:1.1rem;line-height:1.55;font-weight:500}
+.hero-line .label{display:block;font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:600;margin-bottom:0.4rem}
+/* Attack */
+.attack{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem 0.8rem;margin:1rem 0;border-radius:4px}
+.attack .q{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.95rem;color:var(--accent);margin-bottom:0.5rem}
+.attack .a{margin:0.4rem 0 0.6rem;font-size:1.03rem}
+.attack .micro{font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Timer */
+.timer-box{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.3rem;margin:1.3rem 0;text-align:center}
+.timer-display{font-family:"JetBrains Mono","SF Mono",monospace;font-size:2.6rem;font-weight:700;color:var(--accent);margin:0.3rem 0;font-feature-settings:"tnum"}
+.timer-buttons{display:flex;gap:0.6rem;justify-content:center;margin-top:0.7rem;flex-wrap:wrap}
+.timer-buttons button{font-family:"Inter",system-ui,sans-serif;font-size:0.92rem;font-weight:600;padding:0.55rem 1.3rem;border:1px solid var(--accent);background:var(--accent);color:#FFF;border-radius:4px;cursor:pointer;transition:background 120ms}
+.timer-buttons button:hover{background:var(--accent-soft)}
+.timer-buttons button.secondary{background:#FFF;color:var(--accent)}
+.timer-buttons button.secondary:hover{background:#FBFAF7}
+.timer-verdict{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin-top:0.7rem;min-height:1.4rem;font-weight:600}
+.timer-verdict.win{color:var(--success)}
+.timer-verdict.over{color:var(--warn)}
+/* Quiz */
+.quiz{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem;margin:1.4rem 0}
+.quiz h4{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin:0 0 0.8rem;color:var(--accent)}
+.quiz .qstem{font-size:1.02rem;margin-bottom:0.7rem}
+.choices{list-style:none;padding:0;margin:0}
+.choices li{margin:0.45rem 0;padding:0.55rem 0.8rem;border:1px solid var(--rule);border-radius:4px;cursor:pointer;background:#FBFAF7;font-size:0.98rem;transition:background 120ms,border-color 120ms}
+.choices li:hover{background:#F5EFE2;border-color:var(--accent-soft)}
+.choices li.right{background:var(--success-soft);border-color:var(--success);color:var(--success)}
+.choices li.wrong{background:#F5E4E4;border-color:var(--accent);color:var(--accent)}
+.choices li.locked{pointer-events:none;opacity:0.85}
+.feedback{font-family:"Inter",system-ui,sans-serif;font-size:0.93rem;margin-top:0.7rem;color:var(--ink-soft);min-height:1.2rem;font-style:italic}
+/* Followup */
+.followup{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin-top:2.4rem;border-left:3px solid var(--beat)}
+.followup ul{margin:0.6rem 0 0 1.1rem}
+.followup li{margin:0.45rem 0;font-size:1rem}
+.bottom{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;color:var(--ink-soft);border-top:1px solid var(--rule);padding-top:1.2rem;margin-top:3rem;font-style:italic}
+.cite{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);margin-top:0.3rem}
+.cite a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent-soft)}
+.cite a:hover{border-bottom:1px solid var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">Lesson 19 · Slide 17</div>
+<h1>Per-entity F1 — the reliability map</h1>
+<div class="subtitle">Slide 16 gave the panel two averages; slide 17 opens them up into eight rows. The slide's central craft skill is <strong>operational translation</strong>: every F1 decimal gets converted into an analyst workflow instruction — trust, spot-check, verify, correct. The second skill is <strong>weakest-number ownership</strong>: VICTIM's 0.817 is the lowest number on the slide, and you explain it before anyone asks, with a causal account and a forward reference to the ablation that lifted it.</div>
+
+<div class="meta">
+<span><strong>Slide:</strong> 17 of 22</span>
+<span><strong>Target time:</strong> 90 seconds</span>
+<span><strong>Hero line:</strong> "Read it operationally — what to trust, what to spot-check, what to correct"</span>
+<span><strong>Reserved cards:</strong> 5,492 vs 47,612 · P&gt;R every row · Goma/Beni · slide 18 / slide 20</span>
+</div>
+
+<h2>1 · Where this slide sits in the arc</h2>
+
+<p>Slide 16 ended with "the per-entity breakdown is where the operational story lives" — slide 17 must now deliver that operational story, not just more decimals. The macro 0.887 from slide 16 decomposes into the eight rows here (their simple average <em>is</em> 0.887 — the panel can check). And slide 17 sets up slide 18: VICTIM at 0.817 is the slide's weakest number, and the ablation is the story of how it got there from 0.708. The pivot line hands over explicitly: <em>"to prove the loss-function choice was the right one, here's the ablation."</em></p>
+
+<div class="callout beat">
+<strong>The function of slide 17.</strong> Three jobs. (1) Recite the eight-row ranking fluently — this is the evidence section's second memorisation artefact, after slide 15's 10-step pipeline. (2) Translate every number into an analyst instruction — the "reliability map" framing is what makes eight decimals into a usability claim, which is the thesis's operational selling point. (3) Own the weak rows (DISTRICT 0.826, VICTIM 0.817) with causal accounts <em>before</em> the panel asks — the weakest-number ownership move. A candidate who explains their own worst number unprompted cannot be ambushed with it.
+</div>
+
+<h2>2 · What's on the slide</h2>
+
+<div class="slide-mock">
+<div class="badge">Slide 17</div>
+<div class="title">Per-entity F1 — the reliability map</div>
+
+<div class="barlist">
+<div class="barrow trust"><span class="ent">DATE</span><div class="track"><div class="fill" style="width:95.6%"></div></div><span class="f1">0.956</span><span class="op">Trust</span></div>
+<div class="barrow trust"><span class="ent">CITY</span><div class="track"><div class="fill" style="width:93.4%"></div></div><span class="f1">0.934</span><span class="op">Trust</span></div>
+<div class="barrow spot"><span class="ent">ACTOR</span><div class="track"><div class="fill" style="width:92.3%"></div></div><span class="f1">0.923</span><span class="op">Spot-check</span></div>
+<div class="barrow spot"><span class="ent">REGION</span><div class="track"><div class="fill" style="width:89.1%"></div></div><span class="f1">0.891</span><span class="op">Occasional fix</span></div>
+<div class="barrow verify"><span class="ent">CASUALTIES</span><div class="track"><div class="fill" style="width:88.5%"></div></div><span class="f1">0.885</span><span class="op">Verify qualifier</span></div>
+<div class="barrow verify"><span class="ent">ACTION</span><div class="track"><div class="fill" style="width:86.6%"></div></div><span class="f1">0.866</span><span class="op">Add passive</span></div>
+<div class="barrow correct"><span class="ent">DISTRICT</span><div class="track"><div class="fill" style="width:82.6%"></div></div><span class="f1">0.826</span><span class="op">Correct</span></div>
+<div class="barrow correct"><span class="ent">VICTIM</span><div class="track"><div class="fill" style="width:81.7%"></div></div><span class="f1">0.817</span><span class="op">Most corrected</span></div>
+</div>
+<div class="bar-avg"><span>Macro avg</span><span><b>0.887</b> — the eight rows average back to slide 16's number</span></div>
+</div>
+
+<p>One ranked list, top to bottom, with an operational tag on every row. The visual argument is the <em>gradient</em>: nothing falls off a cliff — the weakest entity is still at 0.817, and the spread from best to worst is 14 points. The slide reads as "everything works; some fields need more analyst attention than others" — which is exactly the review-not-rewrite workflow claim from the early deck made quantitative.</p>
+
+<h2>3 · The full table — precision and recall behind each F1</h2>
+
+<p>The slide shows F1 per entity; the thesis table (6.7) behind it carries precision, recall, and support. You need the full table in your head because two of the four pre-loaded attacks are about its columns.</p>
+
+<table class="f1table">
+<tr><th>Entity</th><th class="num">Support</th><th class="num">Precision</th><th class="num">Recall</th><th class="num">F1</th></tr>
+<tr><td class="ent">DATE</td><td class="num">31,938</td><td class="num">0.961</td><td class="num">0.952</td><td class="num"><b>0.956</b></td></tr>
+<tr><td class="ent">CITY</td><td class="num">44,361</td><td class="num">0.941</td><td class="num">0.928</td><td class="num"><b>0.934</b></td></tr>
+<tr><td class="ent">ACTOR</td><td class="num">47,612</td><td class="num">0.929</td><td class="num">0.917</td><td class="num"><b>0.923</b></td></tr>
+<tr><td class="ent">REGION</td><td class="num">24,331</td><td class="num">0.902</td><td class="num">0.881</td><td class="num"><b>0.891</b></td></tr>
+<tr><td class="ent">CASUALTIES</td><td class="num">4,907</td><td class="num">0.901</td><td class="num">0.869</td><td class="num"><b>0.885</b></td></tr>
+<tr><td class="ent">ACTION</td><td class="num">9,963</td><td class="num">0.881</td><td class="num">0.852</td><td class="num"><b>0.866</b></td></tr>
+<tr><td class="ent">DISTRICT</td><td class="num">21,471</td><td class="num">0.842</td><td class="num">0.811</td><td class="num"><b>0.826</b></td></tr>
+<tr><td class="ent">VICTIM</td><td class="num">5,492</td><td class="num">0.838</td><td class="num">0.798</td><td class="num"><b>0.817</b></td></tr>
+<tr class="avg"><td class="ent">Macro avg</td><td class="num">—</td><td class="num">0.899</td><td class="num">0.876</td><td class="num">0.887</td></tr>
+<tr class="avg"><td class="ent">Micro avg</td><td class="num">190,075</td><td class="num">0.918</td><td class="num">0.901</td><td class="num">0.909</td></tr>
+</table>
+
+<div class="callout">
+<strong>Three structural facts to hold from this table.</strong> (1) <em>Precision exceeds recall on every single row</em> — no exceptions. That uniformity is itself the finding (see §5). (2) <em>Support and F1 mostly correlate, with two instructive exceptions</em> — CASUALTIES is rare (4,907 spans) yet strong (0.885) because casualty phrasings are formulaic ("X killed", "Y wounded"); DISTRICT is common (21,471 spans) yet weak (0.826) because the failure mode is ambiguity, not scarcity. Those two exceptions prove you understand the <em>causes</em>, not just the ranking. (3) The averages row reconnects to slide 16 — macro 0.887, micro 0.909, same numbers, now decomposed.
+</div>
+
+<h2>4 · The operational translation — the core skill</h2>
+
+<p>The reliability map is the move that converts a metrics table into a usability claim. Each F1 band maps to an analyst behaviour. This framing is why the slide exists — without it, slide 17 is "more numbers after slide 16"; with it, slide 17 is the answer to <em>"what is it actually like to use this system?"</em></p>
+
+<div class="tiers">
+<div class="tier trust">
+<h4>Trust — skim only</h4>
+<div class="ents">DATE 0.956 · CITY 0.934</div>
+<p>Essentially solved. Date expressions and named cities follow recognisable patterns. <em>Analyst: "I never have to add a missing date."</em></p>
+</div>
+<div class="tier spot">
+<h4>Spot-check</h4>
+<div class="ents">ACTOR 0.923 · REGION 0.891</div>
+<p>Mostly solved. Actors: check for <em>new groups</em> not yet in training data or KB. Regions: occasional region/country confusion.</p>
+</div>
+<div class="tier verify">
+<h4>Verify the detail</h4>
+<div class="ents">CASUALTIES 0.885 · ACTION 0.866</div>
+<p>Counts mostly right — <em>verify the qualifier</em> ("at least" sometimes dropped). Actions: active voice caught; <em>passive constructions</em> ("were ambushed") sometimes need adding.</p>
+</div>
+<div class="tier correct">
+<h4>Correct — read carefully</h4>
+<div class="ents">DISTRICT 0.826 · VICTIM 0.817</div>
+<p>The two fields needing real analyst attention. Districts confused with cities/regions; victims have extreme phrasing variability.</p>
+</div>
+</div>
+
+<div class="pattern">
+<h4>The operational-translation move — three steps, reusable for any metrics table</h4>
+<div class="pattern-row"><span class="step">1</span><span><strong>Band the numbers.</strong> Eight decimals collapse into four behavioural tiers: trust / spot-check / verify / correct. Nobody remembers eight numbers; everyone remembers four instructions.</span></div>
+<div class="pattern-row"><span class="step">2</span><span><strong>Phrase each tier as what the analyst does</strong>, not what the model scores. "Spot-check for new groups" is an instruction; "0.923" is a statistic. The instruction is what the panel's institutional consumers (AU-CEWS, ACLED) would actually act on.</span></div>
+<div class="pattern-row"><span class="step">3</span><span><strong>Connect to the workflow claim.</strong> The map is what makes review-not-rewrite save time: the analyst knows what to skim and what to read carefully. Without the map, the analyst re-reads everything and the time saving evaporates.</span></div>
+</div>
+
+<h2>5 · Precision &gt; recall on every row — read the direction out loud</h2>
+
+<p>This is slide 16's "read the gap's direction" move applied a second time. The uniform pattern — precision above recall on all eight rows — is not an accident to gloss over but a designed behaviour to narrate.</p>
+
+<div class="callout win">
+<strong>The three-step reading.</strong> (1) <em>The mechanism:</em> when uncertain, the model defaults to O — the safe choice. Misses some real entities (lower recall), raises fewer false alarms (higher precision). (2) <em>The direction is right for this consumer:</em> for an analyst <em>reviewing</em> extracted records, a false alarm costs a deletion plus eroded trust; a miss costs an addition the analyst was scanning for anyway. Fewer false alarms wins. (3) <em>And it's tunable:</em> the per-category confidence thresholds (pipeline step 5, slide 15) can trade precision for recall per use case — a recall-hungry consumer can lower the thresholds. Designed trade, stated openly, adjustable knob: that is a complete defence.
+</div>
+
+<h2>6 · Weakest-number ownership — the VICTIM account</h2>
+
+<p>VICTIM 0.817 is the lowest number the panel will see until the error-analysis slide. The discipline: <em>you</em> bring up why, with a causal account in three parts, before anyone asks. An owned weakness is context; a discovered weakness is a finding.</p>
+
+<div class="rowread">
+<h4>The three-part VICTIM account</h4>
+<div class="rr"><span class="e">CAUSE 1</span><span class="why"><em>Low support.</em> 5,492 gold spans vs 47,612 for ACTOR — nearly nine times less training signal. Rare entities have less to learn from and higher evaluation variance.</span></div>
+<div class="rr"><span class="e">CAUSE 2</span><span class="why"><em>Extreme phrasing variability.</em> Anything can be a victim: "civilians", "Christian worshippers", "the bus driver's family", "internally displaced schoolgirls". Compare DATE, where a handful of patterns covers nearly everything. Few examples × wide variety is the hardest learning setting in the schema.</span></div>
+<div class="rr"><span class="e">CONTEXT</span><span class="why"><em>0.817 is the lifted number.</em> Plain cross-entropy puts VICTIM at 0.708 — the training recipe bought back eleven points. The remaining gap is structural noise needing real-news expansion (limitation 2) or span-level CRF boundary refinement (future work 4). <span class="aq">Deploy the 0.708→0.817 framing only if asked here — the full ablation story is slide 18's.</span></span></div>
+</div>
+
+<div class="callout">
+<strong>And the DISTRICT account, one breath.</strong> DISTRICT 0.826 is the weakest <em>location</em> type for a different reason: name collision, not scarcity. Many African districts share names with their main city or region — Goma and Beni are canonical examples (city, district, regional centre simultaneously). The model defaults to CITY for ambiguous cases because CITY is more often correct. The confusion matrix on slide 20 shows the pattern. <em>Two weak rows, two different causal stories — variability for VICTIM, ambiguity for DISTRICT. Telling them apart is what proves the error analysis was real.</em>
+</div>
+
+<h2>7 · The 90-second script, in four beats</h2>
+
+<div class="beat-script">
+
+<div class="beat">
+<div class="beat-num">1</div>
+<div class="beat-content">
+<div class="label">Beat 1 — frame <span class="secs">~5 seconds</span></div>
+<div class="text">"<em class="key">Per-entity F1 — the reliability map.</em>"</div>
+<div class="micro">Five words. "Reliability map" is the framing that makes the next beat a usability story instead of a number dump. Don't pad it.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">2</div>
+<div class="beat-content">
+<div class="label">Beat 2 — the ranking recital <span class="secs">~25 seconds</span></div>
+<div class="text">"DATE strongest at <em class="num">zero-point-nine-five-six</em>. Then CITY <em class="num">zero-point-nine-three-four</em>. ACTOR <em class="num">zero-point-nine-two-three</em>. REGION <em class="num">zero-point-eight-nine-one</em>. CASUALTIES <em class="num">zero-point-eight-eight-five</em>. ACTION <em class="num">zero-point-eight-six-six</em>. DISTRICT <em class="num">zero-point-eight-two-six</em>. VICTIM <em class="num">zero-point-eight-one-seven</em>."</div>
+<div class="micro">Eight entities, eight decimals, descending order — the evidence section's second recital after slide 15's pipeline. Steady cadence, slight pause between rows; the descending order carries you (each number smaller than the last is a built-in error check). Drill eyes-closed like the pipeline list. Memory scaffold: the tier structure — two trust (956, 934), two spot (923, 891), two verify (885, 866), two correct (826, 817).</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num hero">3</div>
+<div class="beat-content">
+<div class="label hero">Beat 3 — the operational reading <span class="secs">~35 seconds</span></div>
+<div class="text">"<em class="key">Read it operationally.</em> Dates and locations are essentially solved — <em class="key">trust them</em>. Actors are mostly solved — <em class="key">spot-check for new groups</em>. Casualties are mostly solved — <em class="key">verify the qualifier</em>. Actions need occasional addition for <em class="key">passive voice</em>. Districts and victims <em class="key">need the most correction</em>."</div>
+<div class="micro">The hero beat. Five instructions in parallel structure — solved/trust, solved/spot-check, solved/verify, addition/passive, correction. This is the paragraph the panel's institutional members (anyone who has run a coding team) will recognise as the real contribution: a per-field guide their analysts could actually work from. Slow down; let each instruction land as an instruction.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">4</div>
+<div class="beat-content">
+<div class="label">Beat 4 — the precision-recall direction + pivot <span class="secs">~25 seconds</span></div>
+<div class="text">"<em class="key">Precision exceeds recall on every row</em> — standard NER. When uncertain the model defaults to O, trading a missed entity for <em class="key">fewer false alarms</em>. That's the <em class="key">right trade for analyst review</em>. <em class="key">To prove the loss-function choice was the right one — here's the ablation.</em>"</div>
+<div class="micro">Read the direction, name the mechanism (defaults to O), claim the trade as right-for-this-consumer. Then the pivot — it frames slide 18 in advance as <em>proof</em>, the same way slide 16's pivot framed this slide as <em>operational</em>. If running long, the precision-recall reading compresses to one sentence; the pivot line is not cuttable.</div>
+</div>
+</div>
+
+</div>
+
+<h2>8 · Reserved cards — deploy on demand</h2>
+
+<div class="reserved">
+<h4>Reserved evidence — bring out only if asked</h4>
+<div class="reserved-rows">
+<div class="label">VICTIM support</div>
+<div class="desc">vs ACTOR 47,612 — the 9× training-signal gap behind the weakest row</div>
+<div class="num">5,492</div>
+<div class="row-sep"></div>
+<div class="label">VICTIM P / R</div>
+<div class="desc">Precision 0.838, recall 0.798 — "found ~80 %, false alarms rare"</div>
+<div class="num">0.838 / 0.798</div>
+<div class="row-sep"></div>
+<div class="label">CASUALTIES anomaly</div>
+<div class="desc">Rare (4,907 spans) yet strong — formulaic phrasings ("X killed", "Y wounded")</div>
+<div class="num">0.885</div>
+<div class="row-sep"></div>
+<div class="label">DISTRICT anomaly</div>
+<div class="desc">Common (21,471 spans) yet weak — name collision with CITY/REGION, not scarcity</div>
+<div class="num">0.826</div>
+<div class="row-sep"></div>
+<div class="label">Goma / Beni</div>
+<div class="desc">Canonical ambiguity examples — city, district, regional centre simultaneously</div>
+<div class="num">slide 20</div>
+<div class="row-sep"></div>
+<div class="label">VICTIM before recipe</div>
+<div class="desc">Plain CE baseline — deploy only if directly asked; full story is slide 18's</div>
+<div class="num">0.708</div>
+<div class="row-sep"></div>
+<div class="label">Threshold tuning</div>
+<div class="desc">Per-category confidence thresholds can trade P for R per use case</div>
+<div class="num">§4.7</div>
+<div class="row-sep"></div>
+<div class="label">Macro / micro check</div>
+<div class="desc">The eight rows average to 0.887; pooled counts give 0.909 — ties back to slide 16</div>
+<div class="num">0.887 / 0.909</div>
+</div>
+</div>
+
+<h3>The deployment rule</h3>
+<ul>
+<li><strong>Default delivery:</strong> the eight-row recital, the five operational instructions, the precision-recall direction reading, the pivot. No support numbers, no P/R columns, no Goma — those wait for questions.</li>
+<li><strong>If asked "why is VICTIM weakest?"</strong> Deploy the three-part account: support gap (5,492 vs 47,612) + phrasing variability (the four example phrasings) + the lifted-number context (0.708 → 0.817 via the recipe; remainder is structural; limitation 2 / future work 4).</li>
+<li><strong>If asked "why is precision always higher?"</strong> Deploy mechanism + direction + knob: defaults-to-O, right trade for review, thresholds tunable per use case (§4.7).</li>
+<li><strong>If asked "why is DISTRICT so low despite 21 k spans?"</strong> Deploy the ambiguity account: name collision, Goma/Beni, model defaults to CITY because it's more often right, confusion matrix on slide 20.</li>
+<li><strong>Critical:</strong> the ablation table itself — the four configurations, the deltas, the significance — is slide 18's. If the VICTIM question forces the +11, give the two endpoint numbers and say "the full ablation is the next slide." Do not recite the four-configuration progression here.</li>
+</ul>
+
+<h2>9 · Four pre-loaded interrupts</h2>
+
+<div class="attack">
+<div class="q">"Why is VICTIM the worst entity? Isn't that the one that matters most for a violence-monitoring system?"</div>
+<div class="a">"Two causes. Low support — five thousand four hundred ninety-two gold spans against forty-seven thousand for ACTOR, nearly nine times less training signal. And extreme phrasing variability — anything from 'civilians' to 'Christian worshippers' to 'the bus driver's family' can be a victim, where DATE has a handful of patterns covering nearly everything. Fewest examples, widest variety — the hardest cell in the schema. And yes, it matters most — which is exactly why the training recipe targets it: the ablation on the next slide shows focal-plus-weights lifted VICTIM by eleven F1 points over plain cross-entropy. Zero-point-eight-one-seven is the lifted number. The remaining gap is structural — it needs real-news corpus expansion or span-level CRF boundary refinement, both named in the thesis as limitation two and future work four."</div>
+<div class="micro">The question has a barb — "the one that matters most" — and the answer embraces it instead of deflecting: <em>because</em> it matters most, the whole training recipe aims at it. That judo turn converts the weakest number into the motivation for the contribution. End on the forward reference; do not unpack the ablation table here.</div>
+</div>
+
+<div class="attack">
+<div class="q">"Precision is higher than recall on every single row. Doesn't that mean the model is systematically missing entities?"</div>
+<div class="a">"It means the model is calibrated to miss rather than to guess — and that's by design. When uncertain, it defaults to O instead of risking a wrong entity. The cost is some missed entities; the benefit is fewer false alarms. For an analyst reviewing extracted records, that's the right direction: a false alarm costs a deletion and erodes trust in every other chip on the screen; a miss costs an addition the analyst was scanning for anyway. And the trade is adjustable — the per-category confidence thresholds from the inference pipeline can be lowered for a recall-hungry use case. Section 4.7 documents the knob. The direction is a choice, stated openly, not an accident."</div>
+<div class="micro">Mechanism → direction-is-right-for-consumer → tunable knob. The phrase "calibrated to miss rather than to guess" reframes the observation as design before the panellist can frame it as flaw. The false-alarm-erodes-trust point is the operational heart: precision failures poison the analyst's trust in everything; recall failures cost only the one missed span.</div>
+</div>
+
+<div class="attack">
+<div class="q">"DISTRICT has four times the training data of VICTIM but almost the same F1. Doesn't that contradict your low-support explanation?"</div>
+<div class="a">"No — it shows there are two different failure modes, and support only explains one of them. VICTIM is scarcity plus variability: few examples, unbounded phrasings. DISTRICT is ambiguity: plenty of examples, but many African districts share names with their main city or their region — Goma is simultaneously a city, a district, and a regional centre. For an ambiguous mention, the model defaults to CITY because that's more often correct, and every such default is a DISTRICT miss. More DISTRICT data wouldn't fix that — the surface form is genuinely ambiguous; disambiguation needs context the sentence often doesn't contain. The confusion matrix on slide twenty shows exactly this CITY-DISTRICT confusion pattern. CASUALTIES is the mirror case — rare but formulaic, so it scores well. Support predicts F1 only when the phrasing distribution is held constant."</div>
+<div class="micro">This is the smartest attack the table invites — it tests whether the causal stories are real or post-hoc. The answer's strength is naming the full two-by-two: VICTIM (rare + variable, weak), CASUALTIES (rare + formulaic, strong), DISTRICT (common + ambiguous, weak), DATE (common + formulaic, strongest). Four cells, four entities, one principle: support × phrasing-regularity jointly predict F1.</div>
+</div>
+
+<div class="attack">
+<div class="q">"These F1 differences between entities — are they even significant, or just noise on the rare rows?"</div>
+<div class="a">"The seed variance is about plus-or-minus zero-point-four points on macro F1, and rare entities do have wider per-row variance — that's acknowledged. But the structure I'm reading from the table is far above that noise floor: the DATE-to-VICTIM spread is fourteen points, the tier boundaries are three-to-five points apart, and the rankings are stable across all three seeds. What I don't lean on is any single one-point difference — REGION versus CASUALTIES at 0.891 versus 0.885 is within noise and the slide draws no conclusion from it. The operational tiers are built on the robust gaps, not the fragile ones."</div>
+<div class="micro">Concede the per-row variance immediately, then distinguish the robust structure (14-point spread, stable rankings) from the fragile differences (adjacent rows). Naming a specific difference you do NOT defend (REGION vs CASUALTIES) is the honest-metric reframe again — policing your own table harder than the panel would. That one move usually ends the line of questioning.</div>
+</div>
+
+<h2>10 · The hero close</h2>
+
+<div class="hero-line">
+<span class="label">The hero line — memorise verbatim</span>
+"Read it operationally. Dates and locations — trust them. Actors — spot-check for new groups. Casualties — verify the qualifier. Actions — add the passive-voice misses. Districts and victims — those need the most correction."
+</div>
+
+<h3>Why this line is the hero</h3>
+<ul>
+<li><strong>It converts metrics into a usability claim.</strong> Eight decimals become five workflow instructions. This is the thesis's operational selling point — the per-field map is what makes review-not-rewrite actually save analyst time — delivered as a single spoken paragraph.</li>
+<li><strong>Parallel structure does the memorisation for the panel.</strong> Five clauses, same shape: field → instruction. The panel will remember "trust dates, correct victims" long after the decimals fade — and that is the right residue for this slide to leave.</li>
+<li><strong>It pre-owns both weak rows.</strong> "Districts and victims need the most correction" states the slide's two worst numbers as workflow fact, in your framing, before any question. Weakest-number ownership in one clause.</li>
+<li><strong>Consistent with the deck's posture.</strong> Slide 16 demoted accuracy and declined relaxed scoring; slide 17 reads its own table's weaknesses out loud and bands them into instructions. Same honesty discipline, now applied row by row: <strong>operational truth over flattering summary</strong>.</li>
+</ul>
+
+<h2>11 · Timed practice</h2>
+
+<p>Four beats, ~90 seconds. Target window: 80–105 seconds. Beat 2's eight-row recital is the fluency risk — drill it like slide 15's pipeline list. Beat 3's five instructions are the hero — slow there. Beat 4 compresses if needed; the pivot line never does.</p>
+
+<div class="timer-box">
+<div class="timer-display" id="timer">0.0 s</div>
+<div class="timer-buttons">
+<button id="startBtn">Start (begin "Per-entity F1 — the reliability map")</button>
+<button id="stopBtn" class="secondary" disabled>Stop (after "here's the ablation")</button>
+<button id="resetBtn" class="secondary">Reset</button>
+</div>
+<div class="timer-verdict" id="verdict"></div>
+</div>
+
+<div class="callout">
+<strong>The harder rep — the eyes-closed ranking drill.</strong> Recite the eight entities with their F1s, descending, eyes closed, five clean runs: DATE 956 · CITY 934 · ACTOR 923 · REGION 891 · CASUALTIES 885 · ACTION 866 · DISTRICT 826 · VICTIM 817. Stumble = restart. Use the tier scaffold (2 trust / 2 spot / 2 verify / 2 correct) and the descending-order check (every number smaller than the last). Then the transfer test: have someone name any entity out of order — answer its F1, tier, and one-line causal story within three seconds.
+</div>
+
+<h2>12 · Quiz</h2>
+
+<div class="quiz" id="quiz1">
+<h4>Q1. The panel asks: "Why is VICTIM your weakest entity when victims are what a violence-monitoring system is for?"</h4>
+<p class="qstem">Pick the strongest response.</p>
+<ul class="choices" data-answer="c">
+<li data-key="a">"VICTIM is inherently the hardest NER class; every published system struggles with it, so 0.817 is in line with expectations."</li>
+<li data-key="b">"The 0.817 figure is actually competitive — most fields would consider anything above 0.8 production-ready."</li>
+<li data-key="c">"Two causes: low support — 5,492 spans vs 47,612 for ACTOR — and extreme phrasing variability, from 'civilians' to 'the bus driver's family'. And because it matters most, the training recipe targets it: the ablation on the next slide shows +11 F1 over plain cross-entropy. 0.817 is the lifted number; the remaining gap is structural — limitation 2 and future work 4 name the paths."</li>
+<li data-key="d">"Victim identification is ultimately subjective, so a ceiling around 0.82 reflects annotator disagreement rather than model weakness."</li>
+</ul>
+<p class="feedback" id="fb1"></p>
+</div>
+
+<div class="quiz" id="quiz2">
+<h4>Q2. Precision exceeds recall on every row. What is the rehearsed three-step reading?</h4>
+<p class="qstem">Pick the complete version.</p>
+<ul class="choices" data-answer="b">
+<li data-key="a">It shows the model is under-trained — more epochs would close the precision-recall gap and should be future work.</li>
+<li data-key="b">Mechanism: when uncertain the model defaults to O, trading misses for fewer false alarms. Direction: right for analyst review — a false alarm costs a deletion and erodes trust in every chip; a miss costs one addition the analyst was scanning for anyway. Knob: per-category confidence thresholds (§4.7) can trade precision for recall per use case.</li>
+<li data-key="c">It is a known artefact of BIO encoding — the B/I split systematically depresses recall, and switching to BIOES would equalise the columns.</li>
+<li data-key="d">It reflects the 78 % O dominance: with so many O tokens, precision on entity classes is mechanically inflated relative to recall.</li>
+</ul>
+<p class="feedback" id="fb2"></p>
+</div>
+
+<div class="quiz" id="quiz3">
+<h4>Q3. "DISTRICT has 4× VICTIM's training data but nearly the same F1 — doesn't that break your low-support explanation?"</h4>
+<p class="qstem">Pick the strongest response.</p>
+<ul class="choices" data-answer="d">
+<li data-key="a">"District performance is dragged down by inconsistent gold annotations — the κ for DISTRICT was the lowest in the pilot."</li>
+<li data-key="b">"They're within noise of each other, so the comparison doesn't carry meaning either way."</li>
+<li data-key="c">"DISTRICT spans are longer on average, and strict span matching penalises long spans more, depressing the F1."</li>
+<li data-key="d">"Two different failure modes. VICTIM is scarcity plus variability. DISTRICT is ambiguity with plenty of data — districts share names with their cities and regions (Goma: city, district, regional centre simultaneously), and the model defaults to CITY because it's more often right. More data wouldn't fix genuinely ambiguous surface forms. CASUALTIES is the mirror: rare but formulaic, so strong. Support predicts F1 only with phrasing regularity held constant."</li>
+</ul>
+<p class="feedback" id="fb3"></p>
+</div>
+
+<div class="quiz" id="quiz4">
+<h4>Q4. What is the operational-translation move, and why does the slide depend on it?</h4>
+<p class="qstem">Pick the correct account.</p>
+<ul class="choices" data-answer="a">
+<li data-key="a">Band the eight F1s into four behavioural tiers (trust / spot-check / verify / correct), phrase each as what the analyst does rather than what the model scores, and connect to the workflow claim: the map is what makes review-not-rewrite save time, because the analyst knows what to skim and what to read carefully. Without it, slide 17 is just more decimals after slide 16.</li>
+<li data-key="b">Translate F1 into percentages so non-technical panel members can follow — 0.956 becomes "right 95.6 % of the time".</li>
+<li data-key="c">Re-derive each per-entity F1 from its precision and recall on stage, demonstrating command of the underlying arithmetic.</li>
+<li data-key="d">Rank entities by operational importance rather than by F1, so the panel sees the system's priorities rather than its scores.</li>
+</ul>
+<p class="feedback" id="fb4"></p>
+</div>
+
+<div class="followup">
+<strong>Ask your teacher follow-up questions.</strong>
+<ul>
+<li>Want a 70-second compressed delivery for if you're running behind?</li>
+<li>Want the eyes-closed ranking drill run interactively — I name an entity, you give F1 + tier + causal story?</li>
+<li>Want to rehearse the support × phrasing-regularity two-by-two (DATE / CASUALTIES / DISTRICT / VICTIM) until it's one breath?</li>
+<li>Want to drill the VICTIM judo turn — "it matters most, which is why the recipe targets it" — under interruption?</li>
+<li>Want to map exactly which slide-17 threads slide 18 (ablation) and slide 20 (confusion matrix) pick up, so the forward references stay precise?</li>
+</ul>
+<p class="cite">References: <a href="../../VioNER_Defense_Slides_study_guide.md">VioNER_Defense_Slides_study_guide.md</a> Slide 17; <a href="../../experimental_results.md">experimental_results.md</a> Part 5 (Table 6.7, row-by-row readings, panel Q&amp;A); thesis §6.5 (per-entity results), §4.7 (confidence thresholds), §6.6 (ablation — next slide), §7.2 limitation 2, §7.4 future work 4.</p>
+</div>
+
+<div class="bottom">Lesson 19 of the slide drill. Next up — slide 18: the ablation (the single most important table in the thesis — four loss configurations, +10.9 on VICTIM, the number the whole deck has been reserving).</div>
+
+</div>
+
+<script>
+// Timer
+(function(){
+  const display=document.getElementById('timer');
+  const startBtn=document.getElementById('startBtn');
+  const stopBtn=document.getElementById('stopBtn');
+  const resetBtn=document.getElementById('resetBtn');
+  const verdict=document.getElementById('verdict');
+  let raf=null, t0=0;
+  function tick(){const t=(performance.now()-t0)/1000;display.textContent=t.toFixed(1)+' s';raf=requestAnimationFrame(tick)}
+  startBtn.onclick=()=>{cancelAnimationFrame(raf);t0=performance.now();raf=requestAnimationFrame(tick);startBtn.disabled=true;stopBtn.disabled=false;verdict.textContent='';verdict.className='timer-verdict'};
+  stopBtn.onclick=()=>{cancelAnimationFrame(raf);const t=(performance.now()-t0)/1000;display.textContent=t.toFixed(1)+' s';startBtn.disabled=false;stopBtn.disabled=true;
+    if(t<70){verdict.textContent='Too fast — the eight-row recital needs its pauses (the descending order is your error check), and the five operational instructions in Beat 3 must land as instructions, not a list read in one breath.';verdict.className='timer-verdict over'}
+    else if(t<=105){verdict.textContent='Inside the window. The recital held and the operational reading got its space.';verdict.className='timer-verdict win'}
+    else{verdict.textContent='Over time — check whether Beat 4 expanded (the precision-recall reading compresses to one sentence) or causal stories for VICTIM/DISTRICT crept into the default run (they belong in reserve, behind questions).';verdict.className='timer-verdict over'}};
+  resetBtn.onclick=()=>{cancelAnimationFrame(raf);display.textContent='0.0 s';startBtn.disabled=false;stopBtn.disabled=true;verdict.textContent='';verdict.className='timer-verdict'};
+})();
+// Quizzes
+document.querySelectorAll('.quiz').forEach(quiz=>{
+  const ul=quiz.querySelector('.choices');
+  const answer=ul.dataset.answer;
+  const fb=quiz.querySelector('.feedback');
+  const fbMap={
+    quiz1:{
+      c:'Yes. Causes (support gap + variability), then the judo turn — because it matters most, the recipe targets it — then the lifted-number context with the forward reference to slide 18. Owned, explained, and converted into motivation for the contribution.',
+      a:'"Everyone struggles with it" is deflection by company — it explains nothing about THIS system and invites "so what did YOU do about it?" unarmed.',
+      b:'Defending 0.817 as "fine" dodges the causal question and surrenders the chance to deploy the +11 lift. The number needs an account, not a shrug.',
+      d:'Blaming annotator subjectivity contradicts the κ = 0.78 agreement story from earlier in the deck — the panel will catch the inconsistency immediately.'
+    },
+    quiz2:{
+      b:'Yes. Mechanism (defaults to O), direction (right for the review consumer — false alarms erode trust, misses cost one addition), knob (per-category thresholds, §4.7). Designed trade, stated openly, adjustable.',
+      a:'No — the gap is not a training deficiency. More epochs after epoch 2 made validation WORSE (overfitting). The gap is calibration behaviour, by design.',
+      c:'No — BIO vs BIOES does not produce a uniform precision-recall asymmetry; the asymmetry comes from the model defaulting to O under uncertainty.',
+      d:'No — O dominance motivated the metric choice (slide 16), but it does not mechanically inflate entity-class precision. The asymmetry is behavioural: default-to-O under uncertainty.'
+    },
+    quiz3:{
+      d:'Yes. The two-by-two: support × phrasing regularity. VICTIM rare+variable (weak), CASUALTIES rare+formulaic (strong), DISTRICT common+ambiguous (weak), DATE common+formulaic (strongest). Naming CASUALTIES as the mirror case proves the model is causal, not post-hoc.',
+      a:'Inventing an annotation-quality excuse undermines the κ = 0.78 story and is not in the thesis. Never improvise a new weakness to explain an old one.',
+      b:'They are 0.9 points apart with stable rankings across seeds — and "it\'s all noise" surrenders the causal analysis that the error-analysis chapter actually did.',
+      c:'Span length is not the documented mechanism — the confusion matrix shows CITY-DISTRICT substitution, which is type confusion, not boundary failure.'
+    },
+    quiz4:{
+      a:'Yes. Band → instruct → connect to the workflow claim. The map is what makes the eight decimals into the thesis\'s usability argument — and what makes review-not-rewrite genuinely save time.',
+      b:'Percentage paraphrase is presentation polish, not the move. The translation is into analyst BEHAVIOUR, not into friendlier units.',
+      c:'Re-deriving arithmetic on stage is slide-16 whiteboard reserve material, not the slide-17 skill — and it would burn the whole time budget.',
+      d:'Re-ranking by importance would hide the actual result. The move keeps the F1 ranking and ATTACHES behaviour to it; it does not replace the ranking.'
+    }
+  };
+  ul.querySelectorAll('li').forEach(li=>{
+    li.onclick=()=>{
+      if(li.classList.contains('locked'))return;
+      const key=li.dataset.key;
+      const correct=key===answer;
+      ul.querySelectorAll('li').forEach(x=>x.classList.add('locked'));
+      li.classList.add(correct?'right':'wrong');
+      if(!correct){ul.querySelector('li[data-key="'+answer+'"]').classList.add('right')}
+      fb.textContent=fbMap[quiz.id][key]||'';
+    };
+  });
+});
+</script>
+
+</body>
+</html>

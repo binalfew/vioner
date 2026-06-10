@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 14 — Delivering Slide 12: The Training Recipe (focal × weights)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --accent-soft:#A14747;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --success-soft:#E6F0E6;
+  --warn:#8B5A2B;
+  --beat:#1A365D;
+  --beat-soft:#E8EEF5;
+  --across:#3D6B8B;   /* class weights — across classes */
+  --across-soft:#E8EEF5;
+  --within:#7B1E1E;   /* focal loss — within difficulty */
+  --within-soft:#F5E6E6;
+  --combine:#3F6B3F;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:42rem;margin:0 auto;padding:3.5rem 1.5rem 6rem}
+.eyebrow{font-family:"Inter","SF Pro Text",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.18em;font-size:0.72rem;color:var(--accent);font-weight:600}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:2.2rem;font-weight:700;line-height:1.18;margin:0.4rem 0 0.6rem;letter-spacing:-0.012em}
+h2{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:1.45rem;margin:3rem 0 0.6rem;font-weight:700;border-bottom:1px solid var(--rule);padding-bottom:0.4rem}
+h3{font-family:"Inter",system-ui,sans-serif;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin:1.6rem 0 0.4rem;color:var(--accent)}
+p,li{font-size:1.05rem}
+.subtitle{color:var(--ink-soft);font-style:italic;font-size:1.1rem;margin:0 0 1.4rem}
+.meta{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);letter-spacing:0.02em;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:0.6rem 0;margin-bottom:2.2rem;display:flex;flex-wrap:wrap;gap:1.2rem}
+.meta span strong{color:var(--ink)}
+.callout{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem;margin:1.2rem 0;border-radius:4px}
+.callout.win{border-left:3px solid var(--success)}
+.callout.warn{border-left:3px solid var(--warn)}
+.callout.beat{border-left:3px solid var(--beat)}
+code{font-family:"JetBrains Mono","SF Mono",Menlo,monospace;font-size:0.92em;background:#F0EBE0;padding:0.06em 0.36em;border-radius:3px}
+/* Slide mock */
+.slide-mock{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.5rem 1.7rem;margin:1.4rem 0;box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+.slide-mock .badge{font-family:"Inter",system-ui,sans-serif;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:0.3rem;font-weight:600}
+.slide-mock .title{font-family:"Iowan Old Style",Georgia,serif;font-size:1.45rem;font-weight:700;margin:0 0 0.6rem}
+/* Formula */
+.formula{background:#FAF7F0;border:1px solid var(--rule);border-radius:4px;padding:1rem 1.2rem;margin:0.5rem 0;text-align:center;font-family:"Iowan Old Style",Georgia,serif;font-size:1.18rem;line-height:1.5}
+.formula .var{font-style:italic;font-weight:600}
+.formula .w{color:var(--across);font-weight:700}
+.formula .focus{color:var(--within);font-weight:700}
+.formula .ce{color:var(--ink);font-weight:600}
+.formula .label{display:block;font-family:"Inter",system-ui,sans-serif;font-size:0.66rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.06em;font-weight:600;margin-top:0.4rem}
+.formula .underline{display:inline-block;border-bottom:1.5px solid currentColor;padding:0 0.1em}
+/* Two-card layout: across vs within */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin:1rem 0}
+.card{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.95rem 1.1rem}
+.card.across{border-left:3px solid var(--across);background:linear-gradient(180deg,#FFF 0%,#F8FAFD 100%)}
+.card.within{border-left:3px solid var(--within);background:linear-gradient(180deg,#FFF 0%,#FDF8F8 100%)}
+.card h4{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.3rem;font-weight:700}
+.card.across h4{color:var(--across)}
+.card.within h4{color:var(--within)}
+.card h5{font-family:"Iowan Old Style",Georgia,serif;font-size:1.02rem;margin:0 0 0.4rem;font-weight:700}
+.card .role{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;background:var(--paper);padding:0.25rem 0.5rem;border-radius:3px;display:inline-block;margin-bottom:0.4rem;font-weight:600}
+.card.across .role{color:var(--across);border:1px solid var(--across)}
+.card.within .role{color:var(--within);border:1px solid var(--within)}
+.card p{font-size:0.92rem;margin:0.35rem 0;color:var(--ink-soft);line-height:1.5}
+.card p strong{color:var(--ink)}
+.card .arith{font-family:"JetBrains Mono","SF Mono",monospace;font-size:0.85rem;background:#FAF7F0;padding:0.4rem 0.7rem;border-radius:3px;margin:0.4rem 0;color:var(--ink);font-weight:600}
+/* The 130x token */
+.bignum{display:flex;align-items:center;gap:0.7rem;justify-content:center;background:var(--highlight);border:1.5px solid var(--accent);border-radius:6px;padding:0.9rem 1.2rem;margin:1rem 0;font-family:"Iowan Old Style",Georgia,serif}
+.bignum .n{font-size:2.4rem;font-weight:800;color:var(--accent);font-feature-settings:"tnum";line-height:1}
+.bignum .label{font-size:0.95rem;color:var(--ink-soft);font-style:italic;line-height:1.4}
+.bignum .label strong{color:var(--ink);font-style:normal}
+/* Spotlight table */
+.spotlight{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.7rem 1rem;margin:0.8rem 0;font-family:"JetBrains Mono",monospace;font-size:0.86rem}
+.spotlight .row{display:grid;grid-template-columns:5rem 6rem 1fr;gap:0.6rem;padding:0.25rem 0;border-bottom:1px dashed var(--rule);align-items:center;line-height:1.4}
+.spotlight .row:first-child{font-family:"Inter",sans-serif;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);border-bottom:1px solid var(--rule)}
+.spotlight .row:last-child{border:0}
+.spotlight .row .py{font-weight:700;color:var(--ink)}
+.spotlight .row .factor{font-weight:700;color:var(--within);font-feature-settings:"tnum"}
+.spotlight .row .read{font-family:"Iowan Old Style",Georgia,serif;font-size:0.92rem;color:var(--ink-soft);font-style:italic}
+/* Complementarity diagram */
+.complement{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.complement h4{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.5rem;color:var(--accent);font-weight:700;text-align:center}
+.complement-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:0.6rem;align-items:center}
+.complement-grid .side{background:#FAF7F0;border-radius:4px;padding:0.7rem 0.9rem;text-align:center;border:1px solid var(--rule)}
+.complement-grid .side.across{border-left:3px solid var(--across)}
+.complement-grid .side.within{border-left:3px solid var(--within)}
+.complement-grid .side h5{font-family:"Inter",sans-serif;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.3rem;font-weight:700}
+.complement-grid .side.across h5{color:var(--across)}
+.complement-grid .side.within h5{color:var(--within)}
+.complement-grid .side p{font-family:"Iowan Old Style",Georgia,serif;font-size:0.9rem;margin:0;line-height:1.4;color:var(--ink-soft);font-style:italic}
+.complement-grid .side p strong{color:var(--ink);font-style:normal}
+.complement-grid .x{font-family:"Iowan Old Style",Georgia,serif;font-size:1.8rem;color:var(--combine);font-weight:700}
+.complement .result{text-align:center;margin-top:0.7rem;font-family:"Iowan Old Style",Georgia,serif;font-size:1.02rem;font-weight:600;color:var(--combine);background:var(--success-soft);border-radius:4px;padding:0.55rem 0.9rem}
+/* Beats */
+.beat-script{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin:1.4rem 0}
+.beat{display:grid;grid-template-columns:auto 1fr;gap:0.9rem;align-items:start;padding:0.9rem 0;border-bottom:1px dashed var(--rule)}
+.beat:last-child{border-bottom:0}
+.beat-num{background:var(--beat);color:#FFF;width:2.1rem;height:2.1rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.85rem}
+.beat-num.hero{background:var(--accent)}
+.beat-content .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--beat);font-weight:600;margin-bottom:0.25rem;display:flex;gap:0.7rem;align-items:baseline}
+.beat-content .label.hero{color:var(--accent)}
+.beat-content .label .secs{color:var(--ink-soft);font-weight:400;font-style:italic}
+.beat-content .text{font-size:1.04rem;line-height:1.55;margin:0.2rem 0}
+.beat-content .text em.key{background:var(--success-soft);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:600;color:var(--success)}
+.beat-content .text em.num{background:var(--highlight);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:700;color:var(--accent)}
+.beat-content .text em.across{color:var(--across);font-style:normal;font-weight:700}
+.beat-content .text em.within{color:var(--within);font-style:normal;font-weight:700}
+.beat-content .micro{margin-top:0.4rem;font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Complementarity pattern */
+.pattern{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.pattern h4{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.55rem;color:var(--accent);font-weight:700}
+.pattern-row{display:grid;grid-template-columns:auto 1fr;gap:0.6rem;align-items:start;padding:0.45rem 0;border-bottom:1px dashed var(--rule);font-size:0.95rem;line-height:1.5}
+.pattern-row:last-child{border:0}
+.pattern-row .step{background:var(--accent);color:#FFF;font-family:"Inter",sans-serif;font-size:0.68rem;font-weight:700;padding:0.15em 0.5em;border-radius:3px;white-space:nowrap}
+.pattern-row strong{color:var(--ink)}
+/* Reserved */
+.reserved{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.reserved h4{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.7rem;color:var(--accent);font-weight:700}
+.reserved-rows{display:grid;grid-template-columns:auto 1fr auto;gap:0.6rem 0.9rem;font-family:"Iowan Old Style",Georgia,serif;align-items:center}
+.reserved-rows .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:600}
+.reserved-rows .desc{font-size:0.93rem;color:var(--ink-soft);font-style:italic}
+.reserved-rows .num{font-weight:700;color:var(--accent);font-feature-settings:"tnum";font-size:1.02rem;text-align:right}
+.reserved-rows .row-sep{grid-column:1 / -1;border-top:1px dashed var(--rule);height:0;margin:0.1rem 0}
+/* Hero */
+.hero-line{background:var(--highlight);border:2px solid var(--accent);border-radius:6px;padding:1.2rem 1.4rem;margin:1.3rem 0;text-align:center;font-family:"Iowan Old Style",Georgia,serif;font-size:1.1rem;line-height:1.55;font-weight:500}
+.hero-line .label{display:block;font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:600;margin-bottom:0.4rem}
+/* Attack */
+.attack{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem 0.8rem;margin:1rem 0;border-radius:4px}
+.attack .q{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.95rem;color:var(--accent);margin-bottom:0.5rem}
+.attack .a{margin:0.4rem 0 0.6rem;font-size:1.03rem}
+.attack .micro{font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Timer */
+.timer-box{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.3rem;margin:1.3rem 0;text-align:center}
+.timer-display{font-family:"JetBrains Mono","SF Mono",monospace;font-size:2.6rem;font-weight:700;color:var(--accent);margin:0.3rem 0;font-feature-settings:"tnum"}
+.timer-buttons{display:flex;gap:0.6rem;justify-content:center;margin-top:0.7rem;flex-wrap:wrap}
+.timer-buttons button{font-family:"Inter",system-ui,sans-serif;font-size:0.92rem;font-weight:600;padding:0.55rem 1.3rem;border:1px solid var(--accent);background:var(--accent);color:#FFF;border-radius:4px;cursor:pointer;transition:background 120ms}
+.timer-buttons button:hover{background:var(--accent-soft)}
+.timer-buttons button.secondary{background:#FFF;color:var(--accent)}
+.timer-buttons button.secondary:hover{background:#FBFAF7}
+.timer-verdict{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin-top:0.7rem;min-height:1.4rem;font-weight:600}
+.timer-verdict.win{color:var(--success)}
+.timer-verdict.over{color:var(--warn)}
+/* Quiz */
+.quiz{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem;margin:1.4rem 0}
+.quiz h4{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin:0 0 0.8rem;color:var(--accent)}
+.quiz .qstem{font-size:1.02rem;margin-bottom:0.7rem}
+.choices{list-style:none;padding:0;margin:0}
+.choices li{margin:0.45rem 0;padding:0.55rem 0.8rem;border:1px solid var(--rule);border-radius:4px;cursor:pointer;background:#FBFAF7;font-size:0.98rem;transition:background 120ms,border-color 120ms}
+.choices li:hover{background:#F5EFE2;border-color:var(--accent-soft)}
+.choices li.right{background:var(--success-soft);border-color:var(--success);color:var(--success)}
+.choices li.wrong{background:#F5E4E4;border-color:var(--accent);color:var(--accent)}
+.choices li.locked{pointer-events:none;opacity:0.85}
+.feedback{font-family:"Inter",system-ui,sans-serif;font-size:0.93rem;margin-top:0.7rem;color:var(--ink-soft);min-height:1.2rem;font-style:italic}
+/* Followup */
+.followup{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin-top:2.4rem;border-left:3px solid var(--beat)}
+.followup ul{margin:0.6rem 0 0 1.1rem}
+.followup li{margin:0.45rem 0;font-size:1rem}
+.bottom{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;color:var(--ink-soft);border-top:1px solid var(--rule);padding-top:1.2rem;margin-top:3rem;font-style:italic}
+.cite{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);margin-top:0.3rem}
+.cite a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent-soft)}
+.cite a:hover{border-bottom:1px solid var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">Lesson 14 · Slide 12</div>
+<h1>The training recipe — focal loss × class weights</h1>
+<div class="subtitle">The modelling contribution. Two rebalancers attacking different parts of the same imbalance problem — one across classes, one across difficulty. The hero claim is <em>complementarity</em>: each ingredient does work the other cannot. The ablation on slide 18 is the evidence.</div>
+
+<div class="meta">
+<span><strong>Slide:</strong> 12 of 22</span>
+<span><strong>Target time:</strong> 90 seconds</span>
+<span><strong>Hero line:</strong> "Different parts of the imbalance — the combination beats either alone"</span>
+<span><strong>Reserved cards:</strong> 130× · γ = 2 · cap = 10 · ablation §6.6 / slide 18</span>
+</div>
+
+<h2>1 · Where this slide sits in the arc</h2>
+
+<p>Slides 10 and 11 set the data side — the schema, the taxonomy, the corpus. Slide 12 is where the <em>modelling</em> contribution becomes visible. It is the loss function — the part of the system that <em>decides what the model pays attention to</em>. The 78 % O dominance of the training corpus is the problem this slide solves; the two rebalancers are the solution.</p>
+
+<div class="callout beat">
+<strong>The function of slide 12.</strong> Two jobs. (1) Show that the choice of loss function was principled — each ingredient has a named role and solves a named sub-problem. (2) Make the <em>complementarity</em> claim memorable enough that when slide 18 shows the ablation (+11 F1 on VICTIM), the panel already believes the story this slide tells. Without complementarity established here, the ablation on slide 18 reads as "we combined two things and it worked" — which sounds lucky. With complementarity established, the ablation reads as "we predicted the combination would win, and the experiment confirmed it" — which sounds principled.
+</div>
+
+<h2>2 · What's on the slide</h2>
+
+<div class="slide-mock">
+<div class="badge">Slide 12</div>
+<div class="title">The training recipe — focal loss × class weights</div>
+
+<div class="formula">
+<span class="ce">CE</span> &nbsp;×&nbsp; <span class="w underline">w<sub>c</sub></span> &nbsp;×&nbsp; <span class="focus underline">(1 − p<sub>y</sub>)<sup>γ</sup></span>
+<span class="label">Cross-entropy × class weight × focusing modulator</span>
+</div>
+
+<div class="cards">
+<div class="card across">
+<h4>Ingredient 1</h4>
+<h5>Inverse-frequency class weights</h5>
+<div class="role">Rebalance ACROSS classes</div>
+<p><strong>Each class gets one weight.</strong> Rare classes get a large weight; common classes get a small weight. Computed once at training start.</p>
+<div class="arith">w<sub>c</sub> ∝ 1 / freq(c), capped at 10</div>
+<p>Without weights, the optimiser learns "get O right almost always".</p>
+</div>
+<div class="card within">
+<h4>Ingredient 2</h4>
+<h5>Focal loss (γ = 2)</h5>
+<div class="role">Rebalance ACROSS difficulty</div>
+<p><strong>Each token gets a per-step modulator.</strong> Easy-correct tokens get suppressed; hard tokens dominate the gradient.</p>
+<div class="arith">(1 − p<sub>y</sub>)² &nbsp; — γ = 2 from Lin et al. (2017)</div>
+<p>Without focal, the optimiser polishes tokens it already gets right.</p>
+</div>
+</div>
+
+<div class="bignum">
+<div class="n">130×</div>
+<div class="label">A <strong>VICTIM</strong> token contributes ~130× the loss-weight of an <strong>O</strong> token under the production recipe.</div>
+</div>
+</div>
+
+<p>Three visual elements: the <strong>production formula</strong> at the top (cross-entropy multiplied by two rebalancers), the <strong>two cards</strong> showing the role of each ingredient (across classes vs across difficulty), and the <strong>130× number</strong> that makes the effect concrete on a familiar entity. Optional fourth element: a curve showing how the focal factor suppresses easy tokens — useful as a visual aid but optional in the verbal delivery.</p>
+
+<h2>3 · The "two rebalancers, two axes" mental model</h2>
+
+<p>The imbalance problem has <em>two</em> axes the training has to attack — and each ingredient targets one of them. Hold onto this distinction; it is the entire complementarity argument.</p>
+
+<div class="cards">
+<div class="card across">
+<h4>Axis 1 — across classes</h4>
+<h5>"Some classes are rare"</h5>
+<p>78 % of tokens are <em>O</em>. Rare entity classes like VICTIM appear in single-digit-% shares of the corpus. Plain training puts equal per-token weight on common and rare — the rare classes get drowned out.</p>
+<p><strong>The rebalancer:</strong> <em class="across">class weights</em>. Bigger weight on rare classes.</p>
+</div>
+<div class="card within">
+<h4>Axis 2 — across difficulty (within a class)</h4>
+<h5>"Some tokens are easy"</h5>
+<p>Within a class, some tokens are <em>easy</em> — an O between two punctuation marks the model gets within the first epoch. The model spends gradient polishing easy-correct tokens instead of solving hard ones.</p>
+<p><strong>The rebalancer:</strong> <em class="within">focal loss</em>. (1 − p)² shrinks the easy ones.</p>
+</div>
+</div>
+
+<div class="callout">
+<strong>Why each ingredient is needed.</strong> Class weights alone fix axis 1 — VICTIM tokens count more — but still treat every VICTIM token equally. The model can still spend its capacity polishing easy VICTIMs (e.g., "civilians" right after "killed") while neglecting hard ones. Focal loss alone fixes axis 2 — hard tokens count more — but if VICTIM tokens overall are still rare in count, focal loss alone cannot lift the per-class signal high enough. The two ingredients attack <em>different axes</em>, so neither does the other's job. The combination is not redundant; it is required.
+</div>
+
+<h2>4 · The focal-loss spotlight analogy</h2>
+
+<p>Class weights are the easy intuition — bigger weight on rare classes. Focal loss is the one the panel may want to hear in plain English. The image to carry is a teacher with 100 students:</p>
+
+<div class="callout">
+<strong>The spotlight.</strong> A teacher with 100 students — 95 already understand, 5 are struggling. Uniform attention (= cross-entropy) wastes most of the energy on the 95 who don't need it. <em>Focal loss installs a spotlight that automatically brightens on confused students and dims on confident ones</em>. The γ parameter controls how aggressive the spotlight is. γ = 0 — uniform attention. γ = 2 — sharp spotlight, the value used here. γ = 5 — too sharp, even moderately confident students fade and training destabilises.
+</div>
+
+<div class="spotlight">
+<div class="row"><span class="py">p<sub>y</sub></span><span class="factor">(1 − p<sub>y</sub>)²</span><span class="read">Reading</span></div>
+<div class="row"><span class="py">0.99</span><span class="factor">0.0001</span><span class="read">Confident-correct → focal loss virtually ignores this token.</span></div>
+<div class="row"><span class="py">0.90</span><span class="factor">0.01</span><span class="read">Confident-correct → 100× less weight than a hard token.</span></div>
+<div class="row"><span class="py">0.50</span><span class="factor">0.25</span><span class="read">Uncertain → still substantial loss.</span></div>
+<div class="row"><span class="py">0.10</span><span class="factor">0.81</span><span class="read">Wrong with high model confidence → near-maximum focal weight.</span></div>
+</div>
+
+<h2>5 · The 90-second script, in four beats</h2>
+
+<div class="beat-script">
+
+<div class="beat">
+<div class="beat-num">1</div>
+<div class="beat-content">
+<div class="label">Beat 1 — name the recipe <span class="secs">~10 seconds</span></div>
+<div class="text">"The training recipe — <em class="key">focal loss times class weights</em>. Two ingredients, each attacking a different part of the imbalance problem."</div>
+<div class="micro">Open with the formula name and the structural claim ("different parts of the imbalance"). The structural claim is what makes the next two beats parallel — beat 2 covers axis 1, beat 3 covers axis 2. Plant the parallelism in beat 1.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">2</div>
+<div class="beat-content">
+<div class="label">Beat 2 — class weights, across classes <span class="secs">~30 seconds</span></div>
+<div class="text">"<em class="across">Inverse-frequency class weights</em> rebalance <em class="key">across classes</em>. Rare classes get a large weight, capped at <em class="num">ten</em> to avoid gradient blow-up. A <em>VICTIM</em> token ends up about <em class="num">a hundred and thirty times</em> more loss-impactful than an <em>O</em> token. That is what counter-balances the 78 % O dominance of the corpus."</div>
+<div class="micro">The 130× number is the single most important number on this slide. Say it slowly. Pause briefly after "a hundred and thirty times." Don't try to deliver the formula on stage — the cap-at-10 number and the 130× ratio together are enough; the panel can read the formula on screen.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">3</div>
+<div class="beat-content">
+<div class="label">Beat 3 — focal loss, across difficulty <span class="secs">~30 seconds</span></div>
+<div class="text">"<em class="within">Focal loss</em>, with <em class="num">gamma equal to two</em>, rebalances <em class="key">across difficulty</em>. The <em class="key">(one minus p) squared</em> factor suppresses tokens the model already gets right — when p is point nine, the factor is point oh one, a hundred times smaller than for a confused token. So the optimiser concentrates on the hard ones, which is where the rare entities live."</div>
+<div class="micro">The spotlight image is optional — use it if you want a verbal payoff. If you're running tight on time, the factor math (0.9 → 0.01 → 100× less) lands the same point in fewer words. Either way, end on "where the rare entities live" — that's the bridge to beat 4.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num hero">4</div>
+<div class="beat-content">
+<div class="label hero">Beat 4 — the complementarity claim <span class="secs">~20 seconds</span></div>
+<div class="text">"The key claim is <em class="key">complementarity</em>. The two attack <em class="key">different parts</em> of the imbalance — class weights across classes, focal loss across difficulty. So the combination <em class="key">beats either alone</em>. The ablation on slide 18 is the empirical evidence — eleven F1 points on VICTIM versus plain cross-entropy."</div>
+<div class="micro">"Complementarity" is the load-bearing word. Say it crisply. The slide-18 forward reference makes a promise the deck will keep; the panel can flag it as a thing to verify, but they already know it's coming. Don't over-claim the +11 — that number lives on slide 18; here you only tease it.</div>
+</div>
+</div>
+
+</div>
+
+<h2>6 · The complementarity claim — the core skill</h2>
+
+<p>Slide 12's central craft skill is the <strong>complementarity claim</strong>: when you use two techniques together, the defence requires showing they attack <em>different parts</em> of the problem. Otherwise you are double-counting — paying twice for the same gain. The defence has three compulsory moves.</p>
+
+<div class="pattern">
+<h4>The three-move complementarity defence</h4>
+<div class="pattern-row"><span class="step">1</span><span><strong>Name the two ingredients.</strong> "Inverse-frequency class weights and focal loss." Use the technical names; the panel knows them.</span></div>
+<div class="pattern-row"><span class="step">2</span><span><strong>Name the two distinct axes they attack.</strong> "Across classes" vs "across difficulty." This is the load-bearing move — the answer survives only if the two axes are genuinely different.</span></div>
+<div class="pattern-row"><span class="step">3</span><span><strong>Point to the ablation as evidence.</strong> "Slide 18 / §6.6 shows neither alone reaches the combined performance." The ablation table is what converts the claim from <em>asserted</em> to <em>measured</em>.</span></div>
+</div>
+
+<div class="complement">
+<h4>The two-axes mental picture</h4>
+<div class="complement-grid">
+<div class="side across"><h5>Class weights</h5><p><strong>Across classes</strong><br>VICTIM ≫ O</p></div>
+<div class="x">×</div>
+<div class="side within"><h5>Focal loss</h5><p><strong>Across difficulty</strong><br>Hard ≫ Easy</p></div>
+</div>
+<div class="result">Combination = signal lifted on rare AND hard tokens at once</div>
+</div>
+
+<div class="callout warn">
+<strong>The trap.</strong> If asked "why both?", do <em>not</em> say "they both fix imbalance" — that sounds redundant and reads as double-counting. Say "they fix <em>different aspects</em> of imbalance." Distinct axes is the whole defence. Without naming the two axes by name, the answer collapses.
+</div>
+
+<h2>7 · Reserved cards — deploy on demand</h2>
+
+<div class="reserved">
+<h4>Reserved evidence — bring out only if asked</h4>
+<div class="reserved-rows">
+<div class="label">VICTIM-vs-O ratio</div>
+<div class="desc">Loss-weight a VICTIM token gets vs an O token</div>
+<div class="num">~130×</div>
+<div class="row-sep"></div>
+<div class="label">Weight cap</div>
+<div class="desc">Without it, VICTIM weight would hit ~22 and destabilise</div>
+<div class="num">cap = 10</div>
+<div class="row-sep"></div>
+<div class="label">γ value</div>
+<div class="desc">Lin et al. 2017 default; tested γ=1 (smaller gain) and γ=3 (instability)</div>
+<div class="num">γ = 2</div>
+<div class="row-sep"></div>
+<div class="label">O fraction</div>
+<div class="desc">The empirical motivation for needing rebalancers at all</div>
+<div class="num">~78 %</div>
+<div class="row-sep"></div>
+<div class="label">Ablation gain</div>
+<div class="desc">VICTIM F1 lift over plain cross-entropy — reserved for slide 18</div>
+<div class="num">+11 F1</div>
+<div class="row-sep"></div>
+<div class="label">Label smoothing</div>
+<div class="desc">β = 0.1 is in the production loss but marginal — don't volunteer</div>
+<div class="num">β = 0.1</div>
+</div>
+</div>
+
+<h3>The deployment rule</h3>
+<ul>
+<li><strong>Default delivery:</strong> name the two ingredients, name the two axes, cite 130×, cite γ = 2, end on complementarity + ablation reference.</li>
+<li><strong>If asked "why cap at 10?"</strong> Deploy <em>"empirical — without it the rarest class weight hits about twenty-two and destabilises early training. Ten keeps rare classes elevated without exploding the gradients."</em></li>
+<li><strong>If asked "why γ = 2?"</strong> Deploy <em>"Lin et al. 2017 default. We tested γ = 1, smaller gains; γ = 3, training instability. γ = 2 is the empirically stable choice."</em></li>
+<li><strong>If asked "why not dice loss / label smoothing only?"</strong> Concede: <em>"Label smoothing at β = 0.1 is in fact in the production loss but contributes a marginal effect. Dice loss is a fair future comparison but wasn't tested — focal loss has more direct prior work in token classification under imbalance."</em></li>
+<li><strong>Critical:</strong> the +11 F1 number is reserved for slide 18 (the ablation). Don't deploy the number here unless directly asked, even if you mention the slide-18 ablation by name.</li>
+</ul>
+
+<h2>8 · Four pre-loaded interrupts</h2>
+
+<div class="attack">
+<div class="q">"Why focal loss and class weights — isn't using both double-counting?"</div>
+<div class="a">"No — they attack different parts of the imbalance problem. Class weights rebalance <em>across classes</em>: VICTIM tokens become about a hundred and thirty times more loss-impactful than O tokens. Focal loss rebalances <em>within a class</em>: easy-correct tokens get a (one minus p) squared factor that nearly zeroes them out, so the optimiser spends capacity on hard cases. Class weights alone still let the model polish easy VICTIMs; focal alone cannot lift the per-class signal enough when VICTIM is rare to begin with. The ablation in section 6.6, on slide 18, shows neither alone reaches the combined performance."</div>
+<div class="micro">Two-axes framing is the entire defence. Never say "they both help with imbalance" — say "they fix different aspects of imbalance." The §6.6 / slide-18 reference is what converts the claim from asserted to measured.</div>
+</div>
+
+<div class="attack">
+<div class="q">"Why γ = 2 and not 1 or 3?"</div>
+<div class="a">"Lin et al. 2017's recommended default from the original focal-loss paper. We tested both alternatives. Gamma equal to one gave smaller gains — the spotlight wasn't sharp enough to suppress confident-correct tokens. Gamma equal to three destabilised training in the first few hundred steps because moderately-confident tokens were also fading out, leaving the optimiser only catastrophic cases. Two is the empirically stable choice for our O-dominance and our learning rate."</div>
+<div class="micro">Four moves: cite the paper, name the alternatives, give the symptom of each, name "empirically stable" as the criterion. The "empirically stable" phrase ties back to slide 9's measurement-not-preference posture.</div>
+</div>
+
+<div class="attack">
+<div class="q">"Why cap the class weights at 10?"</div>
+<div class="a">"Empirical. Without the cap, the rarest classes — VICTIM and CASUALTIES — come out with weights around twenty-two, and the resulting gradients destabilise training in the first few hundred steps. Ten keeps the rare-class weights high enough to lift the signal without producing the gradient blow-up. Finding the right cap was iterative — section 5.5 of the thesis documents the search."</div>
+<div class="micro">Don't volunteer the math on the unclipped weights — say "around twenty-two" and move on. Don't lead with "the literature suggests" — this was an empirical choice for our corpus, not a literature default. The §5.5 reference is the audit trail.</div>
+</div>
+
+<div class="attack">
+<div class="q">"Did you try other losses — dice, only label smoothing, contrastive?"</div>
+<div class="a">"Label smoothing at beta zero point one is in fact in the production loss already — its contribution is marginal but kept for completeness. Dice loss is a fair future comparison but wasn't tested in this thesis; focal loss has more direct prior work in token classification under severe imbalance, which is why it was the principal candidate. Contrastive losses are out of scope — they fit representation learning, not the classification-head fine-tuning regime here."</div>
+<div class="micro">Concede label smoothing's presence honestly, defer dice loss to future work without pretending it was tested, and rule out contrastive on architectural grounds (it's a different training regime). The pattern: <em>concede what you did, defer what's fair, refuse what's a category error</em>.</div>
+</div>
+
+<h2>9 · The hero close</h2>
+
+<div class="hero-line">
+<span class="label">The hero line — memorise verbatim</span>
+"The two attack different parts of the imbalance — class weights across classes, focal loss across difficulty. The combination beats either alone."
+</div>
+
+<h3>Why this line is the hero</h3>
+<ul>
+<li><strong>"Different parts"</strong> names and refuses the double-counting attack inside your own sentence — the same pattern as slide 10's "didn't get smaller as a concession" and slide 11's "not a relabelling." The objection is neutralised before it's asked.</li>
+<li><strong>"Across classes" vs "across difficulty"</strong> are the two axes — the parallel structure makes the distinction memorable. Saying both axes in one breath is what plants the mental picture of two orthogonal rebalancers.</li>
+<li><strong>"Beats either alone"</strong> teases the slide-18 ablation without spending its number. The panel hears "this claim has measured evidence behind it" without losing the +11 F1 punchline that lives on slide 18.</li>
+<li><strong>Consistent with the deck's posture.</strong> Slide 9: measurement, not preference. Slide 10: decomposed, not narrower. Slide 11: synthesis, not relabelling. Slide 12: <strong>complementary, not redundant.</strong> Every contribution slide names the dismissive reading and refuses it with a precise positive claim.</li>
+</ul>
+
+<h2>10 · Timed practice</h2>
+
+<p>Four beats, ~90 seconds. Target window: 80–105 seconds. Beat 1 has to set up the parallel ("different parts of the imbalance") so Beats 2 and 3 land as parallel. The 130× number in Beat 2 is the most memorable on the slide — don't rush it.</p>
+
+<div class="timer-box">
+<div class="timer-display" id="timer">0.0 s</div>
+<div class="timer-buttons">
+<button id="startBtn">Start (begin "The training recipe — focal loss times class weights")</button>
+<button id="stopBtn" class="secondary" disabled>Stop (after "beats either alone")</button>
+<button id="resetBtn" class="secondary">Reset</button>
+</div>
+<div class="timer-verdict" id="verdict"></div>
+</div>
+
+<div class="callout">
+<strong>The harder rep — the "different parts" test.</strong> Run Beat 4 (the complementarity beat) without ever saying "both help with imbalance" or "they both improve performance." Replace with: "across classes vs across difficulty", "different parts of the imbalance", "neither alone reaches the combined". Re-run the rep until any "both/both improve" formulation is gone from your delivery.
+</div>
+
+<h2>11 · Quiz</h2>
+
+<div class="quiz" id="quiz1">
+<h4>Q1. The panel asks: "Why use focal loss <em>and</em> class weights? Isn't that double-counting?"</h4>
+<p class="qstem">Pick the strongest response.</p>
+<ul class="choices" data-answer="c">
+<li data-key="a">"Both help with class imbalance, so using both is safer than relying on either."</li>
+<li data-key="b">"Class weights are the standard approach, and focal loss adds extra robustness."</li>
+<li data-key="c">"No — they attack different parts of the imbalance problem. Class weights rebalance across classes — a VICTIM token becomes about 130× more loss-impactful than an O token. Focal loss rebalances across difficulty within a class — the (1−p)² factor suppresses easy-correct tokens so the optimiser concentrates on hard ones. Class weights alone still let the model polish easy VICTIMs; focal alone cannot lift the per-class signal enough when VICTIM is rare. The ablation on slide 18 shows neither alone reaches the combined performance."</li>
+<li data-key="d">"Focal loss covers the cases that class weights miss."</li>
+</ul>
+<p class="feedback" id="fb1"></p>
+</div>
+
+<div class="quiz" id="quiz2">
+<h4>Q2. What is the role of the (1−p<sub>y</sub>)<sup>γ</sup> term in the focal loss formula?</h4>
+<p class="qstem">Pick the cleanest explanation.</p>
+<ul class="choices" data-answer="b">
+<li data-key="a">It normalises the loss across class sizes.</li>
+<li data-key="b">It is a per-token modulator that becomes near zero when the model is confident and correct (p<sub>y</sub> high), and approaches 1 when the model is uncertain (p<sub>y</sub> low). Effect: the optimiser spends gradient on hard tokens, not on easy-correct ones.</li>
+<li data-key="c">It penalises overconfident predictions during inference.</li>
+<li data-key="d">It is a smoothing term that prevents the loss from becoming infinite.</li>
+</ul>
+<p class="feedback" id="fb2"></p>
+</div>
+
+<div class="quiz" id="quiz3">
+<h4>Q3. The panel asks: "Why cap class weights at 10?"</h4>
+<p class="qstem">Pick the strongest response.</p>
+<ul class="choices" data-answer="d">
+<li data-key="a">"Ten is the literature default."</li>
+<li data-key="b">"To keep the loss values in a reasonable numerical range."</li>
+<li data-key="c">"Ten worked best in our validation experiments."</li>
+<li data-key="d">"Empirical — without the cap, VICTIM and CASUALTIES come out with weights around 22, which destabilises training in the first few hundred steps with gradient blow-up. Ten keeps the rare-class weights elevated without producing instability. The search is documented in §5.5."</li>
+</ul>
+<p class="feedback" id="fb3"></p>
+</div>
+
+<div class="quiz" id="quiz4">
+<h4>Q4. What does the "130×" number on the slide refer to?</h4>
+<p class="qstem">Pick the correct meaning.</p>
+<ul class="choices" data-answer="a">
+<li data-key="a">A VICTIM token contributes about 130× the loss-weight of an O token under the production recipe (class weight ≈ 10 vs class weight ≈ 0.075).</li>
+<li data-key="b">The focal loss is 130× more sensitive to hard examples than plain cross-entropy.</li>
+<li data-key="c">Training with the recipe is 130× faster to converge than plain cross-entropy.</li>
+<li data-key="d">The combined model achieves 130× higher recall on VICTIM than the cross-entropy baseline.</li>
+</ul>
+<p class="feedback" id="fb4"></p>
+</div>
+
+<div class="followup">
+<strong>Ask your teacher follow-up questions.</strong>
+<ul>
+<li>Want a 60-second compressed delivery for if you're running behind?</li>
+<li>Want to drill the γ = 2 defence (Lin et al. + γ = 1/3 tested) under interruption?</li>
+<li>Want a worked numerical example of one token's focal-loss value to deploy if a methodologist asks for the arithmetic?</li>
+<li>Want to rehearse the complementarity claim against the harder "but ablations only show marginal interaction effects" attack?</li>
+</ul>
+<p class="cite">References: <a href="../../formulas_explained.md">formulas_explained.md</a> §3 (class weights), §4 (focal loss), §5 (production loss); <a href="../../concepts_explained.md">concepts_explained.md</a> §4 (imbalance overview); thesis §2.4, §5.5, §6.6. Original focal-loss reference: Lin et al. (2017), <em>Focal Loss for Dense Object Detection</em>, ICCV.</p>
+</div>
+
+<div class="bottom">Lesson 14 of the slide drill. Next up — slide 13: the curated knowledge base (the 150-armed-group / 200-city lookup layer that validates and enriches model output).</div>
+
+</div>
+
+<script>
+// Timer
+(function(){
+  const display=document.getElementById('timer');
+  const startBtn=document.getElementById('startBtn');
+  const stopBtn=document.getElementById('stopBtn');
+  const resetBtn=document.getElementById('resetBtn');
+  const verdict=document.getElementById('verdict');
+  let raf=null, t0=0;
+  function tick(){const t=(performance.now()-t0)/1000;display.textContent=t.toFixed(1)+' s';raf=requestAnimationFrame(tick)}
+  startBtn.onclick=()=>{cancelAnimationFrame(raf);t0=performance.now();raf=requestAnimationFrame(tick);startBtn.disabled=true;stopBtn.disabled=false;verdict.textContent='';verdict.className='timer-verdict'};
+  stopBtn.onclick=()=>{cancelAnimationFrame(raf);const t=(performance.now()-t0)/1000;display.textContent=t.toFixed(1)+' s';startBtn.disabled=false;stopBtn.disabled=true;
+    if(t<70){verdict.textContent='Too fast — the 130× number needs space, and the complementarity beat needs the two axes named distinctly. Slow down on Beat 2 and Beat 4.';verdict.className='timer-verdict over'}
+    else if(t<=105){verdict.textContent='Inside the window. The complementarity claim landed.';verdict.className='timer-verdict win'}
+    else{verdict.textContent='Over time — tighten Beat 3 (the focal-loss explanation). Use the (1−p)² → 0.01 number to land "100× less weight" in one phrase, drop the spotlight expansion.';verdict.className='timer-verdict over'}};
+  resetBtn.onclick=()=>{cancelAnimationFrame(raf);display.textContent='0.0 s';startBtn.disabled=false;stopBtn.disabled=true;verdict.textContent='';verdict.className='timer-verdict'};
+})();
+// Quizzes
+document.querySelectorAll('.quiz').forEach(quiz=>{
+  const ul=quiz.querySelector('.choices');
+  const answer=ul.dataset.answer;
+  const fb=quiz.querySelector('.feedback');
+  const fbMap={
+    quiz1:{
+      c:'Yes. Two-axes framing — across classes vs across difficulty — is the entire defence. Concrete numbers (130×, (1−p)²) and the ablation forward-reference seal it.',
+      a:'"Both help with imbalance" reads as double-counting. The defence must name distinct axes, not stack the same effect.',
+      b:'"Extra robustness" is hand-wavey. The panel needs the two-axes contrast, not a hedge.',
+      d:'Half-right — it conveys distinctness but doesn\'t name the axes. Without "across classes" vs "across difficulty", the defence is too vague to survive scrutiny.'
+    },
+    quiz2:{
+      b:'Yes. The (1−p)^γ term is the focusing modulator. High confidence p → near-zero factor; low confidence → near-one factor. Effect: gradient concentrates on hard cases.',
+      a:'No — class weights normalise across classes. The (1−p)^γ term is per-token, not per-class.',
+      c:'No — focal loss operates during training, not inference. The penalty shapes training gradients.',
+      d:'No — the −log p_y term is what could be unbounded; (1−p)^γ actually bounds the loss further by shrinking it for confident-correct cases.'
+    },
+    quiz3:{
+      d:'Yes. Empirical justification with the specific failure mode (gradient blow-up at ~22), the threshold (10), and the documented audit trail (§5.5). All three together = airtight.',
+      a:'Vague — "literature default" doesn\'t exist as a specific value here. The cap was chosen empirically for this corpus.',
+      b:'"Reasonable numerical range" is hand-wavey. The panel needs the specific instability mode (gradient blow-up at unclipped ~22).',
+      c:'"Worked best in validation" sounds like fitting hyperparameters to a metric. The defence is upstream — the unclipped weights destabilise training itself.'
+    },
+    quiz4:{
+      a:'Yes. With class weight 10 capped on VICTIM and ~0.075 on O, the ratio is approximately 130×. That is the loss-impact ratio that counter-balances the 78 % O dominance.',
+      b:'No — focal-loss sensitivity is captured by γ = 2, not by the 130× number. 130× is the across-classes ratio.',
+      c:'No — convergence speed isn\'t what 130× measures. It\'s the per-token loss-weight ratio between rare and common classes.',
+      d:'No — recall comparisons are reported on slide 17 (per-entity F1) and slide 18 (ablation). 130× is a loss-weight ratio, not a metric ratio.'
+    }
+  };
+  ul.querySelectorAll('li').forEach(li=>{
+    li.onclick=()=>{
+      if(li.classList.contains('locked'))return;
+      const key=li.dataset.key;
+      const correct=key===answer;
+      ul.querySelectorAll('li').forEach(x=>x.classList.add('locked'));
+      li.classList.add(correct?'right':'wrong');
+      if(!correct){ul.querySelector('li[data-key="'+answer+'"]').classList.add('right')}
+      fb.textContent=fbMap[quiz.id][key]||'';
+    };
+  });
+});
+</script>
+
+</body>
+</html>

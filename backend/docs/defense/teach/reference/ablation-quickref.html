@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>§6.6 Ablation — Quick Reference Card</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})"></script>
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --highlight:#F5EBC9;
+  --grid:#E8E1D2;
+  --success:#3F6B3F;
+  --success-soft:#E6F0E6;
+}
+*{box-sizing:border-box}
+html{font-size:15px}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;
+  line-height:1.5;
+}
+.card{
+  max-width:46rem;
+  margin:1.5rem auto;
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-radius:8px;
+  padding:1.8rem 2rem;
+  box-shadow:0 1px 4px rgba(0,0,0,0.04);
+}
+.header{border-bottom:2px solid var(--accent);padding-bottom:0.6rem;margin-bottom:1.2rem}
+.eyebrow{
+  font-family:"Inter",system-ui,sans-serif;
+  text-transform:uppercase;
+  letter-spacing:0.18em;
+  font-size:0.7rem;
+  color:var(--accent);
+  font-weight:600;
+}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:1.55rem;margin:0.25rem 0 0}
+.numbers{display:grid;grid-template-columns:repeat(4,1fr);gap:0.7rem;margin:0.7rem 0 0.4rem}
+.numbers .n{background:var(--accent);color:#FFF;text-align:center;padding:0.55rem 0.4rem;border-radius:5px}
+.numbers .n strong{display:block;font-size:1.3rem;font-family:"Iowan Old Style",Georgia,serif}
+.numbers .n span{font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;opacity:0.85}
+.section-h{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.78rem;
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  color:var(--accent);
+  margin:1.3rem 0 0.5rem;
+  font-weight:600;
+  border-bottom:1px solid var(--grid);
+  padding-bottom:0.25rem;
+}
+.ablation-table{width:100%;border-collapse:collapse;font-family:"Inter",system-ui,sans-serif;font-size:0.88rem;margin:0.4rem 0}
+.ablation-table th,.ablation-table td{padding:0.4rem 0.55rem;text-align:right;border-bottom:1px solid var(--grid)}
+.ablation-table th:first-child,.ablation-table td:first-child{text-align:left}
+.ablation-table th{font-weight:600;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft)}
+.ablation-table .num{font-family:"Iowan Old Style",Georgia,serif;font-feature-settings:"tnum"}
+.ablation-table tr.production{background:var(--highlight);font-weight:600}
+.ablation-table tr.lift{background:var(--success-soft);color:var(--success);font-weight:600;font-style:italic}
+.attacks{margin:0.6rem 0}
+.atk{display:grid;grid-template-columns:auto 1fr;gap:0.7rem;align-items:start;padding:0.55rem 0;border-bottom:1px dashed var(--grid);font-size:0.9rem}
+.atk:last-child{border-bottom:0}
+.atk .num{background:var(--accent);color:#FFF;width:1.6rem;height:1.6rem;border-radius:50%;font-size:0.78rem;font-family:"Inter",system-ui,sans-serif;display:flex;align-items:center;justify-content:center;font-weight:600}
+.atk .q{font-weight:600;color:var(--ink)}
+.atk .a{color:var(--ink-soft)}
+.kw{background:var(--highlight);padding:0 0.18em;border-radius:2px}
+.inequality{
+  background:var(--success-soft);
+  border:1px solid var(--success);
+  border-radius:5px;
+  padding:0.7rem 0.9rem;
+  margin:0.7rem 0;
+  text-align:center;
+  font-size:1rem;
+}
+.inequality .note{
+  display:block;
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.78rem;
+  font-style:italic;
+  color:var(--ink-soft);
+  margin-top:0.3rem;
+}
+.pitch{
+  background:var(--highlight);
+  padding:0.7rem 0.9rem;
+  border-radius:5px;
+  font-size:0.92rem;
+  line-height:1.55;
+  margin:0.5rem 0;
+}
+.foot{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.72rem;
+  color:var(--ink-soft);
+  margin-top:1rem;
+  border-top:1px dashed var(--grid);
+  padding-top:0.5rem;
+  text-align:right;
+}
+@media print{
+  body{background:#FFF}
+  .card{box-shadow:none;border:0;margin:0;max-width:none;padding:0.5in}
+  .numbers .n,.ablation-table tr.production,.ablation-table tr.lift,.inequality,.pitch{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="card">
+
+<div class="header">
+<div class="eyebrow">Quick reference · VioNER defense kit</div>
+<h1>§6.6 Ablation — Slide 18</h1>
+</div>
+
+<div class="numbers">
+<div class="n"><strong>+11 F1</strong><span>VICTIM lift</span></div>
+<div class="n"><strong>+7.2</strong><span>ACTION lift</span></div>
+<div class="n"><strong>3 seeds</strong><span>variance ±0.4 F1</span></div>
+<div class="n"><strong>p &lt; 0.01</strong><span>paired bootstrap</span></div>
+</div>
+
+<div class="section-h">Table 6.8 — the four cells</div>
+<table class="ablation-table">
+<thead>
+<tr><th>Loss configuration</th><th>VICTIM</th><th>ACTION</th><th>DATE</th></tr>
+</thead>
+<tbody>
+<tr><td>Plain CE (baseline)</td><td class="num">0.708</td><td class="num">0.794</td><td class="num">0.948</td></tr>
+<tr><td>Weighted CE</td><td class="num">0.776</td><td class="num">0.825</td><td class="num">0.953</td></tr>
+<tr><td>Focal alone (γ=2)</td><td class="num">0.792</td><td class="num">0.842</td><td class="num">0.951</td></tr>
+<tr class="production"><td>Focal + weights (production)</td><td class="num">0.817</td><td class="num">0.866</td><td class="num">0.956</td></tr>
+<tr class="lift"><td>Lift over baseline</td><td class="num">+10.9</td><td class="num">+7.2</td><td class="num">+0.8</td></tr>
+</tbody>
+</table>
+
+<div class="section-h">Complementarity inequality</div>
+<div class="inequality">
+$$0.817 \;>\; \max(0.792, 0.776) \;=\; 0.792$$
+<span class="note">Production beats max of single ingredients by 2.5 F1 → ingredients complement, not duplicate.</span>
+</div>
+
+<div class="section-h">The 60-second pitch</div>
+<div class="pitch">
+"The ablation in §6.6 is the empirical defence of the loss contribution. Four configurations, identical conditions, only the loss varies. VICTIM reads: 0.708, 0.776, 0.792, 0.817. Plus eleven on VICTIM, plus 7.2 on ACTION, no common-class regression. Three seeds, variance ±0.4, so gain exceeds variance 25×. Paired bootstrap p &lt; 0.01. This is what makes the loss choice a defensible contribution rather than an assertion."
+</div>
+
+<div class="section-h">Three attacks, three answers</div>
+<div class="attacks">
+
+<div class="atk">
+<div class="num">1</div>
+<div>
+<div class="q">How do you know this isn't a lucky run?</div>
+<div class="a">3 seeds; variance <span class="kw">±0.4 F1</span>; +11 lift exceeds variance by <span class="kw">25×</span>; paired bootstrap p &lt; 0.01.</div>
+</div>
+</div>
+
+<div class="atk">
+<div class="num">2</div>
+<div>
+<div class="q">Why these four configurations?</div>
+<div class="a">Isolates the design space of the loss contribution. γ value, weight cap, label smoothing → <span class="kw">sensitivity analysis</span> in §5.5 (different question, different table).</div>
+</div>
+</div>
+
+<div class="atk">
+<div class="num">3</div>
+<div>
+<div class="q">Could a third ingredient have beaten this?</div>
+<div class="a">Possibly. Label smoothing tested in Table 6.4 (calibration gain, marginal F1). Dice loss and effective-number weighting → future work item 4. Claim is <span class="kw">bounded</span>: combination beats baseline, not globally optimal.</div>
+</div>
+</div>
+
+</div>
+
+<div class="section-h">Where this lives</div>
+<p style="font-size:0.86rem;color:var(--ink-soft);margin:0.3rem 0">
+<strong>Thesis:</strong> §6.6 (Table 6.8) · §5.5 (sensitivity) · §6.13 (held-out integrity)
+<br><strong>Defense slide:</strong> Slide 18 (ablation) · Slide 12 (the recipe being ablated)
+<br><strong>Defense kit:</strong> <code>experimental_results.md</code> §6.6 · <code>VioNER_Defense_Slides_study_guide.md</code> slide 18 · <code>concepts_explained.md</code> §D1
+</p>
+
+<div class="foot">Reference card · keep open during slide-18 rehearsal</div>
+</div>
+
+</body>
+</html>

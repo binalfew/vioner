@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Slide 8 — VioNER in One Slide Delivery Card</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--ink:#1c1916;--ink-soft:#3d3935;--paper:#FBFAF7;--rule:#D9D2C5;--accent:#7B1E1E;--highlight:#F5EBC9;--grid:#E8E1D2;--beat:#1A365D;--beat-soft:#E8EEF5;--success:#3F6B3F}
+*{box-sizing:border-box}
+html{font-size:15px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.5}
+.card{max-width:46rem;margin:1.5rem auto;background:#FFF;border:1px solid var(--rule);border-radius:8px;padding:1.8rem 2rem;box-shadow:0 1px 4px rgba(0,0,0,0.04)}
+.header{border-bottom:2px solid var(--accent);padding-bottom:0.6rem;margin-bottom:1.2rem}
+.eyebrow{font-family:"Inter",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.18em;font-size:0.7rem;color:var(--accent);font-weight:600}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:1.55rem;margin:0.25rem 0 0}
+.section-h{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin:1.3rem 0 0.5rem;font-weight:600;border-bottom:1px solid var(--grid);padding-bottom:0.25rem}
+.components{display:grid;grid-template-columns:repeat(5,1fr);gap:0.45rem;margin:0.4rem 0}
+.components .c{background:var(--paper);border:1px solid var(--grid);border-radius:4px;padding:0.45rem 0.3rem;text-align:center}
+.components .c .n{font-family:"Inter",system-ui,sans-serif;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);font-weight:600;margin-bottom:0.2rem}
+.components .c .name{font-family:"Iowan Old Style",Georgia,serif;font-weight:700;font-size:0.78rem;line-height:1.2}
+.beats{display:grid;grid-template-columns:1fr;gap:0.4rem;margin:0.5rem 0}
+.b{background:var(--highlight);border-left:3px solid var(--beat);padding:0.55rem 0.85rem;border-radius:4px;font-size:0.88rem;line-height:1.55}
+.b strong{color:var(--accent)}
+.b .ord{font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--beat);font-weight:600;display:block;margin-bottom:0.2rem}
+.b.hero{border-left-color:var(--accent);background:#FFE8E8}
+.latency{background:#FFF;border:1px solid var(--grid);border-radius:5px;padding:0.7rem;margin:0.5rem 0;display:grid;grid-template-columns:1fr auto 1fr;gap:0.5rem;align-items:center;text-align:center}
+.latency .big{font-family:"Iowan Old Style",Georgia,serif;font-size:1.5rem;font-weight:700;color:var(--accent);font-feature-settings:"tnum"}
+.latency .vs{font-family:"Inter",system-ui,sans-serif;font-weight:700;color:var(--ink-soft);font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em}
+.latency .label{font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.04em;margin-top:0.2rem}
+.hero-line{background:#FFE8E8;border:2px solid var(--accent);border-radius:5px;padding:0.85rem 1rem;margin:0.7rem 0;text-align:center;font-family:"Iowan Old Style",Georgia,serif;font-size:0.98rem;font-weight:500}
+.hero-line .label{display:block;font-family:"Inter",system-ui,sans-serif;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.09em;color:var(--accent);font-weight:600;margin-bottom:0.3rem}
+.demotion{background:var(--paper);border:1px solid var(--grid);border-radius:4px;padding:0.6rem 0.85rem;margin:0.5rem 0}
+.demotion strong{color:var(--accent);font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.3rem}
+.demotion p{font-size:0.86rem;margin:0.15rem 0;font-style:italic;color:var(--ink-soft)}
+.transform{display:grid;grid-template-columns:1fr auto 1fr;gap:0.5rem;align-items:center;margin:0.5rem 0;text-align:center}
+.transform .side{background:#FFF;border:1px solid var(--grid);border-radius:4px;padding:0.5rem 0.7rem;font-size:0.84rem}
+.transform .side strong{color:var(--accent);font-family:"Inter",system-ui,sans-serif;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.2rem}
+.transform .arr{font-family:"Inter",system-ui,sans-serif;font-size:1.2rem;color:var(--accent);font-weight:700}
+.attacks{margin:0.5rem 0}
+.atk{display:grid;grid-template-columns:auto 1fr;gap:0.6rem;padding:0.5rem 0;border-bottom:1px dashed var(--grid);font-size:0.85rem}
+.atk:last-child{border-bottom:0}
+.atk .n{background:var(--accent);color:#FFF;width:1.5rem;height:1.5rem;border-radius:50%;font-size:0.72rem;font-family:"Inter",system-ui,sans-serif;display:flex;align-items:center;justify-content:center;font-weight:600;flex-shrink:0}
+.atk .q{font-weight:600;color:var(--ink);font-size:0.84rem}
+.atk .a{color:var(--ink-soft)}
+.kw{background:var(--highlight);padding:0 0.18em;border-radius:2px}
+.foot{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;color:var(--ink-soft);margin-top:1rem;border-top:1px dashed var(--grid);padding-top:0.5rem;text-align:right}
+@media print{
+  body{background:#FFF}
+  .card{box-shadow:none;border:0;margin:0;max-width:none;padding:0.5in}
+  .components .c,.b,.latency,.hero-line,.transform .side,.demotion{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="card">
+
+<div class="header">
+<div class="eyebrow">Quick reference · VioNER defense kit</div>
+<h1>Slide 8 — VioNER in one slide (75 s)</h1>
+</div>
+
+<div class="section-h">The five components</div>
+<div class="components">
+<div class="c"><div class="n">One</div><div class="name">8-entity schema</div></div>
+<div class="c"><div class="n">Two</div><div class="name">Fine-tuned BERT</div></div>
+<div class="c"><div class="n">Three</div><div class="name">Curated KB</div></div>
+<div class="c"><div class="n">Four</div><div class="name">4-level taxonomy</div></div>
+<div class="c"><div class="n">Five</div><div class="name">Deployable platform</div></div>
+</div>
+
+<div class="section-h">Four beats — verbatim</div>
+<div class="beats">
+
+<div class="b"><span class="ord">Beat 1 · opener · 5 s</span>
+"VioNER in one slide. <strong>Five components.</strong>" <em>(pause)</em>
+</div>
+
+<div class="b"><span class="ord">Beat 2 · rapid list · 20 s · EVEN CADENCE, NO EMPHASIS ON MODEL</span>
+"<strong>One</strong> — the eight-entity grounding-validated schema. <strong>Two</strong> — a fine-tuned BERT NER model. <strong>Three</strong> — a curated knowledge base. <strong>Four</strong> — a four-level event taxonomy. <strong>Five</strong> — a deployable web platform."
+</div>
+
+<div class="b"><span class="ord">Beat 3 · latency contrast · 20 s · SLOW ON BOTH NUMBERS</span>
+"End-to-end latency is about <strong>a hundred and fifty milliseconds</strong> per article on a single CPU core, versus <strong>fifteen to twenty-five minutes</strong> of manual coding."
+</div>
+
+<div class="b hero"><span class="ord">Beat 4 · strategic demotion · 30 s · HERO BEAT</span>
+"The point I want you to hold: <strong>the model is one component.</strong> The schema, the KB, the taxonomy, and the platform are what turn <strong>a checkpoint on a laptop</strong> into <strong>a capability an analyst can actually drive.</strong>"
+</div>
+
+</div>
+
+<div class="section-h">The latency contrast</div>
+<div class="latency">
+<div><div class="big">~150 ms</div><div class="label">per article (CPU)</div></div>
+<div class="vs">VS</div>
+<div><div class="big">15-25 min</div><div class="label">manual coding</div></div>
+</div>
+<p style="font-size:0.82rem;color:var(--ink-soft);font-style:italic;margin:0.3rem 0">Do NOT compute the ratio aloud (~6,000-10,000×). The contrast speaks louder when the panel computes silently.</p>
+
+<div class="section-h">Hero line</div>
+<div class="hero-line">
+<span class="label">The hero line — memorise verbatim</span>
+"The schema, the KB, the taxonomy, and the platform are what turn a checkpoint on a laptop into a capability an analyst can actually drive."
+</div>
+
+<div class="section-h">The before/after image</div>
+<div class="transform">
+<div class="side"><strong>Before</strong>Checkpoint on a laptop<br><small>(model alone, inert)</small></div>
+<div class="arr">→</div>
+<div class="side"><strong>After</strong>Capability an analyst can drive<br><small>(integrated, operational)</small></div>
+</div>
+
+<div class="section-h">Strategic demotion — naive vs savvy</div>
+<div class="demotion">
+<strong>Naive (most candidates)</strong>
+<p>"The core is the fine-tuned BERT. Schema, KB, taxonomy, platform support it." → Panel hears: "you fine-tuned BERT."</p>
+</div>
+<div class="demotion">
+<strong>Savvy (this script)</strong>
+<p>"The model is one component." → Panel hears: "integrated system, evaluated end-to-end."</p>
+</div>
+
+<div class="section-h">The "no emphasis" rule</div>
+<p style="font-size:0.84rem;line-height:1.55;margin:0.3rem 0">Do NOT vocally emphasise "fine-tuned BERT NER model" in the five-component list. Your voice naturally wants to — you worked harder on it than the others. Resist. Same weight as "curated knowledge base". Record yourself and check.</p>
+
+<div class="section-h">Pre-loaded interrupts</div>
+<div class="attacks">
+
+<div class="atk">
+<div class="n">1</div>
+<div>
+<div class="q">Why no F1 numbers here?</div>
+<div class="a">Slide 16 with proper context. This is the <span class="kw">system reveal</span>, not the <span class="kw">result reveal</span>. Slide 1 already planted 0.909 as the headline.</div>
+</div>
+</div>
+
+<div class="atk">
+<div class="n">2</div>
+<div>
+<div class="q">Which component is most novel?</div>
+<div class="a"><span class="kw">The integration.</span> Each has precedent in isolation. What's new: closing all four gaps with these five components, evaluated end-to-end with UAT.</div>
+</div>
+</div>
+
+<div class="atk">
+<div class="n">3</div>
+<div>
+<div class="q">Isn't the loss recipe (+11 F1) the actual contribution?</div>
+<div class="a">Loss recipe is the <span class="kw">methodological contribution</span> (slide 22 contribution #3). This slide is the <span class="kw">system view</span> — model = one of five components. Different views, both honest.</div>
+</div>
+</div>
+
+</div>
+
+<div class="section-h">Where this lives</div>
+<p style="font-size:0.85rem;color:var(--ink-soft);margin:0.3rem 0">
+<strong>Defense slide:</strong> Slide 8 of 22 (VioNER in one slide)
+<br><strong>Defense kit:</strong> <code>VioNER_Defense_Slides_study_guide.md</code> slide 8 · <code>solution_architecture.md</code> · thesis §6.8 (latency)
+<br><strong>Continues into:</strong> Slide 9 (design-science methodology) · Slides 10-14 (each component gets its own slide)
+</p>
+
+<div class="foot">Reference card · keep open during slide-8 rehearsal</div>
+</div>
+
+</body>
+</html>

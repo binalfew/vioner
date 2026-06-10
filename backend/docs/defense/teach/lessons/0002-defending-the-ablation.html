@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 2 — Defending the Ablation Table</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+  onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false})"></script>
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --accent-soft:#A14747;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --success-soft:#E6F0E6;
+  --warn:#8B5A2B;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:42rem;margin:0 auto;padding:3.5rem 1.5rem 6rem}
+.eyebrow{
+  font-family:"Inter","SF Pro Text",system-ui,sans-serif;
+  text-transform:uppercase;
+  letter-spacing:0.18em;
+  font-size:0.72rem;
+  color:var(--accent);
+  font-weight:600;
+}
+h1{
+  font-family:"Iowan Old Style","Charter",Georgia,serif;
+  font-size:2.3rem;
+  font-weight:700;
+  line-height:1.18;
+  margin:0.4rem 0 0.6rem;
+  letter-spacing:-0.012em;
+}
+h2{
+  font-family:"Iowan Old Style","Charter",Georgia,serif;
+  font-size:1.45rem;
+  margin:3rem 0 0.6rem;
+  font-weight:700;
+  border-bottom:1px solid var(--rule);
+  padding-bottom:0.4rem;
+}
+h3{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:1rem;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.05em;
+  margin:1.6rem 0 0.4rem;
+  color:var(--accent);
+}
+p,li{font-size:1.05rem}
+.subtitle{
+  color:var(--ink-soft);
+  font-style:italic;
+  font-size:1.1rem;
+  margin:0 0 1.4rem;
+}
+.meta{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.78rem;
+  color:var(--ink-soft);
+  letter-spacing:0.02em;
+  border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);
+  padding:0.6rem 0;
+  margin-bottom:2.2rem;
+  display:flex;
+  flex-wrap:wrap;
+  gap:1.2rem;
+}
+.meta span strong{color:var(--ink)}
+blockquote{
+  margin:1.4rem 0;
+  padding:1rem 1.3rem;
+  background:#FFF;
+  border-left:3px solid var(--accent);
+  font-style:italic;
+  color:var(--ink-soft);
+  font-size:1.05rem;
+}
+blockquote.pitch{
+  background:var(--highlight);
+  border-left-color:var(--accent);
+  font-size:1.06rem;
+  color:var(--ink);
+  font-style:normal;
+  line-height:1.55;
+}
+.callout{
+  background:#FFF;
+  border:1px solid var(--rule);
+  padding:1rem 1.3rem;
+  margin:1.2rem 0;
+  border-radius:4px;
+}
+.callout.win{border-left:3px solid var(--success)}
+.callout.warn{border-left:3px solid var(--warn)}
+.attack{
+  background:#FFF;
+  border:1px solid var(--rule);
+  padding:1rem 1.3rem 0.8rem;
+  margin:1rem 0;
+  border-radius:4px;
+}
+.attack .q{
+  font-family:"Inter",system-ui,sans-serif;
+  font-weight:600;
+  font-size:0.95rem;
+  color:var(--accent);
+  margin-bottom:0.5rem;
+}
+.attack .a{margin:0.4rem 0 0.6rem;font-size:1.03rem}
+.attack .micro{font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+code{
+  font-family:"JetBrains Mono","SF Mono",Menlo,monospace;
+  font-size:0.92em;
+  background:#F0EBE0;
+  padding:0.06em 0.36em;
+  border-radius:3px;
+}
+/* Ablation table */
+.ablation{
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-radius:6px;
+  padding:1.1rem;
+  margin:1.4rem 0;
+  overflow-x:auto;
+}
+.ablation table{
+  width:100%;
+  border-collapse:collapse;
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.95rem;
+}
+.ablation th,.ablation td{
+  padding:0.55rem 0.7rem;
+  text-align:right;
+  border-bottom:1px solid var(--rule);
+}
+.ablation th:first-child,.ablation td:first-child{text-align:left}
+.ablation th{
+  font-weight:600;
+  font-size:0.78rem;
+  text-transform:uppercase;
+  letter-spacing:0.05em;
+  color:var(--ink-soft);
+  border-bottom:2px solid var(--rule);
+}
+.ablation tr.production{
+  background:var(--highlight);
+  font-weight:600;
+}
+.ablation tr.production td{border-bottom-color:var(--accent)}
+.ablation tr.lift{
+  background:var(--success-soft);
+  color:var(--success);
+  font-weight:600;
+}
+.ablation tr.lift td{font-style:italic}
+.ablation .num{font-family:"Iowan Old Style","Charter",Georgia,serif;font-feature-settings:"tnum"}
+.ablation .big{font-size:1.05rem;color:var(--accent);font-weight:700}
+.ablation caption{
+  font-family:"Iowan Old Style",Georgia,serif;
+  font-style:italic;
+  color:var(--ink-soft);
+  font-size:0.88rem;
+  text-align:left;
+  caption-side:bottom;
+  margin-top:0.6rem;
+}
+/* Inequality block */
+.inequality{
+  background:var(--success-soft);
+  border:1px solid var(--success);
+  border-radius:6px;
+  padding:1rem 1.3rem;
+  margin:1.4rem 0;
+  text-align:center;
+  font-size:1.1rem;
+}
+.inequality strong{color:var(--success);font-weight:700}
+.inequality .note{
+  display:block;
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.85rem;
+  font-style:italic;
+  color:var(--ink-soft);
+  margin-top:0.4rem;
+}
+/* Timer */
+.timer-box{
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-radius:6px;
+  padding:1.3rem;
+  margin:1.3rem 0;
+  text-align:center;
+}
+.timer-display{
+  font-family:"JetBrains Mono","SF Mono",monospace;
+  font-size:2.6rem;
+  font-weight:700;
+  color:var(--accent);
+  margin:0.3rem 0;
+  font-feature-settings:"tnum";
+}
+.timer-buttons{display:flex;gap:0.6rem;justify-content:center;margin-top:0.7rem}
+.timer-buttons button{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.92rem;
+  font-weight:600;
+  padding:0.55rem 1.3rem;
+  border:1px solid var(--accent);
+  background:var(--accent);
+  color:#FFF;
+  border-radius:4px;
+  cursor:pointer;
+  transition:background 120ms;
+}
+.timer-buttons button:hover{background:var(--accent-soft)}
+.timer-buttons button.secondary{
+  background:#FFF;
+  color:var(--accent);
+}
+.timer-buttons button.secondary:hover{background:#FBFAF7}
+.timer-verdict{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.95rem;
+  margin-top:0.7rem;
+  min-height:1.4rem;
+  font-weight:600;
+}
+.timer-verdict.win{color:var(--success)}
+.timer-verdict.over{color:var(--warn)}
+.script-card{
+  background:var(--paper);
+  border:1px dashed var(--rule);
+  border-radius:5px;
+  padding:0.9rem 1.1rem;
+  margin:0.9rem 0;
+  font-size:1.05rem;
+  line-height:1.6;
+}
+.script-card .label{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.7rem;
+  text-transform:uppercase;
+  letter-spacing:0.08em;
+  color:var(--accent);
+  font-weight:600;
+  display:block;
+  margin-bottom:0.3rem;
+}
+/* Quiz */
+.quiz{
+  background:#FFF;
+  border:1px solid var(--rule);
+  border-radius:6px;
+  padding:1.4rem;
+  margin:1.4rem 0;
+}
+.quiz h4{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:0.95rem;
+  margin:0 0 0.8rem;
+  color:var(--accent);
+}
+.quiz .qstem{font-size:1.02rem;margin-bottom:0.7rem}
+.choices{list-style:none;padding:0;margin:0}
+.choices li{
+  margin:0.45rem 0;
+  padding:0.55rem 0.8rem;
+  border:1px solid var(--rule);
+  border-radius:4px;
+  cursor:pointer;
+  background:#FBFAF7;
+  font-size:0.98rem;
+  transition:background 120ms,border-color 120ms;
+}
+.choices li:hover{background:#F0EBE0}
+.choices li.right{background:#E6F0E6;border-color:var(--success);color:var(--success);font-weight:600}
+.choices li.wrong{background:#F5DEDE;border-color:var(--accent);color:var(--accent)}
+.feedback{
+  margin-top:0.6rem;
+  font-size:0.93rem;
+  font-style:italic;
+  color:var(--ink-soft);
+  min-height:1.2rem;
+}
+.checklist{list-style:none;padding:0}
+.checklist li{
+  padding:0.5rem 0 0.5rem 1.8rem;
+  position:relative;
+  font-size:1rem;
+  border-bottom:1px dashed var(--rule);
+}
+.checklist li:before{
+  content:"☐";
+  position:absolute;
+  left:0;
+  top:0.45rem;
+  font-size:1.1rem;
+  color:var(--accent);
+}
+hr{border:0;border-top:1px solid var(--rule);margin:2.4rem 0}
+.footer-note{
+  margin-top:3rem;
+  padding:1.2rem 1.4rem;
+  background:#FFF;
+  border:1px dashed var(--rule);
+  border-radius:6px;
+  font-size:0.95rem;
+}
+.footer-note strong{color:var(--accent)}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft)}
+a:hover{color:var(--accent-soft)}
+@media print{
+  body{background:#FFF;font-size:11pt}
+  .wrap{max-width:none;padding:0 1in}
+  .quiz,.choices li,.timer-buttons button{cursor:auto}
+  .choices li{break-inside:avoid}
+  h2{break-after:avoid}
+  blockquote.pitch,.inequality,.ablation tr.production,.ablation tr.lift{
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;
+  }
+  .timer-buttons{display:none}
+  .meta{display:block}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">Lesson 02 · Slide 18 — Ablation</div>
+<h1>Defend the ablation as a controlled experiment</h1>
+<p class="subtitle">Not as a result. The four numbers on the slide are <em>evidence</em>, not a claim — and rigorous evidence has to be defended as evidence.</p>
+
+<div class="meta">
+  <span><strong>Mission link.</strong> Survive the methodology questions on the loss contribution.</span>
+  <span><strong>Builds on.</strong> Lesson 01.</span>
+  <span><strong>Time.</strong> 15–20 minutes.</span>
+</div>
+
+<p>In <a href="0001-defending-focal-loss.html">Lesson 1</a> you learned to explain <em>what focal loss is</em> and why you used it. That gets you past <q>tell me about your loss function.</q> But the harder question — the one the methodology-minded panellist asks — is <strong>"how do you know your loss choice was better than the alternatives?"</strong>. The answer is the §6.6 ablation table. This lesson teaches you to defend it.</p>
+
+<h2>1 · What an ablation actually is</h2>
+
+<p>An <strong>ablation study</strong> is a controlled experiment for software/ML methodology. You take your full system, hold everything constant, and turn one ingredient off at a time. The drop in performance is the contribution of that ingredient. It's the ML equivalent of <em>"if I remove this component and the system still works the same, the component wasn't doing anything."</em></p>
+
+<p>An ablation is rigorous when:</p>
+<ul>
+<li><strong>Identical conditions</strong> — same data, same training schedule, same random seeds, only the ingredient under test varies.</li>
+<li><strong>Multiple seeds</strong> — to confirm the result isn't a lucky run.</li>
+<li><strong>Statistical significance</strong> — the observed gain exceeds run-to-run noise by a comfortable margin.</li>
+<li><strong>Honest reporting</strong> — every cell of the table is reported, not just the ones that flatter the contribution.</li>
+</ul>
+
+<p>The §6.6 table satisfies all four. This lesson teaches you how to demonstrate that under panel pressure.</p>
+
+<h2>2 · The table you'll defend</h2>
+
+<p>This is what your panel sees on slide 18. Memorise the four VICTIM numbers — they are the empirical core of the loss-function contribution.</p>
+
+<div class="ablation">
+<table>
+<caption>Table 6.8 (§6.6). Per-entity F1 under four loss configurations. Identical data, identical schedule, identical seeds — only the loss function varies.</caption>
+<thead>
+<tr>
+  <th>Loss configuration</th>
+  <th>VICTIM F1</th>
+  <th>ACTION F1</th>
+  <th>DATE F1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Plain cross-entropy (baseline)</td>
+  <td class="num">0.708</td>
+  <td class="num">0.794</td>
+  <td class="num">0.948</td>
+</tr>
+<tr>
+  <td>Weighted cross-entropy</td>
+  <td class="num">0.776</td>
+  <td class="num">0.825</td>
+  <td class="num">0.953</td>
+</tr>
+<tr>
+  <td>Focal loss alone (γ = 2)</td>
+  <td class="num">0.792</td>
+  <td class="num">0.842</td>
+  <td class="num">0.951</td>
+</tr>
+<tr class="production">
+  <td>Focal + class weights (production)</td>
+  <td class="num big">0.817</td>
+  <td class="num big">0.866</td>
+  <td class="num">0.956</td>
+</tr>
+<tr class="lift">
+  <td>Lift over baseline</td>
+  <td class="num">+10.9</td>
+  <td class="num">+7.2</td>
+  <td class="num">+0.8</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout win">
+<strong>Two things to point at while presenting.</strong> First — the bottom row (lift) on VICTIM and ACTION: the rare entities gained substantially. Second — the bottom row on DATE: <em>no regression</em> on the common entity. The combination doesn't trade off; it lifts the rare classes <em>without sacrificing anything</em>. That second point is what makes this a clean contribution.
+</div>
+
+<h2>3 · The 60-second read-aloud script</h2>
+
+<p>This is what you say when you arrive at slide 18. Roughly one minute at calm pace. Section-by-section structured so even if interrupted mid-way, the key technical content has landed.</p>
+
+<blockquote class="pitch">
+<strong>(Open)</strong> "The ablation in section 6.6 is the empirical defence of the loss-function contribution. Four configurations. Identical conditions. Only the loss changes."
+<br><br>
+<strong>(Walk the table)</strong> "Reading the VICTIM column. Plain cross-entropy: zero-point-seven-zero-eight. Weighted cross-entropy: zero-point-seven-seven-six. Focal loss alone: zero-point-seven-nine-two. Focal-plus-weights: zero-point-eight-one-seven."
+<br><br>
+<strong>(Headline)</strong> "Plus eleven F1 points over baseline on VICTIM. Plus seven-point-two on ACTION. No common-class regression — DATE went up zero-point-eight points."
+<br><br>
+<strong>(Rigour)</strong> "On significance: three random seeds, run-to-run variance plus-minus zero-point-four F1, so the eleven-point gain exceeds variance by twenty-five times. Paired bootstrap at the article level — p below zero-point-zero-one. The gain is real, not noise."
+<br><br>
+<strong>(Close)</strong> "This table is what makes the loss choice defensible as a contribution rather than an assertion."
+</blockquote>
+
+<h2>4 · The complementarity inequality</h2>
+
+<p>The single most important conceptual claim of the ablation: the two ingredients <em>complement</em> each other. They are not redundant. If they were redundant, the production row would equal the better of the two ingredient-alone rows. It doesn't. It's higher.</p>
+
+<div class="inequality">
+$$\text{Focal + weights } (0.817) \;>\; \max\Bigl(\text{focal alone } (0.792), \text{ weighted CE } (0.776)\Bigr) \;=\; 0.792$$
+<span class="note">The combination beats the better of the two ingredients by 2.5 F1 points. That's the evidence of complementarity.</span>
+</div>
+
+<p>In words: if class weights and focal loss were doing the same job, you'd see the combined row plateau at the better single-ingredient row. The fact that it lifts <em>above</em> that maximum means the two ingredients are addressing different parts of the imbalance problem — and the lesson 1 frame applies:</p>
+
+<ul>
+<li><strong>Class weights</strong> rebalance <em>across</em> classes (per-class multiplier on the loss).</li>
+<li><strong>Focal loss</strong> rebalances <em>within</em> a class (suppresses easy-correct tokens).</li>
+</ul>
+
+<p>Different axes of the same imbalance problem → combination beats either alone → the table is the proof.</p>
+
+<h2>5 · Three predicted attacks</h2>
+
+<p>The methodology-minded panellist will pursue one of three lines. Pre-load the answers.</p>
+
+<div class="attack">
+<div class="q">Attack 1. "How do you know this isn't just one lucky run?"</div>
+<div class="a">"Three random seeds per configuration. Run-to-run variance on macro F1 is plus-minus zero-point-four F1. The eleven-point VICTIM lift exceeds variance by about twenty-five times. We also ran a paired bootstrap at the article level — p below zero-point-zero-one. The gain is robust to noise."</div>
+<div class="micro">The "25× headroom" framing is what makes this answer feel rigorous rather than hand-wavy. Land that number.</div>
+</div>
+
+<div class="attack">
+<div class="q">Attack 2. "Why exactly these four configurations? Could you be cherry-picking?"</div>
+<div class="a">"The four cells isolate the design space of the loss contribution: baseline, the class-weights ingredient alone, the focal-loss ingredient alone, and the combination. Each pairwise comparison answers a specific causal question. Adjacent design choices like the value of gamma, the class-weight cap, label smoothing — those are sensitivity analyses in section 5.5, not structural ablations. The §6.6 table answers what each loss-function ingredient contributes; sensitivity asks how robust the result is to parameter values. Different questions, different tables."</div>
+<div class="micro">The "structural ablation vs sensitivity analysis" distinction is the key — it shows methodological literacy.</div>
+</div>
+
+<div class="attack">
+<div class="q">Attack 3. "Couldn't a third ingredient have outperformed this combination?"</div>
+<div class="a">"Possibly. We tested label smoothing with beta zero-point-one (Table 6.4) — marginal F1 effect, but better confidence calibration, so it's in the production loss. We did not test dice loss or effective-number weighting; those are documented as future-work item four. The contribution claim is specifically that focal loss plus class weights beats plain cross-entropy by a substantial margin — not that no alternative could ever do better. That's an honest, bounded claim."</div>
+<div class="micro">"Honest, bounded claim" is the disarming move. It concedes the question's premise without conceding the contribution.</div>
+</div>
+
+<h2>6 · Read-aloud drill (timed)</h2>
+
+<p>The hardest delivery moment is the four-number walk through the VICTIM column. You need to say <em>"zero-point-seven-zero-eight, zero-point-seven-seven-six, zero-point-seven-nine-two, zero-point-eight-one-seven, plus eleven F1 points"</em> in 15 seconds or less. Smooth, no hesitation, no number swaps. Practice it now.</p>
+
+<div class="script-card">
+<span class="label">Read this aloud while the timer runs</span>
+"Plain cross-entropy: zero-point-seven-zero-eight. Weighted cross-entropy: zero-point-seven-seven-six. Focal alone: zero-point-seven-nine-two. Focal-plus-weights: zero-point-eight-one-seven. Plus eleven F1 points over baseline."
+</div>
+
+<div class="timer-box">
+<div class="timer-display" id="timer">0.0 s</div>
+<div class="timer-buttons">
+<button id="startBtn">Start</button>
+<button id="stopBtn" class="secondary" disabled>Stop</button>
+<button id="resetBtn" class="secondary">Reset</button>
+</div>
+<div class="timer-verdict" id="verdict"></div>
+</div>
+
+<div class="callout">
+<strong>What "good enough" looks like.</strong> If you finished in under 15 seconds with no number swap, you can deliver this on the day. If you finished between 15 and 20 seconds, do another rep. If you went over 20 or you swapped a number, slow it down by one beat per number and try again.
+</div>
+
+<h2>7 · Quiz</h2>
+
+<div class="quiz" id="quiz1">
+<h4>Q1. A panellist asks: "How do you know your VICTIM gain isn't just a lucky seed?"</h4>
+<p class="qstem">Pick the most rigorous-sounding answer.</p>
+<ul class="choices" data-answer="b">
+<li data-key="a">"We ran the experiment multiple times and got similar numbers."</li>
+<li data-key="b">"Three random seeds. Run-to-run variance is ±0.4 F1. The +11 VICTIM lift exceeds variance by 25×. Paired bootstrap at article level gives p &lt; 0.01."</li>
+<li data-key="c">"VICTIM is a rare class so we expect bigger swings, but +11 is too big to be noise."</li>
+<li data-key="d">"The other entities also improved, so it's not just one fluke on VICTIM."</li>
+</ul>
+<p class="feedback" id="fb1"></p>
+</div>
+
+<div class="quiz" id="quiz2">
+<h4>Q2. "Why these four configurations and not eight?"</h4>
+<p class="qstem">Which framing best defends the table's scope?</p>
+<ul class="choices" data-answer="c">
+<li data-key="a">"More cells would have made the table too large to fit on the slide."</li>
+<li data-key="b">"We did the structural ablation; adjacent ingredients would have been redundant."</li>
+<li data-key="c">"The four cells isolate the design space of the loss contribution. Adjacent choices like γ value, weight cap, label smoothing are sensitivity analyses in §5.5 — different question, different table."</li>
+<li data-key="d">"There are only four reasonable loss functions to compare against."</li>
+</ul>
+<p class="feedback" id="fb2"></p>
+</div>
+
+<div class="quiz" id="quiz3">
+<h4>Q3. The complementarity inequality.</h4>
+<p class="qstem">If focal loss and class weights were doing the same job (i.e. redundant), which row of the table would the production row equal?</p>
+<ul class="choices" data-answer="b">
+<li data-key="a">The plain CE baseline row.</li>
+<li data-key="b">The better of the two ingredient-alone rows (focal alone = 0.792).</li>
+<li data-key="c">The sum of the two ingredient-alone improvements.</li>
+<li data-key="d">It would equal exactly one of the two ingredient-alone rows, but it's unclear which.</li>
+</ul>
+<p class="feedback" id="fb3"></p>
+</div>
+
+<h2>8 · The fluency checklist</h2>
+
+<p>Mentally tick each box. If you can't tick all six, do another rep of the section that broke down.</p>
+
+<ul class="checklist">
+<li>I can name all four loss configurations in order, from memory.</li>
+<li>I can recite the four VICTIM numbers (0.708, 0.776, 0.792, 0.817) in under 15 seconds with no swaps.</li>
+<li>I can deliver the 60-second read-aloud script without notes.</li>
+<li>I can answer Attack 1 (statistical significance) with the "3 seeds, ±0.4 variance, 25× headroom, paired bootstrap p &lt; 0.01" framing.</li>
+<li>I can answer Attack 2 (why these four) with the "structural ablation vs sensitivity analysis" distinction.</li>
+<li>I can state the complementarity inequality (0.817 > max(0.792, 0.776)) and explain what it proves.</li>
+</ul>
+
+<div class="callout win">
+<strong>If all six are ticked,</strong> you have moved from <em>knowing the result</em> to <em>defending the evidence</em>. That's what a methodology-minded panel is checking.
+</div>
+
+<h2>Where to go next</h2>
+
+<p>When you're ready, ask:</p>
+<ul>
+<li><em>"Teach me class weights the same way."</em></li>
+<li><em>"Teach me label smoothing — why it's in the production loss but doesn't show up as a big delta."</em></li>
+<li><em>"Teach me how to defend the held-out split (§6.13) — the 'how do we know there's no leakage?' attack."</em></li>
+<li><em>"Quiz me cold — fire 5 ablation-related panel questions and I'll respond verbally."</em></li>
+</ul>
+
+<div class="footer-note">
+<strong>Authority for this lesson.</strong> Sourced from your thesis defense kit: <code>VioNER_Defense_Slides_study_guide.md</code> slide 18, <code>experimental_results.md</code> §6.6 (Table 6.8 walkthrough), <code>concepts_explained.md</code> §D1 (the complementarity claim). The "structural ablation vs sensitivity analysis" framing is the established methodological distinction in ML reporting (cf. Lipton & Steinhardt 2019, <em>"Troubling Trends in Machine Learning Scholarship"</em>).
+</div>
+
+</div>
+
+<script>
+// Quiz wiring
+document.querySelectorAll('.quiz').forEach(function(q){
+  var list=q.querySelector('.choices');
+  var ans=list.getAttribute('data-answer');
+  var fb=q.querySelector('.feedback');
+  list.querySelectorAll('li').forEach(function(li){
+    li.addEventListener('click',function(){
+      list.querySelectorAll('li').forEach(function(x){x.classList.remove('right','wrong');});
+      if(li.getAttribute('data-key')===ans){
+        li.classList.add('right');
+        fb.textContent='Correct — this is the phrasing to use.';
+      } else {
+        li.classList.add('wrong');
+        fb.textContent='Not the strongest answer — try again.';
+      }
+    });
+  });
+});
+
+// Timer
+(function(){
+  var display=document.getElementById('timer');
+  var startBtn=document.getElementById('startBtn');
+  var stopBtn=document.getElementById('stopBtn');
+  var resetBtn=document.getElementById('resetBtn');
+  var verdict=document.getElementById('verdict');
+  var startTime=null,timer=null,elapsed=0;
+  function tick(){
+    elapsed=(performance.now()-startTime)/1000;
+    display.textContent=elapsed.toFixed(1)+' s';
+  }
+  startBtn.addEventListener('click',function(){
+    startTime=performance.now();
+    timer=setInterval(tick,50);
+    startBtn.disabled=true;
+    stopBtn.disabled=false;
+    verdict.textContent='';
+    verdict.className='timer-verdict';
+  });
+  stopBtn.addEventListener('click',function(){
+    clearInterval(timer);
+    startBtn.disabled=false;
+    stopBtn.disabled=true;
+    var t=elapsed;
+    if(t<=15){
+      verdict.textContent='Under 15 s — ready to deliver on the day.';
+      verdict.className='timer-verdict win';
+    } else if(t<=20){
+      verdict.textContent='Between 15 and 20 s — do another rep to tighten.';
+      verdict.className='timer-verdict over';
+    } else {
+      verdict.textContent='Over 20 s — slow each number by a beat and try again.';
+      verdict.className='timer-verdict over';
+    }
+  });
+  resetBtn.addEventListener('click',function(){
+    clearInterval(timer);
+    startBtn.disabled=false;
+    stopBtn.disabled=true;
+    elapsed=0;
+    display.textContent='0.0 s';
+    verdict.textContent='';
+    verdict.className='timer-verdict';
+  });
+})();
+</script>
+</body>
+</html>

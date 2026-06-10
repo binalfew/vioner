@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 17 — Delivering Slide 15: The Inference Pipeline (Worked Example)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --accent-soft:#A14747;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --success-soft:#E6F0E6;
+  --warn:#8B5A2B;
+  --beat:#1A365D;
+  --beat-soft:#E8EEF5;
+  --pipe:#7B5B1E;
+  --pipe-soft:#F5EFC9;
+  --who:#3F6B3F;       /* WHO — green */
+  --who-soft:#E6F0E6;
+  --what:#7B1E1E;      /* WHAT — red */
+  --what-soft:#F5E6E6;
+  --when:#5B3D7B;      /* WHEN — purple */
+  --when-soft:#EEE8F5;
+  --where:#3D6B8B;     /* WHERE — blue */
+  --where-soft:#E8EEF5;
+  --how:#8B5A2B;       /* HOW — orange */
+  --how-soft:#F5EFE2;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:42rem;margin:0 auto;padding:3.5rem 1.5rem 6rem}
+.eyebrow{font-family:"Inter","SF Pro Text",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.18em;font-size:0.72rem;color:var(--accent);font-weight:600}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:2.2rem;font-weight:700;line-height:1.18;margin:0.4rem 0 0.6rem;letter-spacing:-0.012em}
+h2{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:1.45rem;margin:3rem 0 0.6rem;font-weight:700;border-bottom:1px solid var(--rule);padding-bottom:0.4rem}
+h3{font-family:"Inter",system-ui,sans-serif;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin:1.6rem 0 0.4rem;color:var(--accent)}
+p,li{font-size:1.05rem}
+.subtitle{color:var(--ink-soft);font-style:italic;font-size:1.1rem;margin:0 0 1.4rem}
+.meta{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);letter-spacing:0.02em;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:0.6rem 0;margin-bottom:2.2rem;display:flex;flex-wrap:wrap;gap:1.2rem}
+.meta span strong{color:var(--ink)}
+.callout{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem;margin:1.2rem 0;border-radius:4px}
+.callout.win{border-left:3px solid var(--success)}
+.callout.warn{border-left:3px solid var(--warn)}
+.callout.beat{border-left:3px solid var(--beat)}
+code{font-family:"JetBrains Mono","SF Mono",Menlo,monospace;font-size:0.92em;background:#F0EBE0;padding:0.06em 0.36em;border-radius:3px}
+/* Slide mock */
+.slide-mock{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.5rem 1.7rem;margin:1.4rem 0;box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+.slide-mock .badge{font-family:"Inter",system-ui,sans-serif;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:0.3rem;font-weight:600}
+.slide-mock .title{font-family:"Iowan Old Style",Georgia,serif;font-size:1.45rem;font-weight:700;margin:0 0 0.6rem}
+/* The 10-step pipeline */
+.pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:1rem 0}
+.step-box{background:#FFF;border:1px solid var(--rule);border-left:3px solid var(--pipe);border-radius:4px;padding:0.55rem 0.55rem;text-align:center;position:relative}
+.step-box .n{font-family:"Inter",system-ui,sans-serif;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--pipe);font-weight:700;display:block;margin-bottom:0.15rem}
+.step-box .name{font-family:"Iowan Old Style",Georgia,serif;font-size:0.85rem;font-weight:700;line-height:1.25;color:var(--ink)}
+.step-box .where{font-family:"Inter",system-ui,sans-serif;font-size:0.6rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.05em;margin-top:0.2rem}
+.step-box.bert{border-left-color:var(--what);background:#FDF8F8}
+.step-box.kb{border-left-color:var(--where);background:#F8FAFD}
+.step-box.tax{border-left-color:var(--when);background:#FBF8FD}
+.step-box.ui{border-left-color:var(--who);background:#F4FAF4}
+/* Latency budget */
+.latency{display:grid;grid-template-columns:auto 1fr auto;gap:0.5rem;margin:1rem 0;background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1rem 1.2rem}
+.latency h4{font-family:"Inter",sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.5rem;color:var(--accent);font-weight:700;grid-column:1 / -1}
+.lat-bar{grid-column:1 / -1;display:flex;height:34px;border-radius:4px;overflow:hidden;border:1px solid var(--rule);margin-bottom:0.4rem}
+.lat-bar .seg{display:flex;align-items:center;justify-content:center;font-family:"Inter",sans-serif;font-size:0.78rem;font-weight:700;color:#FFF;text-shadow:0 1px 0 rgba(0,0,0,0.2)}
+.lat-bar .seg.bert{background:var(--what);flex-basis:75%}
+.lat-bar .seg.kb{background:var(--where);flex-basis:15%}
+.lat-bar .seg.other{background:var(--ink-soft);flex-basis:10%}
+.lat-legend{grid-column:1 / -1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;font-size:0.86rem}
+.lat-legend .l{display:flex;align-items:baseline;gap:0.3rem;color:var(--ink-soft)}
+.lat-legend .l .sw{width:10px;height:10px;border-radius:2px}
+.lat-legend .l strong{color:var(--ink)}
+.lat-legend .l .sw.bert{background:var(--what)}
+.lat-legend .l .sw.kb{background:var(--where)}
+.lat-legend .l .sw.other{background:var(--ink-soft)}
+/* Worked example */
+.worked{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.1rem 1.3rem;margin:1.2rem 0}
+.worked h4{font-family:"Inter",sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.55rem;color:var(--accent);font-weight:700}
+.worked .sentence{background:#FAF7F0;border:1px solid var(--rule);border-radius:4px;padding:0.7rem 0.9rem;font-family:"Iowan Old Style",Georgia,serif;font-size:1.04rem;font-style:italic;line-height:1.45;margin:0.45rem 0 0.9rem}
+.worked .sentence em{font-style:normal;padding:0.05em 0.25em;border-radius:3px;font-weight:600}
+.worked .sentence em.who{background:var(--who-soft);color:var(--who)}
+.worked .sentence em.what{background:var(--what-soft);color:var(--what)}
+.worked .sentence em.when{background:var(--when-soft);color:var(--when)}
+.worked .sentence em.where{background:var(--where-soft);color:var(--where)}
+.worked .sentence em.how{background:var(--how-soft);color:var(--how)}
+.worked .chips{display:grid;grid-template-columns:repeat(3,1fr);gap:0.55rem;margin-top:0.4rem}
+.chip{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.55rem 0.8rem}
+.chip.who{border-left:3px solid var(--who);background:linear-gradient(180deg,#FFF 0%,var(--who-soft) 100%)}
+.chip.what{border-left:3px solid var(--what);background:linear-gradient(180deg,#FFF 0%,var(--what-soft) 100%)}
+.chip.when{border-left:3px solid var(--when);background:linear-gradient(180deg,#FFF 0%,var(--when-soft) 100%)}
+.chip.where{border-left:3px solid var(--where);background:linear-gradient(180deg,#FFF 0%,var(--where-soft) 100%)}
+.chip.how{border-left:3px solid var(--how);background:linear-gradient(180deg,#FFF 0%,var(--how-soft) 100%)}
+.chip .cat{font-family:"Inter",sans-serif;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;display:block;margin-bottom:0.2rem}
+.chip.who .cat{color:var(--who)}
+.chip.what .cat{color:var(--what)}
+.chip.when .cat{color:var(--when)}
+.chip.where .cat{color:var(--where)}
+.chip.how .cat{color:var(--how)}
+.chip .v{font-family:"Iowan Old Style",Georgia,serif;font-size:0.95rem;font-weight:700;color:var(--ink);display:block}
+.chip .n{font-family:"Inter",sans-serif;font-size:0.76rem;color:var(--ink-soft);font-style:italic;margin-top:0.2rem;display:block;line-height:1.3}
+.chip .n strong{color:var(--accent);font-style:normal}
+/* Normalisation flourishes */
+.flourish{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.85rem 1.05rem;margin:0.85rem 0}
+.flourish h4{font-family:"Inter",sans-serif;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.5rem;color:var(--accent);font-weight:700}
+.flourish-row{display:grid;grid-template-columns:auto auto 1fr;gap:0.7rem;padding:0.4rem 0;border-bottom:1px dashed var(--rule);align-items:center;font-size:0.95rem;line-height:1.4}
+.flourish-row:last-child{border:0}
+.flourish-row .raw{font-family:"JetBrains Mono",monospace;font-size:0.85rem;font-weight:600;background:#FAF7F0;padding:0.2em 0.5em;border-radius:3px;color:var(--ink-soft);white-space:nowrap}
+.flourish-row .arrow{font-family:"Iowan Old Style",Georgia,serif;font-size:1rem;color:var(--accent);font-weight:700;text-align:center}
+.flourish-row .resolved{font-family:"JetBrains Mono",monospace;font-size:0.85rem;font-weight:700;color:var(--success);background:var(--success-soft);padding:0.2em 0.5em;border-radius:3px;white-space:nowrap}
+.flourish-row .why{font-family:"Iowan Old Style",Georgia,serif;font-size:0.88rem;color:var(--ink-soft);font-style:italic}
+/* Beats */
+.beat-script{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin:1.4rem 0}
+.beat{display:grid;grid-template-columns:auto 1fr;gap:0.9rem;align-items:start;padding:0.9rem 0;border-bottom:1px dashed var(--rule)}
+.beat:last-child{border-bottom:0}
+.beat-num{background:var(--beat);color:#FFF;width:2.1rem;height:2.1rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.85rem}
+.beat-num.hero{background:var(--accent)}
+.beat-content .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--beat);font-weight:600;margin-bottom:0.25rem;display:flex;gap:0.7rem;align-items:baseline}
+.beat-content .label.hero{color:var(--accent)}
+.beat-content .label .secs{color:var(--ink-soft);font-weight:400;font-style:italic}
+.beat-content .text{font-size:1.04rem;line-height:1.55;margin:0.2rem 0}
+.beat-content .text em.key{background:var(--success-soft);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:600;color:var(--success)}
+.beat-content .text em.num{background:var(--highlight);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:700;color:var(--accent)}
+.beat-content .text em.step{font-family:"JetBrains Mono",monospace;font-style:normal;font-weight:700;color:var(--accent);font-size:0.94em}
+.beat-content .micro{margin-top:0.4rem;font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Drill */
+.drill{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.1rem 1.3rem;margin:1.2rem 0;border-left:3px solid var(--success)}
+.drill h4{font-family:"Inter",sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.45rem;color:var(--success);font-weight:700}
+.drill p{font-size:0.95rem;margin:0.3rem 0}
+.drill ol{margin:0.4rem 0 0.4rem 1.4rem;padding:0}
+.drill ol li{font-size:0.93rem;margin:0.2rem 0;font-family:"JetBrains Mono",monospace}
+/* Reserved */
+.reserved{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.reserved h4{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.7rem;color:var(--accent);font-weight:700}
+.reserved-rows{display:grid;grid-template-columns:auto 1fr auto;gap:0.6rem 0.9rem;font-family:"Iowan Old Style",Georgia,serif;align-items:center}
+.reserved-rows .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:600}
+.reserved-rows .desc{font-size:0.93rem;color:var(--ink-soft);font-style:italic}
+.reserved-rows .num{font-weight:700;color:var(--accent);font-feature-settings:"tnum";font-size:1.02rem;text-align:right}
+.reserved-rows .row-sep{grid-column:1 / -1;border-top:1px dashed var(--rule);height:0;margin:0.1rem 0}
+/* Hero / close */
+.hero-line{background:var(--highlight);border:2px solid var(--accent);border-radius:6px;padding:1.2rem 1.4rem;margin:1.3rem 0;text-align:center;font-family:"Iowan Old Style",Georgia,serif;font-size:1.1rem;line-height:1.55;font-weight:500}
+.hero-line .label{display:block;font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:600;margin-bottom:0.4rem}
+/* Attack */
+.attack{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem 0.8rem;margin:1rem 0;border-radius:4px}
+.attack .q{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.95rem;color:var(--accent);margin-bottom:0.5rem}
+.attack .a{margin:0.4rem 0 0.6rem;font-size:1.03rem}
+.attack .micro{font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Timer */
+.timer-box{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.3rem;margin:1.3rem 0;text-align:center}
+.timer-display{font-family:"JetBrains Mono","SF Mono",monospace;font-size:2.6rem;font-weight:700;color:var(--accent);margin:0.3rem 0;font-feature-settings:"tnum"}
+.timer-buttons{display:flex;gap:0.6rem;justify-content:center;margin-top:0.7rem;flex-wrap:wrap}
+.timer-buttons button{font-family:"Inter",system-ui,sans-serif;font-size:0.92rem;font-weight:600;padding:0.55rem 1.3rem;border:1px solid var(--accent);background:var(--accent);color:#FFF;border-radius:4px;cursor:pointer;transition:background 120ms}
+.timer-buttons button:hover{background:var(--accent-soft)}
+.timer-buttons button.secondary{background:#FFF;color:var(--accent)}
+.timer-buttons button.secondary:hover{background:#FBFAF7}
+.timer-verdict{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin-top:0.7rem;min-height:1.4rem;font-weight:600}
+.timer-verdict.win{color:var(--success)}
+.timer-verdict.over{color:var(--warn)}
+/* Quiz */
+.quiz{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem;margin:1.4rem 0}
+.quiz h4{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin:0 0 0.8rem;color:var(--accent)}
+.quiz .qstem{font-size:1.02rem;margin-bottom:0.7rem}
+.choices{list-style:none;padding:0;margin:0}
+.choices li{margin:0.45rem 0;padding:0.55rem 0.8rem;border:1px solid var(--rule);border-radius:4px;cursor:pointer;background:#FBFAF7;font-size:0.98rem;transition:background 120ms,border-color 120ms}
+.choices li:hover{background:#F5EFE2;border-color:var(--accent-soft)}
+.choices li.right{background:var(--success-soft);border-color:var(--success);color:var(--success)}
+.choices li.wrong{background:#F5E4E4;border-color:var(--accent);color:var(--accent)}
+.choices li.locked{pointer-events:none;opacity:0.85}
+.feedback{font-family:"Inter",system-ui,sans-serif;font-size:0.93rem;margin-top:0.7rem;color:var(--ink-soft);min-height:1.2rem;font-style:italic}
+/* Followup */
+.followup{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin-top:2.4rem;border-left:3px solid var(--beat)}
+.followup ul{margin:0.6rem 0 0 1.1rem}
+.followup li{margin:0.45rem 0;font-size:1rem}
+.bottom{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;color:var(--ink-soft);border-top:1px solid var(--rule);padding-top:1.2rem;margin-top:3rem;font-style:italic}
+.cite{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);margin-top:0.3rem}
+.cite a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent-soft)}
+.cite a:hover{border-bottom:1px solid var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">Lesson 17 · Slide 15</div>
+<h1>The inference pipeline — worked example</h1>
+<div class="subtitle">The deck's first <em>demonstration</em> slide. Slides 9–14 argued the contributions; slide 15 shows the system <em>running</em>. Ten steps, one canonical article, six extracted entities, three normalisation flourishes — and the integration claim from slide 14 becomes visually concrete on screen. Slide 15's defence is not argument but <strong>fluency</strong>: the candidate's job is to walk the panel through the pipeline so confidently that the integration looks effortless.</div>
+
+<div class="meta">
+<span><strong>Slide:</strong> 15 of 22</span>
+<span><strong>Target time:</strong> 90 seconds</span>
+<span><strong>Close line:</strong> "That's what 'integration evaluated end-to-end' looks like in one article"</span>
+<span><strong>Reserved cards:</strong> ~150 ms · 75 / 15 / 10 · 110 M params · 10 steps</span>
+</div>
+
+<h2>1 · Where this slide sits in the arc</h2>
+
+<p>Slide 14 made the claim: <em>"the integration is the contribution."</em> Slide 15 is the <strong>demonstration that backs that claim up</strong>. The 10-step pipeline visibly touches the tokeniser, the model, the BIO decoder, the KB, the taxonomy classifier, and the persistence + UI layer in one walkthrough. After slide 15, no panellist can credibly claim "but I only saw parts" — they have seen the parts compose end-to-end on a single article. Slide 15 is then the bridge into slide 16's evidence section ("with the system explained, we move to the evidence").</p>
+
+<div class="callout beat">
+<strong>The function of slide 15.</strong> Two jobs. (1) Make the pipeline <em>concrete</em> — replace abstract architecture diagrams with one article going in and six colour-coded entity chips coming out. (2) Demonstrate <em>fluency</em> — the candidate's ability to walk through their own system end-to-end in 90 seconds without stumbling is itself the strongest signal of mastery. A candidate who stumbles on their own pipeline is, fairly or not, read as not having internalised it. Slide 15 is therefore the deck's most rehearsal-rewarding slide.
+</div>
+
+<h2>2 · What's on the slide</h2>
+
+<div class="slide-mock">
+<div class="badge">Slide 15</div>
+<div class="title">The inference pipeline (worked example)</div>
+
+<div class="pipeline">
+<div class="step-box"><span class="n">1</span><span class="name">Article in</span><span class="where">UI</span></div>
+<div class="step-box"><span class="n">2</span><span class="name">Tokenise</span><span class="where">WordPiece</span></div>
+<div class="step-box bert"><span class="n">3</span><span class="name">BERT forward</span><span class="where">Model</span></div>
+<div class="step-box"><span class="n">4</span><span class="name">BIO decode</span><span class="where">Post-proc</span></div>
+<div class="step-box"><span class="n">5</span><span class="name">Confidence filter</span><span class="where">Threshold</span></div>
+<div class="step-box"><span class="n">6</span><span class="name">5W1H group</span><span class="where">Schema map</span></div>
+<div class="step-box kb"><span class="n">7</span><span class="name">KB validate + enrich</span><span class="where">KB</span></div>
+<div class="step-box tax"><span class="n">8</span><span class="name">Taxonomy classify</span><span class="where">Lvl 1–4</span></div>
+<div class="step-box ui"><span class="n">9</span><span class="name">Persist</span><span class="where">PostgreSQL</span></div>
+<div class="step-box ui"><span class="n">10</span><span class="name">Render chips</span><span class="where">React UI</span></div>
+</div>
+
+<div class="latency">
+<h4>Total ~150 ms per article on CPU</h4>
+<div class="lat-bar">
+<div class="seg bert">BERT forward · ~75 %</div>
+<div class="seg kb">KB · ~15 %</div>
+<div class="seg other">~10 %</div>
+</div>
+<div class="lat-legend">
+<div class="l"><span class="sw bert"></span><span><strong>~112 ms</strong> BERT forward (110 M params)</span></div>
+<div class="l"><span class="sw kb"></span><span><strong>~22 ms</strong> KB lookup (in-memory)</span></div>
+<div class="l"><span class="sw other"></span><span><strong>~15 ms</strong> tokenise · decode · 5W1H · taxonomy · persist · render</span></div>
+</div>
+</div>
+
+<div class="worked">
+<h4>Worked example — one sentence in</h4>
+<div class="sentence">"<em class="who">Al-Shabaab</em> <em class="what">attacked</em> a convoy near <em class="where">Mogadishu</em> on <em class="when">Tuesday</em>, killing <em class="how">twelve soldiers</em>."</div>
+<div class="chips">
+<div class="chip who"><span class="cat">WHO · Perpetrator</span><span class="v">Al-Shabaab</span><span class="n"><strong>Enriched</strong> → al_shabaab (SO)</span></div>
+<div class="chip what"><span class="cat">WHAT · Action</span><span class="v">attacked</span><span class="n">EVENT_TYPE → armed attack</span></div>
+<div class="chip when"><span class="cat">WHEN · Date</span><span class="v">Tuesday</span><span class="n"><strong>Normalised</strong> → 2026-06-09</span></div>
+<div class="chip where"><span class="cat">WHERE · Location</span><span class="v">Mogadishu</span><span class="n"><strong>Resolved</strong> → Somalia (SO)</span></div>
+<div class="chip how"><span class="cat">HOW · Casualties</span><span class="v">twelve soldiers</span><span class="n">{killed: 12, qualifier: 'at least'}</span></div>
+<div class="chip who"><span class="cat">WHO · Victim</span><span class="v">soldiers</span><span class="n">VICTIM type → combatant</span></div>
+</div>
+</div>
+
+</div>
+
+<p>Three visual layers, top to bottom: the <strong>10-step pipeline strip</strong> (numbered, colour-keyed by layer), the <strong>latency Pareto bar</strong> (75 / 15 / 10), and the <strong>worked example</strong> (the canonical sentence + the six colour-coded chips it produces). The visual itself is the integration claim: <em>article in, structured records out, 150 ms.</em></p>
+
+<h2>3 · The 10-step pipeline — fluency drill</h2>
+
+<p>This is the core skill on slide 15. The 10 steps want to be recitable as a list in under 15 seconds with no stumbling. The first rep is slow; the goal is to memorise the order so muscle memory takes over and the candidate is free to read the panel's reactions while speaking.</p>
+
+<div class="drill">
+<h4>The 10-step list — memorise in order</h4>
+<ol>
+<li>Article in</li>
+<li>Tokenise (WordPiece)</li>
+<li>BERT forward pass</li>
+<li>BIO decode to spans</li>
+<li>Confidence filter</li>
+<li>5W1H grouping</li>
+<li>KB validate-and-enrich</li>
+<li>Taxonomy classify</li>
+<li>Persist</li>
+<li>Render chips</li>
+</ol>
+<p><strong>Drill protocol.</strong> Recite the list aloud five times, eyes closed. If you stumble on step 5 (where confidence-filter sits between BIO decode and 5W1H grouping), repeat the run from step 1. The stumble points are predictable: <em>steps 4–6 (BIO decode → confidence filter → 5W1H group)</em> and <em>steps 7–8 (KB → taxonomy)</em> are the two most common slip sites. Drill those pairs separately if needed.</p>
+</div>
+
+<div class="callout">
+<strong>The mnemonic.</strong> Group the 10 steps into four mental clusters: <em>(1–2) intake</em> — article in, tokenise · <em>(3) model</em> — BERT forward · <em>(4–6) post-process</em> — BIO decode, confidence filter, 5W1H group · <em>(7–8) augment</em> — KB validate-and-enrich, taxonomy classify · <em>(9–10) deliver</em> — persist, render chips. Four clusters, two-to-three items each. This is how the list stays in working memory without being read off the slide.
+</div>
+
+<h2>4 · The latency Pareto — three numbers, one engineering claim</h2>
+
+<p>The latency budget is one of the slide's signature elements. Three numbers — <strong>75 / 15 / 10</strong> — partition the ~150 ms inference budget. The candidate's job is to make the panel understand the budget without burning time on per-step millisecond math.</p>
+
+<div class="latency">
+<h4>The Pareto partition (~150 ms total)</h4>
+<div class="lat-bar">
+<div class="seg bert">BERT forward · ~75 %</div>
+<div class="seg kb">KB · ~15 %</div>
+<div class="seg other">~10 %</div>
+</div>
+<div class="lat-legend">
+<div class="l"><span class="sw bert"></span><span><strong>~112 ms</strong> · 110 M-param matrix multiplies on CPU</span></div>
+<div class="l"><span class="sw kb"></span><span><strong>~22 ms</strong> · in-memory dict + alias match</span></div>
+<div class="l"><span class="sw other"></span><span><strong>~15 ms</strong> · all other steps combined</span></div>
+</div>
+</div>
+
+<div class="callout">
+<strong>The engineering payoff.</strong> The 10 % "everything else" number is the slide's cleanest engineering claim. It includes seven of the ten steps — tokenise, BIO decode, confidence filter, 5W1H group, taxonomy classify, persist, render. Each is fast individually. <em>The reason "everything else" sums to only 10 % is that the KB is in-memory.</em> If the KB were a remote service, "KB lookup" alone would expand from ~22 ms to ~50 ms (network RTT + serialisation), and "everything else" would no longer feel free. The in-process architecture from slide 14 is what makes the Pareto land. Use that connection if you have room — it bridges slides 14 and 15 in one sentence.
+</div>
+
+<h2>5 · The worked example — the slide's center of gravity</h2>
+
+<p>Six entities from one sentence is the slide's structural payoff. The candidate's delivery of the worked example is what the panel will <em>remember</em> from slide 15 — every other visual is supporting. The example is canonical for VioNER and should be deployable in any other slide that needs a concrete artefact (slide 19, slide 22 in particular).</p>
+
+<div class="worked">
+<h4>The canonical sentence</h4>
+<div class="sentence">"<em class="who">Al-Shabaab</em> <em class="what">attacked</em> a convoy near <em class="where">Mogadishu</em> on <em class="when">Tuesday</em>, killing <em class="how">twelve soldiers</em>."</div>
+<div class="chips">
+<div class="chip who"><span class="cat">WHO · Perpetrator</span><span class="v">Al-Shabaab</span><span class="n">surface ⇒ <strong>al_shabaab (SO)</strong></span></div>
+<div class="chip who"><span class="cat">WHO · Victim</span><span class="v">soldiers</span><span class="n">VICTIM type ⇒ combatant</span></div>
+<div class="chip what"><span class="cat">WHAT · Action</span><span class="v">attacked</span><span class="n">EVENT_TYPE ⇒ armed attack</span></div>
+<div class="chip when"><span class="cat">WHEN · Date</span><span class="v">Tuesday</span><span class="n">normalised ⇒ <strong>2026-06-09</strong></span></div>
+<div class="chip where"><span class="cat">WHERE · Location</span><span class="v">Mogadishu</span><span class="n">resolved ⇒ <strong>Somalia (SO)</strong></span></div>
+<div class="chip how"><span class="cat">HOW · Casualties</span><span class="v">twelve soldiers</span><span class="n"><strong>{killed: 12, qualifier: 'at least'}</strong></span></div>
+</div>
+</div>
+
+<h2>6 · The three normalisation flourishes</h2>
+
+<p>The worked example carries three <em>normalisation moments</em> that distinguish VioNER from "just NER". Each turns raw extracted text into a structured value an analyst can query against. These three moments are what the candidate should pace deliberately during delivery — they are the slide's quietly-impressive engineering details.</p>
+
+<div class="flourish">
+<h4>Three normalisation moments — pace these deliberately</h4>
+<div class="flourish-row">
+<span class="raw">"Tuesday"</span>
+<span class="arrow">→</span>
+<span class="resolved">2026-06-09</span>
+</div>
+<div class="flourish-row" style="grid-column:1/-1">
+<span class="why" style="grid-column:1/-1">Relative dates resolved using the article's publication date as the anchor. If the article published on a Friday, "Tuesday" becomes that week's prior Tuesday. <em>Without this, the analyst cannot range-query events by date.</em></span>
+</div>
+<div class="flourish-row">
+<span class="raw">"Mogadishu"</span>
+<span class="arrow">→</span>
+<span class="resolved">Somalia (SO)</span>
+</div>
+<div class="flourish-row" style="grid-column:1/-1">
+<span class="why" style="grid-column:1/-1">CITY-level location resolved to COUNTRY via the KB's 200-city map. <em>Without this, the analytics dashboard's per-country counts would all be empty for city-level extractions.</em></span>
+</div>
+<div class="flourish-row">
+<span class="raw">"twelve soldiers"</span>
+<span class="arrow">→</span>
+<span class="resolved">{12, "at least"}</span>
+</div>
+<div class="flourish-row" style="grid-column:1/-1">
+<span class="why" style="grid-column:1/-1">CASUALTIES split into the integer count and a qualifier field. The qualifier preserves journalistic hedging ("at least 12", "as many as 30", "dozens") as structured data. <em>Without this, analytics over casualties either over-states confidence or drops qualified counts entirely.</em></span>
+</div>
+</div>
+
+<div class="callout">
+<strong>Why three flourishes and not more.</strong> The slide has exactly enough time for three flourishes, no more. Adding a fourth (KB enrichment of Al-Shabaab → canonical id, for instance) crosses into slide-13 territory and steals that slide's payoff. The three chosen here are mutually disjoint — date, location, casualty count — and together cover the three structural problems an unstructured-text NER would leave the analyst with. Three is the right number; resist adding more.
+</div>
+
+<h2>7 · The 90-second script, in four beats</h2>
+
+<div class="beat-script">
+
+<div class="beat">
+<div class="beat-num">1</div>
+<div class="beat-content">
+<div class="label">Beat 1 — the pipeline as a list <span class="secs">~25 seconds</span></div>
+<div class="text">"<em class="key">The end-to-end inference pipeline, with the worked example.</em> <em class="step">Article in. Tokenise. BERT forward pass. BIO decode to spans. Confidence filter. 5W1H grouping. KB validate-and-enrich. Taxonomy classify. Persist. Render chips.</em>"</div>
+<div class="micro">Read the 10 steps as a list — not as 10 separate sentences, not as a flowing paragraph. Small pause between each. The cadence is the whole defence here. If the panel hears the list delivered fluently, they update toward "candidate knows their system." If they hear stumbling on step 5 (confidence filter) or step 8 (taxonomy classify), they update the other way. Drill until the list is muscle memory.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">2</div>
+<div class="beat-content">
+<div class="label">Beat 2 — the latency Pareto <span class="secs">~20 seconds</span></div>
+<div class="text">"<em class="key">The forward pass is about seventy-five percent of the hundred-and-fifty milliseconds.</em> KB lookup is <em class="num">fifteen percent</em>. Everything else is <em class="num">ten percent</em>, <em class="key">because the KB is in-memory</em>."</div>
+<div class="micro">Three numbers, in order: 75, 15, 10. The "because the KB is in-memory" coda is the engineering payoff — it ties slide 14's in-process architecture decision to the latency outcome you just stated. Do not give per-step millisecond math; the Pareto bar is doing that work visually. Naming the architecture-to-latency link verbally is what the panel can't get from the bar alone.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">3</div>
+<div class="beat-content">
+<div class="label">Beat 3 — the canonical sentence + extraction <span class="secs">~30 seconds</span></div>
+<div class="text">"<em class="key">Worked example.</em> 'Al-Shabaab attacked a convoy near Mogadishu on Tuesday, killing twelve soldiers.' Becomes: <em class="step">perpetrator Al-Shabaab</em>. <em class="step">Victim twelve soldiers</em>. <em class="step">Action attacked</em>. <em class="step">Date Tuesday</em> — <em class="key">normalised to a calendar date relative to publication</em>. <em class="step">Location Mogadishu</em> — <em class="key">resolved to Somalia</em>. <em class="step">Casualties twelve, with the 'at least' qualifier preserved</em>."</div>
+<div class="micro">Read the sentence at a slightly slower pace than normal speech — the panel needs to hold it in working memory while you walk through the six extractions. The six chip labels (perpetrator, victim, action, date, location, casualties) want a small pause each. The three normalisation flourishes (Tuesday → calendar, Mogadishu → Somalia, casualties + qualifier) are the highest-bandwidth moments on the slide — pace them deliberately.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num hero">4</div>
+<div class="beat-content">
+<div class="label hero">Beat 4 — the close + pivot <span class="secs">~15 seconds</span></div>
+<div class="text">"<em class="key">That's what 'integration evaluated end-to-end' looks like in one article — schema, model, KB, taxonomy, platform, all touching one record.</em> <em class="key">With the system explained, we move to the evidence.</em>"</div>
+<div class="micro">The close performs two jobs: it ties slide 15 back to slide 14's integration claim ("here's what that meant"), and it pivots into slide 16's evidence section ("with the system explained, we move to the evidence"). The closing line is the candidate's first explicit verbal callback to slide 14 — it tells the panel "I'm carrying the argument through the deck, not slide by slide." This is a small but valuable signal of preparedness.</div>
+</div>
+</div>
+
+</div>
+
+<h2>8 · Reserved cards — deploy on demand</h2>
+
+<div class="reserved">
+<h4>Reserved evidence — bring out only if asked</h4>
+<div class="reserved-rows">
+<div class="label">Total latency</div>
+<div class="desc">End-to-end CPU inference budget per article</div>
+<div class="num">~150 ms</div>
+<div class="row-sep"></div>
+<div class="label">BERT forward share</div>
+<div class="desc">Matrix multiplies dominate; 110 M params on CPU</div>
+<div class="num">~75 % · ~112 ms</div>
+<div class="row-sep"></div>
+<div class="label">KB share</div>
+<div class="desc">In-memory dict + alias match; remote would push to ~50 ms by itself</div>
+<div class="num">~15 % · ~22 ms</div>
+<div class="row-sep"></div>
+<div class="label">Other 7 steps</div>
+<div class="desc">Tokenise + decode + filter + group + classify + persist + render</div>
+<div class="num">~10 % · ~15 ms</div>
+<div class="row-sep"></div>
+<div class="label">BERT param count</div>
+<div class="desc">bert-base-cased — the model behind the 75 % share</div>
+<div class="num">110 M</div>
+<div class="row-sep"></div>
+<div class="label">Pipeline steps</div>
+<div class="desc">Article in · tokenise · BERT · BIO · filter · 5W1H · KB · taxonomy · persist · render</div>
+<div class="num">10</div>
+<div class="row-sep"></div>
+<div class="label">Confidence threshold</div>
+<div class="desc">Per-category — CASUALTIES higher than DATE (operational cost asymmetry)</div>
+<div class="num">per-cat</div>
+<div class="row-sep"></div>
+<div class="label">Thesis sections</div>
+<div class="desc">§5.5 inference pipeline · §6.8 latency · §4.5 worked example</div>
+<div class="num">§5.5 / §6.8</div>
+</div>
+</div>
+
+<h3>The deployment rule</h3>
+<ul>
+<li><strong>Default delivery:</strong> the 10-step list, the three latency numbers + in-memory line, the canonical sentence with six extractions and three normalisation flourishes, the close.</li>
+<li><strong>If asked "why is BERT 75 %?"</strong> Deploy <em>"BERT-base has 110 million parameters. The forward pass involves matrix multiplications across all of them on CPU. The other steps — tokenisation, BIO decode, KB lookup — are comparatively trivial."</em></li>
+<li><strong>If asked "what does 'normalised' mean for the date?"</strong> Deploy <em>"Relative dates like 'Tuesday' or 'yesterday' get resolved to a calendar date using the article's publication date as the anchor. If the article was published on a Friday, 'Tuesday' becomes the previous Tuesday's date."</em></li>
+<li><strong>If asked "how is the casualty qualifier preserved?"</strong> Deploy <em>"The post-processor parses 'twelve' as the count and 'at least' as the qualifier into a structured field. Downstream consumers see <code>{killed: 12, qualifier: 'at least'}</code>, not the bare number."</em></li>
+<li><strong>If asked "what happens if KB lookup fails?"</strong> Deploy <em>"The record is still persisted with the raw surface form. No fabrication. KB failure doesn't block extraction."</em> Then optionally cite the slide-13 two guarantees.</li>
+<li><strong>Critical:</strong> per-entity F1 numbers from slide 17 are NOT deployed here. The worked example shows six categories doing the work; the <em>quantitative</em> evidence that each category does the work well lives on slide 17.</li>
+</ul>
+
+<h2>9 · Four pre-loaded interrupts</h2>
+
+<div class="attack">
+<div class="q">"Why is BERT 75 % of the latency? Is that not slow?"</div>
+<div class="a">"BERT-base has a hundred and ten million parameters. The forward pass involves matrix multiplications across all of them — that's the dominant cost. The other steps in the pipeline — tokenisation, BIO decode, confidence filter, KB lookup, 5W1H grouping, taxonomy classify, persist, render — are each comparatively trivial; together they're only about ten percent of the budget. A hundred and fifty milliseconds on CPU is well inside the operational target — analysts are not interactive on a per-keystroke basis; they paste, wait, read. Moving to GPU would push BERT below twenty milliseconds, but the deployment target was non-ML-engineers running this on standard server hardware, so CPU is the right baseline."</div>
+<div class="micro">Three moves: (1) name the cost driver (110 M params); (2) name the residual cost (everything else is 10 %); (3) reframe "is that slow" as "is that fast enough" — operational fit, not theoretical maximum. Don't apologise for CPU inference; defend it as the deployment-target choice. The "paste, wait, read" cadence makes 150 ms feel fast because it is fast at the human-interaction level.</div>
+</div>
+
+<div class="attack">
+<div class="q">"What does 'normalised' actually mean for the date?"</div>
+<div class="a">"Relative dates — 'Tuesday', 'yesterday', 'last week' — are anchored to the article's publication date and resolved to a specific calendar date. If the article was published on Friday the thirteenth, 'Tuesday' becomes Tuesday the tenth — the prior Tuesday relative to publication. Absolute dates like 'on June 4th' are parsed directly into ISO format. Without this normalisation, the analytics layer cannot range-query events by date — 'show me all attacks in the first week of June' would miss every relatively-dated extraction. The publication date is metadata on the article, so it's available to the post-processor at extraction time."</div>
+<div class="micro">Three moves: (1) name the two cases (relative + absolute); (2) give the worked example with a specific anchor (Friday the 13th → Tuesday the 10th); (3) name the downstream consequence (range-querying analytics). The third move is what converts "normalisation" from a technical detail to an operational requirement.</div>
+</div>
+
+<div class="attack">
+<div class="q">"How is the 'at least' qualifier preserved? Wouldn't most NER pipelines just extract '12'?"</div>
+<div class="a">"Most NER pipelines would extract '12' and lose the hedging. VioNER's post-processor parses the CASUALTIES span into a structured field — the integer count and a qualifier string. So 'at least twelve' becomes <code>{killed: 12, qualifier: 'at least'}</code>; 'as many as thirty' becomes <code>{killed: 30, qualifier: 'as many as'}</code>; 'dozens' becomes <code>{killed: null, qualifier: 'dozens'}</code>. Downstream consumers see both fields. This matters because casualty counts in journalism are systematically hedged — dropping the hedge either over-states confidence in the count or drops qualified extractions entirely. Both are common failure modes in conflict data."</div>
+<div class="micro">The three example variants ('at least N' / 'as many as N' / 'dozens') show the breadth of the qualifier vocabulary the post-processor handles. The 'dozens' case — where the integer field is null — demonstrates the structured field can represent absence of a count. Naming the failure mode ("over-stating confidence or dropping qualified extractions") is what makes the qualifier-preservation feature visible as a design decision, not a coincidence.</div>
+</div>
+
+<div class="attack">
+<div class="q">"What happens if KB lookup fails or returns nothing?"</div>
+<div class="a">"The record is still persisted with the raw surface form. No fabrication. KB failure doesn't block extraction — that's one of the two guarantees from slide 13: validation never blocks; enrichment never invents. If the surface form 'Al-Shabaab fighters' doesn't match the KB, the actor field carries the raw string and the canonical-id field is empty. New armed groups not yet in the KB are exactly this case. The analyst sees the raw text and can flag the group for KB curation through the admin page."</div>
+<div class="micro">Two moves: (1) state the behaviour (raw form persists); (2) cite the slide-13 guarantees by name. This is the slide that demonstrates "validation never blocks; enrichment never invents" <em>operationally</em> — when KB lookup is in the 10-step pipeline and the panel asks what happens at failure, the answer ties back to slide 13's hero line. Use this opportunity if the panel asks; it reinforces the cross-slide coherence of the deck.</div>
+</div>
+
+<h2>10 · The close line</h2>
+
+<div class="hero-line">
+<span class="label">The close — memorise verbatim</span>
+"That's what 'integration evaluated end-to-end' looks like in one article — schema, model, KB, taxonomy, platform, all touching one record."
+</div>
+
+<h3>Why this close is load-bearing</h3>
+<ul>
+<li><strong>It cites slide 14 verbatim.</strong> "Integration evaluated end-to-end" is the hero phrase from slide 14. Repeating it here is what makes the deck cohere — the panel hears the same claim asserted on slide 14 and demonstrated on slide 15. Without the verbatim callback, the demonstration sits in isolation; with it, the demonstration <em>satisfies</em> the prior claim.</li>
+<li><strong>It enumerates the five components in one breath.</strong> Schema, model, KB, taxonomy, platform. These are the five contribution areas of the deck. Naming all five in the close primes the panel for slide 22's five-contribution synthesis — the closing breath of slide 15 is the opening structure of slide 22.</li>
+<li><strong>It pivots cleanly into slide 16.</strong> "With the system explained, we move to the evidence." This is the line from the study guide. It frames slides 16–18 (headline F1, per-entity F1, ablation) as <em>evidence</em> for what slide 15 just demonstrated. Without this pivot, slide 16 looks like a results dump; with it, slide 16 looks like the empirical follow-through.</li>
+</ul>
+
+<h2>11 · Timed practice</h2>
+
+<p>Four beats, ~90 seconds. Target window: 80–105 seconds. Beat 1's 10-step list wants pacing as a list — small pause between each step, not a flowing paragraph. Beat 3's six-entity walkthrough is where most candidates rush; deliberately slow on the three normalisation moments. Beat 4's close has the verbatim "integration evaluated end-to-end" callback — say it crisply.</p>
+
+<div class="timer-box">
+<div class="timer-display" id="timer">0.0 s</div>
+<div class="timer-buttons">
+<button id="startBtn">Start (begin "The end-to-end inference pipeline")</button>
+<button id="stopBtn" class="secondary" disabled>Stop (after "move to the evidence")</button>
+<button id="resetBtn" class="secondary">Reset</button>
+</div>
+<div class="timer-verdict" id="verdict"></div>
+</div>
+
+<div class="callout">
+<strong>The hardest rep — the eyes-closed pipeline drill.</strong> Recite the 10-step list (Beat 1) five times in a row with eyes closed. If you stumble at any step, restart from step 1. Continue until you complete five clean reps. The drill targets the muscle-memory failure mode where the candidate knows the steps but cannot recite them under live attention — a particular risk because the pipeline list is non-narrative (no story holds it together), so it depends purely on memorisation.
+</div>
+
+<h2>12 · Quiz</h2>
+
+<div class="quiz" id="quiz1">
+<h4>Q1. The panel asks: "Why is BERT 75 % of the inference latency?"</h4>
+<p class="qstem">Pick the strongest response.</p>
+<ul class="choices" data-answer="c">
+<li data-key="a">"Transformers are inherently slow because of the self-attention mechanism's quadratic cost in sequence length."</li>
+<li data-key="b">"BERT was the slowest-performing model we tested; faster alternatives are available but were out of scope."</li>
+<li data-key="c">"BERT-base has 110 million parameters. The forward pass involves matrix multiplications across all of them on CPU — that's the dominant cost. The other steps (tokenisation, BIO decode, KB lookup) are comparatively trivial; together ~10 % of the budget. 150 ms on CPU is well inside the operational target — analysts paste, wait, read. CPU was the deployment-target choice."</li>
+<li data-key="d">"BERT spends most of its time on the [CLS] token's attention computation, which scales with vocabulary size."</li>
+</ul>
+<p class="feedback" id="fb1"></p>
+</div>
+
+<div class="quiz" id="quiz2">
+<h4>Q2. What does "normalised to a calendar date" mean for the worked example's "Tuesday"?</h4>
+<p class="qstem">Pick the correct meaning.</p>
+<ul class="choices" data-answer="b">
+<li data-key="a">The string "Tuesday" is matched against a calendar lookup table and discarded if no match is found.</li>
+<li data-key="b">"Tuesday" is resolved to a specific ISO calendar date using the article's publication date as the anchor — if the article was published on a Friday, "Tuesday" becomes the previous Tuesday's date. This enables range-querying analytics by date.</li>
+<li data-key="c">The article is timestamped with the current server date, which is then compared against "Tuesday" to compute a delta.</li>
+<li data-key="d">"Tuesday" is converted to its day-of-week integer (1=Monday, 2=Tuesday) and stored as metadata.</li>
+</ul>
+<p class="feedback" id="fb2"></p>
+</div>
+
+<div class="quiz" id="quiz3">
+<h4>Q3. The panel asks: "What happens if the KB lookup returns no match for an extracted actor?"</h4>
+<p class="qstem">Pick the strongest response.</p>
+<ul class="choices" data-answer="a">
+<li data-key="a">"The record is still persisted with the raw surface form. No fabrication. KB failure doesn't block extraction — slide 13's two guarantees: validation never blocks; enrichment never invents. New armed groups not yet in the KB are exactly this case; the analyst can flag for KB curation through the admin page."</li>
+<li data-key="b">"The pipeline routes the record to a fuzzy-matching fallback that picks the closest KB entry by string similarity."</li>
+<li data-key="c">"The record is discarded — without a canonical actor id, downstream analytics cannot aggregate it."</li>
+<li data-key="d">"The pipeline retries the KB lookup three times before failing the extraction with an error."</li>
+</ul>
+<p class="feedback" id="fb3"></p>
+</div>
+
+<div class="quiz" id="quiz4">
+<h4>Q4. How is the casualty count "twelve soldiers" structured by the post-processor?</h4>
+<p class="qstem">Pick the correct shape.</p>
+<ul class="choices" data-answer="d">
+<li data-key="a">As the raw string "twelve soldiers" stored in the CASUALTIES field — no normalisation.</li>
+<li data-key="b">As the integer 12 only; the journalistic hedging ("at least") is dropped during span extraction.</li>
+<li data-key="c">As a single string "at least 12 soldiers killed" stored unparsed for later analyst processing.</li>
+<li data-key="d">As a structured field with the integer count and a qualifier string — <code>{killed: 12, qualifier: 'at least'}</code>. The qualifier preserves journalistic hedging as structured data, so downstream analytics doesn't over-state confidence or drop qualified extractions.</li>
+</ul>
+<p class="feedback" id="fb4"></p>
+</div>
+
+<div class="followup">
+<strong>Ask your teacher follow-up questions.</strong>
+<ul>
+<li>Want a 70-second compressed delivery for if you're running behind?</li>
+<li>Want a focused drill on just the 10-step pipeline list (5 clean reps with eyes closed)?</li>
+<li>Want a second canonical worked example as a backup — e.g. an event with multiple actors, or a sentence with no casualties?</li>
+<li>Want to drill the latency-Pareto-to-in-memory-KB bridge so the slide-14/slide-15 link lands without rehearsal?</li>
+<li>Want to rehearse the close — "that's what integration evaluated end-to-end looks like" — so the slide-14 callback never gets rushed?</li>
+</ul>
+<p class="cite">References: <a href="../../VioNER_Defense_Slides_study_guide.md">VioNER_Defense_Slides_study_guide.md</a> Slide 15; <a href="../../concepts_explained.md">concepts_explained.md</a> §4.1–4.7 (per-step lifecycle); thesis §5.5 (inference pipeline), §6.8 (latency), §4.5 (worked example annotation).</p>
+</div>
+
+<div class="bottom">Lesson 17 of the slide drill. Next up — slide 16: the headline results (macro F1 0.887 · micro F1 0.909 · what counts as "good" in this domain and why).</div>
+
+</div>
+
+<script>
+// Timer
+(function(){
+  const display=document.getElementById('timer');
+  const startBtn=document.getElementById('startBtn');
+  const stopBtn=document.getElementById('stopBtn');
+  const resetBtn=document.getElementById('resetBtn');
+  const verdict=document.getElementById('verdict');
+  let raf=null, t0=0;
+  function tick(){const t=(performance.now()-t0)/1000;display.textContent=t.toFixed(1)+' s';raf=requestAnimationFrame(tick)}
+  startBtn.onclick=()=>{cancelAnimationFrame(raf);t0=performance.now();raf=requestAnimationFrame(tick);startBtn.disabled=true;stopBtn.disabled=false;verdict.textContent='';verdict.className='timer-verdict'};
+  stopBtn.onclick=()=>{cancelAnimationFrame(raf);const t=(performance.now()-t0)/1000;display.textContent=t.toFixed(1)+' s';startBtn.disabled=false;stopBtn.disabled=true;
+    if(t<70){verdict.textContent='Too fast — the 10-step list (Beat 1) wants pacing as a list, and the three normalisation flourishes (Beat 3) want deliberate pause on each. Slow down on Beats 1 and 3.';verdict.className='timer-verdict over'}
+    else if(t<=105){verdict.textContent='Inside the window. The pipeline list, the latency Pareto, and the worked example all landed.';verdict.className='timer-verdict win'}
+    else{verdict.textContent='Over time — tighten Beat 2 (latency Pareto). Drop the per-step millisecond math; the bar is doing visual work. Three numbers + the in-memory line is enough.';verdict.className='timer-verdict over'}};
+  resetBtn.onclick=()=>{cancelAnimationFrame(raf);display.textContent='0.0 s';startBtn.disabled=false;stopBtn.disabled=true;verdict.textContent='';verdict.className='timer-verdict'};
+})();
+// Quizzes
+document.querySelectorAll('.quiz').forEach(quiz=>{
+  const ul=quiz.querySelector('.choices');
+  const answer=ul.dataset.answer;
+  const fb=quiz.querySelector('.feedback');
+  const fbMap={
+    quiz1:{
+      c:'Yes. Three moves: name the cost driver (110 M params); name the residual cost (everything else is 10 %); reframe "is it slow" as "is it fast enough" — operational fit not theoretical maximum.',
+      a:'Half-right about the architecture, but "quadratic in sequence length" misframes the cost driver — for short news sentences, the 110 M parameter matrix mults dominate the attention quadratic cost.',
+      b:'"BERT was the slowest" sounds apologetic. The defence is operational fit (CPU + 150 ms is the right shape for the deployment target), not a comparison loss.',
+      d:'Technically misframed — [CLS] attention is not the dominant cost. The dominant cost is the matrix multiplications across all 110 M params.'
+    },
+    quiz2:{
+      b:'Yes. Publication-date-anchored resolution to ISO calendar date. The downstream consequence (range-querying analytics) is what makes the normalisation operationally necessary.',
+      a:'No — normalisation does not discard "Tuesday"; it resolves it. Discarding would drop information the model correctly extracted.',
+      c:'No — the article publication date is the anchor, not the server date. Server-date anchoring would corrupt historical articles ingested in batch.',
+      d:'No — converting to a day-of-week integer loses the calendar-date information that range-queries need. The normalisation produces an ISO date, not a weekday integer.'
+    },
+    quiz3:{
+      a:'Yes. Raw form persists; no fabrication; the slide-13 two-guarantees framing carries through to inference. Naming the slide-13 guarantees by name reinforces deck-wide coherence.',
+      b:'No fuzzy matching in the production pipeline — it would introduce silent canonicalisation errors. KB uses exact alias match; misses leave the raw form intact.',
+      c:'No — dropping records would lose information the model correctly extracted. The architectural commitment is that enrichment augments, never gatekeeps.',
+      d:'No — there is no retry loop. KB lookup is in-memory; "failure" here means no alias match, not a transient error. The behaviour is deterministic.'
+    },
+    quiz4:{
+      d:'Yes. Structured field with integer count and qualifier string. The qualifier preserves journalistic hedging as structured data — downstream analytics neither over-states confidence nor drops qualified extractions.',
+      a:'Raw-string-only would lose the structure that the analytics layer needs (numeric aggregation requires the integer count to be parseable).',
+      b:'Dropping the hedging is exactly the failure mode the qualifier field exists to prevent. Over-stating confidence on hedged counts corrupts conflict data.',
+      c:'Single unparsed string defers the parse to the consumer, but the deck\'s commitment is that the post-processor does the structuring once, consistently, at extraction time.'
+    }
+  };
+  ul.querySelectorAll('li').forEach(li=>{
+    li.onclick=()=>{
+      if(li.classList.contains('locked'))return;
+      const key=li.dataset.key;
+      const correct=key===answer;
+      ul.querySelectorAll('li').forEach(x=>x.classList.add('locked'));
+      li.classList.add(correct?'right':'wrong');
+      if(!correct){ul.querySelector('li[data-key="'+answer+'"]').classList.add('right')}
+      fb.textContent=fbMap[quiz.id][key]||'';
+    };
+  });
+});
+</script>
+
+</body>
+</html>

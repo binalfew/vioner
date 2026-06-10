@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Slide 16 Quick Reference — Headline Results</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+@page{size:A4;margin:14mm}
+:root{
+  --ink:#1c1916;
+  --ink-soft:#4a4744;
+  --paper:#FFF;
+  --rule:#CFC8B8;
+  --accent:#7B1E1E;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --macro:#3D6B8B;
+  --acc:#8B5A2B;
+}
+*{box-sizing:border-box}
+html{font-size:10.5pt}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter",Georgia,serif;line-height:1.42}
+.wrap{max-width:185mm;margin:0 auto;padding:0}
+header{border-bottom:2px solid var(--accent);padding-bottom:6px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline;gap:1rem}
+header h1{font-family:"Iowan Old Style",Georgia,serif;font-size:16pt;font-weight:700;margin:0;letter-spacing:-0.01em}
+header .eye{font-family:"Inter","SF Pro Text",system-ui,sans-serif;font-size:8pt;color:var(--accent);text-transform:uppercase;letter-spacing:0.14em;font-weight:600}
+header .target{font-family:"Inter",sans-serif;font-size:8.5pt;color:var(--ink-soft)}
+.hero{background:var(--highlight);border:1.5px solid var(--accent);border-radius:4px;padding:7px 12px;margin:8px 0;text-align:center;font-size:10pt;font-weight:600;font-style:italic;line-height:1.45}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:7mm;margin-top:6px}
+h2{font-family:"Iowan Old Style",Georgia,serif;font-size:10.5pt;margin:8px 0 4px;border-bottom:1px solid var(--rule);padding-bottom:2px;color:var(--accent)}
+p,li{font-size:9.5pt;margin:2px 0}
+ul{margin:2px 0 2px 14px;padding:0}
+ul.tight li{margin:1px 0}
+em.k{background:#FFEFC0;font-style:normal;padding:0 2px;border-radius:2px;font-weight:600;color:var(--accent)}
+em.g{color:var(--success);font-style:normal;font-weight:600}
+/* Numbers strip */
+.numstrip{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:3px;margin:4px 0}
+.nc{background:#FAF7F0;border:1px solid var(--rule);border-radius:3px;padding:5px 4px;text-align:center}
+.nc.hero-n{border:1.5px solid var(--accent);background:#FDF8F8}
+.nc .n{font-family:"Iowan Old Style",Georgia,serif;font-weight:800;color:var(--accent);line-height:1;font-feature-settings:"tnum";font-size:13pt}
+.nc.hero-n .n{font-size:17pt}
+.nc.macro-n .n{color:var(--macro)}
+.nc.acc-n .n{color:var(--acc)}
+.nc.loss-n .n{color:var(--success)}
+.nc .l{font-family:"Inter",sans-serif;font-size:6.2pt;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);margin-top:2px;font-weight:600;line-height:1.25}
+/* Beats */
+.beats{margin:3px 0}
+.b{display:grid;grid-template-columns:18px 1fr;gap:6px;padding:3px 0;border-bottom:1px dashed var(--rule);font-size:9pt}
+.b:last-child{border:0}
+.b .n{background:var(--accent);color:#FFF;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-family:"Inter",sans-serif;font-size:7pt;font-weight:700;margin-top:2px}
+.b .t{line-height:1.4}
+.b .t b{color:var(--accent)}
+.b .t .secs{font-family:"Inter",sans-serif;font-size:7pt;color:var(--ink-soft);font-style:italic;letter-spacing:0.04em}
+/* Spoken forms */
+.spoken{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;font-size:8.5pt;margin:3px 0}
+.spoken .d{font-family:"JetBrains Mono",monospace;font-weight:700;color:var(--accent);font-size:8pt;font-feature-settings:"tnum"}
+.spoken .s{font-style:italic;color:var(--ink-soft)}
+.spoken .s b{color:var(--ink);font-style:normal}
+/* F1 chain */
+.chain{background:#FAF7F0;border:1px solid var(--rule);border-radius:3px;padding:5px 8px;margin:4px 0;font-size:8.5pt;line-height:1.5}
+.chain b{color:var(--accent)}
+.chain .f{font-family:"JetBrains Mono",monospace;font-size:7.8pt;display:block;text-align:center;margin:3px 0;color:var(--ink)}
+/* Worked example */
+.worked{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;font-size:8.3pt;margin:3px 0;font-family:"JetBrains Mono",monospace}
+.worked .l{font-family:"Inter",sans-serif;font-size:6.5pt;text-transform:uppercase;letter-spacing:0.04em;color:var(--ink-soft);font-weight:700;padding-top:1px}
+.worked .v{color:var(--ink)}
+.worked .v b{color:var(--accent)}
+/* Micro vs macro */
+.mvm{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:4px 0}
+.mvm .col{background:#FAF7F0;border:1px solid var(--rule);border-radius:3px;padding:5px 7px}
+.mvm .col.micro{border-left:2.5px solid var(--accent)}
+.mvm .col.macro{border-left:2.5px solid var(--macro)}
+.mvm .col h5{font-family:"Inter",sans-serif;font-size:7pt;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 2px;font-weight:700}
+.mvm .col.micro h5{color:var(--accent)}
+.mvm .col.macro h5{color:var(--macro)}
+.mvm .col p{font-size:8.3pt;margin:1px 0;line-height:1.35}
+/* Bench */
+.bench{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:4px 0}
+.bench .col{background:#FAF7F0;border:1px solid var(--rule);border-radius:3px;padding:5px 7px;text-align:center}
+.bench .col h5{font-family:"Inter",sans-serif;font-size:7pt;text-transform:uppercase;margin:0 0 2px;font-weight:700;color:var(--macro)}
+.bench .col.v h5{color:var(--accent)}
+.bench .col .big{font-family:"Iowan Old Style",Georgia,serif;font-size:13pt;font-weight:800;color:var(--macro)}
+.bench .col.v .big{color:var(--accent)}
+.bench .col p{font-size:7.8pt;margin:2px 0 0;line-height:1.3;color:var(--ink-soft)}
+/* Attacks */
+.attack{background:#FAF7F0;border:1px solid var(--rule);border-radius:3px;padding:5px 7px;margin:3px 0;font-size:8.7pt}
+.attack .q{font-family:"Inter",sans-serif;font-size:7.5pt;color:var(--accent);font-weight:700;margin-bottom:2px}
+.attack .a{line-height:1.35}
+/* Reserved */
+.nums{display:grid;grid-template-columns:auto 1fr auto;gap:2px 6px;font-size:8.5pt;margin-top:3px}
+.nums .l{font-family:"Inter",sans-serif;text-transform:uppercase;font-size:6.5pt;letter-spacing:0.05em;color:var(--ink-soft);font-weight:700}
+.nums .d{font-style:italic;color:var(--ink-soft);font-size:8.5pt;line-height:1.3}
+.nums .n{color:var(--accent);font-weight:700;text-align:right;font-feature-settings:"tnum"}
+.nums .sep{grid-column:1 / -1;border-top:1px dashed var(--rule);height:0;margin:1px 0}
+footer{margin-top:8px;border-top:1px solid var(--rule);padding-top:4px;font-family:"Inter",sans-serif;font-size:6.5pt;color:var(--ink-soft);display:flex;justify-content:space-between}
+@media print{html{font-size:10pt}.hero{font-size:9.5pt}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+<div>
+<div class="eye">Slide 16 · Defense quick reference</div>
+<h1>Headline results — four numbers, two self-demotions</h1>
+</div>
+<div class="target">Target: 75 s · Window 65–88 s · Beats: 4</div>
+</header>
+
+<div class="hero">"I lead with F1, not accuracy — seventy-eight percent of tokens are O, so a model that predicts O everywhere already scores seventy-eight percent accuracy and learns nothing."</div>
+
+<div class="numstrip">
+<div class="nc hero-n"><div class="n">0.909</div><div class="l">Micro F1 · HERO<br>strict span-level</div></div>
+<div class="nc macro-n"><div class="n">0.887</div><div class="l">Macro F1<br>8 entities equal</div></div>
+<div class="nc acc-n"><div class="n">96.7 %</div><div class="l">Token accuracy<br>DEMOTED on stage</div></div>
+<div class="nc loss-n"><div class="n">0.0074</div><div class="l">Val loss<br>epoch 2 checkpoint</div></div>
+</div>
+
+<div class="cols">
+<div>
+
+<h2>The 75-second script · four beats</h2>
+<div class="beats">
+<div class="b"><div class="n">1</div><div class="t"><b>Frame (~10 s).</b> <em class="k">Held-out</em> 10,000-example validation set · <em class="k">190,075 gold spans</em>.<br><span class="secs">"Held-out" certifies the numbers before they're stated.</span></div></div>
+<div class="b"><div class="n">2</div><div class="t"><b>Four numbers (~20 s).</b> Micro F1 <em class="k">0.909</em> · Macro <em class="k">0.887</em> · Token acc <em class="k">96.7 %</em> · best checkpoint <em class="k">epoch 2</em>, val loss <em class="k">0.0074</em>.<br><span class="secs">Full precision, digit by digit, no hedging, pause after each.</span></div></div>
+<div class="b"><div class="n">3</div><div class="t"><b>Honest-metric reframe (~25 s).</b> Lead with F1 not accuracy: <em class="k">78 % of tokens are O</em> — predict-O-everywhere scores 78 % and learns nothing. Micro > macro by 2 pts because high-support entities (DATE, CITY, ACTOR) <em class="k">also have the highest F1</em>.<br><span class="secs">HERO BEAT. Degenerate-model line as one unbroken sentence.</span></div></div>
+<div class="b"><div class="n">4</div><div class="t"><b>Honesty close (~15 s).</b> All numbers <em class="k">strict span-level — exact boundaries and type — reported for honesty</em>. Pivot: <em class="g">"The per-entity breakdown is where the operational story lives."</em><br><span class="secs">CoNLL stays in reserve — it answers "is 0.909 good?", not the default run.</span></div></div>
+</div>
+
+<h2>Spoken forms — drill until automatic</h2>
+<div class="spoken">
+<span class="d">0.909</span><span class="s">"zero-point-<b>nine-zero-nine</b>" — never "about ninety-one"</span>
+<span class="d">0.887</span><span class="s">"zero-point-<b>eight-eight-seven</b>"</span>
+<span class="d">96.7 %</span><span class="s">"ninety-six-point-seven percent"</span>
+<span class="d">0.0074</span><span class="s">"zero-point-zero-zero-<b>seven-four</b>"</span>
+<span class="d">190,075</span><span class="s">"one hundred and ninety thousand gold spans"</span>
+<span class="d">78 %</span><span class="s">"seventy-eight percent of tokens are O" — same number as slide 12</span>
+</div>
+
+<h2>The F1 chain — whiteboard-ready</h2>
+<div class="chain">
+<b>Precision</b> = TP/(TP+FP) — of predicted, what fraction right? · <b>Recall</b> = TP/(TP+FN) — of existing, what fraction found?
+<span class="f">F1 = 2 × P × R / (P + R) — harmonic mean punishes one-sidedness</span>
+</div>
+<div class="worked">
+<span class="l">Setup</span><span class="v">100 gold VICTIM · model predicts 90</span>
+<span class="l">Buckets</span><span class="v">TP 82 · FP 8 · FN 18</span>
+<span class="l">Precision</span><span class="v">82/90 = <b>0.911</b></span>
+<span class="l">Recall</span><span class="v">82/100 = <b>0.820</b></span>
+<span class="l">F1</span><span class="v">2×0.911×0.820/1.731 = <b>0.863</b></span>
+<span class="l">Reading</span><span class="v">find ~82 of 100, with ~8 false alarms</span>
+</div>
+
+<h2>Micro vs macro — the 2-point gap</h2>
+<div class="mvm">
+<div class="col micro"><h5>Micro 0.909 · throughput</h5><p>Pool all TP/FP/FN, then F1. High-support entities dominate (ACTOR 47.6 k spans).</p></div>
+<div class="col macro"><h5>Macro 0.887 · fairness</h5><p>Average of 8 per-entity F1s. VICTIM 0.817 counts same as DATE 0.956.</p></div>
+</div>
+<p style="font-size:8.5pt"><em class="k">Gap is good news:</em> highest-support entities also have highest F1 — analysts see the best entities most often. Inverted gap would be the warning sign.</p>
+
+</div>
+<div>
+
+<h2>Benchmark context — reserve for "is 0.909 good?"</h2>
+<div class="bench">
+<div class="col"><h5>CoNLL-2003</h5><div class="big">~0.92</div><p>4 entities · general news · mild imbalance</p></div>
+<div class="col v"><h5>VioNER</h5><div class="big">0.909</div><p>8 entities · severe imbalance (78 % O)</p></div>
+</div>
+<p style="font-size:8.5pt">Exact claim: <em class="k">"competitive on a harder distribution"</em> — not "better", not "SOTA". If pressed: backup B9, 0.94 vs 0.82 on the 4 shared entity types vs generic BERT NER.</p>
+
+<h2>Pre-loaded interrupts</h2>
+
+<div class="attack">
+<div class="q">Q · "Why F1, not accuracy?"</div>
+<div class="a"><em class="k">78 % of tokens are O</em> ⇒ predict-O-everywhere scores 78 % accuracy, <em class="k">0.0 F1</em>. F1 ignores correct O entirely — measures only entity recovery. The two metrics maximally disagree about a know-nothing model; F1 tells the truth.</div>
+</div>
+
+<div class="attack">
+<div class="q">Q · "Why is micro higher than macro?"</div>
+<div class="a">Micro pools counts ⇒ high-support dominates (ACTOR 47.6 k vs VICTIM 5.5 k). Macro weights equally. Gap positive because high-support entities have highest F1 — <em class="k">the reassuring direction</em>.</div>
+</div>
+
+<div class="attack">
+<div class="q">Q · "Leakage between train and validation?"</div>
+<div class="a">Three defences in order: <em class="k">article-level split</em> · <em class="k">hash dedup before split</em> · <em class="k">augmentation template pools partitioned</em>. Then volunteer §6.13: residual wire-copy risk listed honestly.</div>
+</div>
+
+<div class="attack">
+<div class="q">Q · "Lucky seed?"</div>
+<div class="a">3 seeds (42, 17, 91) · variance <em class="k">±0.4 pp</em> macro F1. Ablation gains exceed noise by an order of magnitude — VICTIM gain ≈ 25× seed noise. Paired bootstrap p &lt; 0.01. §6.4 / §6.6.</div>
+</div>
+
+<h2>Reserved numbers — only if asked</h2>
+<div class="nums">
+<div class="l">CoNLL</div><div class="d">~0.92 · 4 entities · "competitive on harder distribution"</div><div class="n">reserve</div>
+<div class="sep"></div>
+<div class="l">Relaxed Δ</div><div class="d">+1.5–2 F1 declined for honesty — strict matches consumer experience</div><div class="n">+1.5–2</div>
+<div class="sep"></div>
+<div class="l">Seeds</div><div class="d">42, 17, 91 · run-to-run variance</div><div class="n">±0.4 pp</div>
+<div class="sep"></div>
+<div class="l">§6.13</div><div class="d">Leakage audit + residual risks</div><div class="n">audit</div>
+<div class="sep"></div>
+<div class="l">B9</div><div class="d">vs generic BERT NER, 4 shared entities</div><div class="n">0.94 vs 0.82</div>
+<div class="sep"></div>
+<div class="l">Epoch curve</div><div class="d">Epoch 2 = lowest val loss AND highest macro F1; 3–4 overfit</div><div class="n">epoch 2</div>
+<div class="sep"></div>
+<div class="l">Per-entity</div><div class="d">DATE 0.956 → VICTIM 0.817 — full map on next slide</div><div class="n">slide 17</div>
+<div class="sep"></div>
+<div class="l">+11 F1</div><div class="d">VICTIM ablation gain — still held</div><div class="n">slide 18</div>
+</div>
+
+<h2>Delivery traps to avoid</h2>
+<ul class="tight">
+<li>Hedged numbers ("about point nine") ⇒ reads as not knowing your own results. Full precision, always.</li>
+<li>Letting the panel discover the accuracy inflation first ⇒ 96.7 % then reads as attempted inflation. Demote it yourself.</li>
+<li>CoNLL comparison in the default run ⇒ overruns the window. It answers "is 0.909 good?" only.</li>
+<li>Claiming "better than CoNLL" ⇒ false (0.909 &lt; 0.92). The claim is "competitive on a harder distribution".</li>
+<li>Delivering the per-entity ranking here ⇒ steals slide 17. Name VICTIM as weakest if forced; defer the map.</li>
+<li>Expanding micro/macro into full arithmetic on stage ⇒ one sentence suffices; the table is on screen.</li>
+</ul>
+
+</div>
+</div>
+
+<footer>
+<span>VioNER defense — slide 16 quick reference</span>
+<span>0.909 micro · 0.887 macro · two self-demotions · strict span-level</span>
+</footer>
+
+</div>
+</body>
+</html>

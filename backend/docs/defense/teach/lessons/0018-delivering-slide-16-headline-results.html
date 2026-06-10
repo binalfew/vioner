@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 18 — Delivering Slide 16: Headline Results</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --accent-soft:#A14747;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --success-soft:#E6F0E6;
+  --warn:#8B5A2B;
+  --beat:#1A365D;
+  --beat-soft:#E8EEF5;
+  --micro:#7B1E1E;     /* micro F1 — hero */
+  --macro:#3D6B8B;     /* macro F1 */
+  --macro-soft:#E8EEF5;
+  --acc:#8B5A2B;       /* token accuracy — the demoted number */
+  --acc-soft:#F5EFE2;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:42rem;margin:0 auto;padding:3.5rem 1.5rem 6rem}
+.eyebrow{font-family:"Inter","SF Pro Text",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.18em;font-size:0.72rem;color:var(--accent);font-weight:600}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:2.2rem;font-weight:700;line-height:1.18;margin:0.4rem 0 0.6rem;letter-spacing:-0.012em}
+h2{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:1.45rem;margin:3rem 0 0.6rem;font-weight:700;border-bottom:1px solid var(--rule);padding-bottom:0.4rem}
+h3{font-family:"Inter",system-ui,sans-serif;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin:1.6rem 0 0.4rem;color:var(--accent)}
+p,li{font-size:1.05rem}
+.subtitle{color:var(--ink-soft);font-style:italic;font-size:1.1rem;margin:0 0 1.4rem}
+.meta{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);letter-spacing:0.02em;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:0.6rem 0;margin-bottom:2.2rem;display:flex;flex-wrap:wrap;gap:1.2rem}
+.meta span strong{color:var(--ink)}
+.callout{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem;margin:1.2rem 0;border-radius:4px}
+.callout.win{border-left:3px solid var(--success)}
+.callout.warn{border-left:3px solid var(--warn)}
+.callout.beat{border-left:3px solid var(--beat)}
+code{font-family:"JetBrains Mono","SF Mono",Menlo,monospace;font-size:0.92em;background:#F0EBE0;padding:0.06em 0.36em;border-radius:3px}
+/* Slide mock */
+.slide-mock{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.5rem 1.7rem;margin:1.4rem 0;box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+.slide-mock .badge{font-family:"Inter",system-ui,sans-serif;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:0.3rem;font-weight:600}
+.slide-mock .title{font-family:"Iowan Old Style",Georgia,serif;font-size:1.45rem;font-weight:700;margin:0 0 0.6rem}
+/* Hero number */
+.hero-num{text-align:center;padding:1.3rem 1rem 1rem;background:linear-gradient(180deg,#FFF 0%,#FDF8F8 100%);border:1.5px solid var(--accent);border-radius:8px;margin:1rem 0}
+.hero-num .n{font-family:"Iowan Old Style",Georgia,serif;font-size:4rem;font-weight:800;color:var(--micro);line-height:1;font-feature-settings:"tnum";letter-spacing:-0.02em}
+.hero-num .l{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-soft);font-weight:700;margin-top:0.5rem}
+.hero-num .sub{font-family:"Iowan Old Style",Georgia,serif;font-size:0.92rem;color:var(--ink-soft);font-style:italic;margin-top:0.3rem}
+/* Supporting numbers strip */
+.numstrip{display:grid;grid-template-columns:repeat(3,1fr);gap:0.55rem;margin:0.7rem 0}
+.numcell{background:#FAF7F0;border:1px solid var(--rule);border-radius:5px;padding:0.75rem 0.55rem;text-align:center}
+.numcell.macro{border-left:3px solid var(--macro)}
+.numcell.acc{border-left:3px solid var(--acc)}
+.numcell.loss{border-left:3px solid var(--success)}
+.numcell .n{font-family:"Iowan Old Style",Georgia,serif;font-size:1.5rem;font-weight:800;line-height:1;font-feature-settings:"tnum"}
+.numcell.macro .n{color:var(--macro)}
+.numcell.acc .n{color:var(--acc)}
+.numcell.loss .n{color:var(--success)}
+.numcell .l{font-family:"Inter",system-ui,sans-serif;font-size:0.64rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:600;margin-top:0.35rem;line-height:1.35}
+/* F1 primer */
+.primer{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.1rem 1.3rem;margin:1.2rem 0}
+.primer h4{font-family:"Inter",sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.55rem;color:var(--accent);font-weight:700}
+.primer-row{display:grid;grid-template-columns:7.5rem 1fr;gap:0.7rem;padding:0.4rem 0;border-bottom:1px dashed var(--rule);font-size:0.95rem;line-height:1.45;align-items:start}
+.primer-row:last-child{border:0}
+.primer-row .term{font-family:"Inter",sans-serif;font-size:0.8rem;font-weight:700;color:var(--accent)}
+.primer-row .def em{color:var(--ink);font-style:italic}
+.formula{background:#FAF7F0;border:1px solid var(--rule);border-radius:4px;padding:0.9rem 1.1rem;margin:0.6rem 0;text-align:center;font-family:"Iowan Old Style",Georgia,serif;font-size:1.1rem;line-height:1.5}
+.formula .label{display:block;font-family:"Inter",system-ui,sans-serif;font-size:0.66rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.06em;font-weight:600;margin-top:0.4rem}
+/* Worked arithmetic */
+.arith-box{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.95rem 1.15rem;margin:0.9rem 0}
+.arith-box h4{font-family:"Inter",sans-serif;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.5rem;color:var(--accent);font-weight:700}
+.arith-line{display:grid;grid-template-columns:8rem 1fr;gap:0.7rem;padding:0.32rem 0;border-bottom:1px dashed var(--rule);font-size:0.94rem;align-items:baseline}
+.arith-line:last-child{border:0}
+.arith-line .lhs{font-family:"Inter",sans-serif;font-size:0.78rem;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.04em}
+.arith-line .rhs{font-family:"JetBrains Mono",monospace;font-size:0.88rem;color:var(--ink)}
+.arith-line .rhs b{color:var(--accent)}
+/* Micro vs macro table */
+.f1table{width:100%;border-collapse:collapse;margin:0.8rem 0;font-size:0.92rem}
+.f1table th{font-family:"Inter",sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:700;text-align:left;padding:0.4rem 0.6rem;border-bottom:1.5px solid var(--rule)}
+.f1table th.num,.f1table td.num{text-align:right;font-feature-settings:"tnum"}
+.f1table td{padding:0.35rem 0.6rem;border-bottom:1px dashed var(--rule);font-family:"Iowan Old Style",Georgia,serif}
+.f1table td.ent{font-weight:600}
+.f1table td.num{font-family:"JetBrains Mono",monospace;font-size:0.85rem}
+.f1table tr.hi td{background:#F8FAFD}
+.f1table tr.lo td{background:#FDF8F8}
+.f1table tr.avg td{border-top:1.5px solid var(--rule);font-weight:700;background:var(--highlight)}
+.f1table td .tag{font-family:"Inter",sans-serif;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.04em;padding:0.1em 0.4em;border-radius:3px;font-weight:700;margin-left:0.4rem}
+.f1table td .tag.hi{background:var(--macro-soft);color:var(--macro)}
+.f1table td .tag.lo{background:#F5E6E6;color:var(--accent)}
+/* Benchmark comparison */
+.bench{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin:1rem 0}
+.bench .col{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.95rem 1.1rem}
+.bench .col.conll{border-left:3px solid var(--macro);background:linear-gradient(180deg,#FFF 0%,#F8FAFD 100%)}
+.bench .col.vioner{border-left:3px solid var(--accent);background:linear-gradient(180deg,#FFF 0%,#FDF8F8 100%)}
+.bench .col h4{font-family:"Inter",sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.35rem;font-weight:700}
+.bench .col.conll h4{color:var(--macro)}
+.bench .col.vioner h4{color:var(--accent)}
+.bench .col .big{font-family:"Iowan Old Style",Georgia,serif;font-size:2rem;font-weight:800;line-height:1;font-feature-settings:"tnum"}
+.bench .col.conll .big{color:var(--macro)}
+.bench .col.vioner .big{color:var(--accent)}
+.bench .col p{font-size:0.88rem;margin:0.45rem 0 0;line-height:1.5;color:var(--ink-soft)}
+.bench .col p strong{color:var(--ink)}
+/* Beats */
+.beat-script{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin:1.4rem 0}
+.beat{display:grid;grid-template-columns:auto 1fr;gap:0.9rem;align-items:start;padding:0.9rem 0;border-bottom:1px dashed var(--rule)}
+.beat:last-child{border-bottom:0}
+.beat-num{background:var(--beat);color:#FFF;width:2.1rem;height:2.1rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.85rem}
+.beat-num.hero{background:var(--accent)}
+.beat-content .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--beat);font-weight:600;margin-bottom:0.25rem;display:flex;gap:0.7rem;align-items:baseline}
+.beat-content .label.hero{color:var(--accent)}
+.beat-content .label .secs{color:var(--ink-soft);font-weight:400;font-style:italic}
+.beat-content .text{font-size:1.04rem;line-height:1.55;margin:0.2rem 0}
+.beat-content .text em.key{background:var(--success-soft);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:600;color:var(--success)}
+.beat-content .text em.num{background:var(--highlight);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:700;color:var(--accent)}
+.beat-content .micro{margin-top:0.4rem;font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Pattern */
+.pattern{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.pattern h4{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.55rem;color:var(--accent);font-weight:700}
+.pattern-row{display:grid;grid-template-columns:auto 1fr;gap:0.6rem;align-items:start;padding:0.45rem 0;border-bottom:1px dashed var(--rule);font-size:0.95rem;line-height:1.5}
+.pattern-row:last-child{border:0}
+.pattern-row .step{background:var(--accent);color:#FFF;font-family:"Inter",sans-serif;font-size:0.68rem;font-weight:700;padding:0.15em 0.5em;border-radius:3px;white-space:nowrap}
+.pattern-row strong{color:var(--ink)}
+/* Reserved */
+.reserved{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.reserved h4{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.7rem;color:var(--accent);font-weight:700}
+.reserved-rows{display:grid;grid-template-columns:auto 1fr auto;gap:0.6rem 0.9rem;font-family:"Iowan Old Style",Georgia,serif;align-items:center}
+.reserved-rows .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:600}
+.reserved-rows .desc{font-size:0.93rem;color:var(--ink-soft);font-style:italic}
+.reserved-rows .num{font-weight:700;color:var(--accent);font-feature-settings:"tnum";font-size:1.02rem;text-align:right}
+.reserved-rows .row-sep{grid-column:1 / -1;border-top:1px dashed var(--rule);height:0;margin:0.1rem 0}
+/* Hero line */
+.hero-line{background:var(--highlight);border:2px solid var(--accent);border-radius:6px;padding:1.2rem 1.4rem;margin:1.3rem 0;text-align:center;font-family:"Iowan Old Style",Georgia,serif;font-size:1.1rem;line-height:1.55;font-weight:500}
+.hero-line .label{display:block;font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:600;margin-bottom:0.4rem}
+/* Spoken-form drill */
+.spoken{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.95rem 1.15rem;margin:0.9rem 0}
+.spoken h4{font-family:"Inter",sans-serif;font-size:0.74rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.5rem;color:var(--accent);font-weight:700}
+.spoken-row{display:grid;grid-template-columns:6.5rem 1fr;gap:0.8rem;padding:0.35rem 0;border-bottom:1px dashed var(--rule);align-items:baseline;font-size:0.95rem}
+.spoken-row:last-child{border:0}
+.spoken-row .digit{font-family:"JetBrains Mono",monospace;font-size:0.95rem;font-weight:700;color:var(--accent);font-feature-settings:"tnum"}
+.spoken-row .say{font-family:"Iowan Old Style",Georgia,serif;font-style:italic;color:var(--ink-soft)}
+.spoken-row .say strong{color:var(--ink);font-style:normal}
+/* Attack */
+.attack{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem 0.8rem;margin:1rem 0;border-radius:4px}
+.attack .q{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.95rem;color:var(--accent);margin-bottom:0.5rem}
+.attack .a{margin:0.4rem 0 0.6rem;font-size:1.03rem}
+.attack .micro{font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Timer */
+.timer-box{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.3rem;margin:1.3rem 0;text-align:center}
+.timer-display{font-family:"JetBrains Mono","SF Mono",monospace;font-size:2.6rem;font-weight:700;color:var(--accent);margin:0.3rem 0;font-feature-settings:"tnum"}
+.timer-buttons{display:flex;gap:0.6rem;justify-content:center;margin-top:0.7rem;flex-wrap:wrap}
+.timer-buttons button{font-family:"Inter",system-ui,sans-serif;font-size:0.92rem;font-weight:600;padding:0.55rem 1.3rem;border:1px solid var(--accent);background:var(--accent);color:#FFF;border-radius:4px;cursor:pointer;transition:background 120ms}
+.timer-buttons button:hover{background:var(--accent-soft)}
+.timer-buttons button.secondary{background:#FFF;color:var(--accent)}
+.timer-buttons button.secondary:hover{background:#FBFAF7}
+.timer-verdict{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin-top:0.7rem;min-height:1.4rem;font-weight:600}
+.timer-verdict.win{color:var(--success)}
+.timer-verdict.over{color:var(--warn)}
+/* Quiz */
+.quiz{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem;margin:1.4rem 0}
+.quiz h4{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin:0 0 0.8rem;color:var(--accent)}
+.quiz .qstem{font-size:1.02rem;margin-bottom:0.7rem}
+.choices{list-style:none;padding:0;margin:0}
+.choices li{margin:0.45rem 0;padding:0.55rem 0.8rem;border:1px solid var(--rule);border-radius:4px;cursor:pointer;background:#FBFAF7;font-size:0.98rem;transition:background 120ms,border-color 120ms}
+.choices li:hover{background:#F5EFE2;border-color:var(--accent-soft)}
+.choices li.right{background:var(--success-soft);border-color:var(--success);color:var(--success)}
+.choices li.wrong{background:#F5E4E4;border-color:var(--accent);color:var(--accent)}
+.choices li.locked{pointer-events:none;opacity:0.85}
+.feedback{font-family:"Inter",system-ui,sans-serif;font-size:0.93rem;margin-top:0.7rem;color:var(--ink-soft);min-height:1.2rem;font-style:italic}
+/* Followup */
+.followup{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin-top:2.4rem;border-left:3px solid var(--beat)}
+.followup ul{margin:0.6rem 0 0 1.1rem}
+.followup li{margin:0.45rem 0;font-size:1rem}
+.bottom{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;color:var(--ink-soft);border-top:1px solid var(--rule);padding-top:1.2rem;margin-top:3rem;font-style:italic}
+.cite{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);margin-top:0.3rem}
+.cite a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent-soft)}
+.cite a:hover{border-bottom:1px solid var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">Lesson 18 · Slide 16</div>
+<h1>Headline results — the four numbers</h1>
+<div class="subtitle">The first slide of the evidence section. Four numbers — micro F1 0.909 as the hero — delivered with full precision and zero hedging. The slide's central craft skill is the <strong>honest-metric reframe</strong>: you proactively demote your own highest number (96.7 % accuracy) and explain why the lower one (F1) is the honest metric. The panel hears a candidate who chose the harder grading scheme on purpose.</div>
+
+<div class="meta">
+<span><strong>Slide:</strong> 16 of 22</span>
+<span><strong>Target time:</strong> 75 seconds</span>
+<span><strong>Hero line:</strong> "A predict-O-everywhere model already scores 78 % accuracy and learns nothing"</span>
+<span><strong>Reserved cards:</strong> CoNLL ~0.92 · ±0.4 pp seeds · +1.5–2 relaxed · §6.13 · B9</span>
+</div>
+
+<h2>1 · Where this slide sits in the arc</h2>
+
+<p>Slide 15 closed with "with the system explained, we move to the evidence." Slide 16 opens the evidence section — slides 16 (headline), 17 (per-entity), 18 (ablation), 19 (KB impact + UAT). It also <em>resolves a plant</em>: the 0.909 micro F1 was stated once on slide 1 (the opening) as the headline claim. Slide 16 is where that number gets its full context — what set it was measured on, what metric it is, why that metric, and how it compares to the canonical benchmark.</p>
+
+<div class="callout beat">
+<strong>The function of slide 16.</strong> Three jobs. (1) Deliver the four numbers with full decimal precision — fluency with your own numbers is the strongest competence signal in the evidence section. (2) Pre-empt the "isn't 96.7 % accuracy the better number?" confusion by demoting accuracy <em>yourself</em>, before anyone asks. (3) Establish the honest-evaluation posture — strict span-level scoring, held-out set, article-level split — that slides 17 and 18 will inherit without having to re-argue it. If slide 16 lands, the panel grants the evaluation methodology for the rest of the deck.
+</div>
+
+<h2>2 · What's on the slide</h2>
+
+<div class="slide-mock">
+<div class="badge">Slide 16</div>
+<div class="title">Headline results</div>
+
+<div class="hero-num">
+<div class="n">0.909</div>
+<div class="l">Micro F1 · strict span-level</div>
+<div class="sub">held-out 10,000-example validation set · 190,075 gold spans</div>
+</div>
+
+<div class="numstrip">
+<div class="numcell macro"><div class="n">0.887</div><div class="l">Macro F1<br>(all 8 entities equal)</div></div>
+<div class="numcell acc"><div class="n">96.7 %</div><div class="l">Token accuracy<br>(demoted — see below)</div></div>
+<div class="numcell loss"><div class="n">0.0074</div><div class="l">Val loss<br>best checkpoint · epoch 2</div></div>
+</div>
+</div>
+
+<p>Four numbers, one hierarchy. <strong>Micro F1 0.909 is the hero</strong> — the number the deck planted on slide 1 and the number the abstract leads with. Macro F1 0.887 is the fairness companion (every entity counts equally). Token accuracy 96.7 % is <em>on the slide to be demoted</em> — its job is to let you show why it's misleading. Validation loss 0.0074 at epoch 2 anchors the checkpoint provenance: this specific model, this specific epoch.</p>
+
+<h2>3 · The F1 primer — own every term before the panel asks</h2>
+
+<p>Slide 16 is the slide where a panellist is most likely to test whether you actually understand your own metric. The full chain — TP/FP/FN → precision → recall → F1 → micro vs macro — must be reproducible on a whiteboard. Here is the whole chain with VioNER's numbers.</p>
+
+<div class="primer">
+<h4>The three buckets, then two ratios, then one number</h4>
+<div class="primer-row"><span class="term">True Positive</span><span class="def">Model predicted an entity span and it exactly matches a gold span — <em>right type, exact boundaries</em>.</span></div>
+<div class="primer-row"><span class="term">False Positive</span><span class="def">Model predicted a span that matches no gold span — <em>a false alarm the analyst must delete</em>.</span></div>
+<div class="primer-row"><span class="term">False Negative</span><span class="def">A gold span the model failed to find — <em>a miss the analyst must add by hand</em>.</span></div>
+<div class="primer-row"><span class="term">Precision</span><span class="def">TP / (TP + FP) — <em>"of the spans I predicted, what fraction were right?"</em></span></div>
+<div class="primer-row"><span class="term">Recall</span><span class="def">TP / (TP + FN) — <em>"of the spans that exist, what fraction did I find?"</em></span></div>
+<div class="primer-row"><span class="term">F1</span><span class="def">Harmonic mean of the two. High <em>only</em> when both are high — 100 % precision with 10 % recall scores ~0.18, not 0.55. The harmonic mean punishes one-sided performance.</span></div>
+</div>
+
+<div class="formula">
+F1 &nbsp;=&nbsp; 2 × (Precision × Recall) / (Precision + Recall)
+<span class="label">harmonic mean — punishes imbalance between the two</span>
+</div>
+
+<div class="arith-box">
+<h4>Worked example — 100 gold VICTIM spans (whiteboard-ready)</h4>
+<div class="arith-line"><span class="lhs">Setup</span><span class="rhs">100 gold VICTIMs · model predicts 90 spans as VICTIM</span></div>
+<div class="arith-line"><span class="lhs">Buckets</span><span class="rhs">TP = 82 · FP = 8 (false alarms) · FN = 18 (missed)</span></div>
+<div class="arith-line"><span class="lhs">Precision</span><span class="rhs">82 / 90 = <b>0.911</b> — "when it said VICTIM, right 91 % of the time"</span></div>
+<div class="arith-line"><span class="lhs">Recall</span><span class="rhs">82 / 100 = <b>0.820</b> — "of the actual victims, found 82 %"</span></div>
+<div class="arith-line"><span class="lhs">F1</span><span class="rhs">2 × 0.911 × 0.820 / (0.911 + 0.820) = <b>0.863</b></span></div>
+<div class="arith-line"><span class="lhs">Reading</span><span class="rhs">out of 100 real victims: find ~82, with ~8 false alarms</span></div>
+</div>
+
+<div class="callout">
+<strong>Why this worked example matters.</strong> The operational reading in the last line — <em>"find 82, with 8 false alarms"</em> — is the translation move the whole evidence section depends on. An F1 number is abstract; "82 found, 8 false alarms per 100" is what an analyst experiences. If a panellist ever looks unconvinced by an F1 number, drop to this concrete reading. It works for every per-entity number on slide 17 too.
+</div>
+
+<h2>4 · Micro vs macro — the two-point gap and what it means</h2>
+
+<p>The slide reports both averages, and the panel may ask why they differ. The answer requires knowing how each is computed — and the difference is a one-sentence structural fact about VioNER's per-entity distribution.</p>
+
+<table class="f1table">
+<tr><th>Entity</th><th class="num">Support (spans)</th><th class="num">F1</th></tr>
+<tr class="hi"><td class="ent">ACTOR<span class="tag hi">high support</span></td><td class="num">47,612</td><td class="num">0.923</td></tr>
+<tr class="hi"><td class="ent">CITY<span class="tag hi">high support</span></td><td class="num">44,361</td><td class="num">0.934</td></tr>
+<tr class="hi"><td class="ent">DATE<span class="tag hi">high support</span></td><td class="num">31,938</td><td class="num">0.956</td></tr>
+<tr><td class="ent">REGION</td><td class="num">24,331</td><td class="num">0.891</td></tr>
+<tr><td class="ent">DISTRICT</td><td class="num">21,471</td><td class="num">0.826</td></tr>
+<tr><td class="ent">ACTION</td><td class="num">9,963</td><td class="num">0.866</td></tr>
+<tr class="lo"><td class="ent">VICTIM<span class="tag lo">low support</span></td><td class="num">5,492</td><td class="num">0.817</td></tr>
+<tr class="lo"><td class="ent">CASUALTIES<span class="tag lo">low support</span></td><td class="num">4,907</td><td class="num">0.885</td></tr>
+<tr class="avg"><td class="ent">Macro (equal weight)</td><td class="num">—</td><td class="num">0.887</td></tr>
+<tr class="avg"><td class="ent">Micro (pooled TP/FP/FN)</td><td class="num">190,075</td><td class="num">0.909</td></tr>
+</table>
+
+<div class="callout">
+<strong>The one-sentence explanation.</strong> <em>Macro</em> averages the eight per-entity F1s equally — VICTIM's 0.817 counts as much as DATE's 0.956. <em>Micro</em> pools all TP/FP/FN counts first, so high-support entities dominate. Micro comes out <strong>two points higher</strong> (0.909 vs 0.887) because the three highest-support entities — ACTOR, CITY, DATE — also happen to have the three highest F1s. <strong>That relationship is good news</strong>: the entities the analyst sees most often are the ones the model handles best. If the relationship were inverted (rare entities strong, common entities weak), micro would fall <em>below</em> macro — a warning sign.
+</div>
+
+<div class="callout win">
+<strong>When to use which — the deployment heuristic.</strong> Macro answers <em>"does the model treat all entities fairly?"</em> — it's the fairness number, and it's the number the ablation on slide 18 uses (rare-class gains move macro most). Micro answers <em>"what fraction of entities in a batch will I get right?"</em> — it's the throughput number, and it's the headline because it estimates the analyst's actual experience. Reporting both, with micro > macro explained, is itself an honesty signal.
+</div>
+
+<h2>5 · The honest-metric reframe — the core skill</h2>
+
+<p>Slide 16's transferable craft is the <strong>honest-metric reframe</strong>: when your slide contains a high number that is misleading and a lower number that is honest, <em>you</em> demote the high number before anyone asks. The token-accuracy demotion is the canonical instance.</p>
+
+<div class="pattern">
+<h4>The three-move honest-metric reframe</h4>
+<div class="pattern-row"><span class="step">1</span><span><strong>Name the tempting number and its trap.</strong> "Token accuracy is 96.7 % — but 78 % of tokens are O." The trap is structural: the metric is inflated by the majority class.</span></div>
+<div class="pattern-row"><span class="step">2</span><span><strong>Run the degenerate-model test.</strong> "A model that predicts O everywhere already scores 78 % accuracy and learns nothing." The degenerate model is the audit: any metric a know-nothing model scores well on is not measuring learning.</span></div>
+<div class="pattern-row"><span class="step">3</span><span><strong>Name the honest metric and why it survives the test.</strong> "F1 ignores correct O predictions entirely — it measures only how well actual entities are recovered. The degenerate model scores zero." F1 survives the audit; that's why it leads.</span></div>
+</div>
+
+<div class="callout warn">
+<strong>The trap.</strong> Do not let the panel discover the accuracy inflation themselves. If a panellist works out "wait — 78 % of tokens are O, so accuracy is mostly free" before you've said it, the 96.7 % reads as an attempted inflation and every other number on the slide inherits the suspicion. Demoting your own best-looking number is the single highest-credibility move available on this slide — it buys trust that slides 17 and 18 spend.
+</div>
+
+<p>This is the deck's honest-middle pattern applied to <em>metrics</em>. Slides 9–14 named and refused dismissive readings of contributions; slide 16 names and refuses an inflated reading of the candidate's own results. Same posture, new target: the candidate polices their own numbers harder than the panel would.</p>
+
+<h2>6 · The benchmark-contextualisation move</h2>
+
+<p>The second craft skill: answering <em>"is 0.909 actually good?"</em> without over-claiming. The move has a fixed shape — name the canonical benchmark, name the difficulty delta, then claim exactly as much as the comparison supports.</p>
+
+<div class="bench">
+<div class="col conll">
+<h4>CoNLL-2003 (the canonical benchmark)</h4>
+<div class="big">~0.92</div>
+<p><strong>4 entities</strong> (PER, ORG, LOC, MISC) · general news · <strong>mild imbalance</strong> · decades of tuning by the whole field</p>
+</div>
+<div class="col vioner">
+<h4>VioNER</h4>
+<div class="big">0.909</div>
+<p><strong>8 entities</strong> · violent-event domain · <strong>severe imbalance</strong> (78 % O, rarest class &lt; 3 % of spans) · one thesis</p>
+</div>
+</div>
+
+<div class="callout">
+<strong>The exact claim to make — no more, no less.</strong> <em>"Competitive on a harder distribution."</em> Not "better than CoNLL" (false — 0.909 &lt; 0.92). Not "state of the art" (unverifiable). The claim is that VioNER is within about a point of the canonical benchmark while solving a problem with twice the entity types and far worse imbalance. The comparison's job is to give the panel a <em>reference frame</em>, not to win a leaderboard. If pressed harder, backup slide B9 has the direct comparison: on the four entity types shared with generic BERT NER, VioNER scores 0.94 vs 0.82 macro — but that number stays in reserve.
+</div>
+
+<h2>7 · Strict span-level scoring — the honesty footnote that earns trust</h2>
+
+<p>The final element on the slide: <em>"all numbers are strict span-level — exact boundaries and type — reported for honesty."</em> This one sentence does disproportionate work.</p>
+
+<div class="primer">
+<h4>Strict vs relaxed — what the choice means</h4>
+<div class="primer-row"><span class="term">Strict match</span><span class="def">A predicted span counts as TP only if <em>both</em> the entity type and the exact boundaries match the gold span. "12 civilians" predicted against gold "at least 12 civilians" = FP <em>and</em> FN. CoNLL convention.</span></div>
+<div class="primer-row"><span class="term">Relaxed match</span><span class="def">Partial overlap (e.g. 50 %) counts as a hit. Scores come out <em>1.5–2 F1 points higher</em> on this data.</span></div>
+<div class="primer-row"><span class="term">Why strict</span><span class="def">A partial-match span doesn't save analyst time — they still have to edit the boundary. <em>Strict matches what the consumer actually experiences.</em> Relaxed would inflate the number without inflating the usefulness.</span></div>
+</div>
+
+<div class="callout win">
+<strong>Note the pattern repeating.</strong> This is the honest-metric reframe a second time on the same slide: the candidate had a free +1.5–2 F1 available by choosing relaxed scoring and declined it, and says so. Two self-demotions on one slide (accuracy → F1, relaxed → strict) is what makes slide 16 the deck's credibility anchor. Both demotions share the same justification: <em>report the number that corresponds to the consumer's experience.</em>
+</div>
+
+<h2>8 · The 75-second script, in four beats</h2>
+
+<div class="beat-script">
+
+<div class="beat">
+<div class="beat-num">1</div>
+<div class="beat-content">
+<div class="label">Beat 1 — frame the evaluation set <span class="secs">~10 seconds</span></div>
+<div class="text">"<em class="key">Headline results.</em> All on a <em class="key">held-out</em> ten-thousand-example validation set covering <em class="num">one hundred and ninety thousand gold spans</em>."</div>
+<div class="micro">"Held-out" is the load-bearing word — it certifies the numbers before they're stated. Saying the span count (190 k) signals scale: this is not a small-sample evaluation. Ten seconds, no more; the set-up must not delay the numbers.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">2</div>
+<div class="beat-content">
+<div class="label">Beat 2 — the four numbers <span class="secs">~20 seconds</span></div>
+<div class="text">"Micro F1 <em class="num">zero-point-nine-zero-nine</em>. Macro F1 <em class="num">zero-point-eight-eight-seven</em>. Token accuracy <em class="num">ninety-six-point-seven percent</em>. Best checkpoint at <em class="num">epoch two</em> with validation loss <em class="num">zero-point-zero-zero-seven-four</em>."</div>
+<div class="micro">Full decimal precision, spoken digit by digit, no rounding, no hedging. "About ninety-one percent" sounds unsure; "zero-point-nine-zero-nine" sounds like a candidate who owns the number. Small pause after each of the four. This beat is pure delivery — drill the spoken forms until they are automatic (see §9).</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num hero">3</div>
+<div class="beat-content">
+<div class="label hero">Beat 3 — the honest-metric reframe <span class="secs">~25 seconds</span></div>
+<div class="text">"I lead with F1, not accuracy, because <em class="num">seventy-eight percent</em> of tokens are O — <em class="key">a degenerate predict-O-everywhere model already scores seventy-eight percent accuracy and learns nothing</em>. Micro exceeds macro by about two points because the high-support entities — DATE, CITY, ACTOR — <em class="key">also have the highest F1</em>."</div>
+<div class="micro">Two moves in one beat. First the accuracy demotion (the hero moment — the degenerate-model line is the most quotable sentence on the slide; deliver it cleanly). Then the micro-vs-macro explanation in one sentence — naming the three entities (DATE, CITY, ACTOR) shows you know <em>which</em> entities drive the gap, not just that a gap exists. Note: AAU guideline permits "I" in spoken delivery; the written thesis avoids it.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">4</div>
+<div class="beat-content">
+<div class="label">Beat 4 — the honesty close + pivot <span class="secs">~15 seconds</span></div>
+<div class="text">"All numbers are <em class="key">strict span-level — exact boundaries and type — reported for honesty</em>. <em class="key">The per-entity breakdown is where the operational story lives.</em>"</div>
+<div class="micro">The strict-scoring line closes the slide on the honesty posture. The pivot sentence hands off to slide 17 and frames it correctly in advance: per-entity F1 is not "more numbers", it is the <em>operational</em> reading (trust / spot-check / correct) that slide 17 will deliver. Do not deploy the CoNLL comparison in the default script — it is the answer to "is 0.909 good?", held in reserve.</div>
+</div>
+</div>
+
+</div>
+
+<h2>9 · Spoken-form drill — the numbers as you will say them</h2>
+
+<div class="spoken">
+<h4>Say each exactly like this — drill until automatic</h4>
+<div class="spoken-row"><span class="digit">0.909</span><span class="say">"zero-point-<strong>nine-zero-nine</strong>" — never "point nine one" or "about ninety-one percent"</span></div>
+<div class="spoken-row"><span class="digit">0.887</span><span class="say">"zero-point-<strong>eight-eight-seven</strong>"</span></div>
+<div class="spoken-row"><span class="digit">96.7 %</span><span class="say">"ninety-six-point-seven percent"</span></div>
+<div class="spoken-row"><span class="digit">0.0074</span><span class="say">"zero-point-zero-zero-<strong>seven-four</strong>" — four digits after the point; do not say "nought point nought nought seven four" in one rush</span></div>
+<div class="spoken-row"><span class="digit">190,075</span><span class="say">"one hundred and ninety thousand gold spans" — round in speech; the slide carries the exact figure</span></div>
+<div class="spoken-row"><span class="digit">78 %</span><span class="say">"seventy-eight percent of tokens are O" — the anchor for the accuracy demotion; same number as slide 12's imbalance motivation</span></div>
+</div>
+
+<div class="callout">
+<strong>Why digit-by-digit matters.</strong> The evidence section's competence signal is numerical fluency. A candidate who says "around point nine" invites the question "you don't remember your own headline?" A candidate who says "zero-point-nine-zero-nine" with no hesitation closes that door. This is the same numbers-and-acronyms delivery discipline from slide 3 — now applied to the numbers that matter most.</div>
+
+<h2>10 · Reserved cards — deploy on demand</h2>
+
+<div class="reserved">
+<h4>Reserved evidence — bring out only if asked</h4>
+<div class="reserved-rows">
+<div class="label">CoNLL-2003</div>
+<div class="desc">Canonical benchmark: ~0.92 on 4 entities, mild imbalance — "competitive on a harder distribution"</div>
+<div class="num">~0.92</div>
+<div class="row-sep"></div>
+<div class="label">Relaxed-match delta</div>
+<div class="desc">What relaxed scoring would add — declined for honesty</div>
+<div class="num">+1.5–2 F1</div>
+<div class="row-sep"></div>
+<div class="label">Seed variance</div>
+<div class="desc">3 seeds (42, 17, 91) · run-to-run macro F1 spread — the reproducibility answer</div>
+<div class="num">±0.4 pp</div>
+<div class="row-sep"></div>
+<div class="label">Leakage audit</div>
+<div class="desc">Article-level split · hash dedup before split · augmentation template pools partitioned · residual risks listed honestly</div>
+<div class="num">§6.13</div>
+<div class="row-sep"></div>
+<div class="label">Backup B9</div>
+<div class="desc">vs generic BERT NER on the 4 shared entity types — direct comparison if pressed</div>
+<div class="num">0.94 vs 0.82</div>
+<div class="row-sep"></div>
+<div class="label">Epoch curve</div>
+<div class="desc">Epoch 2 = lowest val loss (0.0074) AND highest macro F1 (0.887); epochs 3–4 overfit</div>
+<div class="num">epoch 2</div>
+<div class="row-sep"></div>
+<div class="label">Per-entity F1s</div>
+<div class="desc">DATE 0.956 → VICTIM 0.817 — reserved for slide 17</div>
+<div class="num">slide 17</div>
+<div class="row-sep"></div>
+<div class="label">Ablation gain</div>
+<div class="desc">+11 F1 on VICTIM vs plain CE — still reserved for slide 18</div>
+<div class="num">slide 18</div>
+</div>
+</div>
+
+<h3>The deployment rule</h3>
+<ul>
+<li><strong>Default delivery:</strong> the four numbers, the accuracy demotion with the degenerate-model line, the micro-vs-macro one-sentence explanation, the strict-scoring close, the pivot.</li>
+<li><strong>If asked "is 0.909 good?"</strong> Deploy the CoNLL comparison: <em>"CoNLL-2003 general-news NER is around 0.92 on four entities with mild imbalance. This is eight entities with severe imbalance — competitive on a harder distribution."</em> Only if pressed further, add B9 (0.94 vs 0.82 on shared entities).</li>
+<li><strong>If asked "how do I know these aren't overfit?"</strong> Deploy the leakage audit: <em>"Article-level split, hash-based deduplication before the split, augmentation template pools partitioned between train and validation. Section 6.13 lists the residual leakage risks honestly."</em></li>
+<li><strong>If asked "did you run multiple seeds?"</strong> Deploy: <em>"Three seeds — run-to-run macro F1 variance is about plus-or-minus zero-point-four percentage points. Every gain reported in the ablation exceeds that by an order of magnitude."</em></li>
+<li><strong>Critical:</strong> per-entity numbers belong to slide 17; the +11 F1 ablation belongs to slide 18. If a panellist asks "which entity is weakest?" here, name VICTIM and say the full reliability map is on the next slide — do not deliver slide 17's ranking early.</li>
+</ul>
+
+<h2>11 · Four pre-loaded interrupts</h2>
+
+<div class="attack">
+<div class="q">"Why is your headline metric F1 and not accuracy? 96.7 % sounds better."</div>
+<div class="a">"Because seventy-eight percent of tokens are O — non-entity. A degenerate model that predicts O everywhere already scores seventy-eight percent token accuracy without learning anything. F1 ignores correct O predictions entirely and measures only how well the model recovers actual entities — on F1, that degenerate model scores zero. For an extraction task, what matters is the entities you found, not the non-entities you correctly ignored. That's why F1 leads and accuracy is the supporting number."</div>
+<div class="micro">The degenerate-model test is the whole answer. Note the symmetry that closes it: the degenerate model scores 78 % on accuracy and 0.0 on F1 — the two metrics maximally disagree about a model that learned nothing, and F1 is the one telling the truth. The 78 % figure deliberately echoes slide 12's imbalance motivation — same number, two slides, one coherent story.</div>
+</div>
+
+<div class="attack">
+<div class="q">"Why is micro F1 higher than macro? Shouldn't they be the same?"</div>
+<div class="a">"They'd only be the same if every entity had identical F1. Micro pools all the true-positive, false-positive, and false-negative counts before computing F1, so high-support entities dominate — ACTOR has forty-seven thousand spans against VICTIM's five and a half thousand. Macro averages the eight per-entity F1s equally, so VICTIM's 0.817 weighs the same as DATE's 0.956. Micro comes out two points higher because the highest-support entities also have the highest F1. That's actually the reassuring direction — the entities analysts encounter most often are the ones the model is best at. The inverted relationship would be the warning sign."</div>
+<div class="micro">Four moves: define both computations, give the support contrast (47 k vs 5.5 k), explain the direction of the gap, then reframe the gap as good news. The last move is the one most candidates miss — the two-point gap is not an embarrassment to explain away but a structural property to read out loud.</div>
+</div>
+
+<div class="attack">
+<div class="q">"How can I trust these numbers aren't inflated by data leakage between train and validation?"</div>
+<div class="a">"Three defences, applied in order. The split is article-level, not sentence-level — sentences from the same article never appear on both sides. Hash-based deduplication ran before the split, so near-duplicate wire copies can't straddle it. And the augmentation template pools were partitioned — templates used to generate training examples were never used for validation examples. Section 6.13 of the thesis lists the residual leakage risks honestly — including that wire-service stories about the same event with different wording can still appear on both sides, which is a limitation of any news corpus."</div>
+<div class="micro">The three defences in order of strength: article-level split (the structural one), hash dedup (the near-duplicate one), template partition (the augmentation-specific one — the defence the panel won't expect you to have thought of). Then the §6.13 concession, volunteered. Conceding the residual wire-copy risk before being pushed is the leakage version of the honest-metric reframe.</div>
+</div>
+
+<div class="attack">
+<div class="q">"Is a single training run enough? These could be a lucky seed."</div>
+<div class="a">"The thesis ran each configuration with three random seeds — forty-two, seventeen, ninety-one. Run-to-run macro F1 variance is about plus-or-minus zero-point-four percentage points. The headline numbers are robust at that scale, and every gain reported in the slide-18 ablation exceeds that variance by an order of magnitude — the eleven-point VICTIM gain is roughly twenty-five times the seed noise. Paired bootstrap at the article level confirms significance for the rare-entity gains. Sections 6.4 and 6.6 carry the details."</div>
+<div class="micro">Name the seeds (it shows the runs really happened), name the variance (±0.4 pp), then use the variance to pre-arm slide 18 — the ablation gain vs seed noise ratio (25×) is the line that kills the "lucky seed" attack permanently. Mentioning "+11" here in the ratio context is acceptable since the panellist forced the reliability question; do not expand into the ablation table itself.</div>
+</div>
+
+<h2>12 · The hero close</h2>
+
+<div class="hero-line">
+<span class="label">The hero line — memorise verbatim</span>
+"I lead with F1, not accuracy — seventy-eight percent of tokens are O, so a model that predicts O everywhere already scores seventy-eight percent accuracy and learns nothing."
+</div>
+
+<h3>Why this line is the hero</h3>
+<ul>
+<li><strong>It demotes your own best-looking number.</strong> The 96.7 % is the biggest number on the slide and you are the one explaining why it doesn't matter. No panel attack on metric choice survives this — you made the attack first, better.</li>
+<li><strong>The degenerate model is a self-contained proof.</strong> "Predicts O everywhere → 78 % accuracy → learned nothing" is a three-step argument any CS panellist completes in their head before you finish the sentence. It doesn't ask for trust; it demonstrates.</li>
+<li><strong>It re-uses the deck's central number.</strong> 78 % O is the imbalance figure from slide 12 — the same fact that motivated focal loss and class weights now motivates the metric choice. One number, two duties, deck-wide coherence.</li>
+<li><strong>Consistent with the deck's posture.</strong> Slides 9–14 each named and refused a dismissive reading of a contribution. Slide 16 turns the same discipline inward: <strong>honest metric, not flattering metric</strong>. The candidate polices their own numbers harder than the panel would — which is precisely what makes the numbers believable.</li>
+</ul>
+
+<h2>13 · Timed practice</h2>
+
+<p>Four beats, ~75 seconds. Target window: 65–88 seconds. Beat 2's four numbers want full decimal precision with a small pause after each. Beat 3's degenerate-model line is the hero — do not rush it. The CoNLL comparison stays out of the default run.</p>
+
+<div class="timer-box">
+<div class="timer-display" id="timer">0.0 s</div>
+<div class="timer-buttons">
+<button id="startBtn">Start (begin "Headline results")</button>
+<button id="stopBtn" class="secondary" disabled>Stop (after "where the operational story lives")</button>
+<button id="resetBtn" class="secondary">Reset</button>
+</div>
+<div class="timer-verdict" id="verdict"></div>
+</div>
+
+<div class="callout">
+<strong>The harder rep — the no-hedge test.</strong> Run Beat 2 (the four numbers) with zero hedging vocabulary: no "about", no "around", no "roughly", no "I think it was". Each number in full spoken precision. Then run Beat 3 and check the degenerate-model line came out as one unbroken sentence. Re-run until both conditions hold three times in a row. Hedged numbers are the evidence section's most common credibility leak.
+</div>
+
+<h2>14 · Quiz</h2>
+
+<div class="quiz" id="quiz1">
+<h4>Q1. The panel asks: "Why F1 and not accuracy? Your accuracy is 96.7 %."</h4>
+<p class="qstem">Pick the strongest response.</p>
+<ul class="choices" data-answer="b">
+<li data-key="a">"F1 is the standard metric in the NER literature, so we follow the convention for comparability."</li>
+<li data-key="b">"78 % of tokens are O — a degenerate model that predicts O everywhere already scores 78 % accuracy and learns nothing. F1 ignores correct O predictions and measures only recovery of actual entities; the degenerate model scores zero on it. For extraction, what matters is the entities found, not the non-entities correctly ignored."</li>
+<li data-key="c">"Accuracy and F1 measure roughly the same thing; F1 is just more granular for multi-class problems."</li>
+<li data-key="d">"Accuracy is reported too — 96.7 % — so both views are available; F1 simply leads the slide."</li>
+</ul>
+<p class="feedback" id="fb1"></p>
+</div>
+
+<div class="quiz" id="quiz2">
+<h4>Q2. Why is micro F1 (0.909) higher than macro F1 (0.887)?</h4>
+<p class="qstem">Pick the correct structural explanation.</p>
+<ul class="choices" data-answer="c">
+<li data-key="a">Micro F1 uses relaxed span matching while macro uses strict matching, adding roughly two points.</li>
+<li data-key="b">Micro F1 is computed on the training set and macro on the validation set, so micro benefits from memorisation.</li>
+<li data-key="c">Micro pools TP/FP/FN across entities so high-support entities dominate; macro weights all eight equally. The gap is positive because the highest-support entities (ACTOR 47.6 k, CITY 44.4 k, DATE 31.9 k spans) also have the highest F1s — the reassuring direction, since analysts see those entities most often.</li>
+<li data-key="d">Macro F1 includes the O class in its average, which drags it down relative to micro.</li>
+</ul>
+<p class="feedback" id="fb2"></p>
+</div>
+
+<div class="quiz" id="quiz3">
+<h4>Q3. The panel asks: "How do I know these numbers aren't inflated by train/validation leakage?"</h4>
+<p class="qstem">Pick the strongest response.</p>
+<ul class="choices" data-answer="d">
+<li data-key="a">"The validation set was held out from the start, so leakage is impossible by construction."</li>
+<li data-key="b">"We used an 80/20 random split, which is the standard practice in the field."</li>
+<li data-key="c">"Leakage would inflate all entities equally, but our per-entity F1s vary widely — so there can't be leakage."</li>
+<li data-key="d">"Three defences: article-level split (sentences from one article never straddle the split), hash-based deduplication before splitting, and augmentation template pools partitioned between train and validation. §6.13 lists the residual risks honestly — including same-event wire copies with different wording."</li>
+</ul>
+<p class="feedback" id="fb3"></p>
+</div>
+
+<div class="quiz" id="quiz4">
+<h4>Q4. What does "strict span-level scoring" mean, and why use it when relaxed scoring adds 1.5–2 F1 points?</h4>
+<p class="qstem">Pick the correct answer.</p>
+<ul class="choices" data-answer="a">
+<li data-key="a">A prediction counts as TP only if both entity type and exact boundaries match the gold span — CoNLL convention. Relaxed (partial-overlap) scoring would score higher but is operationally misleading: a partial-match span doesn't save analyst time, they still have to edit it. Strict matches what the consumer actually experiences.</li>
+<li data-key="b">Strict scoring requires the model's confidence to exceed a fixed threshold before a span is counted, which filters out low-quality predictions.</li>
+<li data-key="c">Strict scoring evaluates each token independently rather than at span level, making it more granular and therefore more honest.</li>
+<li data-key="d">Strict scoring was required because the validation set's gold annotations only mark exact boundaries, leaving no choice in the matter.</li>
+</ul>
+<p class="feedback" id="fb4"></p>
+</div>
+
+<div class="followup">
+<strong>Ask your teacher follow-up questions.</strong>
+<ul>
+<li>Want a 60-second compressed delivery for if you're running behind?</li>
+<li>Want a whiteboard drill — reproduce the precision/recall/F1 worked example (TP 82, FP 8, FN 18) from memory in under 60 seconds?</li>
+<li>Want to drill the spoken number forms ("zero-point-nine-zero-nine") until automatic under interruption?</li>
+<li>Want to rehearse the leakage answer's three defences in order without notes?</li>
+<li>Want to map exactly which slide-16 reserved cards reappear on slides 17 and 18, so the reservation graph stays intact live?</li>
+</ul>
+<p class="cite">References: <a href="../../VioNER_Defense_Slides_study_guide.md">VioNER_Defense_Slides_study_guide.md</a> Slide 16; <a href="../../experimental_results.md">experimental_results.md</a> Part 4 (headline numbers, F1 primer, micro vs macro), Part 3 (epoch curve — epoch 2 sweet spot); thesis §6.3 (headline results), §6.4 (seed variance), §6.13 (leakage audit). Benchmark: CoNLL-2003 shared task (Tjong Kim Sang &amp; De Meulder, 2003).</p>
+</div>
+
+<div class="bottom">Lesson 18 of the slide drill. Next up — slide 17: per-entity F1 (the reliability map — DATE 0.956 down to VICTIM 0.817, read operationally: trust / spot-check / correct).</div>
+
+</div>
+
+<script>
+// Timer
+(function(){
+  const display=document.getElementById('timer');
+  const startBtn=document.getElementById('startBtn');
+  const stopBtn=document.getElementById('stopBtn');
+  const resetBtn=document.getElementById('resetBtn');
+  const verdict=document.getElementById('verdict');
+  let raf=null, t0=0;
+  function tick(){const t=(performance.now()-t0)/1000;display.textContent=t.toFixed(1)+' s';raf=requestAnimationFrame(tick)}
+  startBtn.onclick=()=>{cancelAnimationFrame(raf);t0=performance.now();raf=requestAnimationFrame(tick);startBtn.disabled=true;stopBtn.disabled=false;verdict.textContent='';verdict.className='timer-verdict'};
+  stopBtn.onclick=()=>{cancelAnimationFrame(raf);const t=(performance.now()-t0)/1000;display.textContent=t.toFixed(1)+' s';startBtn.disabled=false;stopBtn.disabled=true;
+    if(t<55){verdict.textContent='Too fast — the four numbers in Beat 2 each need a beat of silence after them, and the degenerate-model line in Beat 3 must land as a complete thought. Slow down on Beats 2 and 3.';verdict.className='timer-verdict over'}
+    else if(t<=88){verdict.textContent='Inside the window. The numbers landed with precision and the accuracy demotion got its space.';verdict.className='timer-verdict win'}
+    else{verdict.textContent='Over time — check whether the CoNLL comparison crept into the default run (it belongs in reserve) or Beat 3 expanded into the full micro/macro arithmetic (one sentence is enough — the table is on screen).';verdict.className='timer-verdict over'}};
+  resetBtn.onclick=()=>{cancelAnimationFrame(raf);display.textContent='0.0 s';startBtn.disabled=false;stopBtn.disabled=true;verdict.textContent='';verdict.className='timer-verdict'};
+})();
+// Quizzes
+document.querySelectorAll('.quiz').forEach(quiz=>{
+  const ul=quiz.querySelector('.choices');
+  const answer=ul.dataset.answer;
+  const fb=quiz.querySelector('.feedback');
+  const fbMap={
+    quiz1:{
+      b:'Yes. The degenerate-model test is the whole answer: 78 % O ⇒ predict-O-everywhere scores 78 % accuracy and 0.0 F1. The two metrics maximally disagree about a model that learned nothing — F1 is the one telling the truth.',
+      a:'Appeal to convention is weak — it explains the field\'s habit, not why the habit is right for THIS data. The degenerate-model test explains it structurally.',
+      c:'False — on this data they disagree wildly. A know-nothing model scores 78 % accuracy and 0.0 F1. They are not "roughly the same thing" under imbalance.',
+      d:'Dodges the question. "Both are available" doesn\'t defend the choice of which one leads. The panel asked WHY F1 leads.'
+    },
+    quiz2:{
+      c:'Yes. Pooled counts vs equal weights, plus the empirical fact that high-support entities have the highest F1s — and the reframe: that direction is good news for the analyst experience.',
+      a:'No — both averages use the same strict span-level matching. The gap comes from the weighting scheme, not the matching scheme.',
+      b:'No — both are computed on the same held-out 10 k validation set. Train-set evaluation appears nowhere on this slide.',
+      d:'No — neither average includes the O class. F1 for entity extraction ignores correct O predictions entirely; that is exactly why F1 was chosen over accuracy.'
+    },
+    quiz3:{
+      d:'Yes. Three named defences in order of strength, then the volunteered §6.13 concession. Conceding the residual wire-copy risk before being pushed is the honest-metric reframe applied to leakage.',
+      a:'"Impossible by construction" is over-claiming — held-out only helps if the split unit is right. Sentence-level splits leak through shared articles; near-duplicates leak through wire copies.',
+      b:'A random 80/20 split at the sentence level is exactly the leaky design. The defence must name the split unit (article-level) and the dedup step.',
+      c:'Faulty inference — leakage doesn\'t inflate uniformly, so varied per-entity F1s prove nothing about leakage either way.'
+    },
+    quiz4:{
+      a:'Yes. Exact type + exact boundaries, CoNLL convention, and the operational justification: a partial match still costs the analyst an edit, so relaxed scoring inflates the number without inflating the usefulness.',
+      b:'No — that describes confidence filtering (pipeline step 5, from slide 15), not the scoring convention used in evaluation.',
+      c:'Backwards — token-level evaluation is the LESS strict view (it gives partial credit for partially-correct spans). Strict span-level requires the whole span to be right.',
+      d:'No — gold annotations always have exact boundaries; the evaluator still chooses how much overlap counts as a hit. Strict was a choice, declined +1.5–2 free points, and says so.'
+    }
+  };
+  ul.querySelectorAll('li').forEach(li=>{
+    li.onclick=()=>{
+      if(li.classList.contains('locked'))return;
+      const key=li.dataset.key;
+      const correct=key===answer;
+      ul.querySelectorAll('li').forEach(x=>x.classList.add('locked'));
+      li.classList.add(correct?'right':'wrong');
+      if(!correct){ul.querySelector('li[data-key="'+answer+'"]').classList.add('right')}
+      fb.textContent=fbMap[quiz.id][key]||'';
+    };
+  });
+});
+</script>
+
+</body>
+</html>

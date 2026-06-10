@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Lesson 12 — Delivering Slide 10: The Grounded 8-Entity Schema</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --accent-soft:#A14747;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --success-soft:#E6F0E6;
+  --warn:#8B5A2B;
+  --beat:#1A365D;
+  --beat-soft:#E8EEF5;
+  --kept:#3F6B3F;
+  --kept-soft:#E6F0E6;
+  --dropped:#8B3D5B;
+  --dropped-soft:#F5E6EC;
+  --recovered:#3D6B8B;
+  --recovered-soft:#E8EEF5;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:42rem;margin:0 auto;padding:3.5rem 1.5rem 6rem}
+.eyebrow{font-family:"Inter","SF Pro Text",system-ui,sans-serif;text-transform:uppercase;letter-spacing:0.18em;font-size:0.72rem;color:var(--accent);font-weight:600}
+h1{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:2.2rem;font-weight:700;line-height:1.18;margin:0.4rem 0 0.6rem;letter-spacing:-0.012em}
+h2{font-family:"Iowan Old Style","Charter",Georgia,serif;font-size:1.45rem;margin:3rem 0 0.6rem;font-weight:700;border-bottom:1px solid var(--rule);padding-bottom:0.4rem}
+h3{font-family:"Inter",system-ui,sans-serif;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin:1.6rem 0 0.4rem;color:var(--accent)}
+p,li{font-size:1.05rem}
+.subtitle{color:var(--ink-soft);font-style:italic;font-size:1.1rem;margin:0 0 1.4rem}
+.meta{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);letter-spacing:0.02em;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:0.6rem 0;margin-bottom:2.2rem;display:flex;flex-wrap:wrap;gap:1.2rem}
+.meta span strong{color:var(--ink)}
+.callout{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem;margin:1.2rem 0;border-radius:4px}
+.callout.win{border-left:3px solid var(--success)}
+.callout.warn{border-left:3px solid var(--warn)}
+.callout.beat{border-left:3px solid var(--beat)}
+code{font-family:"JetBrains Mono","SF Mono",Menlo,monospace;font-size:0.92em;background:#F0EBE0;padding:0.06em 0.36em;border-radius:3px}
+/* Slide visual */
+.slide-mock{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.5rem 1.7rem;margin:1.4rem 0;box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+.slide-mock .badge{font-family:"Inter",system-ui,sans-serif;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:0.3rem;font-weight:600}
+.slide-mock .title{font-family:"Iowan Old Style",Georgia,serif;font-size:1.45rem;font-weight:700;margin:0 0 0.4rem}
+.slide-mock .lede{font-size:0.9rem;color:var(--ink-soft);margin:0 0 0.9rem;line-height:1.5}
+/* The 5W1H table */
+.schema-table{width:100%;border-collapse:collapse;font-size:0.86rem;margin:0.5rem 0 0.6rem}
+.schema-table th{font-family:"Inter",system-ui,sans-serif;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink-soft);text-align:left;padding:0.45rem 0.5rem;border-bottom:1px solid var(--rule);font-weight:600}
+.schema-table td{padding:0.42rem 0.5rem;border-bottom:1px dashed var(--rule);vertical-align:top}
+.schema-table .group{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;font-weight:700;color:var(--ink);letter-spacing:0.04em;width:3.2rem}
+.schema-table .kept{color:var(--kept);font-weight:600}
+.schema-table .dropped{color:var(--dropped);font-style:italic;font-size:0.83rem}
+.schema-table .recover{color:var(--recovered);font-size:0.78rem;display:block;margin-top:0.15rem;font-style:italic}
+.schema-summary{display:flex;justify-content:space-between;align-items:center;background:var(--highlight);border:1px solid var(--accent-soft);border-radius:4px;padding:0.6rem 0.9rem;margin-top:0.6rem;font-size:0.93rem;font-weight:600}
+/* Beats */
+.beat-script{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin:1.4rem 0}
+.beat{display:grid;grid-template-columns:auto 1fr;gap:0.9rem;align-items:start;padding:0.9rem 0;border-bottom:1px dashed var(--rule)}
+.beat:last-child{border-bottom:0}
+.beat-num{background:var(--beat);color:#FFF;width:2.1rem;height:2.1rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.85rem}
+.beat-num.hero{background:var(--accent)}
+.beat-content .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--beat);font-weight:600;margin-bottom:0.25rem;display:flex;gap:0.7rem;align-items:baseline}
+.beat-content .label.hero{color:var(--accent)}
+.beat-content .label .secs{color:var(--ink-soft);font-weight:400;font-style:italic}
+.beat-content .text{font-size:1.04rem;line-height:1.55;margin:0.2rem 0}
+.beat-content .text em.key{background:var(--success-soft);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:600;color:var(--success)}
+.beat-content .text em.num{background:var(--highlight);font-style:normal;padding:0 0.18em;border-radius:2px;font-weight:700;color:var(--accent)}
+.beat-content .text em.kept{color:var(--kept);font-style:normal;font-weight:600}
+.beat-content .text em.dropped{color:var(--dropped);font-style:normal;font-weight:600}
+.beat-content .text em.recover{color:var(--recovered);font-style:normal;font-weight:600}
+.beat-content .micro{margin-top:0.4rem;font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Reframe */
+.reframe{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin:0.9rem 0}
+.reframe .col{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:0.85rem 1.05rem}
+.reframe .col h4{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.4rem;font-weight:700}
+.reframe .col.bad h4{color:var(--accent)}
+.reframe .col.bad{border-left:3px solid var(--accent)}
+.reframe .col.good h4{color:var(--success)}
+.reframe .col.good{border-left:3px solid var(--success)}
+.reframe .col p{font-size:0.9rem;margin:0.35rem 0;color:var(--ink-soft);line-height:1.45;font-style:italic}
+.reframe .col p strong{color:var(--ink);font-style:normal}
+.reframe .col .verdict{margin-top:0.55rem;font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;font-weight:600;font-style:normal}
+.reframe .col.bad .verdict{color:var(--accent)}
+.reframe .col.good .verdict{color:var(--success)}
+/* Reserved numbers */
+.reserved{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:1rem 0}
+.reserved h4{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.7rem;color:var(--accent);font-weight:700}
+.reserved-rows{display:grid;grid-template-columns:auto 1fr auto;gap:0.6rem 0.9rem;font-family:"Iowan Old Style",Georgia,serif;align-items:center}
+.reserved-rows .label{font-family:"Inter",system-ui,sans-serif;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:600}
+.reserved-rows .desc{font-size:0.93rem;color:var(--ink-soft);font-style:italic}
+.reserved-rows .num{font-weight:700;color:var(--accent);font-feature-settings:"tnum";font-size:1.02rem;text-align:right}
+.reserved-rows .row-sep{grid-column:1 / -1;border-top:1px dashed var(--rule);height:0;margin:0.1rem 0}
+/* BIO counter */
+.bio-counter{display:flex;align-items:center;justify-content:center;gap:1rem;background:var(--beat-soft);border:1px solid var(--rule);border-radius:5px;padding:0.8rem 1rem;margin:1rem 0;font-family:"Iowan Old Style",Georgia,serif;font-size:0.95rem}
+.bio-counter .term{font-weight:700;color:var(--beat);font-feature-settings:"tnum";font-size:1.05rem}
+.bio-counter .op{color:var(--accent);font-weight:700}
+.bio-counter .eq{color:var(--accent);font-weight:700;margin-left:0.4rem}
+.bio-counter .total{background:var(--highlight);padding:0.15em 0.6em;border-radius:3px;font-weight:700;color:var(--accent);font-feature-settings:"tnum"}
+/* Hero line */
+.hero-line{background:var(--highlight);border:2px solid var(--accent);border-radius:6px;padding:1.2rem 1.4rem;margin:1.3rem 0;text-align:center;font-family:"Iowan Old Style",Georgia,serif;font-size:1.12rem;line-height:1.55;font-weight:500}
+.hero-line .label{display:block;font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:600;margin-bottom:0.4rem}
+/* Attack */
+.attack{background:#FFF;border:1px solid var(--rule);padding:1rem 1.3rem 0.8rem;margin:1rem 0;border-radius:4px}
+.attack .q{font-family:"Inter",system-ui,sans-serif;font-weight:600;font-size:0.95rem;color:var(--accent);margin-bottom:0.5rem}
+.attack .a{margin:0.4rem 0 0.6rem;font-size:1.03rem}
+.attack .micro{font-size:0.85rem;color:var(--ink-soft);font-style:italic}
+/* Recovery diagram */
+.recovery{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:0.9rem 0}
+.recovery h4{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.6rem;color:var(--ink-soft);font-weight:700}
+.recovery-row{display:grid;grid-template-columns:7rem auto 1fr;gap:0.5rem;align-items:center;padding:0.4rem 0;border-bottom:1px dashed var(--rule);font-size:0.92rem}
+.recovery-row:last-child{border:0}
+.recovery-row .from{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;font-weight:600;color:var(--dropped);background:var(--dropped-soft);padding:0.18em 0.5em;border-radius:3px;text-align:center}
+.recovery-row .arrow{color:var(--accent);font-weight:700;text-align:center}
+.recovery-row .to{font-size:0.93rem;color:var(--ink-soft)}
+.recovery-row .to strong{color:var(--recovered);font-weight:600}
+/* Table-walk diagram */
+.walk{background:#FFF;border:1px solid var(--rule);border-radius:5px;padding:1rem 1.2rem;margin:0.8rem 0}
+.walk h4{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.5rem;color:var(--ink-soft);font-weight:700}
+.walk-row{display:grid;grid-template-columns:auto 1fr;gap:0.6rem;align-items:start;padding:0.3rem 0;font-size:0.9rem}
+.walk-row .step{background:var(--beat);color:#FFF;font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;font-weight:700;padding:0.15em 0.5em;border-radius:3px}
+.walk-row .step.hero{background:var(--accent)}
+/* Timer */
+.timer-box{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.3rem;margin:1.3rem 0;text-align:center}
+.timer-display{font-family:"JetBrains Mono","SF Mono",monospace;font-size:2.6rem;font-weight:700;color:var(--accent);margin:0.3rem 0;font-feature-settings:"tnum"}
+.timer-buttons{display:flex;gap:0.6rem;justify-content:center;margin-top:0.7rem;flex-wrap:wrap}
+.timer-buttons button{font-family:"Inter",system-ui,sans-serif;font-size:0.92rem;font-weight:600;padding:0.55rem 1.3rem;border:1px solid var(--accent);background:var(--accent);color:#FFF;border-radius:4px;cursor:pointer;transition:background 120ms}
+.timer-buttons button:hover{background:var(--accent-soft)}
+.timer-buttons button.secondary{background:#FFF;color:var(--accent)}
+.timer-buttons button.secondary:hover{background:#FBFAF7}
+.timer-verdict{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin-top:0.7rem;min-height:1.4rem;font-weight:600}
+.timer-verdict.win{color:var(--success)}
+.timer-verdict.over{color:var(--warn)}
+/* Quiz */
+.quiz{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem;margin:1.4rem 0}
+.quiz h4{font-family:"Inter",system-ui,sans-serif;font-size:0.95rem;margin:0 0 0.8rem;color:var(--accent)}
+.quiz .qstem{font-size:1.02rem;margin-bottom:0.7rem}
+.choices{list-style:none;padding:0;margin:0}
+.choices li{margin:0.45rem 0;padding:0.55rem 0.8rem;border:1px solid var(--rule);border-radius:4px;cursor:pointer;background:#FBFAF7;font-size:0.98rem;transition:background 120ms,border-color 120ms}
+.choices li:hover{background:#F5EFE2;border-color:var(--accent-soft)}
+.choices li.right{background:var(--success-soft);border-color:var(--success);color:var(--success)}
+.choices li.wrong{background:#F5E4E4;border-color:var(--accent);color:var(--accent)}
+.choices li.locked{pointer-events:none;opacity:0.85}
+.feedback{font-family:"Inter",system-ui,sans-serif;font-size:0.93rem;margin-top:0.7rem;color:var(--ink-soft);min-height:1.2rem;font-style:italic}
+/* Followup */
+.followup{background:#FFF;border:1px solid var(--rule);border-radius:6px;padding:1.4rem 1.6rem;margin-top:2.4rem;border-left:3px solid var(--beat)}
+.followup ul{margin:0.6rem 0 0 1.1rem}
+.followup li{margin:0.45rem 0;font-size:1rem}
+.bottom{font-family:"Inter",system-ui,sans-serif;font-size:0.85rem;color:var(--ink-soft);border-top:1px solid var(--rule);padding-top:1.2rem;margin-top:3rem;font-style:italic}
+/* Cite */
+.cite{font-family:"Inter",system-ui,sans-serif;font-size:0.78rem;color:var(--ink-soft);margin-top:0.3rem}
+.cite a{color:var(--accent);text-decoration:none;border-bottom:1px dotted var(--accent-soft)}
+.cite a:hover{border-bottom:1px solid var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="eyebrow">Lesson 12 · Slide 10</div>
+<h1>The grounded 8-entity schema — Contribution 1</h1>
+<div class="subtitle">The first contribution slide. The skill: turning "we dropped 18 of 26 entities" — which sounds like a weakening — into a strengthening claim, by routing every dropped entity through a downstream recovery path. The reframe is the entire defence.</div>
+
+<div class="meta">
+<span><strong>Slide:</strong> 10 of 22</span>
+<span><strong>Target time:</strong> 100 seconds</span>
+<span><strong>Hero line:</strong> "Reduction is a strengthening — every label has ground truth"</span>
+<span><strong>Reserved cards:</strong> 80 % threshold · Nov 2025 pilot · EVENT_TYPE at 58 % · 17 BIO labels</span>
+</div>
+
+<h2>1 · Where this slide sits in the arc</h2>
+
+<p>Slide 9 pre-stamped the methodology — every contribution that follows now inherits design-science legitimacy. Slide 10 is the <strong>first contribution slide</strong>, the <em>schema loop</em> from slide 9 unfolded with its own evidence. The panel is no longer asking "is this a real problem?"; they're now asking "is this contribution principled?". Slide 10's job is to convert <em>"we dropped 18 entities"</em> — which sounds like a contribution weakened — into <em>"we retained only labels with verifiable ground truth"</em> — which is a strengthening.</p>
+
+<div class="callout beat">
+<strong>The function of slide 10.</strong> It answers RQ1 — the entity schema. It also establishes a rhetorical pattern that will be reused on slides 11–14: every contribution begins with a measurement (here, the grounding pilot), follows with a principled reduction (here, 26 → 8), and ends with a recovery story (here, the dropped types are not lost — they are recovered downstream via the KB and the taxonomy classifier). The pattern is: <em>measure → reduce → recover.</em>
+</div>
+
+<h3>What the panel walks in with</h3>
+<ul>
+<li><strong>The proposal's 26 entities.</strong> They read your proposal six months ago; they expect 26. The first thing they see on this slide is "8 retained."</li>
+<li><strong>Suspicion that you scoped down.</strong> A reduction from 26 to 8 looks, at first glance, like the contribution shrank by 70 %.</li>
+<li><strong>Implicit benchmark.</strong> Most NER papers report on 4–7 entity types. 26 is unusually ambitious; 8 is in the normal range.</li>
+</ul>
+
+<p>Beat 4 — the hero reframe — turns each of those three priors into an argument <em>for</em> the new schema. Don't apologise for the reduction; recast it.</p>
+
+<h2>2 · What's on the slide</h2>
+
+<div class="slide-mock">
+<div class="badge">Slide 10</div>
+<div class="title">Entity schema — eight grounded entity types</div>
+<div class="lede">Original proposal: 26 entities. Nov 2025 grounding pilot measured how many could be located <strong>verbatim</strong> in source text. Types below 80 % grounding were dropped.</div>
+<table class="schema-table">
+<thead><tr><th>Group</th><th>Retained</th><th>Dropped (recovered downstream)</th></tr></thead>
+<tbody>
+<tr><td class="group">WHO</td><td class="kept">ACTOR, VICTIM</td><td class="dropped">ORGANIZATION <span class="recover">→ KB lookup</span></td></tr>
+<tr><td class="group">WHAT</td><td class="kept">ACTION</td><td class="dropped">EVENT_TYPE <span class="recover">→ taxonomy classifier</span></td></tr>
+<tr><td class="group">WHEN</td><td class="kept">DATE</td><td class="dropped">TIME, DURATION, FREQUENCY</td></tr>
+<tr><td class="group">WHERE</td><td class="kept">REGION, CITY, DISTRICT</td><td class="dropped">COUNTRY <span class="recover">→ KB lookup</span></td></tr>
+<tr><td class="group">HOW</td><td class="kept">CASUALTIES</td><td class="dropped">INJURED, DISPLACEMENT, DAMAGE</td></tr>
+<tr><td class="group">WHY</td><td class="kept">— (none supervised)</td><td class="dropped">MOTIVE, TRIGGER <span class="recover">→ noted as future work</span></td></tr>
+</tbody>
+</table>
+<div class="schema-summary"><span>8 entities → 17 BIO labels.</span><span>Every type reliably supervisable.</span></div>
+</div>
+
+<p>The table has three columns. The <em>retained</em> column (green in your eyes) is the supervised schema — what the BERT model actually learns to tag. The <em>dropped</em> column (italic) is the schema that didn't survive the pilot. The arrows show that the dropped entities are <em>not abandoned</em>; they are routed to a downstream component that can handle them more reliably than a noisy NER head.</p>
+
+<h3>The arithmetic on the bottom row</h3>
+<div class="bio-counter">
+<span class="term">8 entities</span>
+<span class="op">×</span>
+<span class="term">2 (B-, I-)</span>
+<span class="op">+</span>
+<span class="term">1 (O)</span>
+<span class="eq">=</span>
+<span class="total">17 BIO labels</span>
+</div>
+<p style="font-size:0.94rem;color:var(--ink-soft);margin-top:-0.3rem">Every entity becomes two labels in <code>B-I-O</code> encoding (Beginning, Inside, Outside). Plus the single Outside-of-any-entity label. That's the number the model's classification head actually outputs. If a panellist asks "why 17?", that's the arithmetic — be ready to say it cleanly.</p>
+
+<h2>3 · The 100-second script, in four beats</h2>
+
+<div class="beat-script">
+
+<div class="beat">
+<div class="beat-num">1</div>
+<div class="beat-content">
+<div class="label">Beat 1 — name the RQ, set the original target <span class="secs">~15 seconds</span></div>
+<div class="text">"<em class="key">RQ1 — the schema.</em> The original proposal called for <em class="num">twenty-six entity types</em> — everything an analyst might care about: motive, intent, organisation, duration, weapons, geographic descriptors. Before committing the training compute, I needed to know which of those could actually be supervised."</div>
+<div class="micro">Open by naming the RQ. The panel knows the proposal had 26 — saying it first removes the surprise. The framing "before committing the training compute" signals this was a planned validation step, not a retrospective excuse.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">2</div>
+<div class="beat-content">
+<div class="label">Beat 2 — the grounding pilot <span class="secs">~30 seconds</span></div>
+<div class="text">"In <em class="num">November 2025</em>, I ran what I called a <em class="key">grounding pilot</em>. A sample of articles was hand-annotated, and for each entity type I measured the fraction that could be located <em class="key">verbatim</em> in the source text — that is, a phrase the annotator could point at, not a category they had to <em>infer</em>. Types below <em class="num">eighty percent</em> grounding were dropped from the supervised schema. The reasoning: training on inferred labels would introduce systematic noise, because two annotators infer differently for the same article."</div>
+<div class="micro">"Verbatim" is the load-bearing word. Slow down on it. The contrast "point at, not infer" is the operational distinction that makes the threshold defensible. This beat introduces the new term ("grounding pilot") — say it as if it's a recognised technique, because by the time you're using it as a noun, it is.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num">3</div>
+<div class="beat-content">
+<div class="label">Beat 3 — walk the table, kept then recovered <span class="secs">~35 seconds</span></div>
+<div class="text">"What remained were <em class="kept">eight entities</em>, in the left column: ACTOR, VICTIM, ACTION, DATE, REGION, CITY, DISTRICT, CASUALTIES. In BIO encoding, that's <em class="num">seventeen labels</em>. The dropped types on the right are <em class="recover">not lost</em> — they're recovered downstream. <em class="dropped">EVENT_TYPE</em> is reconstructed by the <em class="recover">taxonomy classifier</em> from the action verb plus context. <em class="dropped">COUNTRY</em> is recovered by a <em class="recover">knowledge-base lookup</em> from the most specific WHERE entity. So we get eight clean training signals plus two free downstream entities."</div>
+<div class="micro">Walk the table vertically — left column first (the 8 retained, said as a fluent list), then the recovery story for the two most-asked-about drops (EVENT_TYPE and COUNTRY). Don't enumerate every dropped type — that wastes time. Concede the WHY drops (MOTIVE, TRIGGER) only if asked; they're noted as future work.</div>
+</div>
+</div>
+
+<div class="beat">
+<div class="beat-num hero">4</div>
+<div class="beat-content">
+<div class="label hero">Beat 4 — the hero reframe <span class="secs">~20 seconds</span></div>
+<div class="text">"That trade — fewer entities, but every one with a <em class="key">verifiable ground-truth signal</em> — was the single most consequential methodological choice of the thesis. The schema didn't get smaller as a concession. It got <em class="key">trustworthy</em>."</div>
+<div class="micro">This is the slide's hero line. The pivot is the phrase "didn't get smaller as a concession — it got trustworthy". That reframe converts the apparent loss (18 entities gone) into the gain (every retained label is auditable). Pause before "trustworthy" — let it land. This sentence is what the panel will remember from slide 10.</div>
+</div>
+</div>
+
+</div>
+
+<h2>4 · The grounded-reduction reframe — the core skill</h2>
+
+<p>Slide 10's central craft skill is the <strong>grounded-reduction reframe</strong>: when a contribution looks smaller than what was proposed, recast the reduction as a <em>strengthening of the remaining signal</em>. This pattern works whenever you scoped down for a measurable reason. It is the rhetorical move that prevents the panel from reading scope reduction as weakness.</p>
+
+<div class="reframe">
+<div class="col bad">
+<h4>How it sounds if you apologise</h4>
+<p>"We <strong>had to drop</strong> eighteen entities because they were too hard."</p>
+<p>"The schema is <strong>narrower than the proposal</strong>."</p>
+<p>"MOTIVE and TRIGGER <strong>didn't work out</strong>."</p>
+<div class="verdict">→ Reads as: contribution shrank by 70 %.</div>
+</div>
+<div class="col good">
+<h4>How the reframe sounds</h4>
+<p>"The pilot <strong>measured grounding</strong>; types below 80 % were routed elsewhere."</p>
+<p>"Every retained label has a <strong>verifiable ground-truth signal</strong>."</p>
+<p>"Dropped types are <strong>recovered downstream</strong> by KB lookup or the taxonomy classifier."</p>
+<div class="verdict">→ Reads as: schema got more trustworthy, and the system still covers what was proposed.</div>
+</div>
+</div>
+
+<div class="callout warn">
+<strong>The trap.</strong> Words that collapse the frame: <em>"unfortunately"</em>, <em>"we couldn't"</em>, <em>"had to drop"</em>, <em>"too noisy"</em>, <em>"didn't work"</em>. Each of these signals concession. Replace with measurement language: <em>"the pilot measured"</em>, <em>"the grounding rate was"</em>, <em>"the threshold routed"</em>. Reduction described as <em>routing</em>, not <em>losing</em>, is the reframe in one word.
+</div>
+
+<h3>Where dropped entities go — the recovery diagram</h3>
+
+<div class="recovery">
+<h4>What "recovered downstream" means concretely</h4>
+<div class="recovery-row"><span class="from">EVENT_TYPE</span><span class="arrow">→</span><span class="to"><strong>Taxonomy classifier</strong> at the segment level, fed by the ACTION verb plus context. Section 4.3 / slide 17.</span></div>
+<div class="recovery-row"><span class="from">COUNTRY</span><span class="arrow">→</span><span class="to"><strong>KB lookup</strong> from the most-specific WHERE entity (CITY → DISTRICT → REGION → COUNTRY). Section 4.5 / slide 22.</span></div>
+<div class="recovery-row"><span class="from">ORGANIZATION</span><span class="arrow">→</span><span class="to"><strong>KB lookup</strong> against the curated 150-armed-group list, anchored on the ACTOR span. Section 4.5 / slide 22.</span></div>
+<div class="recovery-row"><span class="from">MOTIVE, TRIGGER</span><span class="arrow">→</span><span class="to">Conceded as a <strong>future-work item</strong>. Not recoverable from text alone with current methods; requires causal inference layered on top of the extraction.</span></div>
+</div>
+
+<p>The recovery story is what closes the reframe. Without it, "we dropped 18" still sounds like loss. With it, "we routed 18 entities to higher-precision pathways" sounds like architectural decomposition. <strong>Decomposition</strong>, not <em>deletion</em>, is the operative word.</p>
+
+<h2>5 · The reserved numbers</h2>
+
+<p>The slide itself shows only the table and the bottom-row summary. Five specific numbers are kept in your pocket — to deploy <em>only if a panellist presses</em>. Listing them on the live slide would over-claim; withholding them and deploying them on demand signals you have the evidence and chose the cleanest presentation.</p>
+
+<div class="reserved">
+<h4>Reserved evidence — bring out only if asked</h4>
+<div class="reserved-rows">
+<div class="label">Pilot date</div>
+<div class="desc">When the grounding measurement was run</div>
+<div class="num">November 2025</div>
+<div class="row-sep"></div>
+<div class="label">Threshold</div>
+<div class="desc">Grounding-rate cutoff for inclusion in the supervised schema</div>
+<div class="num">80 %</div>
+<div class="row-sep"></div>
+<div class="label">Schema size</div>
+<div class="desc">Proposal → after the pilot</div>
+<div class="num">26 → 8</div>
+<div class="row-sep"></div>
+<div class="label">BIO labels</div>
+<div class="desc">What the classification head actually outputs</div>
+<div class="num">17</div>
+<div class="row-sep"></div>
+<div class="label">EVENT_TYPE grounding</div>
+<div class="desc">The pilot's most-cited drop — only 58 % verbatim</div>
+<div class="num">58 %</div>
+</div>
+</div>
+
+<h3>The deployment rule</h3>
+<ul>
+<li><strong>Default delivery:</strong> name the pilot, name the 80 % threshold, name 26 → 8 and 17. Stop there.</li>
+<li><strong>If a panellist asks "why eighty percent?"</strong> Deploy the elbow argument: <em>"the grounding-rate distribution clustered above eighty percent or below sixty; little fell in between. Eighty was the elbow."</em></li>
+<li><strong>If a panellist asks "what was the worst case?"</strong> Deploy EVENT_TYPE at 58 % grounding — <em>"the analyst could only point at a verbatim event-type label in fifty-eight percent of articles. The other forty-two percent were inferred. That's why EVENT_TYPE is reconstructed by the taxonomy classifier, not the NER head."</em></li>
+<li><strong>If a panellist asks "what about MOTIVE?"</strong> Concede cleanly: <em>"MOTIVE was the worst offender — the motive of an attack is almost never written in the article; analysts infer it from prior knowledge of the actor. It's noted as a future-work item; causal inference on top of extraction is the next layer."</em></li>
+</ul>
+
+<div class="callout">
+<strong>Why withhold the 58 % number on the live slide?</strong> Same logic as slide 9's reserved numbers. The slide is about the <em>contribution</em> — the 8 grounded entities. Listing every entity's grounding rate would shift attention from "is this schema principled?" to "is EVENT_TYPE really 58 %?". Reserve the per-entity numbers; deploy them on demand to show the methodology had the data behind it.
+</div>
+
+<h2>6 · How to walk the table on stage</h2>
+
+<p>The slide has six rows. Reading every row at one beat per row burns 30+ seconds and loses the panel. The walk technique:</p>
+
+<div class="walk">
+<h4>The vertical walk — left column as a list, recovery as a story</h4>
+<div class="walk-row"><span class="step">1</span><span>Read the <em>retained</em> column top to bottom as one fluent list, with category names suppressed: <strong>"ACTOR, VICTIM, ACTION, DATE, REGION, CITY, DISTRICT, CASUALTIES."</strong> Eight names, said as one phrase.</span></div>
+<div class="walk-row"><span class="step">2</span><span>Pause. State the <strong>"17 BIO labels"</strong> bottom-row number — that's the model's actual output count.</span></div>
+<div class="walk-row"><span class="step">3</span><span>Pick the <em>two most defensible</em> recoveries — <strong>EVENT_TYPE → taxonomy</strong>, <strong>COUNTRY → KB</strong>. Name each in one sentence. Don't enumerate every dropped entity.</span></div>
+<div class="walk-row"><span class="step hero">4</span><span>Land the hero reframe. <em>"Fewer entities, but every one with verifiable ground truth — the schema didn't get smaller, it got trustworthy."</em></span></div>
+</div>
+
+<p style="font-size:0.94rem;color:var(--ink-soft)">If the panel wants the per-row detail, they will ask. The table itself stays on screen for the entire 100 seconds; they can read it themselves. Your job on stage is to give them the <em>structure</em>, not the contents.</p>
+
+<h2>7 · Three pre-loaded interrupts</h2>
+
+<div class="attack">
+<div class="q">"You reduced the schema from 26 to 8 — isn't that a weakening of the contribution?"</div>
+<div class="a">"It's a strengthening. The proposal's 26 entities included types the analyst infers from context — MOTIVE, INTENT, ORGANIZATION sub-types — rather than reads from the article. Training a model on inferred labels introduces systematic noise, because two annotators infer differently. The grounding pilot in November measured this; types below eighty percent verbatim grounding were routed elsewhere. EVENT_TYPE goes to the taxonomy classifier. COUNTRY and ORGANIZATION go to the KB. Every retained label has verifiable ground truth — that's why the trained model is auditable. The schema isn't narrower; it's <em>decomposed</em>."</div>
+<div class="micro">The key sentence: <em>"the schema isn't narrower; it's decomposed."</em> That word — decomposed — is the one-word reframe. Use it.</div>
+</div>
+
+<div class="attack">
+<div class="q">"How did you choose the eighty-percent threshold? It seems arbitrary."</div>
+<div class="a">"The threshold is the elbow of the grounding-rate distribution. When I plotted the per-entity grounding rates from the pilot, types clustered above eighty percent or below sixty percent — there was very little in between. Eighty was the natural cutoff in the data, not a value imposed before the pilot. It's reported as a design parameter rather than a discovered constant — if a future replication finds the elbow elsewhere, the methodology is unchanged, only the retained set shifts."</div>
+<div class="micro">Two-part move: (1) the elbow argument grounds the number in the data; (2) "design parameter, not discovered constant" pre-empts the "what if I disagree with eighty?" follow-up. The methodology is robust to the threshold.</div>
+</div>
+
+<div class="attack">
+<div class="q">"What about MOTIVE? Surely the motive of a violent event matters to the analyst."</div>
+<div class="a">"It matters, and we don't pretend otherwise. The MOTIVE entity is almost never written verbatim in the article — analysts infer it from prior knowledge of the actor, the location, the political context. Training a BERT head on that inference would have been training on noise. So MOTIVE is conceded as a future-work item — natural-language QA layered on the extraction output, or a causal-inference component on top of the actor and action entities. The next layer of the architecture, not this layer."</div>
+<div class="micro">Concede cleanly. Don't pretend MOTIVE can be recovered from the current architecture. The honest answer — <em>"the next layer, not this layer"</em> — preserves credibility for everything else on the slide.</div>
+</div>
+
+<h2>8 · The hero close</h2>
+
+<div class="hero-line">
+<span class="label">The hero line — memorise verbatim</span>
+"Fewer entities, but every one with verifiable ground truth. The schema didn't get smaller as a concession — it got trustworthy."
+</div>
+
+<h3>Why this line is the hero</h3>
+<ul>
+<li><strong>"Didn't get smaller as a concession"</strong> directly names and refuses the framing the panel is most likely to bring. Naming an objection inside your own sentence neutralises it.</li>
+<li><strong>"It got trustworthy"</strong> closes on the operational value. "Trustworthy" is the word an analyst — or a panel member thinking about an analyst — actually wants to hear about a model.</li>
+<li><strong>Verifiable ground truth</strong> is the inheritance from slide 9's "measurement, not preference" hinge. The audit-ability claim doesn't appear from nowhere; it's the design-science loop closing on this specific contribution.</li>
+<li><strong>Internally consistent.</strong> Slide 4 framed analyst work as operational. Slide 7 framed gaps operationally. Slide 9 framed iteration empirically. Slide 10 frames the schema reduction as <em>trustworthiness</em>. The deck's posture stays consistent: external-evidence words, not internal-feeling words.</li>
+</ul>
+
+<h2>9 · Timed practice</h2>
+
+<p>Four beats, ~100 seconds. Target window: 90–115 seconds with proper pacing on Beat 2 (the pilot story) and on the hero reframe.</p>
+
+<div class="timer-box">
+<div class="timer-display" id="timer">0.0 s</div>
+<div class="timer-buttons">
+<button id="startBtn">Start (begin "RQ1 — the schema")</button>
+<button id="stopBtn" class="secondary" disabled>Stop (after "it got trustworthy")</button>
+<button id="resetBtn" class="secondary">Reset</button>
+</div>
+<div class="timer-verdict" id="verdict"></div>
+</div>
+
+<div class="callout">
+<strong>The harder rep — the "apology" test.</strong> Run Beat 3 (the table walk) and Beat 4 (the hero reframe) without any of these words: <em>"unfortunately"</em>, <em>"only"</em>, <em>"just"</em>, <em>"had to"</em>, <em>"we couldn't"</em>, <em>"didn't work"</em>, <em>"too hard"</em>. Each of those is a concession signal. Re-run the rep until every one of them is gone from your delivery.
+</div>
+
+<h2>10 · Quiz</h2>
+
+<div class="quiz" id="quiz1">
+<h4>Q1. The panel asks: "Isn't reducing from 26 entities to 8 a weakening of the contribution?"</h4>
+<p class="qstem">Pick the strongest response.</p>
+<ul class="choices" data-answer="c">
+<li data-key="a">"Yes, but the eight remaining entities cover the most important 5W1H slots."</li>
+<li data-key="b">"The reduction was unavoidable — eighteen of the original entities turned out to be too noisy to train on."</li>
+<li data-key="c">"It's a strengthening. The pilot routed types below eighty-percent grounding to higher-precision pathways — EVENT_TYPE to the taxonomy classifier, COUNTRY to the KB — so every retained label has verifiable ground truth. The schema isn't narrower; it's decomposed."</li>
+<li data-key="d">"We're considering adding more entities in future work to address this concern."</li>
+</ul>
+<p class="feedback" id="fb1"></p>
+</div>
+
+<div class="quiz" id="quiz2">
+<h4>Q2. Why is the live slide delivered <em>without</em> citing the 58 % EVENT_TYPE grounding rate?</h4>
+<p class="qstem">Pick the strongest reason.</p>
+<ul class="choices" data-answer="b">
+<li data-key="a">Because 58 % is too damaging to cite publicly.</li>
+<li data-key="b">The slide is about the <em>contribution</em> (the 8 grounded entities); listing per-entity grounding rates would shift panel attention to "is 58 % really that low?" instead of "is this schema principled?". Reserving the number lets you deploy it on demand and signals the pilot had richer evidence than shown.</li>
+<li data-key="c">Per-entity numbers don't belong in defence presentations.</li>
+<li data-key="d">The 58 % figure is reported on a later slide instead.</li>
+</ul>
+<p class="feedback" id="fb2"></p>
+</div>
+
+<div class="quiz" id="quiz3">
+<h4>Q3. The slide says "8 entities → 17 BIO labels." Where does 17 come from?</h4>
+<p class="qstem">Pick the correct arithmetic.</p>
+<ul class="choices" data-answer="a">
+<li data-key="a">8 × 2 (B- and I- per entity) + 1 (the single O label) = 17.</li>
+<li data-key="b">8 + 9 padding labels for class balance = 17.</li>
+<li data-key="c">The original 26 minus 9 future-work items = 17.</li>
+<li data-key="d">17 is the BERT tokeniser's default label count.</li>
+</ul>
+<p class="feedback" id="fb3"></p>
+</div>
+
+<div class="quiz" id="quiz4">
+<h4>Q4. The panel asks: "How did you choose eighty percent as the threshold?"</h4>
+<p class="qstem">Pick the strongest response.</p>
+<ul class="choices" data-answer="d">
+<li data-key="a">"It's a standard threshold in the NER literature."</li>
+<li data-key="b">"Eighty percent felt like a reasonable cutoff."</li>
+<li data-key="c">"We tried several thresholds and eighty was the best for our metrics."</li>
+<li data-key="d">"The threshold is the elbow of the grounding-rate distribution — types clustered above eighty or below sixty, with little in between. It's reported as a design parameter, not a discovered constant; if a future replication finds the elbow elsewhere, the methodology is unchanged."</li>
+</ul>
+<p class="feedback" id="fb4"></p>
+</div>
+
+<div class="followup">
+<strong>Ask your teacher follow-up questions.</strong>
+<ul>
+<li>Want a 60-second compressed delivery for if you're running behind?</li>
+<li>Want to drill the recovery story for ORGANIZATION (the KB-lookup path) until it's reflex?</li>
+<li>Want a one-page diagram of the grounding pilot protocol for if a methodology purist presses on how the pilot was constructed?</li>
+<li>Want to rehearse fielding the "but MOTIVE is the most interesting one" attack under interruption?</li>
+</ul>
+<p class="cite">References: <a href="../../thesis/thesis.md">thesis.md</a> §3.2 (entity schema), §4.3 (taxonomy classifier), §4.5 (KB enrichment); <a href="../../concepts_explained.md">concepts_explained.md</a> §2 (BIO encoding); <a href="../../qa_kit.md">qa_kit.md</a> Q1, Q15 (schema reduction defence).</p>
+</div>
+
+<div class="bottom">Lesson 12 of the slide drill. Next up — slide 11: contribution 2, the corpus and knowledge base (the diversity-sampled 50k dataset plus the curated 150-armed-group KB).</div>
+
+</div>
+
+<script>
+// Timer
+(function(){
+  const display=document.getElementById('timer');
+  const startBtn=document.getElementById('startBtn');
+  const stopBtn=document.getElementById('stopBtn');
+  const resetBtn=document.getElementById('resetBtn');
+  const verdict=document.getElementById('verdict');
+  let raf=null, t0=0;
+  function tick(){const t=(performance.now()-t0)/1000;display.textContent=t.toFixed(1)+' s';raf=requestAnimationFrame(tick)}
+  startBtn.onclick=()=>{cancelAnimationFrame(raf);t0=performance.now();raf=requestAnimationFrame(tick);startBtn.disabled=true;stopBtn.disabled=false;verdict.textContent='';verdict.className='timer-verdict'};
+  stopBtn.onclick=()=>{cancelAnimationFrame(raf);const t=(performance.now()-t0)/1000;display.textContent=t.toFixed(1)+' s';startBtn.disabled=false;stopBtn.disabled=true;
+    if(t<80){verdict.textContent='Too fast — the table walk needs space. Slow down on the eight retained entities and on the hero reframe.';verdict.className='timer-verdict over'}
+    else if(t<=120){verdict.textContent='Inside the window. The reframe landed.';verdict.className='timer-verdict win'}
+    else{verdict.textContent='Over time — tighten Beat 3. Read the kept column as one fluent list; pick only two recoveries to name.';verdict.className='timer-verdict over'}};
+  resetBtn.onclick=()=>{cancelAnimationFrame(raf);display.textContent='0.0 s';startBtn.disabled=false;stopBtn.disabled=true;verdict.textContent='';verdict.className='timer-verdict'};
+})();
+// Quizzes
+document.querySelectorAll('.quiz').forEach(quiz=>{
+  const ul=quiz.querySelector('.choices');
+  const answer=ul.dataset.answer;
+  const fb=quiz.querySelector('.feedback');
+  const fbMap={
+    quiz1:{
+      c:'Yes. The "decomposed, not narrower" reframe + concrete recovery paths (EVENT_TYPE, COUNTRY) refuses the framing of the question while showing the architecture covers what was proposed.',
+      a:'Half-right. "Most important slots" is defensive — it concedes the framing. The reframe should refuse it: the schema is decomposed, not reduced.',
+      b:'"Unavoidable / too noisy" is concession language. The pilot was a deliberate methodological act, not a forced retreat.',
+      d:'Promising future work in answer to a present-tense question is weak — it lets the panel believe the present-tense answer is inadequate.'
+    },
+    quiz2:{
+      b:'Yes. The slide frames the contribution. Per-entity numbers belong on demand. Reserving them signals you have evidence beyond what the slide shows.',
+      a:'No — 58 % is fine to cite when asked. The choice is rhetorical (frame the contribution first), not defensive.',
+      c:'Per-entity numbers absolutely belong — when deployed in answer to a probing question. They just don\'t belong on the contribution-framing slide.',
+      d:'No — the 58 % figure is held in reserve specifically for the schema-reduction defence. It doesn\'t appear elsewhere in the deck.'
+    },
+    quiz3:{
+      a:'Yes. Each entity contributes two BIO labels (B- and I-). Plus the single O label for tokens that are not part of any entity. 8×2 + 1 = 17.',
+      b:'No — there are no padding labels for class balance in BIO encoding.',
+      c:'No — the 17 number arises mechanically from BIO encoding, not from the entity-count history.',
+      d:'No — BERT\'s tokeniser has no opinion on entity label counts; the count comes from the schema.'
+    },
+    quiz4:{
+      d:'Yes. The elbow argument grounds the threshold in the data, and "design parameter, not discovered constant" pre-empts the "I disagree with eighty" follow-up.',
+      a:'Vague. The panel will ask "which standard?". You need the data argument, not an appeal to literature.',
+      b:'"Felt reasonable" is the exact language the slide-9 frame forbids. Internal-feeling words collapse the methodology.',
+      c:'"Best for our metrics" sounds like fitting the threshold to a result, which is data-snooping in their eyes. The elbow argument is upstream of the metrics.'
+    }
+  };
+  ul.querySelectorAll('li').forEach(li=>{
+    li.onclick=()=>{
+      if(li.classList.contains('locked'))return;
+      const key=li.dataset.key;
+      const correct=key===answer;
+      ul.querySelectorAll('li').forEach(x=>x.classList.add('locked'));
+      li.classList.add(correct?'right':'wrong');
+      if(!correct){ul.querySelector('li[data-key="'+answer+'"]').classList.add('right')}
+      fb.textContent=fbMap[quiz.id][key]||'';
+    };
+  });
+});
+</script>
+
+</body>
+</html>

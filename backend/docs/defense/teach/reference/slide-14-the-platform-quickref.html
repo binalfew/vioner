@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Slide 14 Quick Reference — The Platform</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+@page{size:A4;margin:14mm}
+:root{
+  --ink:#1c1916;
+  --ink-soft:#4a4744;
+  --paper:#FFF;
+  --rule:#CFC8B8;
+  --accent:#7B1E1E;
+  --highlight:#F5EBC9;
+  --success:#3F6B3F;
+  --warn:#8B5A2B;
+  --front:#3D6B8B;
+  --svc:#7B5B1E;
+  --core:#7B1E1E;
+  --store:#3F6B3F;
+}
+*{box-sizing:border-box}
+html{font-size:10.5pt}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter",Georgia,serif;line-height:1.42}
+.wrap{max-width:185mm;margin:0 auto;padding:0}
+header{border-bottom:2px solid var(--accent);padding-bottom:6px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline;gap:1rem}
+header h1{font-family:"Iowan Old Style",Georgia,serif;font-size:16pt;font-weight:700;margin:0;letter-spacing:-0.01em}
+header .eye{font-family:"Inter","SF Pro Text",system-ui,sans-serif;font-size:8pt;color:var(--accent);text-transform:uppercase;letter-spacing:0.14em;font-weight:600}
+header .target{font-family:"Inter",sans-serif;font-size:8.5pt;color:var(--ink-soft)}
+.hero{background:var(--highlight);border:1.5px solid var(--accent);border-radius:4px;padding:7px 12px;margin:8px 0;text-align:center;font-size:10.5pt;font-weight:600;font-style:italic;line-height:1.4}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:7mm;margin-top:6px}
+h2{font-family:"Iowan Old Style",Georgia,serif;font-size:10.5pt;margin:8px 0 4px;border-bottom:1px solid var(--rule);padding-bottom:2px;color:var(--accent)}
+h3{font-family:"Inter",sans-serif;font-size:8pt;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);margin:6px 0 3px;font-weight:600}
+p,li{font-size:9.5pt;margin:2px 0}
+ul{margin:2px 0 2px 14px;padding:0}
+ul.tight li{margin:1px 0}
+em.k{background:#FFEFC0;font-style:normal;padding:0 2px;border-radius:2px;font-weight:600;color:var(--accent)}
+em.t{font-family:"JetBrains Mono",monospace;font-style:normal;font-weight:700;color:var(--accent);font-size:8.7pt}
+em.g{color:var(--success);font-style:normal;font-weight:600}
+/* Stack diagram */
+.stack{display:grid;gap:3px;margin:4px 0}
+.layer{display:grid;grid-template-columns:7rem 1fr auto;gap:6px;background:#FAF7F0;border:1px solid var(--rule);border-radius:3px;padding:4px 8px;align-items:center}
+.layer.front{border-left:2.5px solid var(--front)}
+.layer.svc{border-left:2.5px solid var(--svc)}
+.layer.core{border-left:2.5px solid var(--core)}
+.layer.store{border-left:2.5px solid var(--store)}
+.layer .tech{font-family:"JetBrains Mono",monospace;font-size:8.5pt;font-weight:700}
+.layer.front .tech{color:var(--front)}
+.layer.svc .tech{color:var(--svc)}
+.layer.core .tech{color:var(--core)}
+.layer.store .tech{color:var(--store)}
+.layer .role{font-size:8.5pt;color:var(--ink-soft);line-height:1.35}
+.layer .role b{color:var(--ink)}
+.layer .badge{font-family:"Inter",sans-serif;font-size:6pt;text-transform:uppercase;letter-spacing:0.05em;background:#FFF;border:1px solid var(--rule);color:var(--ink-soft);padding:0.15em 0.4em;border-radius:2px;font-weight:700;white-space:nowrap}
+.orchestrate{background:#FFF;border:1px dashed var(--rule);border-radius:3px;padding:4px 8px;font-family:"JetBrains Mono",monospace;font-size:8pt;color:var(--ink-soft);margin-top:3px;text-align:center}
+.orchestrate code{background:#FAF7F0;padding:0 4px;border-radius:2px;font-weight:700;color:var(--accent)}
+/* Beats */
+.beats{margin:3px 0}
+.b{display:grid;grid-template-columns:18px 1fr;gap:6px;padding:3px 0;border-bottom:1px dashed var(--rule);font-size:9pt}
+.b:last-child{border:0}
+.b .n{background:var(--accent);color:#FFF;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-family:"Inter",sans-serif;font-size:7pt;font-weight:700;margin-top:2px}
+.b .t{line-height:1.4}
+.b .t b{color:var(--accent)}
+.b .t .secs{font-family:"Inter",sans-serif;font-size:7pt;color:var(--ink-soft);font-style:italic;letter-spacing:0.04em}
+/* Swap test */
+.swap{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:4px 0}
+.swap .col{background:#FAF7F0;border:1px solid var(--rule);border-radius:3px;padding:5px 8px}
+.swap .col.ok{border-left:2.5px solid var(--success)}
+.swap .col.no{border-left:2.5px solid var(--accent)}
+.swap .col h5{font-family:"Inter",sans-serif;font-size:7pt;text-transform:uppercase;margin:0 0 3px;font-weight:700}
+.swap .col.ok h5{color:var(--success)}
+.swap .col.no h5{color:var(--accent)}
+.swap .col p{font-size:8.5pt;margin:1px 0;line-height:1.35}
+.swap .col p b{color:var(--accent)}
+.swap .col.ok p b{color:var(--success)}
+/* Engineering choices */
+.choice{display:grid;grid-template-columns:5rem 1fr;gap:4px;padding:3px 0;border-bottom:1px dashed var(--rule);font-size:8.7pt;line-height:1.35}
+.choice:last-child{border:0}
+.choice .tech{font-family:"JetBrains Mono",monospace;font-size:8pt;font-weight:700;color:var(--accent)}
+/* Numbers grid */
+.nums{display:grid;grid-template-columns:auto 1fr auto;gap:2px 6px;font-size:8.5pt;margin-top:3px}
+.nums .l{font-family:"Inter",sans-serif;text-transform:uppercase;font-size:6.5pt;letter-spacing:0.05em;color:var(--ink-soft);font-weight:700}
+.nums .d{font-style:italic;color:var(--ink-soft);font-size:8.5pt;line-height:1.3}
+.nums .n{color:var(--accent);font-weight:700;text-align:right;font-feature-settings:"tnum"}
+.nums .sep{grid-column:1 / -1;border-top:1px dashed var(--rule);height:0;margin:1px 0}
+/* Attacks */
+.attack{background:#FAF7F0;border:1px solid var(--rule);border-radius:3px;padding:5px 7px;margin:3px 0;font-size:8.7pt}
+.attack .q{font-family:"Inter",sans-serif;font-size:7.5pt;color:var(--accent);font-weight:700;margin-bottom:2px}
+.attack .a{line-height:1.35}
+/* Engine vs car */
+.analogy{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:4px 0}
+.analogy .col{background:#FAF7F0;border:1px solid var(--rule);border-radius:3px;padding:5px 7px}
+.analogy .col.engine{border-left:2.5px solid var(--warn)}
+.analogy .col.car{border-left:2.5px solid var(--success)}
+.analogy .col h5{font-family:"Inter",sans-serif;font-size:7pt;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 2px;font-weight:700}
+.analogy .col.engine h5{color:var(--warn)}
+.analogy .col.car h5{color:var(--success)}
+.analogy .col p{font-size:8.5pt;margin:0;line-height:1.35}
+footer{margin-top:8px;border-top:1px solid var(--rule);padding-top:4px;font-family:"Inter",sans-serif;font-size:6.5pt;color:var(--ink-soft);display:flex;justify-content:space-between}
+@media print{html{font-size:10pt}.hero{font-size:10pt}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+<div>
+<div class="eye">Slide 14 · Defense quick reference</div>
+<h1>The platform — engineering pragmatism × research integration</h1>
+</div>
+<div class="target">Target: 75 s · Window 65–88 s · Beats: 4</div>
+</header>
+
+<div class="hero">"The research contribution is the integration evaluated end-to-end. Swapping React for Vue would change implementation, not contribution."</div>
+
+<div class="stack">
+<div class="layer front"><span class="tech">React + TS</span><span class="role"><b>Front-end.</b> Pages for inference, events, analytics, KB admin, training.</span><span class="badge">Presentation</span></div>
+<div class="layer svc"><span class="tech">FastAPI</span><span class="role"><b>Service layer.</b> Seven REST API route groups. Model loaded once at startup. ~150 ms / article.</span><span class="badge">Interface</span></div>
+<div class="layer core"><span class="tech">BERT + KB</span><span class="role"><b>In-process core.</b> Model + KB share memory with FastAPI worker. No network hop.</span><span class="badge">Inference</span></div>
+<div class="layer store"><span class="tech">PostgreSQL 16</span><span class="role"><b>Event store.</b> Full-text + JSONB indexing for analyst queries.</span><span class="badge">Persistence</span></div>
+</div>
+
+<div class="orchestrate">Orchestration: <code>docker compose up</code> — one command stands up the whole stack.</div>
+
+<div class="cols">
+<div>
+
+<h2>The 75-second script · four beats</h2>
+<div class="beats">
+<div class="b"><div class="n">1</div><div class="t"><b>Name (~10 s).</b> <em class="k">The platform — the delivery vehicle.</em> Four layers: <em class="t">React/TS</em>, <em class="t">FastAPI</em>, <em class="k">in-process</em> (model + KB), <em class="t">PostgreSQL 16</em>. <em class="t">Docker Compose</em> — <em class="k">one command stands it up</em>.<br><span class="secs">Read layers as a list. Small pause each.</span></div></div>
+<div class="b"><div class="n">2</div><div class="t"><b>Own engineering (~20 s).</b> <em class="k">Four layers is the minimum for clean separation.</em> Monolith faster than service mesh at <em class="k">30 k articles/year</em>. <em class="k">Defend the stack as engineering, not research claims.</em> React for ecosystem · FastAPI for async + PyTorch + OpenAPI · PostgreSQL for FTS + JSONB.<br><span class="secs">Pre-empt the attack with your own framing. One phrase per layer.</span></div></div>
+<div class="b"><div class="n">3</div><div class="t"><b>Integration claim (~25 s).</b> <em class="k">The research contribution is the INTEGRATION evaluated end-to-end.</em> No academic work integrates schema + model + KB + UI in this domain — <em class="k">slide 6 empty cell</em>. <em class="k">§7.3 contribution #5</em>. <em class="k">Swapping React for Vue changes implementation, not contribution.</em><br><span class="secs">"Integration" is load-bearing. Tiny pause before the swap-React line.</span></div></div>
+<div class="b"><div class="n">4</div><div class="t"><b>Pivot (~10 s).</b> <em class="k">Here's what happens end-to-end when an article goes through the system.</em><br><span class="secs">Bridge into slide 15 (worked example).</span></div></div>
+</div>
+
+<h2>The swap test — what changes if you swap?</h2>
+<div class="swap">
+<div class="col ok"><h5>Swap = implementation</h5><p><b>React → Vue.</b> Same UI surface.<br><b>FastAPI → Flask.</b> Same routes.<br><b>PostgreSQL → MySQL.</b> Same shape.<br><b>Compose → K8s.</b> Same stand-up.</p></div>
+<div class="col no"><h5>Swap = contribution</h5><p><b>Schema → 26 ungrounded labels.</b> Loses grounding claim.<br><b>Loss → plain CE.</b> Loses imbalance result.<br><b>KB → ungrounded LLM.</b> Loses validation.<br><b>UI → notebook.</b> Loses UAT evidence.</p></div>
+</div>
+
+<h2>Engineering reasons — one phrase per layer</h2>
+<div class="choice"><span class="tech">React + TS</span><span>Ecosystem + TypeScript support. Lowest-risk for inheritors. <em class="k">No research claim.</em></span></div>
+<div class="choice"><span class="tech">FastAPI</span><span>Async-native + first-class PyTorch + auto OpenAPI. Right shape for a single in-memory model worker.</span></div>
+<div class="choice"><span class="tech">In-process</span><span>No network hop ⇒ KB lookup stays at ~15 % of 150 ms budget. Remote KB ⇒ ~50 ms by itself.</span></div>
+<div class="choice"><span class="tech">PostgreSQL</span><span>FTS + JSONB in one engine. Analytics needs both — country counts and nested 5W1H queries.</span></div>
+<div class="choice"><span class="tech">Compose</span><span>One command. At 30 k articles/year, service mesh = overengineering.</span></div>
+
+</div>
+<div>
+
+<h2>Engine vs car — pocket analogy</h2>
+<div class="analogy">
+<div class="col engine"><h5>Most academic work</h5><p>Hands you an <b>engine</b>: model + F1 numbers. <b>You can't drive it</b> — no UI, no persistence, no orchestration.</p></div>
+<div class="col car"><h5>VioNER</h5><p>Hands you a <b>car</b>: engine (model) + chassis (architecture) + wheels (API) + dashboard (React) + key (<em class="t">compose up</em>). <em class="g">UAT = test drive.</em></p></div>
+</div>
+
+<h2>Pre-loaded interrupts</h2>
+
+<div class="attack">
+<div class="q">Q · "Isn't this just web engineering?"</div>
+<div class="a">Defend the stack as <em class="k">engineering, not research claims</em> — right reading of the parts. <em class="k">The research is the INTEGRATION evaluated end-to-end.</em> Slide 6 empty cell · §7.3 #5 · §6.10 UAT (n=5, 6/6 tasks).</div>
+</div>
+
+<div class="attack">
+<div class="q">Q · "Why monolith?"</div>
+<div class="a">At <em class="k">30 k articles/year</em>, single FastAPI worker holding 110 M-param BERT in memory = faster + simpler than mesh. KB in-memory ⇒ <em class="k">15 % of 150 ms</em>. Remote KB ⇒ ~50 ms by itself. Microservices fit much higher load.</div>
+</div>
+
+<div class="attack">
+<div class="q">Q · "Why React (not Vue)?"</div>
+<div class="a">Ecosystem + TypeScript support — lowest-risk for inheritors. <em class="k">Swap test:</em> React→Vue changes implementation, not contribution. UI being React vs Vue doesn't change the integration claim or whether UAT validates it.</div>
+</div>
+
+<div class="attack">
+<div class="q">Q · "How do you know analysts can use it?"</div>
+<div class="a">F1 doesn't — <em class="k">UAT does</em>. §6.10: <em class="k">n=5</em> (2 EW analysts + 1 academic + 2 NLP devs) · <em class="k">6/6 tasks all completed</em>. Likert 4.6/5 on 5W1H clarity; 4.0/5 on training screen (drove future work). Slide 19 deepens.</div>
+</div>
+
+<h2>Reserved numbers — only if asked</h2>
+<div class="nums">
+<div class="l">~30 k/yr</div><div class="d">Article load — the monolith justification</div><div class="n">scale</div>
+<div class="sep"></div>
+<div class="l">7</div><div class="d">REST API route groups (§5.6)</div><div class="n">groups</div>
+<div class="sep"></div>
+<div class="l">~150 ms</div><div class="d">End-to-end CPU latency · slide 15 deepens with breakdown</div><div class="n">latency</div>
+<div class="sep"></div>
+<div class="l">~15 %</div><div class="d">KB share of latency · justifies in-process</div><div class="n">KB</div>
+<div class="sep"></div>
+<div class="l">n = 5</div><div class="d">UAT: 2 EW analysts + 1 academic + 2 NLP devs (fairness)</div><div class="n">UAT</div>
+<div class="sep"></div>
+<div class="l">6 / 6</div><div class="d">Tasks completed × 5 / 5 participants — all complete</div><div class="n">tasks</div>
+<div class="sep"></div>
+<div class="l">4.6 / 5</div><div class="d">5W1H clarity Likert · slide 19 deepening</div><div class="n">high</div>
+<div class="sep"></div>
+<div class="l">4.0 / 5</div><div class="d">Training screen Likert — lowest item, honest concession</div><div class="n">low</div>
+<div class="sep"></div>
+<div class="l">§5.6</div><div class="d">Architecture · §7.3 contributions · §6.10 UAT</div><div class="n">refs</div>
+</div>
+
+<h2>Honest-middle binary chain</h2>
+<ul class="tight">
+<li><b>Slide 9</b> — measurement, not preference.</li>
+<li><b>Slide 10</b> — decomposed, not narrower.</li>
+<li><b>Slide 11</b> — synthesis, not relabelling.</li>
+<li><b>Slide 12</b> — complementary, not redundant.</li>
+<li><b>Slide 13</b> — active / metadata / mapping (three negatives).</li>
+<li><b>Slide 14</b> — <em class="k">engineering pragmatism (parts) · research integration (whole)</em>. <em>Only two-level binary in the deck.</em></li>
+</ul>
+
+<h2>Delivery traps to avoid</h2>
+<ul class="tight">
+<li>Defending React / FastAPI / PostgreSQL on their <em>individual</em> merits ⇒ now arguing frameworks, not research. Use the swap test instead.</li>
+<li>Claiming research-grade novelty for any single layer ⇒ over-claiming. Each is engineering pragmatism.</li>
+<li>Skipping the slide-6 callback ⇒ "integration is the contribution" becomes assertion not audit reference.</li>
+<li>Deploying the UAT Likert numbers here ⇒ steals slide 19's payoff. Cite §6.10 by reference only.</li>
+<li>Apologetic phrasing about engineering ⇒ "we know this looks like just web dev". Own the framing positively.</li>
+</ul>
+
+</div>
+</div>
+
+<footer>
+<span>VioNER defense — slide 14 quick reference</span>
+<span>Four layers · one command · integration evaluated end-to-end</span>
+</footer>
+
+</div>
+</body>
+</html>

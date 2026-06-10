@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Slide 11 — Four-Level Taxonomy · Quick Reference</title>
+<style>
+:root{
+  --ink:#1c1916;
+  --ink-soft:#3d3935;
+  --paper:#FBFAF7;
+  --rule:#D9D2C5;
+  --accent:#7B1E1E;
+  --kept:#3F6B3F;
+  --highlight:#F5EBC9;
+  --beat:#1A365D;
+  --political:#3D6B8B;
+  --criminal:#8B5A3D;
+  --communal:#5B7D3D;
+  --state:#8B3D5B;
+}
+@page{size:A4;margin:14mm}
+*{box-sizing:border-box}
+html{font-size:13px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Iowan Old Style","Charter","Source Serif Pro",Georgia,serif;line-height:1.45;-webkit-font-smoothing:antialiased}
+.page{max-width:780px;margin:0 auto;padding:18mm 14mm}
+.head{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid var(--accent);padding-bottom:4mm;margin-bottom:6mm}
+.head h1{font-family:"Iowan Old Style",Georgia,serif;font-size:1.7rem;font-weight:700;margin:0;letter-spacing:-0.01em}
+.head .lesson{font-family:"Inter",system-ui,sans-serif;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.14em;color:var(--accent);font-weight:700}
+.hero{background:var(--highlight);border:1.5px solid var(--accent);border-radius:4px;padding:8mm 10mm;margin:0 0 7mm;text-align:center;font-family:"Iowan Old Style",Georgia,serif;font-size:1.04rem;font-weight:500;line-height:1.55}
+.hero .lbl{display:block;font-family:"Inter",system-ui,sans-serif;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);font-weight:700;margin-bottom:2mm}
+h2{font-family:"Iowan Old Style",Georgia,serif;font-size:1rem;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;border-bottom:1px solid var(--rule);padding-bottom:1.5mm;margin:7mm 0 3mm}
+/* Tree */
+.tree-box{background:#FFF;border:1px solid var(--rule);border-radius:4px;padding:5mm 6mm;margin:2mm 0 3mm;text-align:center}
+.tree-level{margin-bottom:2mm}
+.tree-level .lbl{font-family:"Inter",sans-serif;font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--ink-soft);margin-bottom:1mm}
+.tree-row{display:flex;justify-content:center;align-items:flex-start;gap:1mm;flex-wrap:wrap}
+.node{background:#FFF;border:1px solid var(--rule);border-radius:3px;padding:1mm 2mm;font-family:"Inter",sans-serif;font-size:0.72rem;font-weight:600;text-align:center;line-height:1.3}
+.node.root{background:var(--beat);color:#FFF;border-color:var(--beat);font-size:0.8rem;padding:1.5mm 4mm}
+.node.l1.political{border-left:2px solid var(--political);color:var(--political)}
+.node.l1.criminal{border-left:2px solid var(--criminal);color:var(--criminal)}
+.node.l1.communal{border-left:2px solid var(--communal);color:var(--communal)}
+.node.l1.state{border-left:2px solid var(--state);color:var(--state)}
+.node.l2{font-size:0.62rem;font-weight:500;color:var(--ink-soft);padding:0.8mm 1.5mm}
+.node.ext{background:var(--highlight);border-color:var(--accent);color:var(--accent);font-weight:700}
+.l3-box{background:var(--highlight);border:1px dashed var(--accent);border-radius:3px;padding:1.5mm 3mm;display:inline-block;font-family:"Inter",sans-serif;font-size:0.72rem;color:var(--accent);font-weight:600;margin-top:1.5mm}
+.connector{color:var(--rule);font-size:0.7rem;margin:0.5mm 0}
+/* Beats */
+.beats{background:#FFF;border:1px solid var(--rule);border-radius:4px;padding:4mm 5mm;margin:0 0 4mm}
+.beat{display:grid;grid-template-columns:7mm 14mm 1fr;gap:3mm;padding:2mm 0;border-bottom:1px dashed var(--rule);align-items:start}
+.beat:last-child{border:0}
+.beat .num{background:var(--beat);color:#FFF;font-family:"Inter",sans-serif;font-size:0.72rem;font-weight:700;width:5mm;height:5mm;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.beat.hero .num{background:var(--accent)}
+.beat .secs{font-family:"Inter",sans-serif;font-size:0.62rem;color:var(--ink-soft);font-weight:600;text-transform:uppercase;letter-spacing:0.05em;padding-top:0.5mm}
+.beat .txt{font-size:0.85rem;line-height:1.45}
+.beat .txt em.k{font-style:normal;color:var(--kept);font-weight:700}
+.beat .txt em.h{font-style:normal;background:var(--highlight);font-weight:700;color:var(--accent);padding:0 1mm;border-radius:1.5px}
+.beat .txt em.fam{font-style:normal;font-weight:700}
+.beat .txt em.political{color:var(--political)}
+.beat .txt em.criminal{color:var(--criminal)}
+.beat .txt em.communal{color:var(--communal)}
+.beat .txt em.state{color:var(--state)}
+/* Do / Don't */
+.dod{display:grid;grid-template-columns:1fr 1fr;gap:4mm;margin:3mm 0}
+.dod .col{background:#FFF;border:1px solid var(--rule);border-radius:4px;padding:3mm 4mm}
+.dod .col.do{border-left:3px solid var(--kept)}
+.dod .col.dont{border-left:3px solid var(--accent)}
+.dod .col h3{font-family:"Inter",sans-serif;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 2mm;font-weight:700}
+.dod .col.do h3{color:var(--kept)}
+.dod .col.dont h3{color:var(--accent)}
+.dod .col ul{margin:0 0 0 4mm;padding:0;font-size:0.8rem}
+.dod .col li{margin:0.8mm 0;line-height:1.35}
+/* Sources */
+.sources{background:#FFF;border:1px solid var(--rule);border-radius:4px;padding:3mm 5mm;margin:3mm 0}
+.sources .row{display:grid;grid-template-columns:18mm 1fr;gap:3mm;padding:1.5mm 0;border-bottom:1px dashed var(--rule);font-size:0.78rem}
+.sources .row:last-child{border:0}
+.sources .row .name{font-family:"Inter",sans-serif;font-weight:700;color:var(--beat);font-size:0.72rem;text-transform:uppercase}
+.sources .row .what{color:var(--ink-soft);font-style:italic}
+.sources .row .what strong{color:var(--ink);font-style:normal}
+/* Reserved */
+.reserved{background:#FFF;border:1px solid var(--rule);border-radius:4px;padding:3mm 5mm;margin:3mm 0}
+.reserved h3{font-family:"Inter",sans-serif;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 2mm;color:var(--accent);font-weight:700}
+.r-row{display:grid;grid-template-columns:auto 1fr auto;gap:2mm 4mm;align-items:center;font-size:0.82rem;padding:1.2mm 0;border-bottom:1px dashed var(--rule)}
+.r-row:last-child{border:0}
+.r-row .l{font-family:"Inter",sans-serif;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-soft);font-weight:700}
+.r-row .d{color:var(--ink-soft);font-style:italic;font-size:0.78rem}
+.r-row .n{font-weight:700;color:var(--accent);font-feature-settings:"tnum";text-align:right}
+/* Attack */
+.attack{background:#FFF;border:1px solid var(--rule);border-radius:4px;padding:3mm 4mm;margin:2mm 0;font-size:0.8rem;line-height:1.45}
+.attack .q{font-family:"Inter",sans-serif;font-weight:700;color:var(--accent);font-size:0.78rem;margin-bottom:1mm}
+.attack .a{margin:1mm 0;font-size:0.82rem}
+.foot{margin-top:6mm;border-top:1px solid var(--rule);padding-top:3mm;font-family:"Inter",sans-serif;font-size:0.66rem;color:var(--ink-soft);font-style:italic;display:flex;justify-content:space-between}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="head">
+<h1>Slide 11 · Four-level taxonomy</h1>
+<div class="lesson">Quick Ref · Lesson 13 · 80 s</div>
+</div>
+
+<div class="hero">
+<span class="lbl">Hero line — memorise verbatim</span>
+"Not a relabelling — a <strong>synthesis</strong> with African-specific <strong>extensions</strong> ACLED doesn't reach."
+</div>
+
+<h2>The slide at a glance</h2>
+
+<div class="tree-box">
+<div class="tree-level">
+<div class="lbl">L0 — root</div>
+<div class="tree-row"><div class="node root">Violent Events</div></div>
+</div>
+<div class="connector">┬ ─ ┬ ─ ┬ ─ ┬</div>
+<div class="tree-level">
+<div class="lbl">L1 — four families</div>
+<div class="tree-row">
+<div class="node l1 political">Political</div>
+<div class="node l1 criminal">Criminal</div>
+<div class="node l1 communal">Communal</div>
+<div class="node l1 state">State</div>
+</div>
+</div>
+<div class="connector">↓ ↓ ↓ ↓</div>
+<div class="tree-level">
+<div class="lbl">L2 — example sub-categories</div>
+<div class="tree-row">
+<div class="node l2">Armed conflict</div>
+<div class="node l2">Riots</div>
+<div class="node l2">Banditry</div>
+<div class="node l2">Kidnapping</div>
+<div class="node l2 ext">Pastoralist–farmer</div>
+<div class="node l2 ext">Cattle raiding</div>
+<div class="node l2">Repression</div>
+<div class="node l2">Disappearance</div>
+</div>
+</div>
+<div class="l3-box">L3 — ~95 terminal leaves — Annex B / backup B5</div>
+</div>
+
+<h2>The 80-second script</h2>
+
+<div class="beats">
+<div class="beat">
+<div class="num">1</div>
+<div class="secs">~10 s</div>
+<div class="txt">"The taxonomy gives the event categories the <em class="k">slide-10 schema deliberately doesn't tag</em>. Four levels — root, four families, sub-categories, and about <em class="h">ninety-five</em> terminal leaves at Level 3."</div>
+</div>
+<div class="beat">
+<div class="num">2</div>
+<div class="secs">~30 s</div>
+<div class="txt">"At the root, Violent Events. Four L1 families: <em class="fam political">Political</em> — armed conflict, riots; <em class="fam criminal">Criminal</em> — banditry, kidnapping; <em class="fam communal">Communal</em> — <em class="h">pastoralist–farmer clashes</em>, <em class="h">cattle raiding</em>; <em class="fam state">State</em> — repression, forced disappearance. Each family has 8–15 L2 children. Level 3 is in Annex B."</div>
+</div>
+<div class="beat">
+<div class="num">3</div>
+<div class="secs">~25 s</div>
+<div class="txt">"Synthesises <em class="k">ACLED, UCDP, PMVE</em>. The contribution is the extension: <em class="h">pastoralist–farmer</em> and <em class="h">cattle raiding</em> are not in any source at this granularity. ACLED's nearest bucket is 'Violence against civilians' — but pastoralist–farmer is driven by <strong>resource competition, not political targeting</strong>."</div>
+</div>
+<div class="beat hero">
+<div class="num">4</div>
+<div class="secs">~15 s</div>
+<div class="txt">"This is <em class="h">not a relabelling</em> of ACLED. It's a synthesis with <em class="h">African-specific extensions ACLED doesn't reach</em>."</div>
+</div>
+</div>
+
+<h2>Source attribution — deploy on demand</h2>
+
+<div class="sources">
+<div class="row"><span class="name">ACLED</span><span class="what"><strong>Structural backbone</strong> — L1 family scope and the Political L2 framing.</span></div>
+<div class="row"><span class="name">UCDP</span><span class="what"><strong>State branch's internal structure</strong> — state-based / non-state / one-sided distinction at the actor-pair level.</span></div>
+<div class="row"><span class="name">PMVE</span><span class="what"><strong>Political branch's L2 distinctions</strong> — Politically Motivated Violent Events typology.</span></div>
+</div>
+
+<h2>Do / Don't on stage</h2>
+
+<div class="dod">
+<div class="col do">
+<h3>Do say</h3>
+<ul>
+<li>"Synthesises ACLED, UCDP, and PMVE."</li>
+<li>"Adds <strong>pastoralist–farmer</strong> and <strong>cattle raiding</strong>."</li>
+<li>"Resource competition, not political targeting."</li>
+<li>"About 95 leaves in <strong>Annex B</strong>."</li>
+<li>"<strong>Not a relabelling</strong> — an extension."</li>
+<li>"Backup slide B5 has the L3 tree."</li>
+</ul>
+</div>
+<div class="col dont">
+<h3>Don't say</h3>
+<ul>
+<li>"Just like ACLED, but..."</li>
+<li>"Original work."</li>
+<li>"Better for the African context."</li>
+<li>Enumerate <strong>any</strong> L3 leaves on stage.</li>
+<li>"I'd have to check."</li>
+<li>"Inspired by the literature."</li>
+</ul>
+</div>
+</div>
+
+<h2>Reserved cards</h2>
+
+<div class="reserved">
+<div class="r-row"><span class="l">L3 leaves</span><span class="d">Total terminal categories — operational granularity</span><span class="n">~95</span></div>
+<div class="r-row"><span class="l">Sources</span><span class="d">Cited by name during the synthesis claim</span><span class="n">ACLED · UCDP · PMVE</span></div>
+<div class="r-row"><span class="l">Annex B</span><span class="d">Full taxonomy tree in the thesis appendix</span><span class="n">§ B</span></div>
+<div class="r-row"><span class="l">Backup</span><span class="d">Reachable mid-defence for the L3 tree</span><span class="n">Backup slide B5</span></div>
+<div class="r-row"><span class="l">L3 validation</span><span class="d">If pressed on granularity — count + kappa</span><span class="n">200 events · κ = 0.76</span></div>
+</div>
+
+<h2>Three pre-loaded interrupts</h2>
+
+<div class="attack">
+<div class="q">"Is this just ACLED with different labels?"</div>
+<div class="a">"No, two reasons. Synthesis: backbone from ACLED, State branch from UCDP, Political L2 from PMVE. Extension: pastoralist–farmer and cattle raiding aren't in any source at this granularity. ACLED's nearest bucket misclassifies the bilateral resource-competition nature."</div>
+</div>
+
+<div class="attack">
+<div class="q">"What's at Level 3 under [family]?"</div>
+<div class="a">"About 25 under Political (or ~30 under Communal, etc.) — full list in Annex B and backup slide B5 if you'd like to look now."</div>
+</div>
+
+<div class="attack">
+<div class="q">"How did you validate ninety-five is the right granularity?"</div>
+<div class="a">"Bottom-up construction — 200 sampled ACLED events assigned to the most specific category that fit. Independent second-annotator kappa at L3 was 0.76. Annex B has the leaves and the protocol."</div>
+</div>
+
+<div class="foot">
+<span>Lesson 13 · slide-11 · taxonomy</span>
+<span>Hero: "not a relabelling — an extension"</span>
+</div>
+
+</div>
+</body>
+</html>
